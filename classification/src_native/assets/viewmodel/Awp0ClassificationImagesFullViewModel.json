@@ -1,0 +1,113 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-command-panel-section.directive",
+        "js/aw-cls-fullview-image-ribbon.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "onPrevChevronClick":{
+            "actionType": "JSFunction",
+            "method": "onPrevChevronClick",
+            "inputData": {
+                 "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "classifyTab.chevronPrevious"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "classifyTab.chevronPrevious"
+                    }
+                ]
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "onNextChevronClick":{
+            "actionType": "JSFunction",
+            "method": "onNextChevronClick",
+            "inputData": {
+                 "data":"{{data}}"
+            },
+        "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "classifyTab.chevronNext"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "classifyTab.chevronNext"
+                    }
+                ]
+            },
+            "deps": "js/classifyFullViewService"
+        },
+     "showImage":
+        {
+            "actionType": "JSFunction",
+            "method": "showImage",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        }
+    },
+
+   "data":
+    {
+        "commands":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "action": "onPrevChevronClick",
+                    "iconName": "miscChevronLeft",
+                    "tooltip": "{{i18n.previousButtonTitle}}"
+                },
+                {
+                    "action": "onNextChevronClick",
+                    "iconName": "miscChevronRight",
+                    "tooltip": "{{i18n.nextButtonTitle}}"
+                }
+
+            ]
+          }
+    },
+    "onEvent":[
+        {
+            "eventId": "classifyTab.chevronNext",
+            "action": "showImage"
+        },
+        {
+            "eventId": "classifyTab.imageSelected",
+            "action": "showImage"
+        },
+        {
+            "eventId": "classifyTab.chevronPrevious",
+            "action": "showImage"
+        }
+        ],
+    "functions": {},
+    "messages": {},
+    "conditions": {},
+    "i18n":
+    {
+        "images":                       [ "ClassificationPanelMessages" ],
+        "noImages":                     [ "ClassificationPanelMessages" ],
+        "previousButtonTitle":          [ "ClassificationPanelMessages" ],
+        "nextButtonTitle":              [ "ClassificationPanelMessages" ]
+    }
+}

@@ -1,0 +1,247 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-search-box.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-flex-row.directive"
+    ],
+
+    "actions": {
+        "orgTreeDoSearch": {
+            "actionType": "JSFunctionAsync",
+            "method": "doSearch",
+            "inputData": {
+                "searchString": "{{data.orgTreeSearchBox.dbValue}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "ctx.searchCriteria.treeFilterData": "response"
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "scrollToSelected": {
+            "actionType": "JSFunction",
+            "method": "scrollToSelected",
+            "inputData": {
+                "data": "{{data}}",
+                "orgTreeData": "{{ctx.orgTreeData}}",
+                "selectedNodeHierarchy": "{{ctx.selectedTreeNode.hierarchy}}"
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "treeNodeSelected": {
+            "actionType": "JSFunction",
+            "method": "treeNodeSelected",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "currentNode": "{{data.eventData.selectedObjects.0}}"
+            },
+            "events": {
+                "success": [
+                {
+                    "name": "OrgTree.ExpandNode",
+                    "condition": "data.initialExpand == false"
+                } ]
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "loadOrgTreeData": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTreeStructure",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "treeLoadInput": "request.treeLoadInput",
+                "data": "{{data}}"
+            },
+            "dataParsers": [ {
+                "id": "orgTree",
+                "responseObjs": ""
+            } ],
+            "outputData": {
+                "orgTreeInput": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "OrgTree.preserveSelection"
+                } ]
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "preserveSelection": {
+            "actionType": "JSFunction",
+            "method": "preserveSelection",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "OrgTree.ScrollToSelected",
+                    "condition": "data.orgTreeInput.treeLoadResult.parentNode.id !== 'top'"
+                } ]
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+        "loadPropertiesActionJS": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadPropertiesJS",
+            "inputData": {
+                "dataProvider": "{{data}}",
+                "propertyLoadInput": "request.propertyLoadInput"
+            },
+            "outputData": {},
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+        "expandTreeNode": {
+            "actionType": "JSFunction",
+            "method": "expandNode",
+            "inputData": {
+                "node": "{{ctx.treeLoadInput.rootNode.children.0}}",
+                "isExpanded": true,
+                "data": "{{data}}"
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+        "disableRemoveButton": {
+            "actionType": "JSFunction",
+            "method": "disableButton",
+            "inputData": {
+                "buttonName": "remove",
+                "dataProvider": "{{data.dataProviders.orgTreeTableDataProvider}}"
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        },
+        "unRegisterOrgContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterOrgContext",
+            "deps": "js/Awp0SearchFolderShareRuleService",
+            "inputData": {
+            }
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadColumnsForOrgTable",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.orgTreeTableDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        }
+    },
+    "conditions":
+    {
+    },
+    "onEvent": [ {
+            "eventId": "orgTreeTableDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "treeNodeSelected"
+        },
+        {
+            "eventId": "OrgTree.preserveSelection",
+            "action": "preserveSelection"
+        },
+        {
+            "eventId": "OrgTree.loadOrgTreeData",
+            "action": "loadOrgTreeData"
+        },
+        {
+            "eventId": "OrgTree.ExpandNode",
+            "action": "expandTreeNode"
+        },
+        {
+            "eventId": "OrgTree.ScrollToSelected",
+            "action": "scrollToSelected"
+        },
+        {
+            "eventId": "orgTreeTableDataProvider.selectionChangeEvent",
+            "action": "disableRemoveButton"
+        }
+    ],
+    "data": {
+        "orgTreeName": "prefOrgTree",
+        "orgTreeCategory": {
+            "dbValue": "{{i18n.organizationFilterLabel}}",
+            "uiValue": "{{i18n.organizationFilterLabel}}"
+        },
+        "orgTreeSearchBox": {
+            "displayName": "{{i18n.orgTreeFilterText}}",
+            "type": "STRING"
+        },
+        "orgTreeSearchBoxPlaceHolder": {
+            "dbValue": "{{i18n.searchBtn}}"
+        }
+    },
+
+    "dataProviders": {
+        "orgTreeTableDataProvider": {
+            "action": "loadOrgTreeData",
+            "initializeAction": "loadOrgTreeData",
+            "nextAction": "loadOrgTreeData",
+            "previousAction": "loadOrgTreeData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "editContext": "TABLE_CONTEXT",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "response": "data.response",
+            "selectionModelMode": "multiple"
+        },
+        "orgTreeTablePropertyProvider": {
+            "action": "loadPropertiesActionJS",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+
+    "columnProviders": {
+        "orgTreeTableColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": [],
+            "frozenColumnIndex": -1
+        }
+    },
+
+    "grids": {
+        "orgTreeTable12": {
+            "dataProvider": "orgTreeTableDataProvider",
+            "propertyProvider": "orgTreeTablePropertyProvider",
+            "columnProvider": "orgTreeTableColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "useStaticFirstCol": true
+            }
+        }
+    },
+
+    "dataParseDefinitions": {
+        "orgTree": {
+            "identifier": "AAAAAAAAAAAAAA",
+            "props": {
+                "object_name": {
+                    "name": "object_name",
+                    "displayName": "",
+                    "value": "{{response.label}}",
+                    "displayValue": "{{response.label}}",
+                    "type": "STRING"
+                }
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onUnmount": "unRegisterOrgContext"
+    },
+    "messages": {},
+    "i18n": {
+        "Organization": [
+            "ProjmgmtConstants"
+        ],
+        "searchBtn": [ "SearchMessages" ]
+    }
+}

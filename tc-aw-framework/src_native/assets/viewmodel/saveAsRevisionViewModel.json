@@ -1,0 +1,44 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-xrt.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-textarea.directive"
+    ],
+
+    "actions":
+    {
+        "autoAssignProperty":
+        {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData":
+            {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "REVISE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{ctx['SaveAsReviseWorkSpace'].SelectedObjects[0]}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+
+            "deps": "js/autoAssignService"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        }
+    ],
+
+    "i18n":
+    {
+    }
+}

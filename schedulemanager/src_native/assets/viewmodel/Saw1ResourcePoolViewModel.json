@@ -1,0 +1,510 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/aw-column.directive",
+        "js/aw-row.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getResourcePool",
+                "assignedResourcePool"
+            ]
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getResourcePool}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "ResourcePool",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ScheduleTask",
+                        "properties": [ {
+                            "name": "ResourceAssignment",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        } ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "deps": "js/userListService"
+        },
+        "addResourcePool": {
+            "actionType": "JSFunction",
+            "method": "addResourcePool",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode=='assignmentsResPoolErrorMsg'",
+                    "message": "assignmentsResPoolErrorMsg"
+                } ]
+            },
+            "deps": "js/Saw1AddResourcePoolCommandHandler"
+        },
+        "removeResourcePool": {
+            "actionType": "JSFunction",
+            "method": "removeResourcePool",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1RemoveResourcePoolCommandHandler"
+        },
+        "getProperties" : {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects" : "{{ctx.mselected}}",
+                "attributes" : [ "ResourceAssignment" ]
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "ScheduleTask",
+                        "properties":
+                        [
+                            {
+                                "name": "ResourceAssignment"
+                            }
+                        ]
+
+                    }
+                ]
+            },
+            "outputData" : {
+                "assignedResourcePool" : "{{function:getAssignedResourcePool}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "saveResourcePool": {
+            "actionType": "JSFunction",
+            "method": "resourcePoolSaveAction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                        "condition": "data.unassignResourcePoolFlag === true || data.assignResourcePoolFlag === true",
+                        "name": "unAssignResPoolMsg"
+                    },
+                    {
+                        "condition": "data.unassignResourcePoolFlag === false && data.assignResourcePoolFlag === false && data.ResourcePool.length === data.dataProviders.assignedResourcePool.viewModelCollection.loadedVMObjects.length",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode=='diffScheduleErrorMsg'",
+                        "message": "diffScheduleErrorMsg"
+                    },
+                    {
+                        "condition": "errorCode=='assignmentsResPoolErrorMsg'",
+                        "message": "assignmentsResPoolErrorMsg"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "assignResourcePoolSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2015-07-ScheduleManagement",
+            "method": "assignResources",
+            "inputData": {
+                "schedule": "{{function:getScheduleUidFromCtx}}",
+                "createAssignments": "{{function:getAssignContainerResourcePool}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{function:getUIDToRefresh}}" ]
+                        }
+                    },
+                    {
+                        "name": "priviledgeUser.assignUsers",
+                        "condition": "data.selectedTab.panelId ==='Saw1ResourcePool'"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.unassignResourcePoolFlag !== true",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "getResourceAssignmentsForDiscipline": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForPrimary",
+            "inputData": {
+                "primaryObjects": "{{ctx.mselected}}",
+                "pref": {
+                    "expItemRev": false,
+                    "returnRelations": true,
+                    "info": [ {
+                        "relationTypeName": "ResourceAssignment"
+                    } ]
+                }
+            },
+            "policy": {
+                "types": [ {
+                        "name": "ResourceAssignment",
+                        "properties": [ {
+                                "name": "primary_object"
+                            },
+                            {
+                                "name": "discipline"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "unAssignResourcePool"
+                } ]
+            },
+            "actionMessages":{
+                "failure":[
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            }
+        },
+        "unAssignResourcePool": {
+            "actionType": "JSFunction",
+            "method": "unAssignResourcesfromTask",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "data": "{{data.ResourcePool}}",
+                "dataProvider": "{{data.dataProviders.assignedResourcePool.viewModelCollection.loadedVMObjects}}",
+                "schedule": {
+                    "uid": "{{function:getScheduleUid}}",
+                    "type": "Schedule"
+                },
+                "response": "{{data.response.output}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{function:getUIDToRefresh}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },
+        "unAssignResPoolMsgValidation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "unassignResPool.showMessage",
+                        "condition": "conditions.showUnassignMessage"
+                    },
+                    {
+                        "name": "unassignResPool.doNotShowMessage",
+                        "condition": "conditions.showUnassignMessage === false"
+                    }
+                ]
+            }
+        },
+        "assignAndUnassignSoaCall": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "getResourceAssignmentsForDiscipline",
+                        "condition": "data.unassignResourcePoolFlag === true"
+                    },
+                    {
+                        "name": "assignResourcePoolSOA",
+                        "condition": "data.assignResourcePoolFlag === true"
+                    }
+                ]
+            }
+        },
+        "unregisterEvent": {
+            "actionType": "JSFunction",
+            "method": "unregisterEvent",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name" : "unregisterEvent"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "dataProviders": {
+        "getResourcePool": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_addResourcePoolCellCommand"
+        },
+        "assignedResourcePool": {
+            "action": "getProperties",
+            "response": "{{data.ResourcePool}}",
+            "commandsAnchor": "aw_removeResourcePoolCellCommand"
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "ResourcePool": []
+    },
+    "functions": {
+        "getAssignContainerResourcePool": {
+            "functionName": "getAssignContainerResourcePool",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getScheduleUidFromCtx": {
+            "functionName": "getScheduleUidFromCtx",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getUIDToRefresh": {
+            "functionName": "getUIDToRefresh",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getScheduleUid": {
+            "functionName": "ScheduleUid",
+            "parameters": []
+        },
+        "getAssignedResourcePool" : {
+            "functionName": "getAssignedResourcePool",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "messages": {
+        "diffScheduleErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorMsgForDiffSch}}",
+            "messageTextParams": []
+        },
+        "removeResPoolConfirmationMessage": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.confirmUnassignResPoolMsg}}",
+            "messageTextParams": [],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.CancelText}}",
+                    "action": ""
+                },
+                {
+                    "option": "Remove",
+                    "text": "{{i18n.saw1remove}}",
+                    "action": "assignAndUnassignSoaCall"
+                }
+            ]
+        },
+        "assignmentsResPoolErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.assignmentsResPoolError}}"
+        },
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "conditions": {
+        "showUnassignMessage": {
+            "expression": "ctx.mselected.length > 1 && data.unassignResourcePoolFlag === true"
+        }
+    },
+    "i18n": {
+        "resourcePool": [
+            "ScheduleManagerMessages"
+        ],
+        "assignedSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "availableSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "saw1Any": [
+            "ScheduleManagerMessages"
+        ],
+        "errorMsgForDiffSch": [
+            "ScheduleManagerMessages"
+        ],
+        "confirmUnassignResPoolMsg": [
+            "ScheduleManagerMessages"
+        ],
+        "assignmentsResPoolError": [
+            "ScheduleManagerMessages"
+        ]
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1ResourcePool"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "Saw1AddResourcePoolCommand.addResourcePool",
+            "action": "addResourcePool"
+        },
+        {
+            "eventId": "Saw1RemoveResourcePoolCommand.removeResourcePool",
+            "action": "removeResourcePool"
+        },
+        {
+            "eventId": "assignResourcePoolSOA",
+            "action": "assignResourcePoolSOA"
+        },
+        {
+            "eventId": "unAssignResPoolMsg",
+            "action": "unAssignResPoolMsgValidation"
+        },
+        {
+            "eventId": "unAssignResourcePool",
+            "action": "unAssignResourcePool"
+        },
+        {
+            "eventId": "unassignResPool.showMessage",
+            "message": "removeResPoolConfirmationMessage"
+        },
+        {
+            "eventId": "unassignResPool.doNotShowMessage",
+            "action": "assignAndUnassignSoaCall"
+        },
+        {
+            "eventId": "getResourceAssignmentsForDiscipline",
+            "action": "getResourceAssignmentsForDiscipline"
+        },
+        {
+            "eventId": "Saw1ResourcePoolEvent",
+            "action": "saveResourcePool"
+        },
+        {
+            "eventId": "syncGanttSplitSelectionDone",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "unregisterEvent",
+            "action": "unregisterEvent"
+        }
+    ]
+}

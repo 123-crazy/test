@@ -1,0 +1,180 @@
+// Copyright (c) 2020 Siemens
+.aw-jswidgets-grid {
+    border: $table_border;
+    border-radius: $table_border_radius;
+
+    // no line under header
+    .ui-grid-header {
+        border-bottom-width: 0;
+        z-index: 99;
+        position: relative;
+        -webkit-transition: box-shadow 0.3s ease-in-out;
+        -moz-transition: box-shadow 0.3s ease-in-out;
+        -o-transition: box-shadow 0.3s ease-in-out;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    // show grid lines
+    .ui-grid-row {
+        border-bottom: 0.083rem solid;
+    }
+
+    .ui-grid-row .ui-grid-cell {
+        border-width: 0;
+    }
+
+    .ui-grid-cell,
+    .ui-grid-pinned-container.ui-grid-pinned-container-left .ui-grid-cell:last-child {
+        overflow: visible;
+        font-size: $fontsize_normal;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        justify-content: center;
+        border-width: 1px;
+    }
+
+    .ui-grid-top-panel {
+        background-image: none;
+        font-weight: 600;
+        background-color: inherit;
+    }
+
+    .ui-grid-header-cell {
+        border-style: solid;
+        border-collapse: collapse;
+    }
+
+    .aw-jswidgets-cellTop .aw-jswidgets-dataGridCellText,
+    .aw-jswidgets-cellTop .aw-jswidgets-text {
+        font-size: $fontsize_normal;
+        font-weight: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .ui-grid-cell-contents.ui-grid-header-cell-primary-focus {
+        padding-top: rem-calc(4);
+        padding-left: rem-calc(8);
+        padding-bottom: rem-calc(4);
+        font-size: $fontsize_normal;
+    }
+
+    .ui-grid-tree-base-row-header-buttons.ui-grid-tree-base-header {
+        width: $tree_expand_collapse_icon_container_size;
+        height: $tree_expand_collapse_icon_container_size;
+        flex-shrink: 0;
+        justify-content: center;
+    }
+
+    .aw-widgets-dataGridCellImage,
+    .aw-widgets-dataGridCellImage>.aw-base-icon,
+    .aw-widgets-modelObjectThumbnail,
+    .aw-widgets-modelObjectThumbnail>.aw-base-icon {
+        max-height: $table_command_cell_thumbnail_size;
+        max-width: $table_command_cell_thumbnail_size;
+        /* Below claues is needed for FF or else the width is 17.3px for supplier collobration tree */
+        min-width: $table_command_cell_thumbnail_size;
+        object-fit: cover;
+    }
+
+    .aw-jswidgets-treeExpandCollapseCmd {
+        cursor: pointer;
+    }
+
+    aw-table-icon-cell {
+        margin-left: rem-calc(9);
+    }
+
+    .aw-jswidgets-tablecell {
+        padding-left: rem-calc(8);
+        padding-right: rem-calc(8);
+    }
+
+    aw-table-command-bar aw-command,
+    aw-table-command-bar aw-command button,
+    aw-table-command-cell aw-list-command {
+        height: $table_command_cell_icon_size;
+        width: $table_command_cell_icon_size;
+        align-self: center;
+    }
+
+    aw-table-command-bar aw-command button .aw-commandIcon,
+    aw-table-command-bar aw-command button .aw-commandIcon ng-bind-html,
+    aw-table-command-bar aw-command button .aw-commandIcon ng-bind-html .aw-commands-svg {
+        height: inherit;
+    }
+
+    // tree
+    aw-treetable-command-cell {
+        // in tree, margin-right is bigger since icon and text are in same cell (no padding)
+        .aw-widgets-dataGridCellImage {
+            margin-right: rem-calc(8);
+        }
+    }
+
+    .ui-grid-tree-base-row-header-buttons.ui-grid-tree-base-header .aw-base-icon {
+        // expand collapse icons
+        height: $tree_expand_collapse_icon_size;
+        width: $tree_expand_collapse_icon_size;
+    }
+
+    // menu
+    .ui-grid-menu .ui-grid-menu-inner {
+        // avoid double border when last li is hidden (ui-grid bug)
+        border-bottom-width: 0;
+
+        // always show bottom border (mates with ui-grid bug above)
+        ul>li:not(:last-child)>.ui-grid-menu-item,
+        ul>li>.ui-grid-menu-item {
+            border-bottom-width: 1px;
+            font-size: $fontsize_normal;
+            pointer-events: all;
+        }
+    }
+
+    .ui-grid-menu-button {
+        height: rem-calc(16);
+        width: rem-calc(26);
+        margin-top: 0;
+        border: none;
+        z-index: 999;
+    }
+
+    .ui-grid-menu {
+        z-index: 999;
+    }
+}
+
+aw-table,
+aw-compare {
+    .aw-jswidgets-grid .ui-grid-menu-button {
+        pointer-events: none;
+    }
+}
+
+
+aw-table-cell .aw-jswidgets-cellTop.aw-jswidgets-isEditing aw-property-date-val .aw-jswidgets-dateInputbox .aw-widget-icon,
+aw-table-cell .aw-jswidgets-cellTop.aw-jswidgets-isEditing aw-property-time-val .aw-jswidgets-timepicker .aw-widget-icon {
+    top: $table_edit_date_calender_icon_top;
+    right: $table_edit_date_calender_icon_right;
+    padding: $table_edit_date_calender_icon_padding;
+    visibility: hidden;
+}
+
+aw-table-cell .aw-jswidgets-cellTop.aw-jswidgets-isEditing aw-property-date-val .aw-jswidgets-dateInputbox input,
+aw-table-cell .aw-jswidgets-cellTop.aw-jswidgets-isEditing aw-property-time-val .aw-jswidgets-timepicker input {
+    min-width: $table_edit_date_calender_icon_min_width;
+    &:hover + .aw-widget-icon {
+        visibility: visible;
+    }
+}
+
+.aw-jswidgets-isEditing .aw-layout-popup{
+    box-shadow: none;
+}

@@ -1,0 +1,91 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-xrt-2.directive",
+        "js/aw-include.directive"
+    ],
+
+    "data": {
+    },
+    "actions": {
+        "initializeAceSwaView": {
+            "actionType": "JSFunctionAsync",
+            "method": "initializeAceSwaView",
+            "inputData": {
+                "stickyPagesKey":"occMgmtPageKey",
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/aceSwaService"
+        },
+        "destroyAceSwaView": {
+            "actionType": "JSFunction",
+            "method": "destroyAceSwaView",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceSwaService"
+        },
+        "updateAceSwaActivePageIdOnContext":{
+            "actionType": "JSFunction",
+            "method": "updateAceSwaActivePageIdOnContext",
+            "inputData": {
+                "data":"{{data}}",
+                "eventData":"{{data.eventData}}"
+            },
+            "deps": "js/aceSwaService"
+        },
+        "forceRefreshAceSwaView":{
+            "actionType": "JSFunction",
+            "method": "forceRefreshAceSwaView",
+            "inputData": {
+                "data":"{{data}}",
+                "eventData":"{{data.eventData}}"
+            },
+            "deps": "js/aceSwaService"
+        },
+        "updateAceSwaActiveTabInformation":{
+            "actionType": "JSFunction",
+            "method": "updateAceSwaActiveTabInformation",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData":"{{data.eventData}}"
+            },
+            "deps": "js/aceSwaService"
+        }
+    },
+    "dataProviders": {
+
+    },
+    "conditions": {
+
+    },
+    "functions": {
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeAceSwaView",
+        "onUnmount": "destroyAceSwaView"
+    },
+    "onEvent": [
+        {
+            "eventId": "appCtx.update",
+            "cacheEventData": true,
+            "criteria": {
+                "target": "activeTab"
+            },
+            "action": "updateAceSwaActiveTabInformation"
+        },
+        {
+            "eventId": "appCtx.update",
+            "cacheEventData": true,
+            "criteria": {
+                "target": "sublocationAttributes"
+            },
+            "action": "updateAceSwaActivePageIdOnContext"
+        }
+    ],
+    "i18n": {
+    }
+}

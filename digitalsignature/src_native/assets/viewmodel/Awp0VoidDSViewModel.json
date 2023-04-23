@@ -1,0 +1,167 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+       "js/aw-command-panel.directive",      
+       "js/aw-panel-body.directive",
+       "js/aw-panel-section.directive",
+       "js/aw-panel-footer.directive",       
+       "js/aw-button.directive",
+       "js/aw-i18n.directive",
+       "js/aw-label.directive",
+       "js/aw-textarea.directive",
+       "js/aw-break.directive"                      
+    ],
+    "actions": {                       
+        "voidDS": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2014-06-DigitalSignature",
+            "method": "voidSignatures",         
+            "inputData": {             
+                "input":[
+                    {                        
+                        "targetObject": {
+                            "uid": "{{ctx.pselected.uid}}",
+                            "type": "{{ctx.pselected.type}}"
+                        },
+                        "comment": "{{data.textAreaBox.dbValue}}",
+                        "signatureobject": [{
+                            "uid": "{{ctx.selected.uid}}",
+                            "type": "{{ctx.selected.type}}"
+                        }]                       
+                    }                   
+                ],
+                "electronicSignature": "{{function:getLoggedInUserSignature}}"
+            },
+            "outputData": {                
+                 "voidSignaturePartialErrors": "partialErrors"                                                                                                             
+            },
+            "events": {
+                "success": 
+                [                    
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }                  
+                ],
+                "failure": 
+                [                    
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }                   
+                ]                
+            },
+            "policy": {
+                "types": [{
+                    "name": "Fnd0DigitalSignature",
+                    "properties": [{
+                        "name": "fnd0Root"
+                    },
+                    {
+                        "name": "fnd0Comments"
+                    },
+                    {
+                        "name": "fnd0State"
+                    }]
+                }]                                 
+            },
+            "actionMessages": {
+                "success": [{
+                    "message": "voidDigitalSignatureSuccess"
+                }],
+                "failure": [
+                {
+                    "message": "voidDigitalSignatureFailure"
+                },
+                {
+                    "condition": "errorCode.code === 51028",
+                    "message": "identityDoesNotMatchDSErrorMessage"
+                },{
+                    "condition": "errorCode.code === 51029",
+                    "message": "userHasNoPermissionToVoidDSErrorMessage"
+                },
+                {
+                    "condition": "errorCode.code === 51035",
+                    "message": "userHasNoPrivilegeOnObjectForVoidDSErrorMessage"
+                }]
+            },                
+            "deps": "js/awDigitalSignatureService"                                       
+        }        
+    },                      
+    "data": {
+      "textAreaBox": {
+         "displayName": "{{i18n.comments}}",
+         "type": "STRING",
+         "dbValue": ""
+      },
+      "forObject": {
+          "displayName": "{{i18n.for}}",
+          "type": "STRING",                  
+          "dispValue": "{{ctx.pselected.props.object_string.uiValues[0]}}"
+      }           
+   },
+   "dataProviders": { 
+                
+   },
+    "messages": {
+        "voidDigitalSignatureSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.voidDigitalSignatureSuccess}}"           
+        },
+        "voidDigitalSignatureFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.voidDigitalSignatureFailure}}"          
+        },
+        "identityDoesNotMatchDSErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.identityDoesNotMatchDSErrorMessage}}"       
+        },
+        "userHasNoPermissionToVoidDSErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.userHasNoPermissionToVoidDSErrorMessage}}"          
+        },
+        "userHasNoPrivilegeOnObjectForVoidDSErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.userHasNoPrivilegeOnObjectForVoidDSErrorMessage}}",
+            "messageTextParams": [               
+                "{{ctx.selected.type}}"
+            ]           
+        }                         
+    },       
+   "conditions": {
+        
+   },     
+   "onEvent": [
+      {
+                  
+      }                    
+   ],
+   "functions": 
+    {
+        "getLoggedInUserSignature": 
+        {
+            "functionName": "getLoggedInUserSignature",
+            "parameters": 
+            [
+                "{{data}}"               
+            ]
+        }
+    },
+   "i18n": {      
+      "for": [ "DigitalSignatureMessages" ],
+      "comments": [ "DigitalSignatureMessages" ],
+      "void": [ "DigitalSignatureMessages" ],
+      "voidDS": [ "DigitalSignatureMessages" ],
+      "voidDigitalSignatureSuccess": [ "DigitalSignatureMessages" ],
+      "voidDigitalSignatureFailure": [ "DigitalSignatureMessages" ],
+      "identityDoesNotMatchDSErrorMessage": [ "DigitalSignatureMessages" ],
+      "userHasNoPermissionToVoidDSErrorMessage": [ "DigitalSignatureMessages" ],
+      "userHasNoPrivilegeOnObjectForVoidDSErrorMessage": [ "DigitalSignatureMessages" ]    
+   }
+}

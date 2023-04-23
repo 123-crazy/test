@@ -1,0 +1,207 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-tab-set.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "addProxyTaskContext": {
+            "actionType": "JSFunction",
+            "method": "setProxyTaskContext",
+            "inputData": {
+                   "selectedObj": "{{ctx.selected}}",
+                   "data": "{{data}}"
+            },
+            "deps": "js/Saw1CreatePanelService"
+         },
+        "addProxyTasks": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2011-06-ScheduleManagement",
+            "method": "createProxyTasks",
+            "inputData": {
+                "newProxyTasks": "{{function:createProxyTaskContainers}}"
+            },
+            "outputData": {
+                "createdProxyTasks": "{{function:getProxyTasks}}"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Fnd0ProxyTask",
+                        "properties": [
+                            {
+                                "name": "fnd0WhatIfMode"
+                            },
+                            {
+                                "name": "fnd0WhatIfData"
+                            },
+                            {
+                                "name":"fnd0schedule_tag"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "isPinnedFlag": "{{conditions.ispinned}}",
+                            "relations": "",
+                            "relatedModified": 
+                            [
+                                "{{ctx.selected}}"
+                            ],
+                            "createdObjects": "{{data.createdProxyTasks}}"
+                        }
+                    },
+                    {
+                        "condition": "!data.unpinnedToForm.dbValue",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "updateTreeNodesListOnCreate"
+                    }
+
+                ]
+            },
+            "actionMessages":
+             {
+                 "failure":
+                 [
+                     {
+                         "message": "failedToCreateProxyTaskMessage"
+                     }
+                 ]
+             },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "saw1SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "saw1SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "data": {
+        "typeFilter": "ScheduleTask",
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "name": "{{i18n.paletteTabTitle}}",
+                    "panelId": "paletteTabPageSub",
+                    "selectedTab": true
+                },
+                {
+                    "name": "{{i18n.searchText}}",
+                    "panelId": "Saw1CreateProxyTaskSub"
+                }
+            ]
+        },
+        "saw1pincommands":"saw1_oneStepPinCommands",
+        "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "functions": {
+        "createProxyTaskContainers": {
+            "functionName": "createNewProxyTaskContainersFromTab",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getProxyTasks": {
+            "functionName": "getCreatedProxyTasks",
+            "parameters": [
+            ]
+        }
+    },
+   "onEvent": [
+      {
+        "eventId": "awPanel.reveal",
+        "criteria":
+        {
+           "panelId": "paletteTabPageSub"
+        },
+         "action": "addProxyTaskContext"
+      },
+      {
+        "eventId": "createScheduleTaskWorkSpace.saw1SetPin",
+        "cacheEventData": true,
+        "action": "saw1SetPin"
+      },
+      {
+        "eventId": "createScheduleTaskWorkSpace.saw1SetUnPin",
+        "cacheEventData": true,
+        "action": "saw1SetUnPin"
+      }
+    ],
+    "conditions": {
+        "isValidToShow": {
+            "expression": "data.selectedTab.panelId==='Saw1CreateProxyTaskSub' && (data.dataProviders.scheduleTasksProvider.selectedObjects.length > 0)"
+        },
+        "isValidToShowInPalette": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "ispinned": {
+            "expression": "data.unpinnedToForm.dbValue"
+        }
+    },
+    "messages":
+    {
+        "failedToCreateProxyTaskMessage":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "addProxyTaskCommandTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "paletteTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "searchText": [
+            "UIMessages"
+        ],
+        "add": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

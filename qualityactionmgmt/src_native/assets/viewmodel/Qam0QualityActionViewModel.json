@@ -1,0 +1,163 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-button.directive",
+        "js/aw-textarea.directive",
+        "js/visible-when.directive",
+        "js/aw-break.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "activate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:executeQualityAction}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commentActivate"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "failure": [
+                    {
+                    "message": "SOAFailureMsg"
+                    }
+                ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "confirm": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:executeQualityAction}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "complete": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:executeQualityAction}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "makeCommentNonEditableEvent"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "failure": [
+                    {
+                    "message": "SOAFailureMsg"
+                    }
+                ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "makeCommentNonEditable": {
+            "actionType": "JSFunction",
+            "method": "makeCommentNonEditable",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "commentActivate": {
+            "actionType": "JSFunction",
+            "method": "commentActivate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "updateStyleForQualityActionPanel": {
+            "actionType": "JSFunction",
+            "method": "updateStyleForQualityActionPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        }
+    },
+
+    "data": {
+        "comment": {
+            "displayName": "{{i18n.comment}}",
+            "type": "STRING",
+            "isRequired": "false"
+        },
+        "isActive": {}
+    },
+    "onEvent": [ {
+            "eventId": "Qam0QualityAction.contentLoaded",
+            "action": "makeCommentNonEditable"
+        },
+        {
+            "eventId": "makeCommentNonEditableEvent",
+            "action": "makeCommentNonEditable"
+        },
+        {
+            "eventId": "commentActivate",
+            "action": "commentActivate"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "updateStyleForQualityActionPanel"
+        }
+    ],
+
+    "functions": {
+        "executeQualityAction": {
+            "functionName": "executeQualityAction",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isInDraftState": {
+            "expression": "!ctx.editInProgress && ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('Qam0QualityAction') > -1 && ctx.xrtSummaryContextObject.props.qam0QualityActionStatus.dbValues[0] === 'Draft'"
+        },
+        "isConfirmationRequired": {
+            "expression": "!ctx.editInProgress && ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('Qam0QualityAction') > -1 && (ctx.xrtSummaryContextObject.props.qam0QualityActionStatus.dbValues[0] === 'Active' && ctx.xrtSummaryContextObject.props.qam0ConfirmationRequired.dbValues[0] === '1')"
+        },
+        "isConfirmationNotRequired": {
+            "expression": "!ctx.editInProgress && ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('Qam0QualityAction') > -1 && ( (ctx.xrtSummaryContextObject.props.qam0QualityActionStatus.dbValues[0] === 'Active' && (ctx.xrtSummaryContextObject.props.qam0ConfirmationRequired.dbValues[0] === '0' || ctx.xrtSummaryContextObject.props.qam0ConfirmationRequired.dbValues[0] === null ) )  || (ctx.xrtSummaryContextObject.props.qam0QualityActionStatus.dbValues[0] === 'Confirmed') )"
+        }
+    },
+    "messages": {
+        "SOAFailureMsg": {
+           "messageType": "ERROR",
+           "messageText": "{{errorCode}}"
+         }
+    },
+    "i18n": {
+        "activateQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "confirmQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "completeQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "comment" : [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

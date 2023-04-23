@@ -1,0 +1,452 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "tabs": [
+            {
+                "panelId": "qfm0AddHigherOrLowerFuncWithoutSpec",
+                "name": "{{i18n.qfm0New}}",
+                "tabKey": "qfm0NewFunctionTab",
+                "recreatePanel": true
+            },
+            {
+                "panelId": "qfm0SearchFunctionElement",
+                "name": "{{i18n.qfm0SearchString}}",
+                "tabKey": "qfm0SearchFunctionTab",
+                "selectedTab": true,
+                "recreatePanel": true
+            }
+        ]
+    },
+    "actions": {
+        "createLowerRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2020-05-FMEADataManagement",
+            "method": "addHigherLowerLevelFunctions",
+            "inputData": {
+                "inputs": "{{function:createLowerFunctionInputs}}"
+            },
+            "outputData": {
+                "createdObject": "{{function:getCreatedRelationObject}}",
+                "errorMessage": "{{function:processPartialErrors}}",
+                "partialSuccessObjectCount": "{{function:getSuccessAttachObjectCount}}",
+                "newObjCreated" : "{{function:getObjectIDsToUpdateOrAddInNetViewForRelations}}",
+                "createdFunctionElements": "{{function:getCreatedFMEAElements}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FunctionElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13 ",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "lowerLevelFunctionTable.plTable.reload",
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && !ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13 "
+
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandIncoming",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}"
+                        },
+                        "condition": "((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') && ctx.tcSessionData.tcMajorVersion < 13)  || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{data.createdFunctionElements}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FunctionElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "lowerLevelFunctionTable.plTable.reload",
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && !ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13"
+
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandIncoming",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}"
+                        },
+                        "condition": "data.partialSuccessObjectCount > 0 && ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') && ctx.tcSessionData.tcMajorVersion < 13)  || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{data.createdFunctionElements}}"
+                        },
+                        "condition": "data.dataProviders.loadFilteredList.selectedObjects.length > 1 && data.partialSuccessObjectCount > 0"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.dataProviders.loadFilteredList.selectedObjects.length > 1 && data.partialSuccessObjectCount > 0",
+                        "message": "partialSuccessLowerFunctionAddMessage"
+                    },
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "getNextId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "generateNextValuesForProperties",
+            "inputData": {
+                "propertyNamingRuleInfo":"{{function:getCreateObjectsInputforgenerateID}}"
+            },
+            "outputData": {
+                "nextId": "generatedValues",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "events": {
+                "success": [ {
+                    "name" : "callCreateFunctionElement"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "createFunctionElement": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                 "input": "{{function:getCreateObjectsInputforFunctionElement}}"
+            },
+            "outputData": {
+                "createdObject": "output",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "callAddNewlyCreatedFunctionAsLowerFunction"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{data.createdObject}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "addNewlyCreatedFunctionAsLowerFunction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2020-05-FMEADataManagement",
+            "method": "addHigherLowerLevelFunctions",
+            "inputData": {
+                "inputs": "{{function:createLowerFunctionInputsForNewFunction}}"
+            },
+            "outputData": {
+                "createdObject": "{{function:getCreatedRelationObject}}",
+                "errorMessage": "{{function:processPartialErrors}}",
+                "partialSuccessObjectCount": "{{function:getSuccessAttachObjectCount}}",
+                "newObjCreated" : "{{function:getObjectIDsToUpdateOrAddInNetViewForRelations}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FunctionElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "lowerLevelFunctionTable.plTable.reload",
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && !ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13 "
+
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandIncoming",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}"
+                        },
+                        "condition": "((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') && ctx.tcSessionData.tcMajorVersion < 13)  || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FunctionElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "lowerLevelFunctionTable.plTable.reload",
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && !ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13"
+
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandIncoming",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}"
+                        },
+                        "condition": "data.partialSuccessObjectCount > 0 && (((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') && ctx.tcSessionData.tcMajorVersion < 13 )  || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.showFunctionNetView && ctx.tcSessionData.tcMajorVersion >= 13))"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "functions": {
+        "getSuccessAttachObjectCount": {
+            "functionName": "getSuccessAttachObjectCount",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "createLowerFunctionInputs": {
+            "functionName": "getSoaInputsForHigherLowerFunction",
+            "parameters": [
+                "Qfm0Calling",
+                "{{data.dataProviders.loadFilteredList.selectedObjects}}",
+                "{{ctx.selected}}"
+            ]
+        },
+        "createLowerFunctionInputsForNewFunction": {
+            "functionName": "getSoaInputsForHigherLowerFunction",
+            "parameters": [
+                "Qfm0Calling",
+                "{{data.createdObject[0].objects}}",
+                "{{ctx.selected}}"
+            ]
+        },
+        "getCreatedRelationObject" :{
+            "functionName" : "getCreatedRelationObject",
+            "parameters" :[]
+        },
+        "getCreateObjectsInputforgenerateID": {
+            "functionName": "getCreateObjectsInputforgenerateID",
+               "parameters": [
+                   "{{data}}"
+               ]
+         },
+         "getCreateObjectsInputforFunctionElement": {
+             "functionName": "getCreateObjectsInputforFMEAObjects",
+             "parameters": [
+                 "{{data}}",
+                 "{{ctx}}"
+             ]
+        },
+        "getObjectIDsToUpdateOrAddInNetViewForRelations": {
+            "functionName": "getObjectIDsToUpdateOrAddInNetViewForRelations",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreatedFMEAElements":{
+            "functionName": "getCreatedFMEAElements",
+            "parameters": [
+                "{{data}}"
+            ],
+            "deps":"js/qfm0FmeaManagerUtils2"
+        }
+    },
+    "i18n": {
+        "qfm0New": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Existing": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Add": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0SearchString": [
+            "qualityFmeaMessages"
+        ],
+        "PartialError": [
+            "qualityFmeaMessages"
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "callCreateFunctionElement",
+            "action": "createFunctionElement"
+        },
+        {
+            "eventId": "callAddNewlyCreatedFunctionAsLowerFunction",
+            "action": "addNewlyCreatedFunctionAsLowerFunction"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "qfm0.addElement",
+            "cacheEventData": true
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+<div class="aw-create-multiFileUploadFileUpload" >
+    <div class="aw-create-multiFileUploadFileList">
+
+        <div ng-repeat="pasteInputForms in data.pasteInputForms">
+            <label title="{{pasteInputForms.selectedFile}}" class="aw-create-multiFileUploadLabel">{{pasteInputForms.selectedFile}}</label>
+            <button
+                id="{{pasteInputForms.buttonId}}"
+                class="aw-commands-commandIconButton aw-layout-right"
+                title="{{pasteInputForms.removeTooltip}}"
+                visible-when="pasteInputForms.selectedFile"
+                ng-click="pasteInputForms.removeFile( $index )" >
+
+                <div class="aw-xrt-objectSetCommandPanel">
+                    <div class="aw-commandIcon aw-commands-svg">
+                        <aw-icon icon-id="cmdDelete"></aw-icon>
+                    </div>
+                </div>
+            </button>
+        </div>
+
+        <div ng-repeat="fileInputForm in data.fileInputForms">
+            <label title="{{fileInputForm.selectedFile}}"class="aw-create-multiFileUploadLabel">{{fileInputForm.selectedFile}}</label>
+            <button
+                id="{{fileInputForm.buttonId}}"
+                class="aw-commands-commandIconButton aw-layout-right"
+                title="{{fileInputForm.removeTooltip}}"
+                visible-when="fileInputForm.selectedFile"
+                ng-click="fileInputForm.removeForm( $index )" >
+
+                <div class="aw-xrt-objectSetCommandPanel">
+                    <div class="aw-commandIcon aw-commands-svg">
+                        <aw-icon icon-id="cmdDelete"></aw-icon>
+                    </div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <div class="aw-create-multiFileUploadFileChooserList">
+        <div ng-repeat="fileInputForm in data.fileInputForms">
+            <form id="{{fileInputForm.id}}" name="{{fileInputForm.id}}" index="{{$index}}" target="{{formTarget}}" method="post" novalidate enctype="multipart/form-data">
+                <input multiple="multiple" id="fmsFile{{$index}}" type="file" ng-model="fileInputForm.fmsFile" ng-required="false" name="fmsFile" on-file-change="fileInputForm.updateFile" />
+            </form>
+        </div>
+
+        <div id="filedrag" class="aw-create-multiFileUploadFileDrop aw-widgets-droptable aw-widgets-chooseordropfile aw-jswidgets-lov-novals">
+            <label><aw-i18n>{{i18n.dropHere}}</aw-i18n></label>
+        </div>
+    </div>
+
+    <aw-break></aw-break>
+
+    <label for="fmsFile{{data.fileInputForms.length-1}}" class="aw-create-multiFileUploadFileChooserButton aw-base-button">
+        <aw-i18n>{{i18n.chooseFile}}</aw-i18n>
+    </label>
+</div>

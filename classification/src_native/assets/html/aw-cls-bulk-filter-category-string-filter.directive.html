@@ -1,0 +1,40 @@
+<div  title="{{category.displayName}}" >
+    <div ng-if="!category.isTypeCategory">
+        <aw-cls-bulk-filter-category-value-searchbox category="category"
+                                                index="category.index"
+                                                visible-when="category.showFilterText"
+                                                filter-action="filterAction"
+                                                is-bulk-filter="isBulkFilter"
+                                                add-action="addAction">
+        </aw-cls-bulk-filter-category-value-searchbox>
+        <aw-cls-filter-category-contents
+            search-action="searchAction"
+            checkbox-action="checkboxAction"
+            is-bulk-filter="isBulkFilter"
+            filter="item"
+            category= "category"
+            ng-repeat="item in category.filterValues | limitTo: category.showMoreFilter && ( !category.filterBy || filterAction )  ? category.defaultFilterValueDisplayCount : category.filterValues.length | filterInFilters: ( filterAction ? '' : category.filterBy ) as results" ng-if = "item.count > 0">
+        </aw-cls-filter-category-contents >
+    </div>
+    <div ng-if="category.isTypeCategory">
+        <aw-filter-category-searchbox category="category" index="category.index" visible-when="category.showFilterText"
+                                        filter-action="filterAction" >
+        </aw-filter-category-searchbox>
+        <aw-cls-filter-category-contents
+            search-action="searchAction"
+            checkbox-action="checkboxAction"
+            is-bulk-filter="isBulkFilter"
+            filter="item"
+            category= "category"
+            ng-repeat="item in category.filterValues | limitTo: category.showMoreFilter && ( !category.filterBy || filterAction )  ? category.defaultFilterValueDisplayCount : category.filterValues.length | filterInFilters: ( filterAction ? '' : category.filterBy ) as results">
+        </aw-cls-filter-category-contents >
+    </div>
+    <div class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled"
+        ng-show="category.filterValues.length > category.defaultFilterValueDisplayCount"
+        title="{{category.showMoreFilter || category.hasMoreFacetValues ? moreText : lessText}}" ng-click="toggleFiltersSoa()" visible-when="!(category.filterBy && category.filterValues.length < 100)" exist-when="!(category.filterBy && category.isTypeCategory)">
+        <span filterNameColorBlockId="filterLabelColorBlock1"  class="aw-ui-filterNameColorBlock {{filter.color}}"
+            visible-when="category.showEnabled && category.showColor">&nbsp;
+        </span>
+        {{category.showMoreFilter || category.hasMoreFacetValues ? moreText : lessText}}
+    </div>
+</div>

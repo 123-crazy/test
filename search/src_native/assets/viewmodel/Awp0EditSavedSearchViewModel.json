@@ -1,0 +1,283 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "saveModify": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-FullTextSearch",
+            "method": "modifyFullTextSavedSearch",
+            "inputData": {
+                "inputs": "{{function:getInputs}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==141153",
+                    "message": "confirmOverwrite"
+                } ],
+
+                "success": [ {
+                    "condition": "data.pinToHome.dbValue == true || data.pinToHome.dbValue == 'true' ",
+                    "message": "pinToHome"
+                } ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "saveCreate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-FullTextSearch",
+            "method": "createFullTextSavedSearch",
+            "inputData": {
+                "inputs": [ {
+                    "pinSearch": "{{function:getPinSearchValue}}",
+                    "savedSearchName": "{{data.searchName.dbValue}}",
+                    "searchString": "{{data.searchString.dbValue}}",
+                    "overwriteExistingSearch": true,
+                    "receiveNotification": 0,
+                    "shareSavedSearch": "{{function:getSharedSearchValue}}",
+                    "searchFilterMap": "{{ctx.savedSearch.savedSearchFilterMap}}",
+                    "chartInputParameters": {
+                        "chartOn": "{{ctx.selected.props.awp0ChartOn.dbValues[0]}}"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==141152",
+                    "message": "confirmOverwrite"
+                } ],
+
+                "success": [ {
+                    "condition": "data.pinToHome.dbValue == true || data.pinToHome.dbValue == 'true' ",
+                    "message": "pinToHome"
+                } ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "overwrite": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-FullTextSearch",
+            "method": "createFullTextSavedSearch",
+            "inputData": {
+                "inputs": [ {
+                    "pinSearch": "{{function:getPinSearchValue}}",
+                    "savedSearchName": "{{data.searchName.dbValue}}",
+                    "searchString": "{{data.searchString.dbValue}}",
+                    "overwriteExistingSearch": true,
+                    "receiveNotification": 0,
+                    "shareSavedSearch": "{{function:getSharedSearchValue}}",
+                    "searchFilterMap": "{{ctx.savedSearch.savedSearchFilterMap}}",
+                    "chartInputParameters": {
+                        "chartOn": "{{ctx.selected.props.awp0ChartOn.dbValues[0]}}"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "updateSavedSearchContext": {
+            "actionType": "JSFunction",
+            "method": "updateSavedSearchContext",
+            "inputData": {
+                "savedSearchObject": "{{ctx.selected}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0SaveSearchService"
+        },
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "updateSavedSearchContext",
+            "inputData": {
+                "savedSearchObject": "{{ctx.selected}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0SaveSearchService"
+        }
+    },
+    "messages": {
+        "confirmOverwrite": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.nameInUse}}",
+            "messageTextParams": [
+                "{{data.searchName.dbValue}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.CancelText}}",
+                    "action": ""
+                },
+
+                {
+                    "option": "Overwrite",
+                    "text": "{{i18n.OverwriteText}}",
+                    "action": "overwrite"
+                }
+            ]
+        },
+
+        "pinToHome": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pinToHome}}",
+            "messageTextParams": [
+                "{{data.searchName.dbValue}}"
+            ]
+        }
+    },
+    "data": {
+        "searchName": {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.savedSearch.searchName}}",
+            "dispValue": "{{ctx.savedSearch.searchName}}",
+            "maxLength": 128
+        },
+        "searchString": {
+            "displayName": "{{i18n.searchString}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.savedSearch.searchCriteria}}",
+            "dispValue": "{{ctx.savedSearch.searchCriteria}}"
+        },
+        "searchFilters": {
+            "displayName": "{{i18n.filterString}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.savedSearch.filterDisplayString}}",
+            "dispValue": "{{ctx.savedSearch.filterDisplayString}}"
+        },
+        "pinToHome": {
+            "displayName": "{{i18n.pinSearch}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.savedSearch.pinned}}"
+        },
+        "shareSavedSearch": {
+            "displayName": "{{i18n.shareSavedSearch}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.savedSearch.shared}}"
+        },
+        "chartProperty": {
+            "displayName": "{{i18n.ChartBy}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.savedSearch.chartOnDisplayValue}}",
+            "dispValue": "{{ctx.savedSearch.chartOnDisplayValue}}"
+        },
+        "favorite": {
+            "displayName": "{{i18n.favorite}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.savedSearch.favorite}}"
+        }
+    },
+    "functions": {
+        "getPinSearchValue": {
+            "functionName": "getPinSearchValue",
+            "parameters": [
+                "{{data.pinToHome.dbValue}}"
+            ]
+        },
+        "getInputs": {
+            "functionName": "getInputs",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.selected.uid}}",
+                "{{ctx.selected}}"
+            ]
+        },
+        "getSearchFilterString": {
+            "functionName": "getSearchFilterString",
+            "parameters": [
+                "{{ctx.selected.uid}}"
+            ]
+        },
+        "getSharedSearchValue": {
+            "functionName": "getSharedSearchValue",
+            "parameters": [
+                "{{data.shareSavedSearch.dbValue}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isValidToEdit": {
+            "expression": "data.searchName.dbValue != '' && data.searchName.newValue !== undefined && data.searchName.value !== data.searchName.newValue"
+        },
+        "isValidToSave": {
+            "expression": "data.searchName.dbValue == data.searchName.value && (data.pinToHome.newValue !== undefined && data.pinToHome.value !== data.pinToHome.newValue || data.shareSavedSearch.newValue !== undefined && data.shareSavedSearch.value !== data.shareSavedSearch.newValue || data.favorite.newValue !== undefined && data.favorite.value !== data.favorite.newValue)"
+        }
+    },
+    "onEvent": [ {
+        "eventId": "soa.getVisibleCommands",
+        "action": "updateSavedSearchContext"
+    } ],
+    "i18n": {
+        "Name": [ "SearchMessages" ],
+        "Criteria": [ "SearchMessages" ],
+        "SaveSearch": [ "SearchMessages" ],
+        "Save": [ "SearchMessages" ],
+        "nameInUse": [ "SearchMessages" ],
+        "CancelText": [ "SearchMessages" ],
+        "OverwriteText": [ "SearchMessages" ],
+        "pinToHome": [ "SearchMessages" ],
+        "searchString": [ "SearchMessages" ],
+        "filterString": [ "SearchMessages" ],
+        "pinSearch": [ "SearchMessages" ],
+        "shareSavedSearch": [ "SearchMessages" ],
+        "ChartProperties": [ "SearchMessages" ],
+        "ChartBy": [ "SearchMessages" ],
+        "favorite": [ "SearchMessages" ]
+    }
+}

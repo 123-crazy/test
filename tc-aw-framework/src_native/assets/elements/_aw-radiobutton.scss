@@ -1,0 +1,86 @@
+// Copyright (c) 2020 Siemens
+// aw-radiobutton
+
+aw-property-radio-button-val .aw-jswidgets-radioButtonItemArray {
+    margin: rem-calc(4) rem-calc(4) rem-calc(8) rem-calc(4);
+}
+
+.aw-jswidgets-radioButtonItem {
+    display: inline-block;
+
+    &.aw-jswidgets-radioLabelVertical {
+        display: block;
+    }
+
+    margin: $radiobutton_margin;
+
+    input[type="radio"] {
+        opacity: 0;
+        height: 0;
+        width: 0;
+
+        &:checked+.aw-jswidgets-radioLabel:after {
+            transform: scale(1);
+        }
+    }
+
+    .aw-jswidgets-radioLabel {
+        display: inline-block;
+        vertical-align: top;
+        position: relative;
+        padding: $radiobutton_label_padding;
+        margin: $radiobutton_label_margin;
+        cursor: pointer;
+        border: none;
+
+        &:before,
+        &:after {
+            position: absolute;
+            box-sizing: border-box;
+            content: '';
+            border-radius: 50%;
+            transition: all .3s ease;
+        }
+
+        &:before {
+            left: 0;
+            top: 0;
+            width: $radiobutton_size;
+            height: $radiobutton_size;
+            border: $radiobutton_border;
+        }
+
+        &:after {
+            top: 4px;
+            left: 4px;
+            width: $radiobutton_checked_size;
+            height: $radiobutton_checked_size;
+            transform: scale(0);
+        }
+    }
+
+    .aw-jswidgets-radioText {
+        margin: $radiobutton_text_margin;
+        font-size: $radiobutton_font_size;
+        line-height: 1.618;
+    }
+}
+
+aw-radiobutton .aw-widgets-propertyLabelTop {
+    padding: $radiobutton_main_label_padding;
+}
+
+aw-radiobutton {
+    .disabled,
+    &.disabled {
+        // refreshed elements shouldn't use opacity this way
+        // override until we have a consistent approach
+        opacity: 1;
+    }
+}
+
+.aw-jswidgets-arrayEditWidgetContainer {
+    .aw-jswidgets-radioButtonItem .aw-jswidgets-radioLabel {
+        margin: $radiobutton_array_label_margin;
+    }
+}

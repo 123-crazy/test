@@ -1,0 +1,134 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive"
+    ],
+    "actions": {
+        "loadRootDefects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForPrimary",
+            "inputData": {
+                "primaryObjects": [ {
+                    "uid": "{{ctx.xrtSummaryContextObject.uid}}",
+                    "type": "C2CapaRevision"
+                } ],
+                "pref": {
+                    "expItemRev": false,
+                    "returnRelations": false,
+                    "info": [ {
+                        "relationTypeName": "CPA0RootCause",
+                        "otherSideObjectTypes": ""
+                    } ]
+                }
+            },
+            "outputData": {
+                "defectList": "{{function:processSecondaryObject}}",
+                "totalFound": "data.defectList.length"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "linkRCtoQA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [ {
+                    "object": "{{ctx.relationContext.relationInfo[0].relationObject}}",
+                    "timestamp": "",
+                    "vecNameVal": [ {
+                        "name": "caw0RootCause",
+                        "values": [ "{{data.dataProviders.loadRootDefectsProvider.selectedObjects[0].uid}}" ]
+
+                    } ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "closePanel"
+                }]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/CAW0AddQualityActionsService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "cdm.relatedModified",
+                    "eventData": {
+                        "relatedModified": [
+                            "{{ctx.selectedCAPA}}"
+                        ]
+                }
+                }]
+            }
+        }
+    },
+    "dataProviders": {
+        "loadRootDefectsProvider": {
+            "action": "loadRootDefects",
+            "response": "{{data.defectList}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "loadRootDefectsProvider"
+    },
+    "onEvent": [{
+            "eventId": "closePanel",
+            "action": "closePanel"
+    }],
+    "i18n": {
+        "Caw0LinkToRC": [
+            "CAW0CapaMessages"
+        ],
+        "caw0link": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    }
+}

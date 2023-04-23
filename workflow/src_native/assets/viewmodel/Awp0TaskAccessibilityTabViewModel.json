@@ -1,0 +1,227 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-column.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects":
+                [
+                    "{{ctx.selected}}"
+                ],
+                "attributes": [
+                   "start_action_handlers"
+                ]
+            },
+            "policy": {
+                "types": [
+                {
+                    "name": "EPMHandler",
+                    "properties": [ {
+                        "name": "arguments"
+                    },
+                    {
+                        "name": "handler_arguments"
+                    },
+                    {
+                        "name": "object_name"
+                    },
+                    {
+                        "name": "object_string"
+                    },
+                    {
+                        "name": "parent_action_type"
+                   } ]
+                } ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "epmTaskTemplate.accessibilityPropertiesLoadedNonEdit",
+                        "condition": "ctx.xrtSummaryContextObject && ( !ctx.workflowDgmEditCtx.editObjectUids || ctx.workflowDgmEditCtx.editObjectUids.indexOf( ctx.xrtSummaryContextObject.uid ) <= -1 )"
+                    },
+                    {
+                        "name": "epmTaskTemplate.accessibilityPropertiesLoadedEdit",
+                        "condition": "ctx.xrtSummaryContextObject && ( ctx.workflowDgmEditCtx.editObjectUids && ctx.workflowDgmEditCtx.editObjectUids.indexOf( ctx.xrtSummaryContextObject.uid ) > -1 )"
+                    }
+                ]
+            },
+            "outputData": {
+            },
+            "deps": "js/Awp0WorkflowTemplateAccessibilityService"
+        },
+        "populateACLValues": {
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action": "populateSystemACLList",
+                    "condition": "conditions.isSystemACLLoaded"
+                },
+                {
+                    "action": "populateWorkflowACLList",
+                    "condition": "conditions.isWorkflowACLLoaded"
+                },
+                {
+                    "action": "populateNamedACLList"
+                }
+            ]
+        },
+        "populateSystemACLList": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Administration-2008-06-IRM",
+            "method": "getACLsByType",
+            "inputData": {
+                "aclsType": 0
+            },
+            "outputData": {
+                "systemACLs": "aclNameInfos"
+            }
+        },
+        "populateWorkflowACLList": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Administration-2008-06-IRM",
+            "method": "getACLsByType",
+            "inputData": {
+                "aclsType": 1
+            },
+            "outputData": {
+                "workflowACLs": "aclNameInfos"
+            }
+        },
+        "populateNamedACLList": {
+            "actionType": "JSFunction",
+            "method": "populateNamedACLList",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+
+            },
+            "deps": "js/Awp0WorkflowTemplateAccessibilityService"
+        },
+        "changeAclType": {
+            "actionType": "JSFunction",
+            "method": "changeAclType",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+
+            },
+            "deps": "js/Awp0WorkflowTemplateAccessibilityService"
+        },
+        "saveTemplateAccessibility" : {
+            "actionType": "JSFunction",
+            "method": "saveTemplateAccessibility",
+            "deps": "js/Awp0WorkflowTemplateAccessibilityService",
+            "inputData": {
+                "ctx" : "{{ctx}}",
+                "isUpdate" : true
+            }
+        }
+    },
+    "functions": {
+    },
+    "dataProviders": {
+        "aclListDataProvider": {
+            "response": "{{data.aclNameInfoObjects}}",
+            "moreValuesExist": false
+        }
+    },
+
+    "data": {
+        "aclNameInfoObjects": [],
+        "aclType": {
+            "displayName": "{{i18n.accessType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "system",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "selectedACLValue": {
+            "displayName": "{{i18n.aclType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "",
+            "uiValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "aclList": {
+            "displayName": "{{i18n.aclType}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isRequired": "false",
+            "emptyLOVEntry": true
+        },
+        "aclTypeValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.systemAclList}}",
+                    "propInternalValue": "system"
+                },
+                {
+                    "propDisplayValue": "{{i18n.workflowAclList}}",
+                    "propInternalValue": "workflow"
+                }
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Awp0TaskACLTab.contentLoaded",
+            "condition": "ctx.selected",
+            "action": "reveal"
+        },
+        {
+            "eventId": "epmTaskTemplate.accessibilityPropertiesLoadedNonEdit",
+            "action": "populateNamedACLList"
+        },
+        {
+            "eventId": "epmTaskTemplate.accessibilityPropertiesLoadedEdit",
+            "action": "populateACLValues"
+        },
+        {
+            "eventId": "workflowGraph.selectionChanged",
+            "action": "reveal"
+        },
+        {
+            "eventId": "workflowDesigner.saveEdit",
+            "action": "saveTemplateAccessibility"
+        },
+        {
+            "eventId": "epmTaskTemplate.updatePanel",
+            "action": "reveal"
+        }
+    ],
+    "conditions": {
+        "isTemplateInEditMode" : {
+            "expression": "ctx.xrtSummaryContextObject && ctx.workflowDgmEditCtx.editObjectUids && ctx.workflowDgmEditCtx.editObjectUids.indexOf( ctx.xrtSummaryContextObject.uid ) > -1"
+        },
+        "isSystemACLLoaded": {
+            "expression": "!ctx.systemAclList && ctx.state.params.ttab_name === 'Awp0TaskAccessibilityTab'"
+        },
+        "isWorkflowACLLoaded": {
+            "expression": "!ctx.workflowAclList && ctx.state.params.ttab_name === 'Awp0TaskAccessibilityTab'"
+        }
+    },
+    "i18n": {
+        "aclType": [ "WorkflowDesignerMessages" ],
+        "accessType": [ "WorkflowDesignerMessages" ],
+        "systemAclList" : [ "WorkflowDesignerMessages" ],
+        "workflowAclList": [ "WorkflowDesignerMessages" ],
+        "aclListLabel": [ "WorkflowDesignerMessages" ]
+    }
+}

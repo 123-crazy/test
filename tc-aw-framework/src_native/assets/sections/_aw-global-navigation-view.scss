@@ -1,0 +1,189 @@
+/* To be used by clients using aw-global-navigation-panel and want to write some css
+
+   modified since aw-global-navigation-panel is no more being consumed by global-navigation
+*/
+// mixins
+@import 'mixins/mixins';
+
+.global-navigation {
+
+    .aw-sidenav-layoutContainer,
+    .aw-global-navigation-panel {
+
+        aw-header-context {
+            width: 100%;
+        }
+
+        .aw-layout-headerContext {
+            @include flexbox();
+            @include flex-direction(column);
+            @include flex(1 1 auto);
+
+            .aw-user-settings-anchor {
+                .aw-user-settings-anchor-label {
+                    text-align: center;
+                    cursor: pointer;
+                }
+
+                svg {
+                    height: $global_navigation_user_settings_dock_point_svg_height;
+                    width: $global_navigation_user_settings_dock_point_svg_width;
+                }
+            }
+        }
+
+        .aw-user-text {
+            font-size: $base-font-size;
+            height: 24px;
+            padding-top: 8px;
+            padding-left: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .aw-command-overflowIcon {
+            display: none;
+        }
+
+        .aw-layout-userSessionCommands {
+            height: 48px;
+        }
+
+        .aw-layout-userSessionCommands .aw-commands-commandBarVertical {
+            display: block;
+            height: 48px;
+        }
+
+        .aw-layout-userSession {
+            @include justify-content(flex-end);
+        }
+
+        aw-command .aw-widgets-groupCommandStack svg {
+            padding-left: 0;
+        }
+
+        .aw-widgets-contextSubItem {
+            @include flexbox();
+            @include flex-direction(column);
+            @include align-items(stretch);
+            overflow: hidden;
+            padding-top: 5px;
+
+            aw-link-with-popup {
+                padding-bottom: 8px;
+
+                .aw-widgets-modelObjectList {
+                    margin: 0;
+                }
+            }
+        }
+
+        aw-link-with-popup-menu {
+            padding-bottom: 8px;
+            height: 16px;
+        }
+
+        a {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #avatarPanelUserName {
+            margin-top: 8px;
+        }
+
+        #avatarPanelUserName a {
+            white-space: normal;
+            overflow: unset;
+            text-overflow: unset;
+            text-align: center;
+        }
+
+        .aw-layout-headerContext .aw-seperator-style {
+            display: none;
+        }
+
+        .aw-widgets-propertyContainer {
+            margin-bottom: 0;
+        }
+
+        .aw-layout-declarativePanelRoot {
+            &.aw-layout-panel {
+                height: 0;
+            }
+
+            >aw-include {
+                padding: $global_navigation_padding;
+
+                .aw-base-scrollPanel {
+                    height: 100%
+                }
+            }
+
+        }
+
+        aw-command-bar.aw-commands-commandBarVertical {
+            .aw-commands-wrapper {
+                padding: 0;
+            }
+
+            .aw-command-overflowIcon {
+                display: block;
+            }
+        }
+
+        aw-command-bar.aw-commands-commandBarVertical,
+        aw-command-bar:not(.aw-layout-userSessionCommands).aw-commands-commandBarVertical .aw-commands-overflow {
+            width: 100%;
+
+            aw-command {
+                width: 100%;
+            }
+
+            aw-command .aw-commands-commandIconButton {
+                width: 100%;
+                padding: $global_nav_panel_command_padding;
+                text-align: left;
+
+                .aw-commandIcon {
+                    display: inline-block;
+                    vertical-align: middle;
+
+                    .aw-commands-svg {
+                        margin: 0;
+                    }
+                }
+
+                height: 24px;
+                border-radius: 2px;
+                display: flex;
+
+                .aw-commands-showIconLabel.aw-commands-commandIconButtonText {
+                    display: inline-block;
+                    vertical-align: middle;
+                    font-size: $base-font-size;
+                    width: $global_navigation_command_label_width;
+                    height: $global_navigation_command_label_height;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    margin-left: $global_navigation_command_label_margin;
+                    margin-top: 0;
+                    line-height: $dense_line_height;
+                    font-weight: $bold_font_weight;
+                }
+            }
+        }
+    }
+
+    .aw-sidenav-standard a {
+        max-width: $global_navigation_standard_panel_link_text_max_width;
+    }
+
+    .aw-sidenav-wide a {
+        max-width: $global_navigation_wide_panel_link_text_max_width;
+    }
+}

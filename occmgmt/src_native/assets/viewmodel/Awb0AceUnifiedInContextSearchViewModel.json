@@ -1,0 +1,447 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-checkbox.directive",
+        "js/visible-when.directive",
+        "js/aw-link-with-popup-menu.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-search-box.directive",
+        "js/aw-column.directive",
+        "js/aw-label.directive"
+    ],
+
+    "data": {
+        "searchCriteria": {
+            "type": "STRING",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "searchByLabel": {
+            "displayName": "{{i18n.by}}",
+            "type": "STRING",
+            "labelPosition": "PROPERTY_LABEL_AT_LEFT"
+        },
+        "searchStringIndexed": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "autofocus": "true"
+        },
+        "awb0ContextQuery": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "uiValue": "{{i18n.keyword}}"
+        },
+        "searchScope": {
+            "displayName": "{{i18n.searchScopeText}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "panelId": "InContextSearchCriteriaTab",
+                    "name": "{{i18n.input}}",
+                    "tabKey": "Input"
+                },
+                {
+                    "panelId": "InContextSearchResultsTab",
+                    "name": "{{i18n.results}}",
+                    "tabKey": "Results"
+                },
+                {
+                    "panelId": "InContextSearchFiltersTab",
+                    "name": "{{i18n.filters}}",
+                    "tabKey": "Filters",
+                    "visibleWhen": "false"
+                }
+            ]
+        },
+        "navigateContext":{
+            "type": "STRING",
+            "dbValue": "{{ctx.aceActiveContext.key}}"
+        }
+    },
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "updateKeywordContext",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "resetContent": {
+            "actionType": "JSFunction",
+            "method": "resetContent",
+            "inputData": {},
+            "deps": "js/navigateSearchService"
+        },
+        "redirectResetStructureCommandEvent": {
+            "actionType": "JSFunction",
+            "method": "redirectCommandEvent",
+            "inputData": {
+                "eventName": "navigate.resetStructure"
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "performIndexedSearch": {
+            "actionType": "JSFunction",
+            "method": "preSearchProcessing",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "navigate.doSearch",
+                    "condition": "data.searchStringIndexed.dbValue",
+                    "eventData": {
+                        "showKeywordLabel": true,
+                        "keyword": "{{data.searchStringIndexed.dbValue}}",
+                        "populateDataProvider": true,
+                        "searchString": "{{function:getSearchString}}",
+                        "showLiveSearchResultCommand": true
+                    }
+                } ]
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "updateSearchScopeLabel": {
+            "actionType": "JSFunction",
+            "method": "updateSearchScopeLabel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "populateContextQueries": {
+            "actionType": "JSFunction",
+            "method": "populateContextQueries",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "resetPanelAndHideShowTabsBasedOnQueryCriteria": {
+            "actionType": "JSFunction",
+            "method": "resetPanelAndHideShowTabsBasedOnQueryCriteria",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "preSearchProcessing": {
+            "actionType": "JSFunction",
+            "method": "preSearchProcessing",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "getContextQueryList": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "{{function:getProviderName}}",
+                    "searchCriteria": "{{function:getSearchCriteria}}",
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": []
+                }
+            },
+            "outputData": {
+                "contextQueries": "{{function:addKeywordContext}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "navigate.populateContextQueries"
+                } ]
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "getSelectedQueryCriteria": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-AdvancedSearch",
+            "method": "getSelectedQueryCriteria",
+
+            "inputData": {
+                "selectedQuery": {
+
+                    "uid": "{{data.awb0ContextQuery.dbValue.uid}}",
+                    "type": "ImanQuery"
+                }
+            },
+            "outputData": {
+                "advancedQueryCriteriaUid": "result.advancedQueryCriteria.uid"
+            },
+            "events": {
+                "success": [ {
+                    "name": "navigate.queriesFetched"
+                } ]
+            }
+
+        },
+        "clearAllQueryCriteriaInAdvancedSearch2":
+        {
+            "actionType": "JSFunction",
+            "method": "clearAllQueryCriteriaInContextSearch",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "performSearchToPopulateFilters": {
+            "actionType": "JSFunction",
+            "method": "preSearchProcessing",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "navigate.doSearch",
+                        "condition": "data.dataProviders.icsPerformSearch.noResults",
+                        "eventData": {
+                            "showKeywordLabel": true,
+                            "keyword": "*",
+                            "populateDataProvider": false,
+                            "searchString": "$DefaultSearchProvider_STD$*"
+                        }
+                    },
+                    {
+                        "name": "navigate.doSearch",
+                        "condition": "!data.dataProviders.icsPerformSearch.noResults && !data.searchResults",
+                        "eventData": {
+                            "showKeywordLabel": false,
+                            "keyword": "*",
+                            "populateDataProvider": false,
+                            "searchString": "$DefaultSearchProvider_STD$*"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "persistCategoryFilterToUpdateState": {
+            "actionType": "JSFunction",
+            "method": "persistCategoryFilterToUpdateState",
+            "inputData": {
+                "context": "{{data.eventData}}",
+                "filterMap": "{{data.sourceSearchFilterMap}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "performFacetSearch"
+                } ]
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "performFacetSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-Finder",
+            "method": "performFacetSearch",
+            "inputData": {
+                "facetSearchInput": {
+                    "maxToReturn": 100,
+                    "providerName": "{{ctx.SearchDataProvider.providerName}}",
+                    "searchCriteria": "{{function:getSearchCriteriaForFacetSearch}}",
+                    "searchFilterMap": {},
+                    "startIndex": "{{function:getStartIndexForFacetSearch}}"
+                }
+            },
+            "outputData": {
+                "ctx.search.facetSearchFilterMap": "searchFilterMap",
+                "ctx.search.valueCategory.endIndex": "endIndex",
+                "ctx.search.valueCategory.hasMoreFacetValues": "hasMoreFacetValues"
+            },
+            "events": {
+                "success": [ {
+                    "name": "performFacetSearchCompleted"
+                } ]
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "updateFilterMapForFacet": {
+            "actionType": "JSFunction",
+            "method": "updateFilterMapForFacet",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/navigateSearchService"
+        }
+    },
+    "dataProviders": {
+        "initializeSearchCriteria": {
+            "action": "getContextQueryList"
+        },
+        "getAllContextQueries": {
+            "dataProviderType": "Action",
+            "action": "getContextQueryList",
+            "response": "{{data.contextQueries}}",
+            "totalFound": "{{data.countOfContextQueries}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "conditions": {
+        "isValidSelection": {
+            "expression": "ctx[data.navigateContext.dbValue].currentState.c_uid !== ctx[data.navigateContext.dbValue].currentState.t_uid"
+        },
+        "isLeafNode": {
+            "expression":"ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren && ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren.dbValues[0] === '0' && conditions.isSearchScopeToShowOnLeafNode"
+        },
+        "isSearchScopeToShowOnLeafNode": {
+            "expression": "ctx[data.navigateContext.dbValue].structureSearchConfig && ctx[data.navigateContext.dbValue].structureSearchConfig.showSearchScopeOnleafNode === true ? flase : ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren && ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren.dbValues[0] === '0'"
+        },
+        "isSearchScopeDisable": {
+            "expression": "ctx[data.navigateContext.dbValue].structureSearchConfig && ctx[data.navigateContext.dbValue].structureSearchConfig.disableSearchScope === true"
+        },
+        "hasStructureSearchTitle": {
+            "expression": "ctx[data.navigateContext.dbValue].structureSearchConfig && ctx[data.navigateContext.dbValue].structureSearchConfig.structureSearchTitle"
+        },
+        "isFindInFeatureSupported":{
+            "expression": "ctx[data.navigateContext.dbValue].supportedFeatures.Awb0FindInStructure"
+        },
+        "isWorksetSelected": {
+            "expression": "ctx.mselected.length === 1 && ctx.aceActiveContext.context.worksetTopNode !== undefined && ctx.mselected[0].props.awb0UnderlyingObject.dbValues[0]=== ctx.aceActiveContext.context.worksetTopNode.uid"
+        }
+    },
+    "functions": {
+        "getSearchInfo": {
+            "functionName": "getSearchInfo",
+            "parameters": []
+        },
+        "getSearchString": {
+            "functionName": "parseExpression",
+            "parameters": [
+                "{{data.searchStringIndexed.dbValue}}", "", "", "'$DefaultSearchProvider_STD$' + data"
+            ]
+        },
+        "addKeywordContext": {
+            "functionName": "addKeywordContext",
+            "parameters": [
+                "{{data.searchResults}}"
+            ]
+        },
+        "getSearchCriteriaForFacetSearch": {
+            "functionName": "getSearchCriteriaForFacetSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "getStartIndexForFacetSearch": {
+            "functionName": "getStartIndexForFacetSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "getProviderName": {
+            "functionName": "getProviderName",
+            "parameters": [
+                "SavedQueryProvider"
+            ]
+        },
+        "getSearchCriteria": {
+            "functionName": "getSearchCriteria"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "ace.ResetContentEvent",
+            "action": "resetContent",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "navigate.resetStructure",
+            "action": "resetPanelAndHideShowTabsBasedOnQueryCriteria"
+        },
+        {
+            "eventId": "awTab.selected",
+            "condition": "scope.selectedTab.panelId === 'InContextSearchFiltersTab' && ( data.dataProviders.icsPerformSearch.noResults || !data.searchResults )",
+            "action": "performSearchToPopulateFilters",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awlinkPopup.selected",
+            "action": "resetPanelAndHideShowTabsBasedOnQueryCriteria"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria": {
+                "target": "selectedModelObjects"
+            },
+            "cacheEventData": true,
+            "action": "updateSearchScopeLabel"
+        },
+        {
+            "eventId": "navigate.fetchInitialFilters",
+            "action": "performSearchToPopulateFilters"
+        },
+        {
+            "eventId": "navigate.populateContextQueries",
+            "action": "populateContextQueries"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "updateSearchScopeLabel",
+            "condition": "scope.data._internal.panelId==='Awb0AceUnifiedInContextSearch'"
+        },
+        {
+            "eventId": "navigate.clearAllQueryCriteria",
+            "action": "clearAllQueryCriteriaInAdvancedSearch2"
+        },
+        {
+            "eventId": "navigate.getSelectedQueryCriteria",
+            "action": "getSelectedQueryCriteria"
+        },
+        {
+            "eventId": "toggleExpansionUnpopulated",
+            "action": "persistCategoryFilterToUpdateState",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "filterInFilter.serverFilter",
+            "action": "performFacetSearch",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "performFacetSearch",
+            "action": "performFacetSearch",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "performFacetSearchCompleted",
+            "action": "updateFilterMapForFacet"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria": {
+                "target": "context.configContext"
+            },
+            "cacheEventData": true,
+            "action": "resetContent"
+        }
+    ],
+    "i18n": {
+        "results": [ "OccurrenceManagementConstants" ],
+        "criteria": [ "OccurrenceManagementConstants" ],
+        "input": [ "OccurrenceManagementConstants" ],
+        "filters": [ "OccurrenceManagementConstants" ],
+        "searchScopeText": [ "OccurrenceManagementConstants" ],
+        "find": [ "OccurrenceManagementConstants" ],
+        "by": [ "OccurrenceManagementConstants" ],
+        "keyword": [ "OccurrenceManagementConstants" ]
+    }
+}

@@ -1,0 +1,55 @@
+<aw-panel-header exist-when="conditions.showFileUploadWidget">
+    <aw-layout-slot name="aw_fileUpload" context="data"></aw-layout-slot>
+    <aw-panel-section exist-when="conditions.moreLinkShown">
+    <aw-title-link action="showMoreLinkStyles" prop="data.moreLink"></aw-title-link>
+    </aw-panel-section>
+</aw-panel-header>
+
+<aw-panel-body exist-when="!data.creationType && !data.isDatasetCreate">
+    <div visible-when="!conditions.showFileUploadWidget">
+        <aw-panel-section caption="i18n.objectType"></aw-panel-section>
+    </div>
+
+    <aw-panel-section caption="i18n.recentSectionTitle" exist-when="data.maxRecentTypeCount>0">
+        <div exist-when="!data.recentUsedTypes"><aw-i18n>i18n.LOADING_TEXT</aw-i18n></div>
+        <aw-list dataprovider="data.dataProviders.getRecentTypesProvider" ng-if="data.recentUsedTypes">
+            <aw-type-cell vmo="item"></aw-type-cell>
+        </aw-list>
+    </aw-panel-section>
+
+    <aw-panel-section caption="i18n.otherSectionTitle" exist-when="!conditions.moreLinkShown || data.maxRecentTypeCount>0" >
+        <aw-type-selector prop="data.filterBox" include="{{data.includeTypes}}"
+            load-sub-types="data.loadSubTypes" auto-select-on-unique-type="data.autoSelectOnUniqueType"
+            override-id="{{data.typeOverrideId}}" preferred-type="{{data.preferredType}}" hide-search-box ="conditions.hideSearchBox">
+        </aw-type-selector>
+    </aw-panel-section>
+</aw-panel-body>
+
+<aw-panel-body exist-when="data.creationType && !data.isDatasetCreate">
+    <aw-title-link prop="data.creationType.props.type_name" action="clearSelectedType"></aw-title-link>
+    <div exist-when="!data.objCreateInfo"><aw-i18n>i18n.LOADING_TEXT</aw-i18n></div>
+    <aw-xrt type="CREATE" object-type="{{data.creationType.props.type_name.dbValue}}"></aw-xrt>
+    <aw-panel-section caption="i18n.ownProjectSectionTitle" exist-when="data.isProjectAssignable">
+        <aw-list dataprovider="data.dataProviders.getOwningProjectsProvider" exist-when="ctx.userSession.props.project.dbValues[0] !== ''">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-panel-section>
+    <aw-command-panel-section caption="i18n.projectsSectionTitle" anchor="data.widgetProjectSectionCommands" exist-when="data.isProjectAssignable">
+        <aw-list dataprovider="data.dataProviders.getAssignedProjectsProvider" has-floating-cell-commands=false>
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>
+
+<aw-panel-body exist-when="data.isDatasetCreate">
+    <aw-panel-section>
+        <aw-textbox prop="data.datasetName"></aw-textbox>
+        <aw-textarea prop="data.datasetDesc" hint="textarea"></aw-textarea>
+        <aw-listbox prop="data.datasetType" visible-when="data.datasetTypeList.length>1"
+            list="data.datasetTypeList" action="updateTypeAndReferences">
+        </aw-listbox>
+        <aw-listbox prop="data.reference" visible-when="data.references.length>1"
+            list="data.references">
+        </aw-listbox>
+    </aw-panel-section>
+</aw-panel-body>

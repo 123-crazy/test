@@ -1,0 +1,49 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "initializeCreateChangePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Cm1CreateChangeService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "onEvent": [ 
+    {
+        "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+        "action": "closePanel"
+    },
+    {
+        "eventId": "cdm.relatedModified",
+        "action": "closePanel"
+    }
+    ],
+    "conditions": {
+        "isObjectSelected": {
+            "expression": "haveObjectsSelected===true"
+        }
+    },
+    "i18n": {
+        "addContentTitle": [ "ContentMgmtMessages" ]
+    }
+}

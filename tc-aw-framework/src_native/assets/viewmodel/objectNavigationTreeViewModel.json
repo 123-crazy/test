@@ -1,0 +1,403 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive"
+    ],
+    "actions": {
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "loadTreeColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.objNavTreeDataProvider}}"
+            },
+            "deps": "js/objectNavigationTreeService"
+        },
+        "saveColumnConfigData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.objNavTreeDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.objNavTreeDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {}
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.objNavTreeDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.objNavTreeDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "objNavTree.ColumnConfigSaved"
+                } ]
+            }
+        },
+        "loadDataForSavedColumnConfig": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTableViewModelProperties",
+            "deps": "js/tcViewModelObjectService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.objNavTreeDataProvider.viewModelCollection.loadedVMObjects}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "typesForArrange": "{{data.dataProviders.objNavTreeDataProvider.columnConfig.typesForArrange}}",
+                    "columnsToExclude": []
+                }
+            },
+            "outputData": {
+                "newColumnConfig": "result.output.columnConfig"
+            },
+            "events": {
+                "success": [ {
+                    "name": "objNavTree.updateTreeTableColumns"
+                } ]
+            }
+        },
+        "updateObjNavTreeTableColumns": {
+            "actionType": "JSFunction",
+            "method": "updateObjNavTreeTableColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.objNavTreeDataProvider}}"
+            },
+            "deps": "js/objectNavigationTreeService"
+        },
+        "loadDataForTree": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "0": {
+                    "attributesToInflate": [],
+                    "maxToLoad": "{{function:getDefaultTreePageSize}}",
+                    "maxToReturn": "{{function:getDefaultTreePageSize}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.objNavTreeColumnProvider.sortCriteria}}",
+                    "startIndex": "request.treeLoadInput.startChildNdx"
+                },
+                "1": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "operationType": "{{data.dataProviders.objNavTreeDataProvider.columnConfig.operationType}}"
+                },
+                "2": null,
+                "3": "request.treeLoadInput",
+                "relatedModifiedInfo": "{{data.relatedModifiedInfo}}"
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalFound",
+                "ctx.search.totalLoaded": "result.treeLoadResult.totalLoaded",
+                "ctx.search.filterMap": "result.treeLoadResult.filterMap",
+                "ctx.search.filterCategories": "result.treeLoadResult.filterCategories",
+                "ctx.search.objectsGroupedByProperty": "result.treeLoadResult.objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "result.treeLoadResult.searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "result.treeLoadResult.searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "result.treeLoadResult.objectsGroupedByProperty",
+                "treeLoadResult": "result.treeLoadResult.childNodes"
+            },
+            "deps": "js/objectNavigationTreeService"
+        },
+        "loadTreeTablePropertiesOnInitialLoad": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTablePropertiesOnInitialLoad",
+            "deps": "js/objectNavigationTreeService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.objNavTreeDataProvider.viewModelCollection.loadedVMObjects}}",
+                "declViewModel": "{{data}}",
+                "uwDataProvider": "{{data.dataProviders.objNavTreeDataProvider}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "typesForArrange": "{{data.dataProviders.objNavTreeDataProvider.columnConfig.typesForArrange}}"
+                },
+                "contextKey": "search"
+            },
+            "outputData": {
+                "dataProviders.objNavTreeDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig",
+                "rInfo": "{{function:handleObjSelectionAfterRelatedModification}}"
+            }
+        },
+        "loadTreeProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "methodArgument": {
+                    "propertyLoadInput": "request.propertyLoadInput",
+                    "propertyLoadContext": {
+                        "clientName": "AWClient",
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "typesForArrange": "{{data.dataProviders.objNavTreeDataProvider.columnConfig.typesForArrange}}"
+                    },
+                    "contextKey": "search",
+                    "declViewModel": "{{data}}",
+                    "uwDataProvider": "{{data.dataProviders.objNavTreeDataProvider}}"
+                }
+            },
+            "outputData": {
+                "dataProviders.objNavTreeDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            },
+            "events": {
+                "success": [ {
+                    "name": "objNavTree.updateMSelectedWithProperties"
+                } ]
+            },
+            "deps": "js/objectNavigationTreeService"
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "operationType": "intersection",
+                        "typeNames": "{{function:getTypeNames}}",
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [
+                        {}
+                    ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.gridDataProvider.resetColumnConfigs": "columnConfigurations"
+            },
+            "events": {
+                "success": [ {
+                    "name": "objNavTree.plTable.reload"
+                } ]
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "publishClientRefreshEventForTreeNavFolders": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "objNavTree.plTable.clientRefresh"
+                } ]
+            }
+        },
+        "updateDisplayNames": {
+            "actionType": "JSFunction",
+            "method": "updateDisplayNames",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/objectNavigationTreeService"
+        },
+        "updateMSelectedWithProperties": {
+            "actionType": "JSFunction",
+            "method": "updateMSelectedWithProperties",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.objNavTreeDataProvider.viewModelCollection.loadedVMObjects}}"
+            },
+            "deps": "js/objectNavigationTreeService"
+        },
+        "startEditForNewVmos": {
+            "actionType": "JSFunction",
+            "method": "startEditForNewVmos",
+            "inputData": {
+                "editContext": "{{data.dataProviders.objNavTreeDataProvider.json.editContext}}"
+            },
+            "deps": "js/editEventsService"
+        },
+        "invokeSaveEditsCommand": {
+            "actionType": "Command",
+            "inputData": {
+                "commandId": "Awp0SaveEditsPWA"
+            }
+        },
+        "getRelatedModifiedInfo": {
+            "actionType": "JSFunction",
+            "method": "getRelatedModifiedInfo",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "outputData": {
+                "relatedModifiedInfo": "relatedModifiedInfo",
+                "createdObjects": "relatedModifiedInfo.createdObjects",
+                "childObjects": "relatedModifiedInfo.childObjects",
+                "isPinnedFlag": "relatedModifiedInfo.isPinnedFlag",
+                "refreshLocationFlag": "relatedModifiedInfo.refreshLocationFlag",
+                "relatedModified": "relatedModifiedInfo.relatedModified"
+            },
+            "events": {
+                "success": [ {
+                    "name": "primaryWorkarea.reset",
+                    "condition": "conditions.shouldFolderTreeBeResetAfterRelatedModified"
+                } ]
+            },
+            "deps": "js/objectNavigationService"
+        }
+    },
+    "dataProviders": {
+        "objNavTreeDataProvider": {
+            "initializeAction": "loadDataForTree",
+            "nextAction": "loadDataForTree",
+            "previousAction": "loadDataForTree",
+            "focusAction": "loadDataForTree",
+            "editContext": "TABLE_CONTEXT",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 50,
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}",
+                "accessMode": "{{view}}",
+                "topNodeUid": "{{ctx.state.params.uid}}",
+                "editSupportParamKeys": [ "s_uid", "d_uids" ]
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands"
+        },
+        "objNavTreePropertyProvider": {
+            "action": "loadTreeProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "data": {
+        "uid": "{{ctx.search.criteria.parentUid}}"
+    },
+    "columnProviders": {
+        "objNavTreeColumnProvider": {
+            "loadColumnAction": "loadTreeColumns",
+            "columns": "{{objNavTreeDataProvider.columnConfig.columns}}",
+            "saveColumnAction": "saveColumnConfigData",
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "sortCriteria": "{{ctx.sublocation.sortCriteria}}"
+        }
+    },
+    "grids": {
+        "objNavTree": {
+            "dataProvider": "objNavTreeDataProvider",
+            "propertyProvider": "objNavTreePropertyProvider",
+            "columnProvider": "objNavTreeColumnProvider",
+            "enableArrangeMenu": true,
+            "addIconColumn": false,
+            "gridOptions": {
+                "useStaticFirstCol": true,
+                "enableGridMenu": true,
+                "isFilteringEnabled": false,
+                "enableExpandAndPaginationInEdit": true
+            }
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getTypeNames": {
+            "functionName": "getTypeNames",
+            "parameters": [
+                "{{ctx.searchResponseInfo.searchFilterMap}}"
+            ]
+        },
+        "getDefaultTreePageSize": {
+            "functionName": "getDefaultTreePageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "handleObjSelectionAfterRelatedModification": {
+            "functionName": "handleObjSelectionAfterRelatedModification",
+            "parameters": [
+                "{{response}}",
+                "{{data}}",
+                "{{data.dataProviders.objNavTreeDataProvider.selectionModel}}"
+            ],
+            "deps": "js/objectNavigationService"
+        }
+    },
+    "conditions": {
+        "shouldFolderTreeBeResetAfterRelatedModified": {
+            "expression": "data.relatedModified && data.relatedModified.length > 0 && data.relatedModified[ data.relatedModified.length - 1 ].modelType && data.relatedModified[ data.relatedModified.length - 1 ].modelType.typeHierarchyArray && data.relatedModified[ data.relatedModified.length - 1 ].modelType.typeHierarchyArray.indexOf( 'Folder' ) > -1"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "objNavTreeDataProvider.treeNodesLoaded",
+            "cacheEventData": true,
+            "condition": "!data.dataProviders.objNavTreeDataProvider.columnConfigLoadingInProgress",
+            "action": "loadTreeTablePropertiesOnInitialLoad"
+        },
+        {
+            "eventId": "objNavTree.updateMSelectedWithProperties",
+            "action": "updateMSelectedWithProperties"
+        },
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "primaryWorkarea.multiSelectAction",
+            "action": "publishClientRefreshEventForTreeNavFolders"
+        },
+        {
+            "eventId": "objNavTreeDataProvider.modelObjectsUpdated",
+            "cacheEventData": true,
+            "action": "updateDisplayNames"
+        },
+        {
+            "eventId": "objNav.relatedModifiedTree",
+            "action": "getRelatedModifiedInfo",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "vmc.modified.objNavTreeDataProvider",
+            "cacheEventData": true,
+            "action": "updateDisplayNames"
+        },
+        {
+            "eventId": "objNavTree.ColumnConfigSaved",
+            "cacheEventData": true,
+            "action": "loadDataForSavedColumnConfig",
+            "condition": "!ctx.editInProgress"
+        },
+        {
+            "eventId": "objNavTree.updateTreeTableColumns",
+            "action": "updateObjNavTreeTableColumns"
+        },
+        {
+            "eventId": "objNavTreeDataProvider.startEditForNewVmosRequested",
+            "action": "startEditForNewVmos"
+        },
+        {
+            "eventId": "saveEditsRequested",
+            "action": "invokeSaveEditsCommand"
+        }
+    ]
+}

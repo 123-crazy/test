@@ -1,0 +1,149 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-search-box.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-button.directive"
+    ],
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "*"
+        },
+        "searchFilterPanels": [ {
+                "tabKey": "results",
+                "panelId": "failureResultsTabPageSub",
+                "name": "{{i18n.results}}",
+                "visibleWhen": "data.visibleSearchFilterPanelTabKeys.indexOf('results')>-1 "
+            },
+            {
+                "tabKey": "filters",
+                "panelId": "failureFiltersTabPageSub",
+                "name": "{{i18n.filterTabTitle}}",
+                "visibleWhen": "data.visibleSearchFilterPanelTabKeys.indexOf('filters')>-1 "
+            }
+        ],
+        "visibleSearchFilterPanelTabKeys": "[ 'results', 'filters' ]",
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        }
+    },
+    "actions": {
+        "presetFilter": {
+            "actionType": "JSFunction",
+            "method": "presetFilter",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "initSearch"
+                } ]
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "findSubBusinessObjectsAndInvokeSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "evalConditionForDefaultRelation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "getDefaultRelationforSearch",
+                    "condition": "data.targetObject && data.relationList.length>1"
+                } ]
+            }
+        },
+        "getDefaultRelationforSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-DataManagement",
+            "method": "getDefaultRelation",
+            "inputData": {
+                "input": [ {
+                    "primaryType": "{{data.targetObject.type}}",
+                    "secondaryType": "{{data.eventData.selectedObjects[0].type}}"
+                } ]
+            },
+            "outputData": {
+                "defaultRelation": "output[0].defaultRelation"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.updateRelationList"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "addFailureToDefect": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "caw0addFailureToDefect",
+                    "eventData": {
+                        "selectedFailureObjects": "{{data.eventMap['performSearch.selectionChangeEvent'].selectedObjects}}"
+                    }
+                } ]
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "presetFilter"
+    },
+    "onEvent": [ {
+            "eventId": "initSearch",
+            "action": "search"
+        },
+        {
+            "eventId": "performSearch.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "evalConditionForDefaultRelation"
+        },
+        {
+            "eventId": "getDefaultRelationforSearch",
+            "action": "getDefaultRelationforSearch"
+        }
+    ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showSearchFilterPanel": {
+            "expression": "data.showSearchFilter != undefined && data.showSearchFilter == true"
+        }
+    },
+    "i18n": {
+        "caw0add": [
+            "CAW0CapaMessages"
+        ],
+        "results": [
+            "UIMessages"
+        ],
+        "filterTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ]
+    }
+}

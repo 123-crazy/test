@@ -1,0 +1,267 @@
+// Copyright (c) 2020 Siemens
+// aw-sidenav
+//css for float sidenav
+.aw-sidenav-float {
+    transition: max-width $sidenav_transition ease-in-out;
+    z-index: $sidenav_z_index;
+}
+
+.global-navigation {
+    .aw-sidenav-float {
+        z-index: $sidenav_primary_nav_panel_z_index;
+    }
+}
+
+.aw-sidenav-resizer {
+    @include display_flex;
+    height: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    border-right-width: 1px;
+    border-right-color: transparent;
+    border-right-style: solid;
+    pointer-events: none;
+    right: 0;
+    z-index: 1001;
+
+    aw-property-image {
+        width: 16px;
+        height: 16px;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+}
+
+.aw-sidenav-float-right {
+    z-index: $sidenav_z_index;
+    position: fixed;
+    right: 0;
+
+    .aw-layout-panel {
+        z-index: $sidenav_z_index;
+    }
+}
+
+.aw-sidenav-float-left {
+    position: fixed;
+}
+
+//css for push sidenav
+.aw-sidenav-push {
+    transition: max-width $sidenav_transition ease-in-out;
+    z-index: $sidenav_z_index;
+    border-radius: 0;
+
+    .aw-command-panelContainer {
+        border-radius: 0;
+    }
+}
+
+.aw-sidenav-layoutContainer {
+    max-width: 0%;
+
+    &.aw-sidenav-expand {
+        max-width: 100%;
+    }
+}
+
+.aw-sidenav-transition {
+    transition: max-width 0s;
+}
+
+.global-navigation {
+    .aw-sidenav-layoutContainer {
+        &.aw-sidenav-standard {
+            width: $sidenav_standard_nav_panel_size;
+        }
+
+        &.aw-sidenav-wide {
+            width: $sidenav_wide_nav_panel_size;
+        }
+
+        .pinned,
+        .unpinned {
+            aw-property-image {
+                cursor: pointer;
+
+                svg {
+                    height: $sidenav_panel_pin_icon_height;
+                    width: $sidenav_panel_pin_icon_width;
+                }
+            }
+        }
+    }
+}
+
+.aw-sidenav-standard {
+    width: $sidenav_standard_panel_size;
+}
+
+.aw-sidenav-wide {
+    width: $sidenav_wide_panel_size;
+}
+
+.aw-sidenav-extrawide {
+    width: $sidenav_extra_wide_panel_size;
+}
+
+.aw-sidenav-vertical-standard {
+    height: $sidenav_standard_panel_size;
+}
+
+.aw-sidenav-vertical-large {
+    // As per UX guidelines, the large panel should be 75% of the container height
+    height: 75%;
+}
+
+.aw-sidenav-vertical-wide {
+    height: $sidenav_wide_panel_size;
+}
+
+.aw-sidenav-float.aw-sidenav-rightBackground {
+    border-top-right-radius: $command_panel_border_radius;
+    border-bottom-right-radius: $command_panel_border_radius;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    .aw-command-panelContainer {
+        border-top-right-radius: $command_panel_border_radius;
+        border-bottom-right-radius: $command_panel_border_radius;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+}
+
+.aw-sidenav-float.aw-sidenav-leftBackground {
+    border-top-left-radius: $command_panel_border_radius;
+    border-bottom-left-radius: $command_panel_border_radius;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+
+    .aw-command-panelContainer {
+        border-top-left-radius: $command_panel_border_radius;
+        border-bottom-left-radius: $command_panel_border_radius;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+.aw-sidenav-layoutContainer {
+    .sidenav-pin-col {
+        @include flexbox();
+        @include flex(0 0 1em);
+        @include flex-direction(column);
+    }
+
+    .sidenav-pin-row {
+        @include flexbox();
+        @include flex(0 0 1em);
+        @include flex-direction(row-reverse);
+        @include flex-wrap(wrap);
+        margin-top: 1em;
+        margin-right: 1em;
+    }
+
+    @include flex(0 0 auto);
+
+    .aw-layout-panelFooter {
+        padding: $sidenav_button_padding;
+    }
+
+    button {
+        &.aw-base-size-auto:not(:last-child) {
+            margin: $sidenav_button_margin;
+        }
+
+        &.aw-base-size-auto:last-child {
+            margin: 0;
+        }
+    }
+}
+
+.aw-sidenav-layoutContainer.aw-sidenav-standard {
+    .pinned {
+        aw-property-image {
+            animation-name: animate-pin;
+            animation-duration: $global_navigation_panel_animation_duration;
+        }
+    }
+}
+
+.aw-sidenav-layoutContainer.aw-sidenav-wide {
+    .pinned {
+        aw-property-image {
+            animation-name: animate-pin-wide;
+            animation-duration: $global_navigation_panel_animation_duration;
+        }
+    }
+}
+
+@keyframes animate-pin {
+    0% {
+        position: absolute;
+        left: 220px;
+        top: 12px;
+    }
+
+    50% {
+        position: absolute;
+        left: 232px;
+        top: 0;
+    }
+
+    100% {
+        position: absolute;
+        left: 220px;
+        top: 12px;
+    }
+}
+
+@keyframes animate-pin-wide {
+    0% {
+        position: absolute;
+        left: 320px;
+        top: 12px;
+    }
+
+    50% {
+        position: absolute;
+        left: 332px;
+        top: 0;
+    }
+
+    100% {
+        position: absolute;
+        left: 320px;
+        top: 12px;
+    }
+}
+
+.aw-global-navigationPanelPinned {
+    .global-navigation {
+        .aw-sidenav-layoutContainer {
+            margin: $sidenav_panel_pinned_state_margin;
+            position: relative;
+        }
+    }
+}
+
+/* aw-footer narrow-mode */
+@media (max-width: 28.75em) {
+
+    /* Width of side nav should be 100%
+       Pin icon is not needed in narrow mode.
+       Global navigation is not visible but the div is present in DOM which we don't require in narrow mode.
+    */
+    .global-navigation {
+        .aw-sidenav-layoutContainer.aw-sidenav-standard {
+            width: 100%;
+        }
+
+        .unpinned,
+        .global-navigation-left-toolbar {
+            display: none;
+        }
+    }
+}

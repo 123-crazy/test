@@ -1,0 +1,519 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-title-link.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-listbox.directive",
+        "js/aw-widget.directive"
+
+    ],
+    "data": {
+        "addFailureCommand": "caw0_addFailureCommand",
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "object_name": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "maxLength": 128
+        },
+        "object_desc": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "dbValue": "",
+            "maxLength":240
+        },
+        "caw0reoccuring": {
+            "displayName": "{{i18n.caw0Reoccuring}}",
+            "type": "BOOLEAN",
+            "dbValue": ""
+        },
+        "caw0AnalysisDimension": {
+            "displayName": "{{i18n.caw0AnalysisDimension}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true",
+            "hasLov": "true",
+            "hasInitialValue": "true",
+            "initialize": "true"
+        },
+        "caw0AnalysisDimensionStatic": {
+            "displayName": "{{i18n.caw0AnalysisDimension}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "{{ctx.selected.caw0AnalysisDimension}}",
+            "uiValue": "{{ctx.selected.caw0AnalysisDimension}}",
+            "isEditable": "false"
+        },
+        "caw0AnalysisType": {
+            "displayName": "{{i18n.caw0AnalysisType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true",
+            "hasLov": "true",
+            "hasInitialValue": "true",
+            "initialize": "true"
+        },
+        "caw0category": {
+            "displayName": "{{i18n.caw0Category}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true",
+            "hasLov": "true",
+            "hasInitialValue": "true",
+            "initialize": "true"
+        }
+    },
+    "actions": {
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateObjectInput}}"
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "addElementResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.relateDefectAndFailure",
+                        "condition": "data.selectedFailureObjects.length > 0 && ctx.tcSessionData.tcMajorVersion >= 13"
+                    },
+                    {
+                        "name": "caw0.createRelation",
+                        "condition": "data.selectedFailureObjects === undefined || data.selectedFailureObjects.length === 0"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==26050 || errorCode.code==214200",
+                    "message": "createRelFailureMsg"
+                } ]
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "relateDefectAndFailure": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [
+                    {
+                        "primaryObject": "{{data.createdObject}}",
+                        "secondaryObject": "{{data.selectedFailureObjects[0]}}",
+                        "relationType": "CAW0RelatedFailure",
+                        "clientId": "",
+                        "userData": {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        }
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.createRelation"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "caw0.createRelation"
+                    }
+                ]
+            }
+        },
+        "createRelationWithCAPA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [
+                    {
+                        "primaryObject": "{{ctx.selected}}",
+                        "secondaryObject": "{{data.createdObject}}",
+                        "relationType": "CAW0CausedBy",
+                        "clientId": "",
+                        "userData": {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        }
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addObject.objectcreated"
+                    },
+                    {
+                        "name": "caw0DefectAdded"
+                    },
+                    {
+                        "name": "addObject.setTarget",
+                        "condition": "!data.pasteOnTargetCondition && data.targetObject != undefined && (data.filesToBeRelated === undefined || data.filesToBeRelated && data.filesToBeRelated.length === 0)"
+                    },
+                    {
+                        "name": "addObject.toTargetSuccess",
+                        "condition": "data.pasteOnTargetCondition && data.targetObject != undefined && (data.filesToBeRelated === undefined || data.filesToBeRelated && data.filesToBeRelated.length === 0)"
+                    },
+                    {
+                        "name": "addElement.added",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "addObject.setTarget",
+                        "condition": "!data.pasteOnTargetCondition && data.createdObject && data.targetObject"
+                    },
+                    {
+                        "name": "addObject.toTargetSuccess",
+                        "condition": "data.pasteOnTargetCondition && data.createdObject && data.targetObject"
+                    },
+                    {
+                        "name": "addObject.addOprfailed"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "setProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:getProblemContextSetInput}}"
+            },
+            "deps": "js/CAW0capaUtilsService",
+            "events": {
+                "success": [
+                    {
+                        "name": "refreshLocation"
+                    }
+                ]
+            }
+        },
+        "refreshLocation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addElement.added",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Relations'",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    },
+                    {
+                        "name": "Caw0Relations.activeViewUpdated",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Relations'"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue && ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Relations' && ctx.xrtPageContext.secondaryXrtPageID !== 'tc_xrt_Relations'",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "updatePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "autoSelectType": {
+            "actionType": "JSFunction",
+            "method": "autoSelectType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "getSelectedFailures": {
+            "actionType": "JSFunction",
+            "method": "getSelectedFailures",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "selectedFailureObjects": "selectedFailureObjects"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "navigateToCreateDefectPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "CAW0AddRootCauseSub",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "removeFailure": {
+            "actionType": "JSFunction",
+            "method": "removeFailure",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0FailuerFiltercommandHandler"
+        },
+        "loadAnalysisDimension": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "caw0AnalysisDimension",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "CAW0Defect"
+                    }
+                }
+            },
+            "outputData": {
+                "dimension": "{{function:getLOVListOfAnalysis}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "loadAnalysisTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "caw0AnalysisType",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "CAW0Defect"
+                    }
+                }
+            },
+            "outputData": {
+                "analysisType": "{{function:getLOVListOfAnalysis}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "loadDefectCategory": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "caw0category",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "CAW0Defect"
+                    }
+                }
+            },
+            "outputData": {
+                "category": "{{function:getLOVListOfAnalysis}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "resetUiValuesDefect": {
+            "actionType": "JSFunction",
+            "method": "resetUiValues",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        }
+    },
+    "functions": {
+        "getProblemContextSetInput": {
+            "functionName": "getProblemContextSetInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreateObjectInput": {
+            "functionName": "getCreateObjectInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}",
+                "addingDefect"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "caw0DefectAdded",
+            "action": "refreshLocation"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "GraphRefreshed",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updatePanel"
+        },
+        {
+            "eventId": "awTypeSelector.modelObjectsUpdated",
+            "action": "autoSelectType"
+        },
+        {
+            "eventId": "caw0.createRelation",
+            "action": "createRelationWithCAPA"
+        },
+        {
+            "eventId": "caw0addFailureToDefect",
+            "action": "getFailureProvider"
+        },
+        {
+            "eventId": "caw0addFailureToDefect",
+            "action": "navigateToCreateDefectPanel"
+        },
+        {
+            "eventId": "Caw0RemoveFailureCommand.removeFailure",
+            "action": "removeFailure"
+        },
+        {
+            "eventId": "caw0.relateDefectAndFailure",
+            "action": "relateDefectAndFailure"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadAnalysisDimension"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadAnalysisTypes"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadDefectCategory"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true,
+            "action": "resetUiValuesDefect"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        }
+    },
+    "messages": {
+        "createRelFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "failure": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Category": [
+            "CAW0CapaMessages"
+        ],
+        "caw0AnalysisDimension": [
+            "CAW0CapaMessages"
+        ],
+        "caw0AnalysisType": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Reoccuring": [
+            "CAW0CapaMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ],
+        "description": [
+            "CAW0CapaMessages"
+        ],
+        "name": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "dataProviders": {
+        "getFailureProvider": {
+            "action": "getSelectedFailures",
+            "response": "{{data.selectedFailureObjects}}",
+            "totalFound": "{{data.selectedFailureObjects.length}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "caw0_removeFailureCommand"
+        }
+    }
+}

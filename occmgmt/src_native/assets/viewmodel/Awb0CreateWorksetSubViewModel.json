@@ -1,0 +1,440 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-form.directive",
+        "js/aw-listbox.directive",
+        "js/aw-xrt.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-break.directive",
+        "js/aw-label.directive",
+        "js/aw-column.directive",
+        "js/aw-row.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions":
+    {
+        "reveal": {
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action":"loadCreatableTypes"
+                },
+                {
+                    "action":"ensureWorksetTypeLoaded"
+                },
+                {
+                    "action":"convertToList"
+                },
+                {
+                    "action":"populateBackingObject"
+                },
+                {
+                    "action":"isAceIndexedProduct"
+                }
+            ]
+        },
+        "loadCreatableTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 40,
+                    "maxToReturn": 40,
+                    "providerName": "Awp0TypeSearchProvider",
+                    "searchCriteria":
+                    {
+                        "searchString": "*",
+                        "typeSelectorId": "Fnd0Workset",
+                        "defaultType": "{{ctx.aceActiveContext.context.workingContextObj.type}}",
+                        "listOfIncludeObjectTypes": "Fnd0Workset",
+                        "loadSubTypes": "true"
+                    },
+                    "startIndex": "{{data.dataProviders.performSearch.startIndex}}"
+                }
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "worksetTypeList": "{{function:processSwcTypes}}"
+            },
+            "deps": "js/saveWorkingContextService"
+        },
+        "ensureWorksetTypeLoaded": {
+            "actionType": "JSFunctionAsync",
+            "method": "ensureModelTypesLoaded",
+            "inputData": {
+                "typeNames":  "{{data.worksetTypeList}}"
+            },
+            "deps": "soa/kernel/soaService"
+        },
+        "populateBackingObject": {
+            "actionType": "JSFunction",
+            "method": "getBackingObject",
+            "inputData": {
+                "data":  "{{data}}"
+            },
+            "deps": "js/createWorksetService"
+        },
+         "isAceIndexedProduct": {
+            "actionType": "JSFunction",
+            "method": "isAceIndexedProduct",
+            "outputData":{
+                "isAceIndexedProduct":""
+            },
+            "deps": "js/createWorksetService"
+        },
+        "convertToList":
+        {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData":
+            {
+                "strings": "{{data.worksetTypeList}}"
+            },
+            "outputData":
+            {
+                "worksetTypeList": "",
+                "worksetType.dbValue" : "result.0.propInternalValue",
+                "worksetType.uiValue" : "result.0.propDisplayValue"
+            },
+
+            "deps": "js/listBoxService"
+        },
+        "triggerBackgroundSBM": {
+            "actionType": "JSFunction",
+            "method": "saveUserWorkingContextState",
+            "inputData": {
+                "shouldFireEventOnSuccess": true
+            },
+            "deps": "js/backgroundWorkingContextService"
+        },
+        "createAndOpenWorkset": {
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action":"genericAddObject",
+                    "condition": "conditions.isCreateRelateandSubmitObjectsApplicable"
+
+                },
+                {
+                    "action":"createOrUpdateSavedSessionSoa",
+                    "condition": "conditions.isCreateOrUpdateSavedSessionApplicable"
+                },
+                {
+                    "action":"showSavedWorkingContext"
+                }
+            ]
+        },
+        "genericAddObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdWorkingContext": "{{function:validateWorkingContext}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "swc.objectCreated",
+                        "eventData": {
+                            "createdObject": "{{data.createdWorkingContext}}"
+                        }
+                    },
+                    {
+                        "name": "createWorkingContext"
+                    },
+                    {
+                        "name": "discoveryWorkset.assignProjects"
+                    }
+
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "message": "worksetCreationSuccess"
+                    }
+                ],
+                "failure": [
+                    {
+                        "message": "worksetCreationFailure"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "createOrUpdateSavedSessionSoa": {
+            "actionType": "TcSoaService",
+            "serviceName": "Cad-2020-01-AppSessionManagement",
+            "method": "createOrUpdateSavedSession",
+            "inputData":{
+                "sessionsToCreateOrUpdate": "{{function:createInputForCreateAndUpdateSavedSessionSOA}}"
+            },
+            "outputData": {
+                "createdWorkingContext": "sessionOutputs[0].sessionObject"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "swc.objectCreated",
+                        "eventData": {
+                            "createdObject": "{{data.createdWorkingContext}}"
+                        }
+                    },
+                    {
+                        "name": "createWorkingContext"
+                    },
+                    {
+                        "name": "discoveryWorkset.assignProjects"
+                    }
+
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "worksetCreationSuccess"
+                    }
+                ],
+                "failure": [
+                    {
+                        "message": "worksetCreationFailure"
+                    }
+                ]
+            },
+            "deps": "js/createWorksetService"
+        },
+        "updateWorkingContextAction" :
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2020-05-OccurrenceManagement",
+            "method": "updateWorkingContext",
+            "inputData": {
+                "input":
+                    [{
+                        "productInfo": "{{ctx.aceActiveContext.context.productContextInfo}}",
+                        "workingContext": "{{data.createdWorkingContext}}",
+                        "saveResult": true,
+                        "operation": "Create"
+                    }]
+            }
+        },
+        "showSavedWorkingContext":{
+            "actionType": "JSFunction",
+            "method": "go",
+            "inputData": {
+                "showObject": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{data.createdWorkingContext.uid}}"
+                },
+                "option": {
+                    "inherit": false
+                }
+            },
+            "deps": "js/locationNavigation.service"
+        },
+        "prePopulateNameField":{
+            "actionType": "JSFunction",
+            "method": "dummyAction",
+            "inputData":
+            {
+                "dummyInput" : "{{data.prePopulatedWorksetName}}"
+            },
+            "outputData": {
+                "object_name.dbValue" : "",
+                "object_name.valueUpdated" : true
+            },
+            "deps": "js/zoneFilterService"
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [ {
+                    "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                    "objectToAssign": [
+                        "{{data.createdWorkingContext}}"
+                    ],
+                    "objectToRemove": []
+                } ]
+            }
+        },
+        "navigateToCreateWorksetPage": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "Awb0CreateWorksetSub"
+                    }
+                } ]
+            }
+        }
+    },
+    "functions":
+    {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "processSwcTypes": {
+            "functionName": "processSwcTypes",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "validateWorkingContext":{
+            "functionName": "validateWorkingContext",
+            "parameters":
+            [
+                "{{data}}"
+            ],
+            "deps":"js/createWorksetService"
+        },
+        "createInputForCreateAndUpdateSavedSessionSOA":{
+            "functionName": "createInputForCreateAndUpdateSavedSessionSOA",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+
+    },
+    "conditions": {
+        "isCreateOrUpdateSavedSessionApplicable": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >=3)) && !data.isAceIndexedProduct"
+        },
+        "isCreateRelateandSubmitObjectsApplicable": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion < 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion <=2)) || (data.isAceIndexedProduct) "
+        }
+    },
+    "dataProviders": {
+        "getAssignedProjectsProvider": {
+            "response": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+            "totalFound": "{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_removeProjectCellCommandAction"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "saveBWC.success",
+            "action": "createAndOpenWorkset"
+        },
+        {
+            "eventId": "saveBWC.failure",
+            "cacheEventData": true,
+            "message": "backgroundSaveFailedBeforeWorksetCreate"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "prePopulateNameField"
+        },
+        {
+            "eventId":"createWorkingContext",
+            "action":"updateWorkingContextAction"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "getAssignedProjectsProvider"
+        },
+        {
+            "eventId": "discoveryWorkset.assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "navigateToCreateWorksetPage"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awb0CreateWorksetSub"
+            },
+            "action": "reveal"
+        }
+    ],
+    "data":
+    {
+        "worksetType": {
+            "type": "STRING",
+            "hasLov": true,
+            "dbValue": "",
+            "displayName": "{{i18n.type}}"
+        },
+        "worksetTypeList": {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "topLine":{
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "prePopulatedWorksetName":{"text": "{{i18n.createWorksetPrefix}}",
+            "params": [ "{{ctx.aceActiveContext.context.modelObject.props.object_string.dbValues[0]}}" ]
+        },
+        "isAceIndexedProduct": null,
+        "widgetProjectSectionCommands": "uiwidget_projectSectionCommands"
+},
+    "messages":
+    {
+        "backgroundSaveFailedBeforeWorksetCreate":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.autoSaveOfBookmarkNotYetComplete}}"
+        },
+        "worksetCreationSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.creationOfWorksetSuccessful}}",
+            "messageTextParams":
+            [
+                "{{data.createdWorkingContext.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "worksetCreationFailure":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n":
+    {
+        "createWorksetPrefix" : [ "OccurrenceManagementSubsetConstants" ],
+        "creationOfWorksetSuccessful" : [ "OccurrenceManagementSubsetConstants" ],
+        "Add" : [ "OccurrenceManagementSubsetConstants" ],
+        "projectsSectionTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "type": [ "OccurrenceManagementConstants" ]
+    }
+}

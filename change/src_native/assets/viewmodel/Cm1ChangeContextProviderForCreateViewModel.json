@@ -1,0 +1,70 @@
+{
+    "schemaVersion": "1.0.0",
+    "actions": {
+        "validateChangeContextData": {
+            "actionType": "JSFunction",
+            "method": "getChangeContextProviderForCreate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Cm1CreateChangeService"
+        },
+        "validateChangeContextDataForlocalCN": {
+            "actionType": "JSFunction",
+            "method": "updateChangeContextProviderForCreate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/changeMgmtUtils"
+        },
+        "batchActionOnCMLoad": {
+            "actionType": "batchJob",
+            "steps": [ {
+                "action": "validateChangeContextDataForlocalCN",
+                "condition": "conditions.isLocalCNSet"
+            } ]
+        }
+    },
+    "onEvent": [ {
+        "eventId": "Cm1ChangeContextProviderForCreate.contentLoaded",
+        "condition": "conditions.isNotLocalCNSet",
+        "action": "validateChangeContextData"
+    } ],
+    "lifecycleHooks": {
+        "onMount": "batchActionOnCMLoad"
+    },
+    "data": {
+        "revision__fnd0ContextProvider": {
+            "type": "STRING",
+            "dbValue": "{{ctx.selected.props.items_tag.dbValues[0]}}"
+        }
+    },
+    "conditions": {
+        "isLocalCNSet": {
+            "expression": {
+                "$and": [ {
+                    "$source": "ctx.pselected",
+                    "$query": {
+                        "$source": "changeContextProvider",
+                        "$query": {
+                            "$notNull": true
+                        }
+                    }
+                } ]
+            }
+        },
+        "isNotLocalCNSet": {
+            "expression": {
+                "$and": [ {
+                    "$source": "ctx.pselected",
+                    "$query": {
+                        "$source": "changeContextProvider",
+                        "$query": {
+                            "$isNull": true
+                        }
+                    }
+                } ]
+            }
+        }
+    }
+}

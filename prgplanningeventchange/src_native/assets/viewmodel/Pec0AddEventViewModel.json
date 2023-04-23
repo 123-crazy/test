@@ -1,0 +1,78 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-add.directive"
+    ],
+    "actions":
+    {
+        "createRelationForPaletteOrSearch":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                         "name": "addObject.startCreateRelation"
+                     }
+                 ]
+            }
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+                 ]
+            }
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "cdm.relatedModified",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        }
+    ],
+    "conditions":
+    {
+        "isPaletteTabAddButtonVisible":
+        {
+          "expression":"data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible":
+        {
+          "expression":"data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+
+    "i18n":
+    {
+        "addPanelTitle": [ "TCUICommandPanelsMessages" ],
+        "addButtonTitle": [ "TCUICommandPanelsMessages" ]
+    }
+}
+
+

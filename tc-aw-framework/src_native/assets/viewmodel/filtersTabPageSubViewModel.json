@@ -1,0 +1,240 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-filter-category.directive",
+        "js/aw-repeat.directive",
+        "js/aw-expandable-search-result-filter.directive",
+        "js/aw-filter-separator.directive",
+        "js/aw-i18n.directive",
+        "js/aw-label.directive",
+        "js/aw-filter-in-filters-searchbox.directive"
+    ],
+    "actions": {
+        "revealAction": {
+            "actionType": "JSFunction",
+            "method": "initSearchResultKeyFunction",
+            "inputData": {
+                "declViewModel": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "selectFilter": {
+            "actionType": "JSFunction",
+            "method": "updateSearchFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "category": "{{category}}",
+                "filter": "{{filter}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addPanel.filterChanged"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "selectHierarchyFilter": {
+            "actionType": "JSFunction",
+            "method": "updateHierarchicalSearchFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "category": "{{category}}",
+                "node": "{{selectedNode}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addPanel.filterChanged"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "selectDateRange": {
+            "actionType": "JSFunction",
+            "method": "updateSearchDateRangeFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "category": "{{category}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addPanel.filterChanged"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "selectNumericRange": {
+            "actionType": "JSFunction",
+            "method": "updateSearchNumericRangeFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "category": "{{category}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addPanel.filterChanged"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateCategoryResults": {
+            "actionType": "updateFilterCategories",
+            "inputData": {
+                "category": "{{ctx.search.valueCategory}}"
+            }
+        },
+        "update": {
+            "actionType": "JSFunction",
+            "method": "updateCategories",
+            "inputData": {
+                "categories": "{{data.categories}}",
+                "categoryValues": "{{data.sourceSearchFilterMap}}",
+                "groupProperty": "{{ctx.searchResponseInfo.objectsGroupedByProperty}}",
+                "colorToggle": false,
+                "currentCategories": "{{ctx.incontextSearchFilterPanelInfo.searchCurrentFilterCategories}}",
+                "showRange": true,
+                "incontext": true
+            },
+            "outputData": {
+                "categories": ""
+            },
+            "deps": "js/filterPanelService"
+        },
+        "expandCategory": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-Finder",
+            "method": "performFacetSearch",
+            "inputData": {
+                "facetSearchInput": {
+                    "providerName": "Awp0FullTextSearchProvider",
+                    "searchCriteria": "{{function:getIncontextSearchCriteriaForFacetSearch}}",
+                    "searchFilterMap": "{{function:getIncontextMapForFilterValueSearch}}",
+                    "startIndex": "{{function:getStartIndexForFilterValueSearch}}",
+                    "maxToReturn": 100
+                }
+            },
+            "outputData": {
+                "sourceSearchFilterMap": "{{function:setIncontextFilterMap}}",
+                "ctx.search.valueCategory.endIndex": "endIndex",
+                "ctx.search.valueCategory.hasMoreFacetValues": "hasMoreFacetValues"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateFilterPanel"
+                } ]
+            },
+            "deps": "js/awSearchFilterService"
+        },
+        "rememberCategoryFilterState": {
+            "actionType": "JSFunction",
+            "method": "rememberCategoryFilterState",
+            "inputData": {
+                "context": "{{data.eventData}}",
+                "contextName": "incontextSearchFilterPanelInfo"
+            },
+            "deps": "js/filterPanelEvents"
+        },
+        "rememberCategoryFilterState2": {
+            "actionType": "JSFunction",
+            "method": "rememberCategoryFilterState",
+            "inputData": {
+                "context": "{{data.eventData}}",
+                "contextName": "incontextSearchFilterPanelInfo"
+            },
+            "events": {
+                "success": [ {
+                    "name": "filterInFilter.serverFilter"
+                } ]
+            },
+            "deps": "js/filterPanelEvents"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "condition": "conditions.isFiltersTabPage",
+            "action": "revealAction"
+        },
+        {
+            "eventId": "selectDateRange",
+            "cacheEventData": true,
+            "action": "selectDateRange"
+        },
+        {
+            "eventId": "updateFilterPanel",
+            "condition": "conditions.isFiltersTabPage",
+            "action": "update"
+        },
+        {
+            "eventId": "filterInFilter.serverFilter",
+            "action": "expandCategory",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "toggleExpansionUnpopulated",
+            "action": "rememberCategoryFilterState2",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "toggleExpansion",
+            "action": "rememberCategoryFilterState",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "toggleFilters",
+            "action": "rememberCategoryFilterState",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action": "updateCategoryResults"
+        }
+    ],
+    "i18n": {
+        "refine": [
+            "awAddDirectiveMessages"
+        ]
+    },
+    "conditions": {
+        "isFiltersTabPage": {
+            "expression": "data.selectedTab.panelId==='filtersTabPageSub'"
+        }
+    },
+    "data": {
+        "keyWordLabel": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "filterInFilterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true"
+        }
+    },
+    "functions": {
+        "getIncontextMapForFilterValueSearch": {
+            "functionName": "getIncontextMapForFilterValueSearch",
+            "parameters": [
+                "{{data.searchFilterMap}}",
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "setIncontextFilterMap": {
+            "functionName": "setIncontextFilterMap",
+            "parameters": []
+        },
+        "getStartIndexForFilterValueSearch": {
+            "functionName": "getStartIndexForFilterValueSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "getIncontextSearchCriteriaForFacetSearch": {
+            "functionName": "getIncontextSearchCriteriaForFacetSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        }
+    }
+}

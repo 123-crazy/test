@@ -1,0 +1,219 @@
+.awRoot {
+    .global-navigation-toolbar img {
+        width: $aw_common_frame_global_navigation_app_logo_width;
+    }
+
+    .global-navigation-toolbar {
+        @media (max-width: 28.75em) {
+            width: 0;
+        }
+
+        aw-command-bar.aw-commands-commandBarVertical {
+            width: $global_navigation_toolbar_command_width;
+
+            .aw-commands-commandIconButton {
+                width: $global_navigation_toolbar_command_width;
+                padding: $global_navigation_toolbar_command_cell_padding;
+            }
+
+            .aw-commands-overflow {
+                .aw-commands-commandIconButton.aw-commands-commandWrapperVertical {
+                    width: $global_navigation_toolbar_command_width;
+                }
+            }
+
+            .aw-commands-cellDecorator {
+                top: $global_navigation_toolbar_command_cell_decorator_top;
+                left: $global_navigation_toolbar_command_cell_decorator_left;
+            }
+        }
+
+        .aw-layout-row:first-child .aw-commands-commandBarVertical,
+        .aw-flex-row:first-child .aw-commands-commandBarVertical {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+        }
+    }
+
+    .aw-layout-locationPanel {
+        padding-right: 0;
+    }
+
+    .awLargeTHeader .awHeader,
+    .awLargeHeader .awHeader {
+        height: $aw_common_frame_large_header_height;
+    }
+
+    .awMediumHeader .awHeader {
+        height: $aw_common_frame_medium_header_height;
+    }
+
+    .awHeader {
+        .aw-layout-locationTitle {
+            height: $aw_common_frame_header_location_title;
+            align-items: center;
+        }
+
+        &.afx-layout-fullscreen-header {
+            padding: $fullscreen_header_padding;
+            border-style: solid;
+            border-bottom-width: 1px;
+        }
+
+        .aw-layout-headerTitleContainer {
+            padding-top: $aw_common_frame_header_title_padding_top;
+        }
+
+        aw-header-tabs {
+            padding-top: $aw_common_frame_header_tabs_padding_top;
+        }
+
+        overflow: hidden;
+
+        .aw-layout-workareaTitle {
+            padding-top: $aw_common_frame_header_breakcrumb_padding_top;
+        }
+
+        aw-tab-set {
+            padding-top: $aw_common_frame_header_tab_set_padding_top;
+        }
+    }
+
+    // For tabs below header with template type "Large": the one with tabs below header
+    .awTabs {
+        padding-left: $aw_common_frame_large_header_tabs_padding_left;
+        padding-top: $aw_common_frame_large_header_tabs_padding_top;
+    }
+
+    aw-logo {
+        padding: $aw_common_frame_logo_padding;
+    }
+
+    .aw-widgets-cellListCellTitleBlock {
+        & .aw-widgets-cellListCellTitle {
+            font-weight: $default_cell_list_item_cell_content_cell_title_header1_font_weight;
+        }
+    }
+
+    .aw-taskbar-container {
+        aw-command-bar {
+            &.aw-commands-commandBarHorizontal {
+                .aw-commands-commandIconButton,
+                .aw-commands-commandIconButton:hover {
+                    min-width: $cf_task_toolbar_command_button_width;
+                    min-height: $cf_task_toolbar_command_button_height;
+                }
+            }
+        }
+    }
+
+    @media all and (max-width: 28.75em) {
+        .aw-taskbar-container {
+            display: none;
+        }
+        .aw-user-settings-bar {
+            display: none;
+        }
+        .aw-user-settings-anchor {
+            display: none;
+        }
+    }
+
+    .aw-avatar-container {
+        padding-bottom: 4px;
+    }
+
+    .aw-user-settings-bar {
+        height: auto;
+        @include transition(width, 0.3s, cubic-bezier(0.215, 0.61, 0.355, 1));
+        &.aw-roll-out {
+            width: 100%;
+        }
+        &.aw-roll-in {
+            width: 0;
+        }
+
+        .aw-advanced-bar-horizontal {
+            margin-bottom: 0;
+        }
+
+        .aw-layout-headerContext {
+            @include flexbox();
+            @include flex-direction(row);
+            align-items: center;
+
+            // As per UX team, the max-width on the link should be 40 chars ~ 240px
+            .aw-base-normal a {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                max-width: $link_overflow_limit;
+            }
+
+            .aw-seperator-style {
+                display: none;
+            }
+
+            padding: 6px 0;
+            margin-right: rem-calc(20);
+            .aw-widgets-propertyContainer {
+                margin-bottom: 0;
+                .aw-widgets-contextSubItem > div {
+                    .aw-layout-include .aw-layout-column {
+                        flex-direction: row;
+                    }
+                    .aw-layout-include .aw-layout-row {
+                        flex-direction: column;
+                    }
+                    .aw-layout-include .aw-link-with-popup .aw-layout-headerSubTitle {
+                        padding: 0;
+                    }
+                    .aw-layout-include > *:first-child {
+                        padding-right: rem-calc(20)
+                    }
+                }
+                .aw-widgets-contextSubItem > div:last-child {
+                    padding-right: 0;
+                }
+            }
+        }
+        :not(.aw-layout-headerContext) {
+            .aw-base-iconButton {
+                padding-left: rem-calc(4);
+                padding-right: rem-calc(4);
+                //I.E. Specific. Use extra padding at bottom to center the close button which gets shifted towards bottom only in I.E.
+                @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+                    padding: 0px;
+                    padding-bottom: rem-calc(6);
+                }
+                & > .aw-base-icon {
+                    width: rem-calc(8);
+                    height: rem-calc(8);
+                }
+            }
+        }
+    }
+
+    // The aw-page's scss is to be copied from wherever aw-page is present in afx and pasted here to be available to our common-app-frame through .awRoot
+}
+
+.awRootNarrowMode {
+    aw-logo {
+        padding-right: $aw_common_frame_narrowMode_aw_logo_padding_right;
+        align-self: end;
+    }
+
+    .awHeader {
+        padding-top: $aw_common_frame_narrowMode_header_padding_top;
+
+        .aw-layout-locationTitle {
+            font-size: $aw_common_frame_narrowMode_locationTitle_font_size;
+            align-items: end;
+        }
+    }
+
+    .aw-layout-primaryWorkarea {
+        flex-basis: auto;
+    }
+}

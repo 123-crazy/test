@@ -1,0 +1,40 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "updateUnitEffectivityContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "expressionEffectivity.isOnlyUnitEffectivityApplicable",
+                "value": true
+            },
+            "deps": "js/appCtxService"
+        },
+        "clearUnitEffectivityContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "expressionEffectivity.isOnlyUnitEffectivityApplicable",
+                "value": null
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "onEvent": [ {
+        "eventId": "awPanel.reveal",
+        "condition": "ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature===true",
+        "action": "updateUnitEffectivityContext"
+    } ],
+    "lifecycleHooks": {
+        "onUnmount": "clearUnitEffectivityContext"
+    },
+
+    "i18n": {
+        "elementEffectivityTitle": [ "OccurrenceManagementConstants" ]
+    }
+}

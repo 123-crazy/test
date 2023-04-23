@@ -1,0 +1,346 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                "js/aw-panel-body.directive",
+                "js/aw-panel-section.directive",
+                "js/aw-panel-footer.directive",
+                "js/aw-button.directive",
+                "js/aw-i18n.directive",
+                "js/aw-widget.directive",
+                "js/enable-when.directive",
+                "js/aw-include.directive",
+                "js/aw-command-panel-section.directive",
+                "js/aw-default-cell.directive",
+                "js/aw-date.directive",
+                "js/aw-datetime.directive"
+               ],
+
+    "actions":
+    {
+        "addClauseToRevRule":
+        {
+            "actionType": "JSFunction",
+            "method": "addClauseToRevRule",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+             "events": {
+                "success": [
+                    {
+                        "name":"awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "RevisionRuleAdminPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/addClauseToRevRuleService"
+        },
+        "getClausesToAdd":
+        {
+            "actionType": "JSFunction",
+            "method": "getClausesToAdd",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addClauseToRevRuleService"
+        },
+        "updateCurrentlySelectedClauseForRevOcc":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCurrentlySelectedClauseForRevOcc",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addClauseToRevRuleService"
+        },
+        "launchAddClausePropertyPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "launchClauseUpdatePropertyPanel",
+            "inputData":
+            {
+                "currentlySelectedClause": "{{data.currentlySelectedClause}}",
+                "panelTitle": "{{i18n.add}}",
+                "isForAddClause" : true
+            },
+
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "launchReplaceClausePropertyPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "launchClauseUpdatePropertyPanel",
+            "inputData":
+            {
+                "currentlySelectedClause": "{{data.currentlySelectedClause}}",
+                "panelTitle": "{{i18n.replace}}",
+                "isForAddClause" : true
+            },
+
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "clausePropertyRemove":
+        {
+            "actionType": "JSFunction",
+            "method": "removeClauseProperty",
+            "inputData":
+            {
+                "currentlySelectedClause": "{{data.currentlySelectedClause}}",
+                "dataProvider": "",
+                "isForAddClause" : true
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "upateLatestConfigForAddClauses":{
+            "actionType": "JSFunction",
+            "method": "upateLatestConfigForAddClauses",
+            "inputData":
+            {
+                "latestConfig": "{{data.addClause_latestConfigType}}"
+            },
+            "deps": "js/addClauseToRevRuleService"
+        },
+        "upateLatestConfigForAddClausesForRevOcc":{
+            "actionType": "JSFunction",
+            "method": "upateLatestConfigForAddClauses",
+            "inputData":
+            {
+                "latestConfig": "{{data.addClause_latestConfigTypeForRevOcc}}"
+            },
+            "deps": "js/addClauseToRevRuleService"
+        }
+    },
+
+    "data":
+    {
+       "currentlySelectedClause": {
+            "displayName": "{{i18n.clauses}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dataProvider": "addClausesListProvider",
+            "dbValue": 0,
+            "dispValue": "{{i18n.working}}",
+            "isSelectOnly": true,
+            "hasLov": true,
+            "emptyLOVEntry": false
+        },
+
+        "addClausePropertiesCommandAnchor": "addClausePropertiesCommandAnchor",
+
+        "addClause_user": {
+            "displayName": "{{i18n.user}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "addClause_userGroup": {
+            "displayName": "{{i18n.userGroup}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "addClause_status": {
+            "displayName": "{{i18n.status}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "addClause_anyStatus": {
+            "displayName": "{{i18n.anyStatus}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "addClause_statusConfigType": {
+            "displayName": "{{i18n.statusConfigType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": ""
+        },
+         "addClause_date": {
+            "displayName": "{{i18n.dateTime}}",
+            "type": "DATETIME",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+        "addClause_today": {
+            "displayName": "{{i18n.useToday}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "addClause_unit_no": {
+            "displayName": "{{i18n.unit}}",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "addClause_latestConfigType": {
+            "displayName": "{{i18n.latestConfigType}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dataProvider": "addClause_configValuesProvider",
+            "dbValue": "0",
+            "dispValue": "{{i18n.creationDate}}",
+            "isSelectOnly": true,
+            "hasLov": true,
+            "emptyLOVEntry": false
+        },
+        "addClause_latestConfigTypeForRevOcc": {
+            "displayName": "{{i18n.latestConfigType}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dataProvider": "addClause_configValuesProviderForRevOcc",
+            "dbValue": "0",
+            "dispValue": "{{i18n.creationDate}}",
+            "isSelectOnly": true,
+            "hasLov": true,
+            "emptyLOVEntry": false
+        },
+        "addClause_latestConfigTypeValues":
+        [
+            {
+                "propDisplayValue": "{{i18n.creationDate}}",
+                "propInternalValue": "0"
+            },
+            {
+                "propDisplayValue": "{{i18n.alphanumericRevId}}",
+                "propInternalValue": "1"
+            },
+            {
+                "propDisplayValue": "{{i18n.numericRevId}}",
+                "propInternalValue": "2"
+            },
+            {
+                "propDisplayValue": "{{i18n.alphaplusNumberRevId}}",
+                "propInternalValue": "3"
+            }
+        ],
+        "addClause_latestConfigTypeValuesForRevOcc":
+        [
+            {
+                "propDisplayValue": "{{i18n.creationDate}}",
+                "propInternalValue": "0"
+            },
+            {
+                "propDisplayValue": "{{i18n.alphanumericRevId}}",
+                "propInternalValue": "1"
+            },
+            {
+                "propDisplayValue": "{{i18n.numericRevId}}",
+                "propInternalValue": "2"
+            }
+        ],
+        "addClause_endItem": {
+            "displayName": "{{i18n.endItemName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": ""
+        }
+    },
+
+    "dataProviders": {
+         "addClausesListProvider": {
+            "action": "getClausesToAdd",
+            "response": "{{data.clausesToAdd}}"
+        },
+        "addClause_configValuesProvider":
+        {
+            "response": "{{data.addClause_latestConfigTypeValues}}"
+        },
+        "addClause_configValuesProviderForRevOcc":
+        {
+            "response": "{{data.addClause_latestConfigTypeValuesForRevOcc}}"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "updateCurrentlySelectedClauseForRevOcc"
+        },
+        {
+            "eventId": "AddClausePanel.launchAddClausePropertyPanel",
+            "action": "launchAddClausePropertyPanel"
+        },
+        {
+            "eventId": "AddClausePanel.launchReplaceClausePropertyPanel",
+            "action": "launchReplaceClausePropertyPanel"
+        },
+        {
+            "eventId": "AddClausePanel.clausePropertyRemove",
+            "action": "clausePropertyRemove"
+        },
+        {
+            "eventId": "addClause_latestConfigType.lovValueChanged",
+            "action": "upateLatestConfigForAddClauses"
+        },
+        {
+            "eventId": "addClause_latestConfigTypeForRevOcc.lovValueChanged",
+            "action": "upateLatestConfigForAddClausesForRevOcc"
+        }
+    ],
+
+    "messages":
+    {
+    },
+
+    "conditions":
+    {
+        "isaddClause_TodayUnchecked":
+        {
+            "expression": "!data.addClause_today.dbValue"
+        },
+        "isaddClause_TimeEnabled":{
+            "expression": "ctx.aceActiveContext && ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.propertyDescriptor.constantsMap.timeEnabled"
+        }
+    },
+
+    "i18n":
+    {
+        "clauses": ["RevisionRuleAdminConstants"],
+        "working": ["RevisionRuleAdminConstants"],
+        "status": ["RevisionRuleAdminConstants"],
+        "override": ["RevisionRuleAdminConstants"],
+        "date": ["RevisionRuleAdminConstants"],
+        "unit": ["RevisionRuleAdminConstants"],
+        "precise": ["RevisionRuleAdminConstants"],
+        "latest": ["RevisionRuleAdminConstants"],
+        "endItemName": ["RevisionRuleAdminConstants"],
+        "add": ["RevisionRuleAdminConstants"],
+        "addClausesPanelTitle": ["RevisionRuleAdminConstants"],
+        "user": ["RevisionRuleAdminConstants"],
+        "userGroup": ["RevisionRuleAdminConstants"],
+        "anyStatus": ["RevisionRuleAdminConstants"],
+        "dateTime": ["RevisionRuleAdminConstants"],
+        "useToday": ["RevisionRuleAdminConstants"],
+        "statusConfigType": ["RevisionRuleAdminConstants"],
+        "creationDate": ["RevisionRuleAdminConstants"],
+        "alphanumericRevId":["RevisionRuleAdminConstants"],
+        "numericRevId":["RevisionRuleAdminConstants"],
+        "alphaplusNumberRevId":["RevisionRuleAdminConstants"],
+        "latestConfigType": ["RevisionRuleAdminConstants"],
+        "UnitNumberValidationError": ["RevisionRuleAdminConstants"],
+        "folder": ["RevisionRuleAdminConstants"]
+    }
+}

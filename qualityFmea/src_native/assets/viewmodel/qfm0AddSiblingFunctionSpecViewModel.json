@@ -1,0 +1,75 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive"
+    ],
+    "data": {
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "qfm0Pincommands": "qfm0_oneStepPinCommands"
+    },
+    "actions": {
+        "updateCtxForAddSiblingPanelAction": {
+            "actionType": "JSFunction",
+            "method": "updateCtxForFunctionAddSiblingPanel",
+            "inputData": {
+                "parent": "{{ctx.selected}}"
+            },
+            "outputData": {},
+            "deps": "js/qfm0FunctionManagerUtils"
+        },
+        "qfm0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "qfm0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "updateCtxForAddSiblingPanelAction",
+            "criteria": {
+                "panelId": "qfm0AddFunctionSpec"
+            }
+        },
+        {
+            "eventId": "addElement.qfm0SetPin",
+            "cacheEventData": true,
+            "action": "qfm0SetPin"
+        },
+        {
+            "eventId": "addElement.qfm0SetUnPin",
+            "cacheEventData": true,
+            "action": "qfm0SetUnPin"
+        },
+        {
+            "eventId": "awPanel.loadParentElement",
+            "action": "updateCtxForAddSiblingPanelAction"
+        }
+    ],
+    "i18n": {
+        "qfm0Add": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

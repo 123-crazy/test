@@ -1,0 +1,402 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-pic.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-click.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-separator.directive",
+        "js/aw-textbox.directive",
+        "js/aw-enter-key.directive",
+        "js/extended-tooltip.directive"
+    ],
+    "actions": {
+        "selectionChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "viewerProductSnapshotListDataUpdated"
+                } ]
+            }
+        },
+        "revealProductSnapshot": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "initializeProductSnapshot"
+                },
+                {
+                    "action": "callPSCardDataProvider",
+                    "condition": "conditions.snapshotsViewImage"
+                },
+                {
+                    "action": "callPSListDataProvider",
+                    "condition": "conditions.snapshotsViewList"
+                }
+            ]
+        },
+        "initializeProductSnapshot": {
+            "actionType": "JSFunction",
+            "method": "productSnapshotPanelRevealed",
+            "inputData": {},
+            "outputData": {
+                "viewerCtxNamespace": "viewerCtxNamespace",
+                "handleCommandBarClick": "handleCommandBarClick",
+                "handleTextEditDblClick": "handleTextEditDblClick",
+                "vmoForProductSnapshotGallery": "vmoForProductSnapshotGallery"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "viewerProductSnapshotListDataUpdatedAction": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "callPSCardDataProvider",
+                    "condition": "conditions.snapshotsViewImage"
+                },
+                {
+                    "action": "callPSListDataProvider",
+                    "condition": "conditions.snapshotsViewList"
+                }
+            ]
+        },
+        "callPSListDataProvider": {
+            "actionType": "dataProvider",
+            "method": "productSnapshotDataProvider"
+        },
+        "callPSCardDataProvider": {
+            "actionType": "dataProvider",
+            "method": "productSnapshotCardViewDataProvider"
+        },
+        "showEditProductSnapshotAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "ProductSnapshotEditSub",
+                        "title": "{{data.i18n.editProductSnapshot}}",
+                        "supportGoBack": true,
+                        "recreatePanel": true,
+                        "isolateMode": true
+                    }
+                } ]
+            }
+        },
+        "clearPreviousProductSnapshotSelection": {
+            "actionType": "JSFunction",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.productSnapshotDataProvider}}"
+            },
+            "method": "clearPreviousProductSnapshotSelection",
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "setProductSnapshotView": {
+            "actionType": "JSFunction",
+            "method": "setProductSnapshotView",
+            "inputData": {
+                "viewerCtxNamespace": "{{data.viewerCtxNamespace}}",
+                "snapshotView": "{{data.eventMap['viewersnapshot.setview'].snapshotView}}"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "loadProductSnapshotDataForList": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}"
+                },
+                "searchInput": {
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Awv0SnapshotGalleryProvider",
+                    "searchCriteria": {
+                        "owner": "{{data.listBox.dbValue}}",
+                        "product": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0Product.dbValues[0]}}",
+                        "searchString": "{{data.filterBox.dbValue}}"
+                    },
+                    "searchSortCriteria": [ {
+                        "fieldName": "POM_application_object.creation_date",
+                        "sortDirection": "DESC"
+                    } ],
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.productSnapshotDataProvider.startIndex}}",
+                        "endIndex": "{{data.dataProviders.productSnapshotDataProvider.endIndex}}",
+                        "startReached": "{{data.dataProviders.productSnapshotDataProvider.startReached}}",
+                        "endReached": "{{data.dataProviders.productSnapshotDataProvider.endReached}}"
+                    }
+                },
+                "inflateProperties": false
+            },
+            "policy": {
+                "types": [ {
+                        "name": "BusinessObject",
+                        "properties": [ {
+                                "name": "awp0CellProperties"
+                            },
+                            {
+                                "name": "owning_user"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fnd0Snapshot",
+                        "properties": [ {
+                                "name": "POM_application_object.creation_date"
+                            },
+                            {
+                                "name": "fnd0OwningIdentifier"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "dataProviders.productSnapshotDataProvider.cursorObject": "cursor"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "loadProductSnapshotDataForCard": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}"
+                },
+                "searchInput": {
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Awv0SnapshotGalleryProvider",
+                    "searchCriteria": {
+                        "owner": "{{data.listBox.dbValue}}",
+                        "product": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0Product.dbValues[0]}}",
+                        "searchString": "{{data.filterBox.dbValue}}"
+                    },
+                    "searchSortCriteria": [ {
+                        "fieldName": "POM_application_object.creation_date",
+                        "sortDirection": "DESC"
+                    } ],
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.productSnapshotCardViewDataProvider.startIndex}}",
+                        "endIndex": "{{data.dataProviders.productSnapshotCardViewDataProvider.endIndex}}",
+                        "startReached": "{{data.dataProviders.productSnapshotCardViewDataProvider.startReached}}",
+                        "endReached": "{{data.dataProviders.productSnapshotCardViewDataProvider.endReached}}"
+                    }
+                },
+                "inflateProperties": false
+            },
+            "policy": {
+                "types": [ {
+                        "name": "BusinessObject",
+                        "properties": [ {
+                                "name": "awp0CellProperties"
+                            },
+                            {
+                                "name": "owning_user"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fnd0Snapshot",
+                        "properties": [ {
+                                "name": "POM_application_object.creation_date"
+                            },
+                            {
+                                "name": "fnd0OwningIdentifier"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "ImageViewTotalFound": "totalFound",
+                "ImageViewSearchResults": "{{function:modifyProductSnapshotCardData}}",
+                "dataProviders.productSnapshotCardViewDataProvider.cursorObject": "cursor"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "renameProductSnapshotAction": {
+            "actionType": "JSFunction",
+            "method": "inlineRenameProductSnapshot",
+            "inputData": {
+                "snapshotName": "{{data.dataProviders.productSnapshotCardViewDataProvider.selectedObjects}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "modifyProductSnapshotCardViewAction": {
+            "actionType": "JSFunction",
+            "method": "modifyProductSnapshot",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "renameSnapshotFromPanel": {
+            "actionType": "JSFunction",
+            "method": "renameSnapshotFromPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "viewerProductSnapshotListDataUpdated",
+            "action": "viewerProductSnapshotListDataUpdatedAction"
+        },
+        {
+            "eventId": "showEditProductSnapshot",
+            "action": "showEditProductSnapshotAction"
+        },
+        {
+            "eventId": "awTab.selected",
+            "condition": "scope.selectedTab.tabKey === 'InputSnapshot'",
+            "action": "revealProductSnapshot"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "ProductSnapshotListSub"
+            },
+            "action": "revealProductSnapshot"
+        },
+        {
+            "eventId": "awTab.selected",
+            "condition": "data.selectedTab.tabKey === 'InputImageCapture'",
+            "action": "clearPreviousProductSnapshotSelection"
+        },
+        {
+            "eventId": "viewersnapshot.setview",
+            "action": "setProductSnapshotView",
+            "condition": "viewerCtxNamespace === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "productSnapshotCardViewDataProvider.selectionChangeEvent",
+            "action": "modifyProductSnapshotCardViewAction",
+            "condition": "ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView === 'Image'"
+        },
+        {
+            "eventId": "snapshot.productSnapshotRenameSuccessful",
+            "action": "renameSnapshotFromPanel",
+            "condition": "ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView === 'Image'"
+        }
+    ],
+    "data": {
+        "vmoForProductSnapshotGallery": "",
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "requiredText": "{{i18n.filter}}",
+            "dbValue": ""
+        },
+        "listBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": "OwnedSnapshots",
+            "dispValue": "{{i18n.mySnapshotsDisplayName}}"
+        },
+        "listBoxValues": {
+            "type": "STRING",
+            "dbValue": [ {
+                    "propDisplayValue": "{{i18n.mySnapshotsDisplayName}}",
+                    "dispValue": "{{i18n.mySnapshotsDisplayName}}",
+                    "propInternalValue": "OwnedSnapshots"
+                },
+                {
+                    "propDisplayValue": "{{i18n.sharedByMeSnapshots}}",
+                    "dispValue": "{{i18n.sharedByMeSnapshots}}",
+                    "propInternalValue": "SnapshotsSharedByMe"
+                },
+                {
+                    "propDisplayValue": "{{i18n.sharedwithMeSnapshots}}",
+                    "dispValue": "{{i18n.sharedwithMeSnapshots}}",
+                    "propInternalValue": "SnapshotsSharedWithMe"
+                }
+            ]
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "dataProviders": {
+        "productSnapshotDataProvider": {
+            "action": "loadProductSnapshotDataForList",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "selectionModel": {
+                "multiSelectEnabled": false
+            },
+            "commandsAnchor": "product_snapshot_list_cell_commands"
+        },
+        "productSnapshotCardViewDataProvider": {
+            "action": "loadProductSnapshotDataForCard",
+            "response": "{{data.ImageViewSearchResults}}",
+            "totalFound": "{{data.ImageViewTotalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "functions": {
+        "getDefaultPageSize": {
+            "functionName": "getDefaultPageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "modifyProductSnapshotCardData": {
+            "functionName": "modifyProductSnapshotCardData",
+            "parameters": [
+                "{{response}}"
+            ]
+        }
+    },
+    "conditions": {
+        "dataFetchComplete": {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].pmiToolCtx.dataFetchComplete"
+        },
+        "snapshotFilterValueChanged": {
+            "expression": "data.filterBox.dbValue",
+            "trackValues": true
+        },
+        "snapshotsViewImage": {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView === 'Image'"
+        },
+        "snapshotsViewList": {
+            "expression": "!ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView || ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView === 'List'"
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "revealProductSnapshot"
+    },
+    "i18n": {
+        "productSnapshotPanelTitle": [ "ViewerSnapshotMessages" ],
+        "createProductSnapshotTitle": [ "ViewerSnapshotMessages" ],
+        "editProductSnapshot": [ "ViewerSnapshotMessages" ],
+        "filter": [ "ViewerSnapshotMessages" ],
+        "currentCaptureLabel": [ "ViewerSnapshotMessages" ],
+        "mySnapshotsDisplayName": [ "ViewerSnapshotMessages" ],
+        "sharedByMeSnapshots": [ "ViewerSnapshotMessages" ],
+        "showingProductSnapshot": [ "ViewerSnapshotMessages" ],
+        "sharedwithMeSnapshots": [ "ViewerSnapshotMessages" ],
+        "updatedProductSnapshotSuccessfully": [ "ViewerSnapshotMessages" ]
+    }
+}

@@ -1,0 +1,74 @@
+<div class="aw-search-simpleSearch" ng-class="{'aw-jswidgets-popUpVisible': data.expanded}">
+   <!--
+         Note: The pop-up is placed before the search box to handle an IE11 bug that causes an absolutely positioned
+         element to be displayed to the right of the preceding element. Margin attribute is used to properly
+         position the pop-up when its displayed.
+    -->
+   <div class="aw-search-SuggestBoxPopup">
+       <div class="aw-layout-popup aw-search-PopupLayout" ng-hide="!data.showPopup && !showRecentSearch"
+            aw-search-list active-index={{currentIndex}} active-action="populateSearchBox(item)">
+
+           <!--  Search Suggestion -->
+           <div class="aw-search-suggestionsPopup">
+               <div class="popupContent" ng-hide="!data.showPopup">
+                    <div class="aw-layout-flexRowContainer aw-search-recentSearchBoxHeader">
+                        <div class ="aw-search-recentSearchBoxTitle aw-search-popupTitle" ng-hide="!data.suggestions.length" ><aw-i18n>i18n.suggestions</aw-i18n></div>
+                        <div class="aw-search-recentSearchBoxTitle aw-search-popupTitle" ng-if="data.suggestions==undefined"><aw-i18n>i18n.noSuggestions</aw-i18n></div>
+                    </div>
+                    <div class= "aw-base-scrollPanel"  >
+                        <div class="aw-widgets-cellListWidget">
+                            <ul class="aw-layout-linkWithPopupContainer">
+                                 <li class="aw-widgets-cellListItem aw-widgets-cellTop"
+                                     aw-repeat="item : data.suggestions track by $index"
+                                     ng-click="selectAndExecuteSuggestionSearch(item)" tabIndex={{$index}}
+                                     title="{{item}}">
+                                     <div class ="aw-search-recentSearchBoxItem" ng-bind-html="highlight(item,data.searchBox.dbValue)"></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+               </div>
+           </div>
+
+           <!--  Recent search -->
+           <div class="aw-search-recentSearchPopup">
+               <div class="popupContent" ng-hide="!items.length && displayClearAll">
+                    <div class="aw-search-searchSuggestionsBreak aw-search-refineLabel" ng-show="data.showPopup"></div>
+                    <div class="aw-layout-flexRowContainer aw-search-recentSearchBoxHeader">
+                        <div class ="aw-search-recentSearchBoxTitle aw-search-popupTitle" ng-show="displayClearAll" ><aw-i18n>i18n.recentSearches</aw-i18n></div>
+                        <div class ="aw-search-recentSearchBoxTitle aw-search-popupTitle" ng-show="!displayClearAll" ><aw-i18n>i18n.clearedRecentSearches</aw-i18n></div>
+                        <div class="aw-search-recentSearchBoxCommand">
+                            <aw-link prop="data.clearAll" ng-click="deleteAllRecentSearches(); $event.stopPropagation();" ng-show="displayClearAll"></aw-link>
+                            <aw-link prop="data.undoClearAll" ng-click="undoDeleteAllRecentSearches(); $event.stopPropagation();" ng-show="!displayClearAll"></aw-link>
+                        </div>
+                    </div>
+                    <div class= "aw-base-scrollPanel"  >
+                        <div class="aw-widgets-cellListWidget">
+                            <ul class="aw-layout-linkWithPopupContainer">
+                                <li class="aw-widgets-cellListItem aw-widgets-cellTop aw-layout-flexRowContainer"
+                                    aw-repeat="item : items = ( myRecentSearches | recentSearchFilter:filterItems) | orderBy:['-score','date_created'] | limitTo:(showMoreFlag?5:10) "
+                                    ng-click="selectAndExecuteRecentSearch(item.value.criteria)" tabIndex={{$index+data.suggestions.length}}
+                                    title="{{item.value.criteria}}">
+                                    <div class="aw-layout-flexRowContainer">
+                                     <div class ="aw-search-recentSearchBoxItem" ng-bind-html="highlight(item.value.criteria,data.searchBox.dbValue)"
+                                          title="{{item.value.criteria}}"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="aw-layout-flexRowContainer aw-search-recentSearchBoxFooter" ng-show="items.length > 5">
+                        <div class="aw-search-recentSearchBoxCommand">
+                            <aw-link prop="data.showMore" ng-click="toggleShowMoreFlag(); $event.stopPropagation();" ng-show="showMoreFlag"></aw-link>
+                            <aw-link prop="data.showLess" ng-click="toggleShowMoreFlag(); $event.stopPropagation();" ng-show="!showMoreFlag"></aw-link>
+                        </div>
+                    </div>
+               </div>
+           </div>
+
+       </div>
+   </div>
+   <aw-search-box class="aw-search-searchBox" prop="prop" action="doGlobalSearch"
+             show-suggestions="showSuggestions" suggestion-action="suggestionAction" show-popup="showPopup" ng-keyup="evalKeyup($event)" placeholder="data.searchBoxPlaceHolder"></aw-search-box>
+
+</div>

@@ -1,0 +1,252 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-panel-section.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-break.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData":
+            {
+                "input":
+                    [
+                        "{{i18n.target}}",
+                        "{{i18n.reference}}",
+                        "{{i18n.doNotSubmit}}"
+                    ]
+            },
+            "outputData":
+            {
+                "submitTypeArray": ""
+            },
+            "deps": "js/listBoxService"
+        },
+        "searchScheduleDeliverable": {
+         "actionType": "JSFunction",
+         "method": "getSchDeliverable",
+         "inputData": {
+            "data": "{{data}}",
+            "ctx": "{{ctx}}"
+         },
+         "policy": {
+                "types": [
+                    {
+                        "name": "SchDeliverable",
+                        "properties": [
+                            {
+                                "name": "deliverable_name"
+                            },
+                            {
+                                "name": "deliverable_type"
+                            },
+                            {
+                                "name": "object_name"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":{
+            "failure":[
+               {
+                  "name":"complete",
+                  "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+               }
+            ]
+         },
+            "actionMessages":
+            {
+             "failure": [
+                    {
+                         "condition": "errorCode=='deliverableDiffSchError'",
+                         "message": "deliverableDiffSchError"
+                    },
+                    {
+                         "condition": "errorCode=='deliverableWorkflowError'",
+                         "message": "deliverableWorkflowError"
+                    },
+                    {
+                         "condition": "errorCode=='deliverableTaskTypeError'",
+                         "message": "deliverableTaskTypeError"
+                    },
+                    {
+                        "condition": "errorCode!='deliverableDiffSchError' && errorCode!='deliverableWorkflowError' && errorCode!='deliverableTaskTypeError'",
+                        "message": "displayError"
+                    }
+                ]
+            },
+         "outputData": {
+            "searchResults": "searchResults",
+            "totalFound": "totalFound",
+            "totalLoaded": "totalLoaded"
+         },
+         "deps": "js/AssignTaskDeliverable"
+      },
+        "checkSchDeliverableName":
+        {
+            "actionType": "JSFunction",
+            "method": "checkSchDeliverableName",
+            "inputData":
+            {
+                "data":"{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "assignSoa"
+                    }
+                ]
+            },
+            "deps": "js/AssignTaskDeliverable"
+        },
+      "assign":{
+         "actionType":"TcSoaService",
+         "serviceName":"ProjectManagement-2007-01-ScheduleManagement",
+         "method":"createTaskDeliverableTemplates",
+         "inputData":{
+            "taskDeliverableData":"{{function:getSchTaskDeliverable}}"
+         },
+         "deps":"js/AssignTaskDeliverable",
+          "actionMessages":
+            {
+            "failure": [
+                    {
+                         "condition": "errorCode=='deliverableDiffSchError'",
+                         "message": "deliverableDiffSchError"
+                    },
+                    {
+                         "condition": "errorCode=='deliverableWorkflowError'",
+                         "message": "deliverableWorkflowError"
+                    },
+                    {
+                         "condition": "errorCode=='deliverableTaskTypeError'",
+                         "message": "deliverableTaskTypeError"
+                    }
+                ]
+            },
+         "events":{
+            "success":[
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                  ],
+            "failure":[
+                    {
+                       "name":"complete",
+                       "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+         }
+      }
+    },
+    "dataProviders": {
+        "scheduleDeliverableSearch": {
+         "action": "searchScheduleDeliverable",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "single",
+         "commands": {
+         }
+      }
+   },
+    "data": {
+     "filterBox": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      },
+      "submitType": {
+         "displayName": "{{i18n.submitType}}",
+         "type": "STRING",
+         "isRequired": "false",
+         "hasLov": true,
+         "uiValue": "{{i18n.target}}"
+      }
+   },
+    "onEvent":
+    [
+        {
+           "eventId":"appCtx.update",
+            "action":"scheduleDeliverableSearch"
+        },
+        {
+            "eventId": "assignSoa",
+            "action": "assign"
+        }
+    ],
+    "functions":
+    {
+      "getSchTaskDeliverable":
+        {
+            "functionName": "getSchTaskDeliverable",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+   "messages": {
+
+       "deliverableDiffSchError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.deliverableDiffSchError}}"
+        },
+        "deliverableWorkflowError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.deliverableWorkflowError}}"
+        },
+        "deliverableTaskTypeError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.deliverableTaskTypeError}}"
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+     },
+    "conditions":
+    {
+      "isValidToAdd": {
+         "expression": "data.dataProviders.scheduleDeliverableSearch.selectedObjects.length > 0"
+      }
+    },
+    "i18n":
+     {
+         "assignScheduledeliverableTitle" : ["ScheduleManagerMessages"],
+         "assignButtonText": ["ScheduleManagerMessages"],
+         "submitType": ["ScheduleManagerMessages"],
+         "target": ["ScheduleManagerMessages"],
+         "reference": ["ScheduleManagerMessages"],
+         "doNotSubmit": ["ScheduleManagerMessages"],
+         "deliverableDiffSchError":["ScheduleManagerMessages"],
+         "deliverableWorkflowError":["ScheduleManagerMessages"],
+         "deliverableTaskTypeError":["ScheduleManagerMessages"],
+         "sameInstanceNameErrorMsg":["ScheduleManagerMessages"]
+     }
+
+}

@@ -1,0 +1,13 @@
+<aw-panel-body scrollable="false">
+    <aw-radiobutton prop="data.undefinedArgValueRadioButton" exist-when="ctx.argumentsPanelData.handlerData.undefined_arg_value && ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length === 0" list="data.undefinedArgValueRadioValues.dbValue"></aw-radiobutton>
+     <aw-listbox prop="data.argumentNames" exist-when="ctx.argumentsPanelData.handlerData!='' && ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length === 0 && data.undefinedArgValueRadioButton.dbValue === 'false'" list="data.argumentNameslist" action="populateArgumentValues"></aw-listbox>
+     <aw-label prop="data.readOnlyArgumentName" exist-when="ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length > 0"></aw-label>
+     <aw-listbox prop="data.argumentValues" exist-when="ctx.argumentsPanelData.handlerData!='' && ctx.argumentsPanelData.multiselect===false && ctx.argumentsPanelData.argumentValueslist.length > 0 && !conditions.isArgHasNullValue" list="data.argumentValueslist"></aw-listbox>
+     <aw-widget prop="data.argumentValuesMultiselect" hint="checkboxoptionlov" exist-when="ctx.argumentsPanelData.multiselect===true && ctx.argumentsPanelData.handlerData!='' && ctx.argumentsPanelData.argumentValueslist.length > 1"></aw-widget>
+     <aw-textbox prop="data.argumentNameTextBox" exist-when="conditions.showArgumentTextBox || conditions.isFreeFromCheckBoxEnable"></aw-textbox>
+     <aw-textbox id="freeText" prop="data.argumentValueTextBox" exist-when="conditions.showArgumentValueTextBox && !conditions.isArgHasNullValue || data.undefinedArgValueRadioButton.dbValue === 'true'"></aw-textbox>
+</aw-panel-body>
+<aw-panel-footer>
+<aw-button action="addHandlerArgumentValuesToArgumentsTable" visible-when="(ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length === 0 && (ctx.argumentsPanelData.argumentNameTextBox.uiValue !== '' || ctx.argumentsPanelData.argumentNames.uiValue !== ''))"><aw-i18n>i18n.addTitle</aw-i18n></aw-button>
+<aw-button action="updateHandlerArgumentValuesToArgumentsTable" visible-when="ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length > 0"><aw-i18n>i18n.save</aw-i18n></aw-button>
+</aw-panel-footer>

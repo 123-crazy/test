@@ -1,0 +1,60 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive"
+    ],
+
+    "actions": {
+        "clearVariantInfoSection": {
+            "actionType": "dataProvider",
+            "method": "clearVariantInfo"
+        },
+
+        "clearVariantInfo": {
+            "actionType": "JSFunction",
+            "method": "clearVariantConfigurationData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        }
+    },
+
+    "onEvent": [ {
+        "eventId": "awPanel.navigate",
+        "action": "clearVariantInfoSection",
+        "criteria": {
+            "destPanelId": "ConfigurationPanelFilters"
+        }
+    } ],
+
+    "dataProviders": {
+        "clearVariantInfo": {
+            "action": "clearVariantInfo"
+        }
+    },
+
+    "data": {
+        "svrOwningItemTabsModel": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "panelId": "SVROwningElementPaletteTab",
+                    "name": "{{i18n.paletteEndItemPresenterBtn}}",
+                    "recreatePanel": true,
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "SVROwningElementSearchTab",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+
+    "i18n": {
+        "paletteEndItemPresenterBtn": [ "OccurrenceManagementConstants" ],
+        "searchEndItemPresenterBtn": [ "OccurrenceManagementConstants" ],
+        "variant": [ "OccurrenceManagementConstants" ]
+    }
+}

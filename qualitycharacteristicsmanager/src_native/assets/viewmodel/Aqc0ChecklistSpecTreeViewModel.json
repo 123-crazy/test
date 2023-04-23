@@ -1,0 +1,156 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.checklistSpecDataProvider}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "sortCriteria": "{{data.columnProviders.checklistSpecColumnProvider.sortCriteria}}"
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "searchResults": "result.treeLoadResult.childNodes"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "processPWASelection"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0ChecklistSpecTreeTableService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.checklistSpecDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecTreeTableService"
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "propertyLoadInput": "request.propertyLoadInput",
+                "delayTimeProperty": "{{data.delayTimeProperty}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecTreeTableService"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.checklistSpecDataProvider.selectionModel}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecTreeTableService"
+        },
+        "addNewlyAddedElement": {
+            "actionType": "JSFunction",
+            "method": "addNewElement",
+            "inputData": {
+                "addElementResponse": "{{data.eventMap['aqc0.addChecklistSpec'].addElementInput}}"
+            },
+            "outputData": {},
+            "deps": "js/Aqc0ChecklistSpecEditStructureService"
+        }
+    },
+    "data": {
+        "delayTimeTree": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "20",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "checklistSpecDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}"
+        },
+        "checklistSpecPropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "checklistSpecColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": [
+                {
+                    "fieldName": "object_name",
+                    "sortDirection": "ASC"
+                }
+            ]
+        }
+    },
+    "grids": {
+        "checklistSpecTree": {
+            "dataProvider": "checklistSpecDataProvider",
+            "propertyProvider": "checklistSpecPropertyProvider",
+            "columnProvider": "checklistSpecColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true
+            }
+        }
+    },
+    "i18n": {
+        "Aqc0ElementName": [
+            "qualityfailuremanagerMessages"
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "processPWASelection",
+            "cacheEventData": true,
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "aqc0.addChecklistSpec",
+            "cacheEventData": true,
+            "action": "addNewlyAddedElement"
+        },
+        {
+            "eventId": "aqc0ChecklistSpecSelectionUpdateEvent",
+            "action": "updateSelectionInPWA"
+        }
+    ]
+}

@@ -1,0 +1,60 @@
+<aw-flex-column>
+    <aw-flex-row height="auto">
+        <aw-flex-column width="fill">
+            <span class="aw-base-x-large">
+                <aw-i18n>i18n.PredictCommandTitle</aw-i18n>
+            </span>
+        </aw-flex-column>
+        <aw-separator is-vertical="true" visible-when="conditions.expertModeEnabled"></aw-separator>
+        <aw-flex-column width="6.6f">
+            <aw-togglebutton prop="data.expertButton" action='toggleBtnAction' visible-when="conditions.expertModeEnabled" extended-tooltip="data.tutorModeTooltip" extended-tooltip-options="{'placement' : 'right'}" extended-tooltip-context="data.tutorModeTooltipContext"></aw-togglebutton>
+        </aw-flex-column>
+    </aw-flex-row>
+    <aw-splitter direction="HORIZONTAL"> </aw-splitter>
+    <aw-flex-row class="awa-prediction-container" height="20f">
+        <aw-flex-column id="aw_PredictedCmds">
+            <aw-command-bar anchor="aw_PredictedCmds{{data.anchorCount}}" alignment="VERTICAL" overflow="true"></aw-command-bar>
+        </aw-flex-column>
+        <aw-flex-column id="aw_LikeCmds" width="2.5f">
+            <aw-command-bar anchor="aw_LikePredictedCmds{{data.cellAnchorCount}}" alignment="VERTICAL" overflow="true" visible-when="data.IsCellCmdVisible === true && data.preferences.AWA_enable_command_addl_features[0] === 'true'"></aw-command-bar>
+        </aw-flex-column>
+        <aw-flex-column width="2.5f">
+            <aw-command-bar anchor="aw_DisLikePredictedCmds{{data.cellAnchorCount}}" alignment="VERTICAL" overflow="true" visible-when="data.IsCellCmdVisible === true && data.preferences.AWA_enable_command_addl_features[0] === 'true'" ></aw-command-bar>
+        </aw-flex-column>
+        <aw-flex-column width="2.5f">
+            <aw-command-bar anchor="aw_HighlightPredictedCmds{{data.cellAnchorCount}}" alignment="VERTICAL" overflow="true" visible-when="data.IsCellCmdVisible === true && data.preferences.AWA_enable_command_addl_features[0] === 'true'"></aw-command-bar>
+        </aw-flex-column>
+    </aw-flex-row>
+    <aw-guidance-message visible-when = "conditions.showTutorRibbon" exist-when = "conditions.showTutorRibbon" banner-style="false" message = "tutorModeOnMessage" closable = "true" show-icon = "true" show-type = "false"></aw-guidance-message>
+    <aw-splitter direction="HORIZONTAL"> </aw-splitter>
+    <aw-flex-row height="auto">
+        <aw-panel-body class="awa-data-dropdown">
+            <aw-link-with-popup-menu prop="data.dataAssistant" dataprovider="data.dataProviders.DataAssistantValuesProvider" link-popup-menu-id="aw-state-currentSelection"></aw-link-with-popup-menu>
+        </aw-panel-body>
+    </aw-flex-row>
+    <aw-flex-row>
+        <aw-panel>
+            <aw-list dataprovider="data.dataProviders.MyRecentProvider" visible-when="data.dataAssistant.dbValue==='MyRecent'">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+            <aw-list dataprovider="data.dataProviders.TeamRecentProvider" visible-when="data.dataAssistant.dbValue==='TeamRecent'">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+            <aw-list dataprovider="data.dataProviders.MyFavoritesProvider" visible-when="data.dataAssistant.dbValue==='Favorites'">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+            <aw-list dataprovider="data.dataProviders.MyClipboardProvider" visible-when="data.dataAssistant.dbValue==='Clipboard'">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+            <aw-button button-type="chromeless" size="auto" action="loadMoreRecentObjects" visible-when="conditions.loadMoreRecent">
+                <aw-i18n>i18n.MoreButtonText</aw-i18n>
+            </aw-button>
+            <aw-button button-type="chromeless" size="auto" action="loadMoreTeamObjects" visible-when="conditions.loadMoreTeam">
+                <aw-i18n>i18n.MoreButtonText</aw-i18n>
+            </aw-button>
+            <aw-button button-type="chromeless" size="auto" action="loadMoreFavoriteObjects" visible-when="conditions.loadMoreFavorite">
+                <aw-i18n>i18n.MoreButtonText</aw-i18n>
+            </aw-button>
+        </aw-panel>
+    </aw-flex-row>
+</aw-flex-column>

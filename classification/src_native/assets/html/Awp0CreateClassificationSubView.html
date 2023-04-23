@@ -1,0 +1,37 @@
+<aw-panel-body>
+    <!-- Hierarhcy & Search panel -->
+    <aw-command-panel-section caption="i18n.assignedClasses" collapsed="data.hierarchyExpanded" visible-when="conditions.showHierarchy">
+        <aw-search-box prop="data.searchBox" action="searchEvent" ></aw-search-box>
+        <aw-hierarchical-navigation childNodes="data.children" parentNodes="data.parents"  displayNameProp="'className'" toolTipProp="'id'">
+        </aw-hierarchical-navigation>
+    </aw-command-panel-section>
+    <aw-command-panel-section caption="i18n.assignedClasses" collapsed="data.hierarchyExpanded" visible-when="!conditions.showHierarchy">
+        <aw-search-box prop="data.searchBox" action="searchEvent" ></aw-search-box>
+        <div aw-repeat="prop : data.classificationSearchResults">
+            <a class="aw-clspanel-searchLink aw-base-normal" aw-class="{'aw-cls-selectedLink': data.selectedSearchResult.id != undefined && data.selectedSearchResult.id == prop.id }"
+                aw-click="data.onSearchResultSelected(prop)" title="{{prop.propertyName}}">{{prop.propertyDisplayName}}</a>
+        </div>
+        <aw-i18n visible-when="conditions.showNoSearchResultsMessage">i18n.noSearchResults</aw-i18n>
+    </aw-command-panel-section>
+
+    <!-- Class Images Panel-->
+    <aw-command-panel-section caption="i18n.images" collapsed="{{!data.expandImagesPanel}}"
+            visible-when="conditions.showAttributes && conditions.showClassImagesSection">
+        <aw-image source="imageURL" aw-repeat="imageURL : data.imageURLs"></aw-image>
+    </aw-command-panel-section>
+
+    <!-- Attributes Panel -->
+    <aw-command-panel-section caption="i18n.properties" anchor="data.classifyPropCommands" exist-when="conditions.showAttributes && !conditions.hasAdvancedData">
+        <aw-cls-properties attributes="data.attr_anno" view="data.panelMode" activeview="data.activeView"></aw-cls-properties>
+    </aw-command-panel-section>
+    <aw-message-params context="data.selectedClass" params='["className"]'
+    message="{{i18n.advancedDataPanelMessage}}" exist-when="conditions.hasAdvancedData"></aw-message-params>
+</aw-panel-body>
+
+<aw-panel-footer visible-when="!conditions.hasAdvancedData">
+    <aw-button action="fieldValidation" visible-when="awPanelBody.$valid && conditions.showAttributes && conditions.createMode && conditions.multiClassification"><aw-i18n>i18n.Add</aw-i18n></aw-button>
+    <aw-button action="fieldValidation" visible-when="awPanelBody.$valid && conditions.showAttributes && conditions.createMode && !conditions.multiClassification"><aw-i18n>i18n.Classify</aw-i18n></aw-button>
+    <aw-button action="getAttributes" visible-when="conditions.showSetClass"><aw-i18n>i18n.assignClass</aw-i18n></aw-button>
+    <aw-button action="fieldValidation" visible-when="!conditions.standaloneUseExistingMode && (conditions.editMode && awPanelBody.$valid && conditions.showAttributes || conditions.editMode && awPanelBody.$valid && conditions.showAttributes && conditions.hierarchyDirty)"><aw-i18n>i18n.save</aw-i18n></aw-button>
+    <aw-button action="classifyStandalone" visible-when="conditions.editMode && awPanelBody.$valid && conditions.showAttributes && conditions.standaloneUseExistingMode"><aw-i18n>i18n.Classify</aw-i18n></aw-button>
+</aw-panel-footer>

@@ -1,0 +1,238 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2014-11-RequirementsManagement",
+            "method": "getExportTemplates",
+            "inputData":
+            {
+                "filter":
+                [
+                    {
+                        "inputObjects": "{{ctx.mselected}}",
+                        "templateTypes":
+                        [
+                            "SpecTemplate",
+                            "ExcelTemplate",
+                            "ObjectTemplate",
+                            "SpecElementRevisionSubTypes"
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "specTemplatesListIn": "outTmplNames.SpecTemplate",
+                "excelTemplatesListIn": "outTmplNames.ExcelTemplate",
+                "objectTemplateListIn": "outTmplNames.ObjectTemplate",
+                "specEleRevSubTypesListIn": "outTmplNames.SpecElementRevisionSubTypes"
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "ctx.mselected.length > 0",
+                        "name": "ExportToOffice.clearListDbValues"
+                    },
+                    {
+                        "condition": "ctx.mselected.length > 0",
+                        "name": "ExportToOffice.templatesLoaded"
+                    },
+
+                    {
+                        "condition": "ctx.mselected.length > 0",
+                        "name": "ExportToOffice.prepareTemplateLists"
+                    },
+                    {
+                        "condition": "ctx.mselected.length > 0",
+                        "name": "ExportToOffice.generateObjectTemplateList"
+                    },
+                    {
+                        "condition": "ctx.mselected.length > 0",
+                        "name": "ExportToOffice.generateSpecEleRevSubTypesList"
+                    }
+                ]
+            },
+
+            "actionMessages":
+            {
+                "failure":
+                [
+                    {
+                        "condition": "errorCode.code==141080",
+                        "message": "notificationForExportFailureMsg"
+                    }
+                ]
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+
+        "prepareTemplateLists":
+        {
+            "actionType": "JSFunction",
+            "method": "prepareTemplateLists",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+
+         "convertToObjecTemplateList":
+        {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData":
+            {
+                "input": "{{data.objectTemplateListIn}}"
+            },
+
+            "outputData":
+            {
+                "objectTemplateList": ""
+            },
+
+            "deps": "js/listBoxService"
+        },
+          "convertToSpecEleRevSubTypesList":
+        {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData":
+            {
+                "input": "{{data.specEleRevSubTypesListIn}}"
+            },
+
+            "outputData":
+            {
+                "specEleRevSubTypesList": ""
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "updateCheckoutButtonState":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCheckoutButtonState",
+            "inputData":
+            {
+                "data": "{{data}}",
+                 "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "clearListDbValues":
+        {
+            "actionType": "JSFunction",
+            "method": "clearListDbValues",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "ExportToOffice.templatesLoaded",
+            "action": "updateCheckoutButtonState"
+        },
+
+        {
+            "eventId": "ExportToOffice.prepareTemplateLists",
+            "action": "prepareTemplateLists"
+        },
+        {
+            "eventId": "ExportToOffice.generateObjectTemplateList",
+            "action": "convertToObjecTemplateList"
+        },
+        {
+            "eventId": "ExportToOffice.generateSpecEleRevSubTypesList",
+            "action": "convertToSpecEleRevSubTypesList"
+        },
+        {
+            "eventId": "ExportToOffice.clearListDbValues",
+            "action": "clearListDbValues"
+        },
+        {
+            "eventId": "soa.getVisibleCommands",
+            "condition": "conditions.isExportToOfficeTempalteValid",
+            "action": "reveal"
+        }
+    ],
+
+    "data":
+    {
+
+    },
+
+    "preferences":
+    [
+        "Show_Checkout_option",
+        "REQ_checkout_objects_before_export",
+        "TC_Enable_Implicit_CO"
+    ],
+
+    "functions":
+    {
+
+    },
+
+    "messages":
+    {
+        "notificationForExportFailureMsg":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.notificationForExportFailure}}"
+        }
+    },
+
+    "conditions":
+    {
+        "is4GDObject": {
+            "expression": "ctx.selected.uid.endsWith('AWB4GD')"
+        },
+        "isExportToOfficeTempalteValidNonAce": {
+            "expression": "!ctx.occmgmtContext&&(ctx.selected.modelType.typeHierarchyArray.indexOf( 'WorkspaceObject' ) > -1)"
+        },
+        "isExportToOfficeTempalteValidAce": {
+            "expression": "ctx.occmgmtContext&&(ctx.selected.modelType.typeHierarchyArray.indexOf( 'Awb0ConditionalElement' ) > -1 || ctx.selected.modelType.typeHierarchyArray.indexOf( 'ItemRevision' ) > -1)"
+        },
+        "isExportToOfficeTempalteValid": {
+            "expression": "( ctx.mselected.length > 0 )&&(!ctx.occmgmtContext&&(ctx.selected.modelType.typeHierarchyArray.indexOf( 'WorkspaceObject' ) > -1) ||ctx.occmgmtContext&&(ctx.selected.modelType.typeHierarchyArray.indexOf( 'Awb0ConditionalElement' ) > -1 || ctx.selected.modelType.typeHierarchyArray.indexOf( 'ItemRevision' ) > -1))&& ( !conditions.is4GDObject)"
+        }
+    },
+
+    "i18n":
+    {
+      "exportTitle":
+      [
+        "RequirementsCommandPanelsMessages"
+      ],
+      "notificationForExportFailure":
+      [
+          "RequirementsCommandPanelsMessages"
+      ]
+
+    }
+}

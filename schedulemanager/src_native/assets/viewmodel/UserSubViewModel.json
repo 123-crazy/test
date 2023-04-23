@@ -1,0 +1,435 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports": [
+      "js/aw-panel-body.directive",
+      "js/aw-panel-section.directive",
+      "js/aw-listbox.directive",
+      "js/aw-list-filter.directive",
+      "js/visible-when.directive",
+      "js/aw-default-cell.directive",
+      "js/aw-break.directive"
+   ],
+   "actions": {
+   "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "checkVersionSupportForProject",
+            "inputData": {
+                "major": "11",
+                "minor": "2",
+                "qrm": "4"
+            },
+
+            "outputData":
+            {
+                "isVersionSupported": ""
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.isVersionSupported === true",
+                        "name": "revealWithProject"
+                    },
+                    {
+                        "condition": "data.isVersionSupported === false",
+                        "name": "revealWithoutProject"
+                    }
+
+
+                ]
+            },
+            "deps": "js/userListService"
+        },
+      "revealWithProjectPanel": {
+         "actionType": "dataProvider",
+         "methods": [
+            "getPropertiesProvider",
+            "userPerformSearch"
+         ]
+      },
+      "revealWithoutProjectPanel": {
+         "actionType": "dataProvider",
+         "methods": [
+            "userPerformSearch"
+         ]
+      },
+
+      "search": {
+         "actionType": "JSFunction",
+         "method": "performSearch",
+         "inputData": {
+            "data": "{{data}}",
+            "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+         },
+         "policy": {
+            "types": [
+               {
+                  "name": "Group",
+                  "properties": [
+                     {
+                        "name": "object_full_name"
+                     }
+                  ]
+               },
+               {
+                  "name": "Role",
+                  "properties": [
+                     {
+                        "name": "role_name"
+                     }
+                  ]
+               },
+               {
+                  "name": "POM_member",
+                  "properties": [
+                     {
+                        "name": "user",
+                        "modifiers": [
+                           {
+                              "name": "withProperties",
+                              "Value": "true"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "name": "GroupMember",
+                  "properties": [
+                     {
+                        "name": "group",
+                        "modifiers": [
+                           {
+                              "name": "withProperties",
+                              "Value": "true"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "role",
+                        "modifiers": [
+                           {
+                              "name": "withProperties",
+                              "Value": "true"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "userName"
+                     }
+                  ]
+               },
+               {
+                  "name": "User",
+                  "properties": [
+                     {
+                        "name": "person",
+                        "modifiers": [
+                           {
+                              "name": "withProperties",
+                              "Value": "true"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "user_name"
+                     }
+                  ]
+               },
+               {
+                  "name": "Person",
+                  "properties": [
+                     {
+                        "name": "user_name"
+                     },
+                     {
+                        "name": "PA9"
+                     },
+                     {
+                        "name": "PA10"
+                     }
+                  ]
+               }
+            ]
+         },
+         "outputData": {
+            "searchResults": "searchResults",
+            "totalFound": "totalFound",
+            "totalLoaded": "totalLoaded"
+         },
+         "deps": "js/userListService"
+      },
+      "addSelection": {
+         "actionType": "JSFunction",
+         "method": "addSelectedObject",
+         "inputData": {
+            "data": "{{data}}",
+            "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+         },
+         "deps": "js/userListService"
+      },
+  "populateProjectData": {
+         "actionType": "JSFunction",
+         "method": "populateProjectData",
+         "inputData": {
+            "data": "{{data}}"
+
+         },
+         "deps": "js/userListService"
+      },
+
+       "getProjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2017-05-ProjectLevelSecurity",
+            "method": "getProjectsForAssignOrRemove",
+            "inputData":
+            {
+                "projectsInput":
+                [
+                    {
+                        "user":{
+                            "uid": "{{ctx.user.uid}}",
+                            "type": "{{ctx.user.type}}"
+                        },
+                        "selectedObjects": "{{function:processSelectedObjects}}",
+                        "assignedObjects": [],
+                        "filterText": "",
+                        "isAceContext": false,
+                        "paginationInfo":
+                        {
+                            "startIndexForAvailableProjects": 0,
+                            "maxToReturnForAvailableProjects": 50
+                        }
+                    }
+                ]
+            },
+
+            "outputData":
+            {    "availableProjectsList"   : "ServiceData.modelObjects",
+            "commonProjectList" :  "projectOutput.assignedProjectsList"
+
+
+            },
+                     "policy": {
+            "types": [
+               {
+
+                    "name": "TC_Project",
+                  "properties": [
+                     {
+                        "name": "object_string"
+                     },
+                     {
+                        "name": "project_id"
+                     }
+                  ]
+               }
+            ]
+         },
+
+                  "events": {
+            "success": [
+               {
+                  "name": "projectPropertiesLoaded"
+               }
+            ]
+         },
+         "actionMessages": {
+            "failure": [
+                {
+                    "message": "schUserSubErrorMsg"
+                }
+            ]
+        },
+         "deps": "js/userListService"
+        },
+        "addUser": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2008-06-ScheduleManagement",
+            "method": "addMemberships",
+            "inputData": {
+               "membershipData": "{{function:addSelectedMembers}}"
+            },
+            "events": {
+               "success": [
+                  {
+                     "name": "cdm.relatedModified",
+                     "eventData": {
+                        "relatedModified": [
+                           "{{ctx.schedule.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                     "condition": "!data.unpinnedToForm.dbValue",
+                     "name": "complete",
+                     "eventData": {
+                         "source": "toolAndInfoPanel"
+                     }
+                 }
+               ]
+            },
+            "actionMessages": {
+               "success": [
+                  {
+                     "condition": "data.userObject.length==1",
+                     "message": "AddMemberComplete"
+                  },
+                  {
+                     "condition": "data.userObject.length>1",
+                     "message": "AddMultipleMembersComplete"
+                  }
+               ],
+               "failure": [
+                   {
+                        "message": "schUserSubErrorMsg"
+                   }
+                ]
+            },
+            "deps": "js/userListService"
+         }
+    },
+    "messages": {
+        "AddMemberComplete": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addMemberSuccessful}}",
+            "messageTextParams": [
+                "{{data.userObject[0].props.user_name.dbValues[0]}}"
+            ]
+        },
+        "AddMultipleMembersComplete": {
+         "messageType": "INFO",
+         "messageText": "{{i18n.addMultipleMembersSuccessful}}",
+         "messageTextParams": [
+             "{{data.userObject.length}}"
+         ]
+     },
+        "schUserSubErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+   "data": {
+      "filterBox": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      },
+      "userProjectObject": {
+         "displayName": "{{i18n.project}}",
+         "type": "STRING",
+         "isRequired": "true",
+         "hasLov": true
+      },
+      "showProjectList": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": "true"
+      }
+   },
+   "dataProviders": {
+      "userPerformSearch": {
+         "action": "search",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "multiple",
+         "commands": {
+            "Awp0ShowObjectCell": {
+               "id": "cmdOpen",
+               "areas": [
+                  "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+               ],
+               "priorities": [
+                  300
+               ],
+               "dependencies": [
+                  "js/showObjectCommandHandler"
+               ],
+               "displayOption": "ON_HOVER_AND_SELECTION",
+               "position": "TOP_RIGHT"
+            }
+         }
+      },
+      "getPropertiesProvider": {
+         "action": "getProjects"
+      }
+   },
+
+    "functions": {
+      "addSelectedMembers": {
+         "functionName": "addSelectedMembers",
+         "parameters": [
+            "{{ctx}}",
+            "{{data}}",
+            "{{data.userObject}}"
+         ]
+      },
+        "processSelectedObjects": {
+            "functionName": "processSelectedObjects",
+            "parameters": [
+                "{{ctx}}"
+               ]
+        }
+
+    },
+   "conditions": {
+      "isProjectObjectListEmpty": {
+         "expression": "data.projectObjectList.length<=0"
+      }
+   },
+   "preferences": [
+      "WRKFLW_allow_resourcepool_assignments",
+      "WRKFLW_show_user_assignment_options"
+   ],
+   "i18n": {
+      "project": [
+         "ScheduleManagerMessages"
+      ],
+      "none": [
+         "ScheduleManagerMessages"
+      ],
+      "users": [
+         "ScheduleManagerMessages"
+      ],
+      "addMemberSuccessful": [
+          "ScheduleManagerMessages"
+      ],
+      "addMultipleMembersSuccessful": [
+           "ScheduleManagerMessages"
+      ]
+   },
+   "onEvent": [
+      {
+         "eventId": "userPerformSearch.selectionChangeEvent",
+         "action": "addSelection"
+      },
+      {
+         "eventId": "projectPropertiesLoaded",
+         "action": "populateProjectData"
+      },
+      {
+         "eventId": "revealWithProject",
+         "action": "revealWithProjectPanel"
+      },
+      {
+         "eventId": "revealWithoutProject",
+         "action": "revealWithoutProjectPanel"
+      },
+      {
+         "eventId": "awPanel.reveal",
+         "criteria": {
+            "panelId": "UserSub"
+         },
+         "action": "reveal"
+      },
+      {
+        "eventId": "addUser",
+        "action" : "addUser"
+      }
+   ]
+}

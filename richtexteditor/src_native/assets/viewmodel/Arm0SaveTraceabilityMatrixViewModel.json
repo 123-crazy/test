@@ -1,0 +1,74 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-widget.directive",
+        "js/aw-command-panel.directive"
+    ],
+    "data": {
+        "name": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "maxLength": 90,
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": ""
+        }
+    },
+
+    "actions": {
+        "saveTraceabilityMatrix": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "Arm0TracelinkMatrixObject.saveEditProperty"
+                } ]
+            }
+        },
+
+        "saveEditProperty": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-DataManagement",
+            "method": "saveViewModelEditAndSubmitWorkflow2",
+            "inputData": {
+                "inputs": "{{function:buildInputForSaveEditingTMO}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Arm0TracelinkMatrixObject.saveTraceabilityMatrix"
+                } ]
+            },
+            "deps": "js/Arm0TraceabilityMatrix"
+        }
+    },
+
+    "functions": {
+        "buildInputForSaveEditingTMO": {
+            "functionName": "buildInputForSaveEditingTMO",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Arm0TracelinkMatrixObject.saveEditProperty",
+            "action": "saveEditProperty"
+        }
+
+    ],
+    "i18n": {
+        "saveTraceabilityMatrix": [
+            "MatrixMessages"
+        ],
+        "name": [
+            "MatrixMessages"
+        ],
+        "save": [
+            "MatrixMessages"
+        ]
+    }
+}

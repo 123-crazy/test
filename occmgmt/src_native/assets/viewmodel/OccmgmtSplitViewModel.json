@@ -1,0 +1,217 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-showobject.directive",
+        "js/aw-splitter.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "view1": {
+            "viewKey": "occmgmtContext",
+            "name": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+            "label": {
+                "source": "/i18n/OccurrenceManagementConstants",
+                "key": "occMgmtTitle"
+            },
+            "clientScopeURI": "Awb0OccurrenceManagement",
+            "enableOccMgmtCommands": true,
+            "nameToken": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+            "policy": "/policies/occMgmtPropertyPolicy.json",
+            "viewBase": "occMgmt",
+            "selectionQueryParamKey": "c_uid",
+            "editSupportParamKeys": [ "c_uid", "o_uid", "spageId", "pci_uid", "c_uid2", "o_uid2", "spageId2", "pci_uid2" ],
+            "viewModes": {
+                "TreeView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": false
+                },
+                "TreeSummaryView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": true
+                }
+            },
+            "context": {
+                "commandContextParameters": [ "filter", "recipe", "uid", "uid2" ]
+            },
+            "breadcrumbConfig": {
+                "type": "navigate",
+                "vm": "occMgmtBreadcrumb",
+                "chevronDataProvider": "breadCrumbDataProvider",
+                "crumbDataProvider": "aceBreadCrumbDataProvider",
+                "noUpdate": true,
+                "popuplist": "/html/occMgmtBreadcrumblist.html",
+                "id": "occmgmtContext",
+                "displayProperty": "object_string"
+            },
+            "urlParams": {
+                "selectionQueryParamKey": "c_uid",
+                "openStructureQueryParamKey": "o_uid",
+                "rootQueryParamKey": "uid",
+                "productContextQueryParamKey": "pci_uid",
+                "csidQueryParamKey": "c_csid",
+                "secondaryPageIdQueryParamKey": "spageId",
+                "topElementQueryParamKey": "t_uid",
+                "pageIdQueryParamKey": "pageId",
+                "recipeParamKey": "recipe",
+                "subsetFilterParamKey": "filter"
+            },
+            "headerPreference": {
+                "hideGlobalSearch": true,
+                "hideLogo": true
+            },
+            "awSubLocationPref": {
+                "hideRightWall": true,
+                "hideToolsAndInfoArea": true,
+                "hideFooter": true
+            }
+        },
+        "view2": {
+            "viewKey": "occmgmtContext2",
+            "name": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+            "label": {
+                "source": "/i18n/OccurrenceManagementConstants",
+                "key": "occMgmtTitle"
+            },
+            "clientScopeURI": "Awb0OccurrenceManagement",
+            "enableOccMgmtCommands": true,
+            "nameToken": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+            "policy": "/policies/occMgmtPropertyPolicy.json",
+            "viewBase": "occmgmtSplit",
+            "selectionQueryParamKey": "c_uid",
+            "editSupportParamKeys": [ "c_uid", "o_uid", "spageId", "pci_uid", "c_uid2", "o_uid2", "spageId2", "pci_uid2" ],
+            "viewModes": {
+                "TreeView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": false
+                },
+                "TreeSummaryView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": true
+                }
+            },
+            "context": {
+                "commandContextParameters": [ "filter", "recipe", "uid", "uid2" ]
+            },
+            "breadcrumbConfig": {
+                "type": "navigate",
+                "vm": "occMgmtSplitBreadcrumb",
+                "chevronDataProvider": "breadCrumbDataProvider2",
+                "crumbDataProvider": "aceBreadCrumbDataProvider2",
+                "noUpdate": true,
+                "popuplist": "/html/occMgmtBreadcrumblist.html",
+                "id": "occmgmtContext2",
+                "displayProperty": "object_string"
+            },
+            "urlParams": {
+                "selectionQueryParamKey": "c_uid2",
+                "openStructureQueryParamKey": "o_uid2",
+                "rootQueryParamKey": "uid2",
+                "productContextQueryParamKey": "pci_uid2",
+                "csidQueryParamKey": "c_csid2",
+                "secondaryPageIdQueryParamKey": "spageId2",
+                "topElementQueryParamKey": "t_uid2",
+                "pageIdQueryParamKey": "pageId2",
+                "recipeParamKey": "recipe2",
+                "subsetFilterParamKey": "filter2"
+            },
+            "headerPreference": {
+                "hideGlobalSearch": true
+            },
+            "awSubLocationPref": {
+                "hideNavigationArea": true,
+                "hideFooter": true
+            }
+        },
+        "hiddenCommands": {
+            "isSaveWorkingContextNotSupported": true,
+            "Awb0StructureFilter": true,
+            "Awp0ShowColor": true,
+            "Awb0ShowMarkup": true,
+            "Awb0AddSubstitutes": true,
+            "Awb0RemoveSubstitutes": true,
+            "Awb0UseSubstitute": true,
+            "ps0AddAlternate": true,
+            "ps0RemoveAlternate": true
+        },
+        "view": {
+            "keys": [
+                "occmgmtContext",
+                "occmgmtContext2"
+            ]
+        }
+    },
+    "actions": {
+        "initializeSplitView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "synchronizeSplitViewStateWithURL",
+                    "condition": "!ctx.splitView"
+                },
+                {
+                    "action": "splitViewLocationUpdated",
+                    "condition": "!ctx.splitView"
+                },
+                {
+                    "action": "initializeOccmgmtSplitView",
+                    "condition": "!ctx.splitView"
+                }
+            ]
+        },
+        "synchAndPublishSplitViewLocationUpdate": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "synchronizeSplitViewStateWithURL"
+                },
+                {
+                    "action": "splitViewLocationUpdated"
+                }
+            ]
+        },
+        "synchronizeSplitViewStateWithURL": {
+            "actionType": "JSFunction",
+            "method": "synchronizeSplitViewStateWithURL",
+            "deps": "js/occmgmtSplitViewService",
+            "inputData": {
+                "objectsToOpen": "{{data.objectsToOpen}}",
+                "activeState": "{{data.activeState}}"
+            },
+            "outputData": {
+                "objectsToOpen": "result.objectsToOpen",
+                "activeState": "result.activeState"
+            }
+        },
+        "splitViewLocationUpdated": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "splitViewLocationUpdated",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "initializeOccmgmtSplitView": {
+            "actionType": "JSFunction",
+            "method": "initializeOccmgmtSplitView",
+            "deps": "js/occmgmtSplitViewService",
+            "inputData": {
+                "viewKeys": "{{data.view.keys}}",
+                "hiddenCommands": "{{data.hiddenCommands}}"
+            }
+        },
+        "destroyOccmgmtSplitView": {
+            "actionType": "JSFunction",
+            "method": "destroyOccmgmtSplitView",
+            "deps": "js/occmgmtSplitViewService",
+            "inputData": {}
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeSplitView",
+        "onUnmount": "destroyOccmgmtSplitView"
+    },
+    "onEvent": [ {
+        "eventId": "LOCATION_CHANGE_COMPLETE",
+        "action": "synchAndPublishSplitViewLocationUpdate"
+    } ]
+}

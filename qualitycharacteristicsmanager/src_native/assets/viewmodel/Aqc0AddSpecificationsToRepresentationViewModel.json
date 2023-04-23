@@ -1,0 +1,176 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-header.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-back-button.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-listbox.directive",
+        "js/visible-when.directive",
+        "js/aw-break.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "groupType": {
+            "displayName": "{{i18n.characteristicsGroupTypes}}",
+            "type": "STRING",
+            "hasLov": "true",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "requiredText": "{{i18n.Filter}}",
+            "dbValue": ""
+        },
+        "activeView": "Aqc0AddSpecificationsToRepresentation"
+    },
+    "actions": {
+        "getCharGroupTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qc0CharacteristicsType",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "Qc0CharacteristicsGroup"
+                    }
+                }
+            },
+            "outputData": {
+                "charGrouptypes": "{{function:getLOVList}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "showCharGroupList": {
+            "actionType": "dataProvider",
+            "method": "charGroupListProvider"
+        },
+        "findSavedQuery": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2010-04-SavedQuery",
+            "method": "findSavedQueries",
+            "inputData": {
+                "inputCriteria": [
+                    {
+                        "queryNames": [
+                            "CharGroupProvider"
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "generalQuery": "savedQueries[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "onQueryRetreived"
+                    }
+                ]
+            }
+        },
+        "getSearchResults": {
+            "actionType": "JSFunction",
+            "method": "executeQuery",
+            "deps": "js/Aqc0CipUtilService",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFoundGroups": "totalLoaded.length"
+            }
+        },
+        "getSelectedType": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "callSavedQuery"
+                    }
+                ]
+            }
+        },
+        "navBackMainPanel": {
+            "actionType": "JSFunction",
+            "method": "navBackToMainPanel",
+            "deps": "js/Aqc0openCharGroupCommandHandler",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        }
+    },
+    "dataProviders": {
+        "charGroupListProvider": {
+            "action": "getSearchResults",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFoundGroups}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0NavigateObject": {
+                    "id": "cmdShowChildren",
+                    "title": "Open",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/Aqc0openCharGroupCommandHandler"
+                    ],
+                    "displayOption": "ON_SELECTION",
+                    "position": "bottomRight"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getLOVList": {
+            "functionName": "getLOVList",
+            "parameters": []
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "onQueryRetreived",
+            "action": "showCharGroupList"
+        },
+        {
+            "eventId": "callSavedQuery",
+            "action": "findSavedQuery"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "getCharGroupTypes"
+        }
+    ],
+    "i18n": {
+        "addButtonTitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "ReplaceButtonTitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "characteristicsGroupTypes": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "openCharGroup": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "backButtontitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Filter": [
+            "qualitycharacteristicsmanagerMessages"
+        ]
+    }
+}

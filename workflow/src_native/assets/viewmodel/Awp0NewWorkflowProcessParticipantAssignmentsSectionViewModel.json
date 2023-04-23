@@ -1,0 +1,311 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+    "js/aw-panel-body.directive",
+    "js/aw-repeat.directive",
+    "js/aw-panel-section.directive",
+    "js/aw-command-panel-section.directive",
+    "js/aw-list.directive",
+    "js/aw-include.directive",
+    "js/exist-when.directive"
+    ],
+    "data":
+    {
+        "processAssignmentParticipantAnchorSection": "awp0_addParticipantEPMJobSectionCommands"
+    },
+
+
+
+    "actions":
+    {
+        "navigateToProcessAssignmentPanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "{{data.previousView}}",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "addSelectedUsers": {
+            "actionType": "JSFunction",
+            "method": "addSelectedUsers",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "updatePasteCommandContext": {
+            "actionType": "JSFunction",
+            "method": "updatePasteCommandContext",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "context": "{{ctx.taskAssignmentCtx.panelContext}}",
+                "selectedObjects": "{{data.eventMap['workflow.userPickerPanelSelection'].selectedObjects}}"
+            },
+            "deps": "js/Awp0ProcessAssignment"
+        },
+        "populateParticipantPanel": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "loadParticipantConstantTypes"
+                },
+                {
+                    "action": "populateValidParticipantTypes"
+                },
+                {
+                    "action": "getTargetObjectProperties",
+                    "condition": "conditions.isTargetBasedDPTemplate"
+                },
+                {
+                    "action": "createParticipantsDataProvider",
+                    "condition": "conditions.isJobBasedDPTemplate"
+                }
+            ]
+        },
+        "loadParticipantConstantTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "BusinessModeler-2007-06-Constants",
+            "method": "getTypeConstantValues",
+            "inputData":
+            {
+                "keys": "{{function:getParticipantConstantLoaded}}"
+            },
+            "outputData": {
+                "typeConstantValues": "constantValues"
+            },
+            "deps": "js/Awp0ProcessAssignment"
+        },
+        "populateValidParticipantTypes": {
+            "actionType": "JSFunction",
+            "method": "populateValidParticipantTypes",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "typeConstantValues": "{{data.typeConstantValues}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0ProcessAssignment"
+        },
+        "getTargetObjectProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": [{
+                    "uid":"{{data.targetObject.uid}}",
+                    "type":"{{data.targetObject.type}}"
+                 }],
+                "attributes": [
+                    "HasParticipant",
+                    "assignee"
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "ItemRevision",
+                        "properties":
+                        [
+                            {
+                                "name": "HasParticipant",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [
+                           {
+                              "name": "group",
+                              "modifiers": [
+                                 {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "role",
+                              "modifiers": [
+                                 {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "userName"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "ResourcePool",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Participant",
+                        "properties":
+                        [
+                            {
+                                "name": "assignee",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name" : "workflow.createTargetBasedParticipantProviders"
+                    }
+                ]
+            }
+        },
+        "createParticipantsDataProvider": {
+            "actionType": "JSFunction",
+            "method": "createParticipantsDataProvider",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0ProcessAssignment"
+        },
+        "createTargetBasedProviders": {
+            "actionType": "JSFunction",
+            "method": "createTargetBasedDPProviders",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0ProcessAssignment"
+        }
+
+    },
+    "lifecycleHooks": {
+        "onMount": "populateParticipantPanel"
+    },
+    "functions":
+    {
+        "getParticipantConstantLoaded":{
+            "functionName": "getParticipantConstantLoaded",
+            "parameters": [
+                "{{data.processAssignmentParticipants}}",
+                "{{data}}",
+                "{{subPanelContext}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isTargetBasedDPTemplate":
+        {
+            "expression": "ctx.workflow_process_candidates && ctx.workflow_process_candidates.workFlowObjects && ctx.workflow_process_candidates.workFlowObjects.length > 0 && ctx.workflow_process_candidates.workFlowObjects[0] && ctx.dynamicAssignmentPanelData.workflowTemplates.dbValue.props.fnd0StoreParticipantsOnJob.dbValues[0] === '0'"
+        },
+        "isJobBasedDPTemplate":
+        {
+            "expression": "ctx.dynamicAssignmentPanelData.workflowTemplates.dbValue.props.fnd0StoreParticipantsOnJob.dbValues[0] === '1'"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "addSelectedUsers"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "navigateToProcessAssignmentPanel"
+        },
+        {
+            "eventId": "workflow.userPickerPanelSelection",
+            "action": "updatePasteCommandContext",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "workflow.createTargetBasedParticipantProviders",
+            "action": "createTargetBasedProviders"
+        }
+
+    ],
+
+    "i18n":
+    {
+        "participants":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "addReviewerLabelText":
+        [
+            "InboxMessages"
+        ],
+        "duplicateReviewerMsg": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "wasNotAdded": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "multipleDuplicateMsg": [
+            "WorkflowCommandPanelsMessages"
+        ]
+    }
+
+
+}

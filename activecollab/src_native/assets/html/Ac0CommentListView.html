@@ -1,0 +1,78 @@
+<aw-panel-body>
+    <aw-include name="Ac0CommentList" exist-when="data.loadMoreComments" sub-panel-context="subPanelContext"></aw-include>
+    <aw-flex-row justify="left">
+        <aw-flex-column width="9f">
+            <aw-button action="loadMore" button-type="chromeless" visible-when="!data.hideMoreRepliesButton && data.moreCommentsAvailable">{{data.loadMoreButton}}</aw-button>
+        </aw-flex-column>
+    </aw-flex-row>
+    <aw-list dataprovider="data.dataProviders.commentsDataProvider" class="aw-activecollab-nonIndentedList">
+        <aw-flex-column justify="center">
+            <aw-flex-row justify="left" align-content="start">
+                <aw-flex-column width="5f" visible-when="!item.props.autoMsgType.displayValues[0]">
+                    <aw-avatar size="small" source="item.thumbnailUrl" exist-when="item.hasThumbnail"></aw-avatar>
+                    <aw-avatar size="small" source="item.typeIconURL" exist-when="!item.hasThumbnail"></aw-avatar>
+                </aw-flex-column>
+                <aw-flex-column>
+                    <aw-flex-row class="aw-widgets-propertyNonEditValue" justify="space-between" class="aw-activecollab-convCreds">
+                        <aw-flex-column class="aw-activecollab-autoMsg" visible-when="item.props.autoMsgType.displayValues[0]">
+                            <div aw-parse-html="" display-val="item.props.richTextObject.curtailRichText" is-rich-text="true" visible-when="item.props.richTextObject && item.props.richTextObject.curtailRichText.length > 0 && item.showMore"></div>
+                            <div aw-parse-html="" display-val="item.props.richText.displayValues[0]" is-rich-text="true" visible-when="item.props.richText.displayValues[0] && item.props.richText.displayValues[0].length > 0 && !item.showMore"></div>
+                            <aw-link prop="item.moreLink" action="noop" aw-click="item.doShowMore(item)" visible-when="item.showMoreLink"></aw-link>
+                            <aw-link prop="item.lessLink" action="noop" aw-click="item.doShowLess(item)" visible-when="item.showLessLink"></aw-link>
+                        </aw-flex-column>
+                        <aw-flex-column width="6" class="aw-activecollab-userBold" visible-when="!item.props.autoMsgType.displayValues[0]">
+                            {{item.props.userName.displayValues[0]}}
+                        </aw-flex-column>
+                        <aw-flex-column width="4" align-content="end">
+                            {{item.props.modifiedDateTime.displayValues[0]}}
+                        </aw-flex-column>
+                    </aw-flex-row>
+                    <aw-flex-row visible-when="!item.beingEdited && !item.props.autoMsgType.displayValues[0]" class="aw-activecollab-viewRichText">
+                        <div aw-parse-html="" display-val="item.props.richTextObject.curtailRichText" is-rich-text="true" visible-when="item.props.richTextObject && item.props.richTextObject.curtailRichText.length > 0 && item.showMore"></div>
+                        <div aw-parse-html="" display-val="item.props.richText.displayValues[0]" is-rich-text="true" visible-when="item.props.richText.displayValues[0] && item.props.richText.displayValues[0].length > 0 && !item.showMore"></div>
+                        <div visible-when="!item.props.richText.displayValues[0] && item.showMore">
+                            {{item.props.plainTextObject.curtailPlainText}}
+                        </div>
+                        <div visible-when="!item.props.richText.displayValues[0] && !item.showMore">
+                            {{item.props.plainText.displayValues[0]}}
+                        </div>
+                    </aw-flex-row>
+                    <aw-flex-row height="1.5f" visible-when="!item.beingEdited && !item.props.autoMsgType.displayValues[0]">
+                        <aw-link prop="item.moreLink" action="noop" aw-click="item.doShowMore(item)" visible-when="item.showMoreLink"></aw-link>
+                        <aw-link prop="item.lessLink" action="noop" aw-click="item.doShowLess(item)" visible-when="item.showLessLink"></aw-link>
+                    </aw-flex-row>
+                    <aw-flex-row class="aw-activecollab-quickReply" exist-when="item.beingEdited && !item.props.autoMsgType.displayValues[0]">
+                        <aw-flex-column width="12">
+                            <div class="aw-activecollab-editor">
+                                <div id="{{item.commentCKEId}}" name="{{item.commentCKEId}}"></div>
+                            </div>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                    <aw-include name="Ac0DiscardSaveComment" sub-panel-context="item" exist-when="item.beingEdited && !item.props.autoMsgType.displayValues[0]"></aw-include>
+                    <aw-flex-row justify="left" align-content="center" visible-when="!item.props.autoMsgType.displayValues[0] && !item.beingEdited">
+                        <aw-flex-column justify="center" align-content="end">
+                            <aw-pic id="{{item.moreCmtCellCmdsIdRef}}" class="aw-widget-thumbnail aw-commands-commandToolbarIconButton" icon-id="data.cmdMore" aw-click="item.doShowMoreCmtCellCmds(item)" extended-tooltip="{{item.moreDesc}}" visible-when="item.showMoreCmtCellCmds"></aw-pic>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-flex-column>
+            </aw-flex-row>
+        </aw-flex-column>
+        <div class="aw-activecollab-convSeparator aw-theme-separator"></div>
+    </aw-list>
+    <div visible-when="!data.hideReplyBox">
+        <aw-flex-row class="aw-activecollab-quickReply">
+            <aw-flex-column align-content="stretch">
+                <aw-label prop="data.replyPlaceHolder"></aw-label>
+                <div class="aw-activecollab-editor">
+                    <div id="{{subPanelContext.ckEditorIdRef}}" name="{{subPanelContext.ckEditorIdRef}}"></div>
+                </div>
+            </aw-flex-column>
+        </aw-flex-row>
+        <aw-flex-row align-content="center" justify="right" height="3f">
+            <div align-content="end">
+                <aw-button action="reply" size="auto" enable-when="conditions.validInputDataForCreateComment && !ctx.Ac0ConvCtx.cmtEdit.activeCommentToEdit.beingEdited"><aw-i18n>i18n.reply</aw-i18n></aw-button>
+            </div>
+        </aw-flex-row>
+        <div class="aw-activecollab-convSeparator aw-theme-separator"></div>
+    </div>
+</aw-panel-body>

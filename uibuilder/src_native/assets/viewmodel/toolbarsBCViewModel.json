@@ -1,0 +1,49 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "toolbarsBCProvider"
+        },
+        "buildCrumbs": {
+            "actionType": "JSFunction",
+            "method": "buildNavigateBreadcrumb",
+            "inputData": {
+                "totalFound": "{{ctx.search.totalFound}}",
+                "selectedObjects": "{{ctx.mselected}}"
+            },
+            "outputData": {
+                "crumbs": "crumbs"
+            },
+            "deps": "js/aw.navigateBreadCrumbService"
+        },
+        "doSearchKeepFilter": {
+            "actionType": "JSFunction",
+            "method": "simpleSearch",
+            "inputData": {
+                "searchCriteria": "{{data.searchBox.dbValue}}"
+            },
+
+            "deps": "js/filterPanelService"
+        }
+    },
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isEnabled": "true",
+            "dbValue": "{{ctx.search.criteria.searchString}}",
+            "dispValue": "{{ctx.search.criteria.searchString}}"
+        }
+    },
+    "dataProviders": {
+        "toolbarsBCProvider": {
+            "action": "buildCrumbs",
+            "response": "{{data.crumbs}}",
+            "totalFound": "{{data.crumbs.length}}"
+        }
+    }
+}

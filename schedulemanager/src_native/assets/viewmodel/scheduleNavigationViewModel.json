@@ -1,0 +1,75 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-native-sublocation.directive"
+    ],
+
+    "data":
+    {
+        "_sublocation":
+        {
+            "name": "com.siemens.splm.client.schmgt:ScheduleNavigationSubLocation",
+            "label": {
+                "source": "/i18n/ScheduleManagerMessages",
+                "key": "ganttTitle"
+            },
+            "clientScopeURI": "Saw1ScheduleGantt",
+            "nameToken": "com.siemens.splm.client.schmgt:ScheduleNavigationSubLocation",
+            "context": {
+                "search": {
+                    "provider": "Saw1TaskSearchProvider",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "columnsToExclude": [],
+                    "criteria":
+                    {
+                        "sublocationToken" : "ScheduleGantt",
+                        "searchContentType" : "ScheduleTask",
+                        "searchContent": "childTasks",
+                        "topScheduleUid": "{{ctx.locationContext.modelObject.uid}}",
+                        "parentTaskUid": "{{ctx.locationContext.modelObject.props.fnd0SummaryTask.dbValues[0]}}"
+                    },
+                    "activeFilterMap": {}
+                }
+            },
+            "selectionQueryParamKey": "c_uid",
+            "viewModes": {
+                "TreeView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": false
+                },
+                "TreeSummaryView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": true
+                }
+            },
+            "awSubLocationPref": {
+                "orientation": "HORIZONTAL"
+            },
+            "viewBase": "scheduleNavigation"
+        }
+    },
+    "actions": {
+        "intializeScheduleNavigationSublocation": {
+            "actionType": "JSFunction",
+            "method": "intializeScheduleNavigationSublocation",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/scheduleNavigationService"
+        },
+        "destroyScheduleNavigationSublocation": {
+            "actionType": "JSFunction",
+            "method": "destroyScheduleNavigationSublocation",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/scheduleNavigationService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "intializeScheduleNavigationSublocation",
+        "onUnmount": "destroyScheduleNavigationSublocation"
+    }
+}

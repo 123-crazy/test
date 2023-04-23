@@ -1,0 +1,80 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "data": {
+        "name": {
+            "displayName":"{{i18n.name}}",
+            "dbValue": "",
+            "type": "STRING",
+            "isRequired":"true"
+        },
+        "description": {
+            "displayName":"{{i18n.description}}",
+            "dbValue": " ",
+            "type": "STRING",
+            "isRequired":"false"
+        }
+    },
+
+    "actions":
+    {
+        "create":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagementAw-2017-06-ScheduleManagementAw",
+            "method": "createMasterSchedule",
+            "inputData":
+            {
+                "createMasterInputs":
+                [
+                    {
+                        "name": "{{data.name.dbValue}}",
+                        "description": "{{data.description.dbValue}}",
+                        "schedulesToInsert": "{{ctx.selectedSchedules}}",
+                        "timeZone":""
+
+                   }
+               ],
+               "runInBackground": true
+            },
+            "events":
+            {
+                "success":
+                [
+                   {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "conditions": {
+        "isValidToShowCreateButton": {
+            "expression":"data.name.dbValue"
+        }
+    },
+
+    "i18n":
+    {
+        "createMasterScheduleCommandTitle": ["PrgScheduleManagerMessages"],
+        "create":["PrgScheduleManagerMessages"],
+        "name": ["PrgScheduleManagerMessages"],
+        "description": ["PrgScheduleManagerMessages"],
+        "timeZone": ["PrgScheduleManagerMessages"]
+    }
+}

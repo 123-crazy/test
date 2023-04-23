@@ -1,0 +1,202 @@
+{
+   "schemaVersion" : "1.0.0",
+   "imports":
+    [
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive"
+      ],
+
+    "actions":
+    {
+        "reveal": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addObjectEvent",
+                        "condition": "ctx.subscriptions"
+                    },
+                    {
+                        "name": "initListSubscriptionDataProvider",
+                        "condition": "!ctx.subscriptions"
+                    },
+                    {
+                        "name": "setPinCommandsEvent"
+                    }
+                ]
+            }
+        },
+        "getAllSubscriptionsDataProvider": {
+            "actionType": "dataProvider",
+            "method": "existingSubscription"
+        },
+        "addObjectAction":{
+            "actionType": "JSFunction",
+            "method": "addObject",
+            "inputData":{
+                "data":"{{data}}",
+                "listOfSubscriptions":"{{ctx.subscriptions}}",
+                "dataProvider":"{{data.dataProviders.existingSubscription}}"
+             },
+             "deps":"js/Saw1NotificationService"
+         },
+        "setPinCommandsAction":{
+            "actionType": "JSFunction",
+            "method": "setPinCommands",
+            "inputData":
+            {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Sub0SubscribeCommandPanelService"
+         },
+        "unregisterSubscriptionContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "subscriptions"
+            }
+        },
+        "getSubscriptionList": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Notification-2015-03-SubscriptionManagement",
+            "method": "findSubscriptions",
+            "inputData": {
+                "input": {
+                    "target": {
+                        "uid" : "{{ctx.selected.uid}}",
+                        "type" : "{{ctx.selected.type}}"
+                    }
+                }
+            },
+            "outputData": {
+                "listOfSubscriptions": "{{function:sortSubscriptions}}",
+                "totalFound": "subscriptions.length"
+            },
+            "deps": "propRenderTemplates/Saw1SubscriptionHelper"
+        },
+        "saw1SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "saw1SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "lifecycleHooks": {
+        "onUnmount": "unregisterSubscriptionContext"
+    },
+
+    "data": {
+        "subscriptionCommands":"saw1_subscriptionCommands",
+        "Saw1PinCommands":"saw1_oneStepPinCommands",
+        "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Saw1SubscribeSub"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "setPinCommandsEvent",
+            "action": "setPinCommandsAction"
+        },
+        {
+            "eventId": "addObjectEvent",
+            "action": "addObjectAction"
+        },
+        {
+            "eventId": "initListSubscriptionDataProvider",
+            "action": "getAllSubscriptionsDataProvider"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetPin",
+            "cacheEventData": true,
+            "action": "saw1SetPin"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetUnPin",
+            "cacheEventData": true,
+            "action": "saw1SetUnPin"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        }
+    ],
+
+    "dataProviders": {
+        "existingSubscription": {
+            "action": "getSubscriptionList",
+            "response": "{{data.listOfSubscriptions}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "aw_subscriptionShowObjectCellCommandAction"
+        }
+    },
+
+    "conditions": {
+        "checkSelectionChange": {
+            "expression": "name == 'selected' || name == 'mselected'"
+        }
+    },
+
+    "i18n" :
+    {
+        "mySybscriptionsTitle":["ScheduleManagerMessages"]
+    },
+    "functions": {
+        "sortSubscriptions": {
+            "functionName": "sortSubscriptions",
+            "parameters": [
+                "{{response}}"
+            ]
+        }
+    }
+}

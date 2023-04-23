@@ -1,0 +1,132 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-cls-fullview-image-ribbon.directive",
+        "js/aw-column.directive",
+        "js/aw-command-panel-section.directive",
+        "js/exist-when.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-repeat.directive",
+        "js/aw-widget.directive",
+        "js/visible-when.directive"
+    ],
+    "data":{ 
+        "classifyImageCommands": "classify_imgCommands",
+        "commands":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "action": "onPrevChevronClick",
+                    "iconName": "miscChevronLeft",
+                    "tooltip": "{{i18n.previousButtonTitle}}"
+                },
+                {
+                    "action": "onNextChevronClick",
+                    "iconName": "miscChevronRight",
+                    "tooltip": "{{i18n.nextButtonTitle}}"
+                }
+    
+            ]
+          }
+    },
+    "actions":{
+        "onNextChevronClick":{
+            "actionType": "JSFunction",
+            "method": "onNextChevronClick",
+            "inputData": {
+                 "data":"{{data}}"
+            },
+        "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "classifyTab.chevronNext1"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "classifyTab.chevronNext1"
+                    }
+                ]
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "onPrevChevronClick":{
+            "actionType": "JSFunction",
+            "method": "onPrevChevronClick",
+            "inputData": {
+                 "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "classifyTab.chevronPrevious1"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "classifyTab.chevronPrevious1"
+                    }
+                ]
+            },
+            "deps": "js/classifyFullViewService"
+        },
+     "showImageViewer":
+        {
+            "actionType": "JSFunction",
+            "method": "showImageViewer",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "formatImageAttachments": {
+            "actionType": "JSFunction",
+            "method": "formatImageAttachments",
+            "inputData": {
+               "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId":"fillImageViewer",
+            "action":"formatImageAttachments"
+        },
+        {
+            "eventId": "classifySearch.chevronNext1",
+            "action": "showImageViewer"
+        },
+        {
+            "eventId": "classifySearch.chevronPrevious1",
+            "action": "showImageViewer"
+        },
+        {
+            "eventId": "classifyTab.imageSelected",
+            "action": "showImageViewer"
+        }
+    ],
+    "i18n": {
+        "applicationClass":  [ "ClassificationAdminMessages" ],
+        "attributes":  [ "ClassificationAdminMessages" ],
+        "parent":["ClassificationAdminMessages"],
+        "preview":["ClassificationAdminMessages"],
+        "propertiesTitle":  [ "ClassificationAdminMessages" ],
+        "previousButtonTitle":          [ "ClassificationAdminMessages" ],
+        "nextButtonTitle":              [ "ClassificationAdminMessages" ]
+    },
+    "lifecycleHooks": {
+        "onInit": "formatImageAttachments"
+    }
+}

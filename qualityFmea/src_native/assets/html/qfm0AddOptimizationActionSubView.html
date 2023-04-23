@@ -1,0 +1,38 @@
+<aw-form name="commandPanelForm"
+    visible-when="data.activeView !== 'qfm0AddCrossFuncTeamMemberSub' && data.activeView !== 'qfm0AddCrossFuncTeamMemberSub'">
+    <aw-panel-header>
+        <aw-panel-section caption="i18n.toTitle">
+            <aw-default-cell vmo="data.targetObject"></aw-default-cell>
+        </aw-panel-section>
+    </aw-panel-header>
+    <aw-panel-body>
+        <aw-panel-section
+            caption="{{ctx.activeToolsAndInfoCommand.commandId === 'qfm0AddPreventionOptimizationAction' ?i18n.qfm0PreventionOptimizationAction:i18n.qfm0DetectionOptimizationAction}}">
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.qfm0Properties"></aw-panel-section>
+        <aw-panel-section>
+            <aw-textbox prop="data.nextId"></aw-textbox>
+            <aw-textbox prop="data.name"></aw-textbox>
+            <aw-textarea prop="data.description"></aw-textarea>
+            <aw-widget prop="data.qam0DueDate"></aw-widget>
+        </aw-panel-section>
+        <aw-command-panel-section caption="i18n.qfm0ResponsibleUser" anchor="data.qfm0ResponsibleUserSectionCommands"
+            context="data">
+            <aw-list dataprovider="data.dataProviders.getAssignedResponsibleUserProvider"
+                has-floating-cell-commands="false">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+        </aw-command-panel-section>
+    </aw-panel-body>
+
+    <aw-panel-footer>
+        <aw-button action="createOptimizationAction"
+            visible-when="data.nextId.dbValue.length > 0 && data.name.dbValue.length > 0 && data.qam0DueDate.uiValue.length > 0 && data.dataProviders.getAssignedResponsibleUserProvider.viewModelCollection.loadedVMObjects.length > 0 && !(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet')">
+            <aw-i18n>i18n.qfm0Add</aw-i18n>
+        </aw-button>
+        <aw-button action="createOptimizationActionInFormsheet"
+            visible-when="data.nextId.dbValue.length > 0 && data.name.dbValue.length > 0 && data.qam0DueDate.uiValue.length > 0 && data.dataProviders.getAssignedResponsibleUserProvider.viewModelCollection.loadedVMObjects.length > 0 && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet')">
+            <aw-i18n>i18n.qfm0Add</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-form>

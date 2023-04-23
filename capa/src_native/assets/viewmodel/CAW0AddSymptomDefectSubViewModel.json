@@ -1,0 +1,319 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-xrt.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-title-link.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-header.directive"
+    ],
+    "data": {
+        "addFailureCommand": "caw0_addFailureCommand",
+        "caw0PinWhyCommands": "caw0_whyPinCommands",
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "actions": {
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2016-09-DataManagement",
+            "method": "createAttachAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}",
+                "datasetInfos": "{{function:getDatasets}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "caw0.relateDefectAndFailure",
+                    "condition": "data.selectedFailureObjects.length > 0"
+                },
+                {
+                    "name": "caw0.createRelation",
+                    "condition": "data.selectedFailureObjects === undefined || data.selectedFailureObjects.length === 0"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==26050 || errorCode.code==214200",
+                    "message": "createRelFailureMsg"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "relateDefectAndFailure": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{data.createdMainObject}}",
+                    "secondaryObject": "{{data.selectedFailureObjects[0]}}",
+                    "relationType": "CAW0RelatedFailure",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "caw0.createRelation"
+                } ],
+                "failure": [ {
+                    "name": "caw0.createRelation"
+                } ]
+            }
+        },
+        "createRelationWithCAPA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.xrtSummaryContextObject}}",
+                    "secondaryObject": "{{data.createdMainObject}}",
+                    "relationType": "CPA0SymptomDescription",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "caw0.addparentCAPA"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "addElement.added",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    }
+                ],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "setProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData":
+            {
+                "info":
+                [
+                    {
+                        "object": "{{data.createdMainObject}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "caw0Context",
+                                "values":
+                                [
+                                    "Issue"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "updatePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "autoSelectType": {
+            "actionType": "JSFunction",
+            "method": "autoSelectType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "getSelectedFailures": {
+            "actionType": "JSFunction",
+            "method": "getSelectedFailures",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "selectedFailureObjects": "selectedFailureObjects"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "navigateToCreateDefectPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "CAW0AddSymptomDefectSub",
+                        "eventData": "{{data.eventData}}"
+                    }
+                } ]
+            }
+        },
+        "removeFailure": {
+            "actionType": "JSFunction",
+            "method": "removeFailure",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0FailuerFiltercommandHandler"
+        },
+        "resetUiValuesSD": {
+            "actionType": "JSFunction",
+            "method": "resetUiValues",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "cdm.relatedModified",
+            "action": "setProperties"
+        },
+        {
+            "eventId": "caw0.addparentCAPA",
+            "action": "addparentCAPA"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updatePanel"
+        },
+        {
+            "eventId": "awTypeSelector.modelObjectsUpdated",
+            "action": "autoSelectType"
+        },
+        {
+            "eventId": "caw0.createRelation",
+            "action": "createRelationWithCAPA"
+        },
+        {
+            "eventId": "caw0addFailureToDefect",
+            "action": "getFailureProvider"
+        },
+        {
+            "eventId": "caw0addFailureToDefect",
+            "action": "navigateToCreateDefectPanel"
+        },
+        {
+            "eventId": "Caw0RemoveFailureCommand.removeFailure",
+            "action": "removeFailure"
+        },
+        {
+            "eventId": "caw0.relateDefectAndFailure",
+            "action": "relateDefectAndFailure"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true,
+            "action": "resetUiValuesSD"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        }
+    },
+    "messages": {
+        "createRelFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "failure": [ "CAW0CapaMessages" ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "dataProviders": {
+        "getFailureProvider": {
+            "action": "getSelectedFailures",
+            "response": "{{data.selectedFailureObjects}}",
+            "totalFound": "{{data.selectedFailureObjects.length}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "caw0_removeFailureCommand"
+        }
+    }
+
+}

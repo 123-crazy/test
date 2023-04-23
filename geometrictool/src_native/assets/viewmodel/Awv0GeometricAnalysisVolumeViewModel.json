@@ -1,0 +1,270 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+                 "js/aw-command-panel-section.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-list.directive",
+                 "js/aw-occmgmt-cell.directive",
+                 "js/aw-i18n.directive",
+                 "js/visible-when.directive",
+                 "js/aw-button.directive",
+                 "js/aw-row.directive",
+                 "js/aw-column.directive",
+                 "js/aw-numeric.directive",
+                 "js/aw-splitter.directive"],
+    "actions": {
+
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "volumePanelRevealed",
+            "deps": "js/Awv0GeometricAnalysisVolumeSearchService"
+        },
+        "getAllTargetsAction":
+        {
+            "actionType": "dataProvider",
+            "method": "volumeSearchPanelDataProvider"
+        },
+        "getAllTargets":
+        {
+            "actionType": "JSFunction",
+            "method": "getAllTargets",
+            "inputData":
+            {
+            },
+            "outputData":
+            {
+                "allTargets": "allTargets",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/Awv0GeometricAnalysisVolumeSearchService"
+        },
+        "setNewVoulmeCorners":
+        {
+            "actionType": "JSFunction",
+            "method": "updateVolumeCorners",
+            "inputData":
+            {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/Awv0GeometricAnalysisVolumeSearchService"
+        },
+        "executeVolumeSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "executeVolumeSearch",
+            "inputData":
+            {
+                "cornerValues":
+                [
+                 "{{data.targetRangeVolumeX1.dbValue}}",
+                 "{{data.targetRangeVolumeY1.dbValue}}",
+                 "{{data.targetRangeVolumeZ1.dbValue}}",
+                 "{{data.targetRangeVolumeX2.dbValue}}",
+                 "{{data.targetRangeVolumeY2.dbValue}}",
+                 "{{data.targetRangeVolumeZ2.dbValue}}"
+                ]
+            },
+            "deps": "js/Awv0GeometricAnalysisVolumeSearchService"
+        },
+        "updateTargetVolume": {
+            "actionType": "JSFunction",
+            "method": "updateTargetVolume",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awv0GeometricAnalysisVolumeSearchService"
+        },
+        "initializeVolumeTarget": {
+            "actionType": "JSFunction",
+            "method": "initializeVolumeTarget",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awv0GeometricAnalysisVolumeSearchService"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "geoanalysis.volumeSearchTargetListUpdated",
+            "action": "getAllTargetsAction"
+        },
+        {
+            "eventId": "geoanalysis.volumeSearchTargetListUpdated",
+            "action": "initializeVolumeTarget"
+        },
+        {
+            "eventId": "geoanalysis.volumeCornersUpdated",
+            "cacheEventData": true,
+            "action": "setNewVoulmeCorners"
+        },
+        {
+            "eventId": "geoanalysis.volumePanelRevealed",
+            "action": "getAllTargetsAction"
+        },
+        {
+            "eventId": "geoanalysis.redrawVolumeBoundingBox",
+            "action": "getAllTargetsAction"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "updateTargetVolume",
+            "criteria": {
+                "condition": "conditions.volumeChangeCondition"
+            },
+            "cacheEventData": true
+        }
+    ],
+    "data": {
+       "analysisVolumnAddRemoveCommands":"awv0_volumnAddRemovecommands",
+       "targetRangeVolumeX1":
+        {
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "isEnabled": "true",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidCornerValueX",
+                    "value": "{{i18n.invalidCornerValues}}"
+                }
+            ]
+        },
+        "targetRangeVolumeX2":
+        {
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "isEnabled": "true",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidCornerValueX",
+                    "value": "{{i18n.invalidCornerValues}}"
+                }
+            ]
+        },
+        "targetRangeVolumeY1":
+        {
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "isEnabled": "true",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidCornerValueY",
+                    "value": "{{i18n.invalidCornerValues}}"
+                }
+            ]
+        },
+        "targetRangeVolumeY2":
+        {
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "isEnabled": "true",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidCornerValueY",
+                    "value": "{{i18n.invalidCornerValues}}"
+                }
+            ]
+        },
+        "targetRangeVolumeZ1":
+        {
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "isEnabled": "true",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidCornerValueZ",
+                    "value": "{{i18n.invalidCornerValues}}"
+                }
+            ]
+        },
+        "targetRangeVolumeZ2":
+        {
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "isEnabled": "true",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidCornerValueZ",
+                    "value": "{{i18n.invalidCornerValues}}"
+                }
+            ]
+        }
+    },
+    "dataProviders":
+    {
+        "volumeSearchPanelDataProvider":
+        {
+            "action": "getAllTargets",
+            "response": "{{data.allTargets}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "viewer_volume_cell_commands"
+        }
+    },
+    "conditions":
+    {
+        "hasTargets":
+        {
+            "expression": "data.totalFound !== undefined && data.totalFound > 0"
+        },
+        "invalidCornerValueX":
+        {
+            "expression": "data.targetRangeVolumeX1.dbValue > data.targetRangeVolumeX2.dbValue "
+        },
+        "invalidCornerValueY":
+        {
+            "expression": "data.targetRangeVolumeY1.dbValue > data.targetRangeVolumeY2.dbValue "
+        },
+        "invalidCornerValueZ":
+        {
+            "expression": "data.targetRangeVolumeZ1.dbValue > data.targetRangeVolumeZ2.dbValue "
+        },
+        "anyEmptyCornerValue":
+        {
+            "expression": "data.targetRangeVolumeX1.dbValue === '' || data.targetRangeVolumeX2.dbValue === '' || data.targetRangeVolumeY1.dbValue === '' || data.targetRangeVolumeY2.dbValue === '' || data.targetRangeVolumeZ1.dbValue === '' || data.targetRangeVolumeZ2.dbValue === '' "
+        },
+        "volumeChangeCondition":{
+            "expression": "data.targetRangeVolumeX1.dbValue.toString() + data.targetRangeVolumeX2.dbValue.toString() + data.targetRangeVolumeY1.dbValue.toString() + data.targetRangeVolumeY2.dbValue.toString() + data.targetRangeVolumeZ1.dbValue.toString() + data.targetRangeVolumeZ2.dbValue.toString()",
+            "trackValues": true
+        }
+    },
+     "i18n":
+    {
+        "volumeTabText":["GeometricAnalysisMessages"],
+        "emptyTargetList":["GeometricAnalysisMessages"],
+        "corner1Text":["GeometricAnalysisMessages"],
+        "corner2Text":["GeometricAnalysisMessages"],
+        "coordinateX":["GeometricAnalysisMessages"],
+        "coordinateY":["GeometricAnalysisMessages"],
+        "coordinateZ":["GeometricAnalysisMessages"],
+        "filterButtonText":["GeometricAnalysisMessages"],
+        "seedPartsText":["GeometricAnalysisMessages"],
+        "invalidCornerValues":["GeometricAnalysisMessages"]
+    }
+
+}

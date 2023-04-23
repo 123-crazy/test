@@ -1,0 +1,206 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list-filter.directive"
+    ],
+
+    "actions": {
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "getAllClosureRulesAction": {
+            "actionType": "dataProvider",
+            "method": "getClosureRules"
+        },
+        "getClosureRules":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "{{function:getProviderName}}",
+                    "searchCriteria":
+                    {
+                    },
+                    "searchFilterFieldSortType": "Priority",
+                    "startIndex": 0
+                }
+            },
+            "outputData":
+            {
+                "searchResults": "{{function:processClosureRules}}",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/closureRuleConfigurationService"
+        },
+        "applyClosureRuleBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateJitterFreePropLoadOnCurrentContext"
+                },{
+                    "action": "applyClosureRule"
+                }
+            ]
+        },
+        "updateJitterFreePropLoadOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref.jitterFreePropLoad",
+                "value": true
+            },
+            "deps": "js/appCtxService"
+        },
+        "applyClosureRule":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path": "{{data.contextKey + '.configContext'}}",
+                "value":{
+                    "cl_uid":"{{data.eventData.closureRule}}",
+                    "r_uid": "{{data.contextKeyObject.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "var_uids": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "de": "{{data.contextKeyObject.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "ue": "{{data.contextKeyObject.productContextInfo.props.awb0EffUnitNo.dbValues[0]}}",
+                    "ei_uid": "{{data.contextKeyObject.productContextInfo.props.awb0EffEndItem.dbValues[0]}}",
+                    "startDate" :"{{data.contextKeyObject.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate" :"{{data.contextKeyObject.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "fromUnit" :"{{data.contextKeyObject.productContextInfo.props.awb0StartEffUnits.dbValues[0]}}",
+                    "toUnit" :"{{data.contextKeyObject.productContextInfo.props.awb0EndEffUnits.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+        "deps": "js/appCtxService"
+        },
+        "selectClosureRule": {
+            "actionType": "JSFunction",
+            "method": "selectClosureRule",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/closureRuleConfigurationService"
+        },
+        "updateClosureRule": {
+            "actionType": "JSFunction",
+            "method": "updateClosureRule",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/closureRuleConfigurationService"
+        },
+        "activateCurrentView": {
+            "actionType": "JSFunction",
+            "method": "updateActiveContext",
+            "inputData": {
+                "data": "{{data.viewKey}}"
+            },
+            "deps": "js/contextStateMgmtService"
+        },
+        "initializeClosureRuleView": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "populateContextKey"
+                },
+                {
+                "action": "getAllClosureRulesAction"
+                },
+                {
+                    "action": "activateCurrentView",
+                    "condition": "conditions.isActiveViewDifferent"
+                }
+        ]
+        }
+    },
+
+    "dataProviders":
+    {
+        "getClosureRules":
+        {
+            "action": "getClosureRules",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeClosureRuleView"
+    },
+    "functions": {
+        "getProviderName": {
+            "functionName": "getProviderName",
+            "parameters": [
+                "ClosureRulesProvider"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "getClosureRules.selectionChangeEvent",
+            "action": "updateClosureRule",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "getClosureRules.modelObjectsUpdated",
+            "action": "selectClosureRule"
+        },
+        {
+            "eventId": "awClosureRule.ValueChanged",
+            "cacheEventData": true,
+            "action": "applyClosureRuleBatchJob"
+        }
+    ],
+
+    "messages": {},
+
+    "conditions": {
+        "isActiveViewDifferent": {
+            "expression": "data.viewKey !== ctx.aceActiveContext.key"
+        }
+    },
+
+    "data":
+    {
+        "defaultClosureRule":
+        {
+            "displayName": "{{i18n.defaultClosureRuleValue}}",
+            "uiValue": "{{i18n.defaultClosureRuleValue}}",
+            "type": "STRING"
+        },
+        "currentClosureRule":
+        {
+            "uiValue": "{{data.currentClosureRule}}",
+            "type": "STRING"
+        },
+        "closureRuleFilterbox":
+        {
+            "displayName": "{{i18n.filter1}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "i18n":
+    {
+        "expansion": ["OccurrenceManagementConstants"],
+        "defaultClosureRuleValue": ["OccurrenceManagementConstants"],
+        "filter1":["OccurrenceManagementConstants"]
+    }
+}

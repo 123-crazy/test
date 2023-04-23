@@ -1,0 +1,72 @@
+
+ <aw-panel-header>
+    <!--Removed Aw-include as with scrollable=false an additional space was introduced in the panel header-->
+   <aw-layout-slot name="Awb0ContextFeature_ContextInFilter"  ></aw-layout-slot>
+
+   <!-- Recipe panel -->
+   <div exist-when="data.recipe.length > 0" class="aw-subset-subsetRecipe aw-subset-discoveryRecipe">
+       <!-- Create a new recipe term for each recipe -->
+       <div aw-repeat="recipeItem : data.recipe | limitTo: !data.showMoreLink.dbValue ? '': 3">
+           <aw-include name="DiscoveryRecipeTerm" sub-panel-context="{'recipeItem':recipeItem,'index':$index, 'isEditable':!(ctx[data.contextKey].context.supportedFeatures.HideRecipeEditFeature_30 !== undefined && ctx[data.contextKey].context.supportedFeatures.HideRecipeEditFeature_30===true), 'showfilteroperator': data.showFilterOperator, 'hideFirstTermDelete': (data.recipe && data.recipe.length > 1)}"></aw-include>
+       </div>
+       <!-- More... and Less... link-->
+       <aw-link prop="data.showMore" exist-when="data.recipe.length > 3 && data.showMoreLink.dbValue" class="aw-uiwidgets-moreLink" action="toggleShowMore"></aw-link>
+       <aw-link prop="data.showLess" exist-when="data.recipe.length > 3 && !data.showMoreLink.dbValue" class="aw-uiwidgets-moreLink" action="toggleShowMore"></aw-link>
+   </div>
+
+   <aw-separator class="aw-subset-recipeSeparator" exist-when="data.recipe.length > 0"></aw-separator>
+
+   <!--Category search box-->
+   <aw-filter-in-filters-searchbox class="aw-filter-discoveryFilterProperty"
+   category="ctx[data.contextKey].context.categoriesToRender" prop="data.searchBox1" >
+   </aw-filter-in-filters-searchbox>
+</aw-panel-header>
+
+<!-- Category-Filters display-->
+<aw-panel-body scrollable="false">
+
+    <!-- Filters with category logic display-->
+    <aw-scrollpanel exist-when="conditions.isTCVersion132OrLater">
+
+        <aw-flex-row  class="aw-filter-discoveryCategory" height="auto" aw-repeat="item : ctx[data.contextKey].context.categoriesToRender | filterInFiltersSearch :data.searchBox1.dbValue:this">
+            <aw-flex-column width="fill">
+                <aw-filter-category
+                    exist-when="item.categoryType!='Proximity' || (item.categoryType=='Attribute' && item.filterValues.length==1 && item.filterValues[0].internalName=='')"
+                    search-action="selectStructureFilterAction"
+                    category-action="selectGivenCategory" category="item">
+                    <aw-textbox prop="category.filterValues[0].prop" exist-when="(category.categoryType=='Attribute' && category.filterValues.length==1 && category.filterValues[0].internalName=='')" aw-enter-key="selectStructureFilterAction"></aw-textbox>
+                </aw-filter-category>
+            </aw-flex-column>
+            <aw-flex-column width="3f">
+                <!--Hide category logic when no recipe or for the category for 1st recipe term or for Date type category if first term is from that category -->
+                <div extended-tooltip="data.excludeByFilteringTooltip"  extended-tooltip-options="{'placement' : 'right'}" extended-tooltip-context="data.excludeByFilteringTooltipContext"class="aw-filter-categoryLogicIconWrapper" aw-class="[{'aw-state-selected': data.categoryLogicMap != null && !data.categoryLogicMap[item.displayName] },
+                {'hidden': data.recipe == undefined || data.recipe.length == 0  ||
+                (data.recipe.length >= 1 && data.recipe[0].criteriaValues[0] === item.internalName && item.categoryType !== 'Spatial') ||
+            (data.recipe.length >= 1 && item.type === 'DateFilter' && data.recipe[0].criteriaValues[0].indexOf(item.internalName) > -1) }]" >
+                   <aw-icon class="aw-filter-categoryLogicIcon"  icon-id="miscFilterExclude" visible-when="!ctx[data.contextKey].context.updatedRecipe" aw-click="data.toggleCategoryLogicCommand(item)"></aw-icon>
+                </div>
+            </aw-flex-column>
+        </aw-flex-row>
+
+    </aw-scrollpanel>
+
+      <!-- Filters without category logic display-->
+    <aw-scrollpanel exist-when="!conditions.isTCVersion132OrLater">
+        <aw-filter-category
+            exist-when="item.categoryType!='Proximity' || (item.categoryType=='Attribute' && item.filterValues.length==1 && item.filterValues[0].internalName=='')"
+            search-action="selectStructureFilterAction"
+            category-action="selectGivenCategory" category="item"
+            aw-repeat="item : ctx[data.contextKey].context.categoriesToRender | filterInFiltersSearch :data.searchBox1.dbValue:this track by $index">
+            <aw-textbox prop="category.filterValues[0].prop" exist-when="(category.categoryType=='Attribute' && category.filterValues.length==1 && category.filterValues[0].internalName=='')" aw-enter-key="selectStructureFilterAction"></aw-textbox>
+        </aw-filter-category>
+    </aw-scrollpanel>
+
+</aw-panel-body>
+
+<!--Filter Button-->
+<aw-panel-footer exist-when="conditions.isFilterButtonVisible">
+<br>
+<aw-button action="applyFilter">
+    <aw-i18n>i18n.filterButtonTitle</aw-i18n>
+</aw-button>
+</aw-panel-footer>

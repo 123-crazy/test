@@ -1,0 +1,326 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-listbox.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-break.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "loadDataProvider"
+                },
+                {
+                    "action": "loadRuleObject"
+                },
+                {
+                    "action": "loadStateLOV"
+                }
+            ]
+        },
+        "loadDataProvider": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getEvaluationRuleConditions"
+            ]
+        },      
+        "loadRuleObject": {
+            "actionType": "JSFunction",
+            "method": "loadRatingRuleObjectWithProps",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "outputData":{
+                "ratingObject": "result.ratingObject"
+            },
+            "events": {
+                "success": [  
+                    {
+                        "name": "loadAnswerLOVEvent"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0ChecklistSpecService"
+        },  
+        "loadAnswerLOV":{
+            "actionType": "JSFunction",
+            "method": "loadAnswerOptionsInLOV",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "answerValues": ""
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingAnswerConfigService"
+        },
+        "loadStateLOV":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qc0State",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "Qc0RatingRule"
+                    }
+                }
+            },
+            "outputData": {
+                "stateValues": "{{function:getLOVlistofState}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecService"
+        },
+        "parseEvaluationRuleConditions": {
+            "actionType": "JSFunction",
+            "method": "getEvaluationRuleConditions",
+            "inputData": {        
+                "dataProvider": "{{data.dataProviders.getEvaluationRuleConditions}}",                        
+                "data": "{{data}}"
+            },            
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        },        
+        "addConditions": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info":
+                [
+                    {
+                        "object": "{{data.ratingObject}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "qc0AssessmentRule",
+                                "values": "{{function:getChecklistEvalRulesToAdd}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "serviceData": "ServiceData",                                
+                "errorMessage": "{{function:populateErrorString}}"  
+            },
+            "events": {
+                "success": [  
+                    {
+                        "name": "checklistEvalRuleExprGrid.plTable.reload",
+                        "condition": "ctx.selected.type === 'Qc0ChecklistSpecification'"
+                    },                                  
+                    {
+                        "name": "complete",          
+                        "condition": "data.pinnedToForm.dbValue",              
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {               
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },         
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        },
+        "removeCondition": {
+            "actionType": "JSFunction",
+            "method": "removeCondition",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "deletedVMO": "{{data.eventMap['Aqc0AddChecklistEvaluationRuleSub.removeCondition'].vmo.uid}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        },
+        "cleanUp": {
+            "actionType": "JSFunction",
+            "method": "cleanUpEdit",
+            "inputData": {
+                "ctx": "{{ctx}}"                
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        },        
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },    
+    "data": {
+        "addChecklistEvaluationRuleConditionCommand": "aqc0_addChecklistEvaluationRuleConditionCommand",
+        "rating": {
+            "displayName": "{{i18n.Aqc0RatingPropertyText}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "ratingValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.Aqc0RatingPropertyValueRed}}",
+                    "propInternalValue": "Red"
+                },
+                {
+                    "propDisplayValue": "{{i18n.Aqc0RatingPropertyValueYellow}}",
+                    "propInternalValue": "Yellow"
+                },
+                {
+                    "propDisplayValue": "{{i18n.Aqc0RatingPropertyValueGreen}}",
+                    "propInternalValue": "Green"
+                }
+            ]
+        },
+        "answer": {
+            "displayName": "{{i18n.Aqc0AnswerPropertyText}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "state": {
+            "displayName": "{{i18n.Aqc0StatePropertyText}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov": "true",
+            "dbValue": ""
+        },       
+        "Aqc0PropertySection": {
+            "type": "STRING",
+            "dbValue": "Property",
+            "uiValue": "{{i18n.Aqc0PropertySection}}"
+        },
+        "Aqc0ConditionCellValueSection": {
+            "type": "STRING",
+            "dbValue": "Value",
+            "uiValue": "{{i18n.Aqc0ConditionCellValueSection}}"
+        }      
+    },
+    "dataProviders": {
+        "getEvaluationRuleConditions": {
+            "action": "parseEvaluationRuleConditions",
+            "commandsAnchor": "aw_EvaluationConditionViewCellCommand",
+            "selectionModelMode": "single",
+            "response": "{{data.dataProviders.getEvaluationRuleConditions.viewModelCollection.loadedVMObjects}}"
+        }
+    },
+    "conditions": {
+        "showAddButton": {
+            "expression": "data.rating.dbValue && data.answer.dbValue"
+        }
+    },
+    "functions": {          
+        "getChecklistEvalRulesToAdd":{
+            "functionName": "getChecklistEvalRulesToAdd",
+            "parameters":
+            [                
+                "{{data}}"
+            ]
+        },
+        "getLOVlistofState": {
+            "functionName": "getLOVlist",
+            "parameters": 
+            [
+                "{{data}}",
+                "{{ctx}}",
+                "state",
+                "true"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },        
+        {
+            "eventId": "awPanel.navigate",
+            "criteria": {
+                "destPanelId": "Aqc0AddChecklistEvaluationRuleSub"
+            },
+            "action": "cleanUp"
+        },
+        {
+            "eventId": "Aqc0AddChecklistEvaluationRuleSub.removeCondition",
+            "cacheEventData": true,
+            "action": "removeCondition"
+        },
+        {
+            "eventId": "loadAnswerLOVEvent",
+            "action": "loadAnswerLOV"
+        }
+    ],
+    "messages": {       
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.Aqc0PartialError}}",
+            "messageTextParams": [
+                "{{data.errorMessage}}"
+            ]
+        }
+    },
+    "i18n": {       
+        "Aqc0ParameterSectionTitle":[
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0PropertySection":[
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0ConditionCellValueSection":[
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0ConditionCellNameSection":[
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0RatingPropertyText": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0Add": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0PartialError": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0RatingPropertyValueRed": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0RatingPropertyValueYellow": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0RatingPropertyValueGreen": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0AnswerPropertyText": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0StatePropertyText": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0ChecklistAnswerValueTableColumnName": [
+            "qualitycentermanagerMessages"
+        ]  
+    }
+}

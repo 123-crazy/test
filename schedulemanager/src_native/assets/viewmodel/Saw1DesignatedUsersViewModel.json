@@ -1,0 +1,215 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getDesigUsersList"
+            ]
+        },
+        "getDesignatedUsers": {
+            "actionType": "JSFunction",
+            "method": "getDesignatedUsers",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getDesigUsersList}}",
+                "selectedDiscipline": "{{data.dataProviders.disciplineList.selectedObjects[0].uid}}"
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "designate": {
+            "actionType": "JSFunction",
+            "method": "checkScheduleTags",
+            "inputData": {
+                "data": "{{data}}",
+                "selected": "{{ctx.mselected}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "designateDisciplines.callSoa"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode=='diffScheduleErrorMsg'",
+                    "message": "diffScheduleErrorMsg"
+                } ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "designateDisciplines": {
+            "actionType": "JSFunction",
+            "method": "prepInpForRelToUnassign",
+            "deps": "js/ResourcesService",
+            "outputData": {
+                "output": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "replaceResources"
+                } ]
+
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },
+        "replaceResources": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2014-10-ScheduleManagement",
+            "method": "replaceAssignment",
+            "inputData": {
+                "schedule": "{{ctx.schedule.scheduleTag}}",
+                "newAssignments": "{{function:getNewAssignmentsContainer}}",
+                "assignmentDeletes": "{{function:getAssignmentDeletesContainer}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        }
+    },
+
+    "data": {
+        "filterBoxUser": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "dataProviders": {
+        "getDesigUsersList": {
+            "action": "getDesignatedUsers",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "functions": {
+        "getReplacementAssignContainer": {
+            "functionName": "getReplacementAssignContainer",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getReplacementUnassignContainer": {
+            "functionName": "getReplacementUnassignContainer",
+            "parameters": [
+                "{{data.dataProviders.disciplineList}}"
+            ]
+        },
+        "getNewAssignmentsContainer": {
+            "functionName": "getNewAssignmentsContainer",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getAssignmentDeletesContainer": {
+            "functionName": "getAssignmentDeletesContainer",
+            "parameters": [
+                "{{data}}",
+                "{{data.output}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isValidToShowDesignateButton": {
+            "expression": "data.dataProviders.getDesigUsersList.selectedObjects.length > 0"
+        }
+    },
+    "messages": {
+        "diffScheduleErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorMsgForDiffSchDesignate}}",
+            "messageTextParams": []
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1DesignatedUsers"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "replaceResources",
+            "action": "replaceResources"
+        },
+        {
+            "eventId": "designateDisciplines.callSoa",
+            "action": "designateDisciplines"
+        }
+    ],
+    "i18n": {
+        "DesignateDiscipline": [
+            "ScheduleManagerMessages"
+        ],
+        "discipline": [
+            "ScheduleManagerMessages"
+        ],
+        "designate": [
+            "ScheduleManagerMessages"
+        ],
+        "errorMsgForDiffSchDesignate": [
+            "ScheduleManagerMessages"
+        ]
+    }
+
+}

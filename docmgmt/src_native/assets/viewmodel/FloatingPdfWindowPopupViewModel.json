@@ -1,0 +1,206 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-popup-primary-button.directive",
+        "js/aw-float-pdf-popup.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-docmgmt-pdf-viewer.directive",
+        "js/aw-label.directive"
+    ],
+    "actions": {
+        "addToAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awFloatPdfPopup.addDatasetToRev"
+                } ]
+            }
+        },
+
+        "closeDialog": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awFloatPdfPopup.closePopupWindow"
+                } ]
+            }
+        },
+
+        "getViewerData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-DataManagement",
+            "method": "getViewerData",
+            "inputData":
+            {
+                "inputs":
+                {
+                    "obj": "{{data.eventData.obj}}",
+                    "dataset": "{{data.eventData.dataset}}",
+                    "direction": ""
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Dataset",
+                         "properties":
+                        [
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "object_type"
+                            },
+                            {
+                                "name": "last_mod_date"
+                            },
+                            {
+                                "name": "ref_list",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "checked_out"
+                            },
+                            {
+                                "name": "checked_out_user"
+                            },
+                            {
+                                "name": "is_modifiable"
+                            },
+                            {
+                                "name": "fnd0IsCheckoutable"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ImanFile",
+                        "properties":
+                        [
+                            {
+                                "name": "file_size"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "viewerData": "output"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name":"awFloatPdfPopup.dataFetched"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name":"awFloatPdfPopup.dataFetched"
+                    }
+                ]
+            }
+        },
+
+        "showViewer":
+        {
+            "actionType": "JSFunction",
+            "method": "showViewer",
+            "inputData":
+            {
+               "inData": "{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name":"awFloatPdfPopup.openPopupWindow"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name":"awFloatPdfPopup.openPopupWindow"
+                    }
+                ]
+            },
+            "deps": "js/Awp0ViewerGalleryUtils"
+        }
+    },
+
+    "functions": {
+    },
+
+    "data": {
+        "addToText":
+        {
+            "displayName": "{{i18n.AddTo}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "Value",
+            "dispValue": "{{ctx.docmgmtfloat_name}}"
+        },
+        "commands":
+        {
+              "isArray": "true",
+              "dbValue":
+              [
+
+              ]
+         },
+        "headerProperties1":
+        {
+              "isArray": "true",
+              "dbValue":  ["object_name","object_type", "last_mod_date" ]
+        },
+        "headerProperties2":
+        {
+              "isArray": "true",
+              "dbValue":  ["file_size" ]
+        }
+    },
+
+    "dataProviders":
+    {
+
+    },
+
+    "onEvent": [
+        {
+            "eventId": "awFloatPdfPopup.dataFetched",
+            "action": "showViewer"
+        },
+        {
+            "eventId": "awFloatPdfPopup.getViewerData",
+            "action": "getViewerData",
+            "cacheEventData": true
+        }
+    ],
+
+    "conditions": {
+    },
+
+    "i18n": {
+        "AddTo": [
+            "FloatingPdfMessages"
+        ]
+    },
+
+    "messages": {}
+}

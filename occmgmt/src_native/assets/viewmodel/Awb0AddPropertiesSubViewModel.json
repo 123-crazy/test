@@ -1,0 +1,124 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-list-filter.directive"
+    ],
+
+    "actions":
+    {
+        "getPropertiesFromSubType":
+        {
+            "actionType": "JSFunction",
+            "method": "resetPropertiesFilter",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "importBOM.refreshDataProviderForProperties"
+                    }
+                ]
+            },
+            "deps": "js/importBOMService"
+        },
+
+        "refreshDataProviderForProperties":
+        {
+            "actionType": "dataProvider",
+            "method": "dataProviderForProperties"
+        },
+
+        "addNewPropertiesForMapping":
+        {
+            "actionType": "JSFunction",
+            "method": "addNewPropertiesForMapping",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/importBOMService"
+        },
+
+        "actionFilterList":
+        {
+            "actionType": "JSFunction",
+            "method": "actionFilterList",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "subType": "{{data.subTypes.dbValue}}"
+            },
+
+            "deps": "js/importBOMService"
+        }
+    },
+
+    "data":
+    {
+       "subTypes":
+        {
+            "displayName": "{{i18n.subTypes}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true,
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "filterBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "requiredText": "Filter",
+            "dbValue": ""
+        }
+    },
+
+    "dataProviders":
+    {
+        "dataProviderForProperties":
+        {
+            "action": "actionFilterList",
+            "response": "{{data.propertiesToSelect}}",
+            "totalFound": "{{data.propertiesToSelect.length}}",
+            "deps": "js/importBOMService"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "importBOM.refreshDataProviderForProperties",
+            "action": "refreshDataProviderForProperties"
+        }
+    ],
+
+    "conditions":
+    {
+
+    },
+
+    "i18n":
+    {
+       "subTypes":
+        [
+            "OccmgmtImportExportConstants"
+        ],
+        "Add":
+        [
+            "OccmgmtImportExportConstants"
+        ]
+    }
+}

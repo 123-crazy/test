@@ -1,0 +1,230 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-add.directive"
+    ],
+    "data" :{
+        "psi0PinCommands":"psi0_oneStepPinCommands",
+        "pinnedToForm":
+       {
+           "type": "BOOLEAN",
+           "dbValue": true
+       },
+       "unpinnedToForm":
+       {
+           "type": "BOOLEAN",
+           "dbValue": false
+       }
+    },
+    "actions": {
+        "createRelationAndGetProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": "{{function:getSchedules}}",
+                "attributes": [
+                    "object_name",
+                    "published",
+                    "is_template"
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Schedule",
+                        "properties": [
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "published"
+                            },
+                            {
+                                "name": "is_template"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "condition":"data.schedules.validSchedules[0]",
+                        "name": "addSchedule.callSoa"
+                    },
+                    {
+                        "name": "addSchedule.throwMessage"
+                    }
+                ]
+            },
+            "outputData": {
+                "schedules": "{{function:getProps}}"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/RelateScheduleService"
+        },
+        "createRelationsMessages": {
+            "actionType": "JSFunction",
+            "method": "getErrorMessage",
+            "inputData": {
+                "data": "{{data}}",
+                "schedules": "{{data.schedules.invalidSchedules}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "errorCode=='invalidScheduleErrorMsg'",
+                        "message": "invalidScheduleErrorMsg"
+                    }
+                ]
+            },
+            "deps": "js/RelateScheduleService"
+        },
+        "createRelationsforPalette": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:getCreateInput}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relations": "",
+                            "relatedModified": [
+                                "{{data.targetObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "awPanel.CreateOrAddObjectCompleteEvent",
+                        "eventData": {
+                            "createdObjs": "{{data.sourceObject}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!data.unpinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/RelateScheduleService"
+        },
+        "psi0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "psi0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "functions": {
+        "getProps": {
+            "functionName": "getProps",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getSchedules": {
+            "functionName": "getSchedules",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}",
+                "{{data.schedules.validSchedules}}",
+                "{{ctx.Object.relation}}"
+            ]
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "invalidScheduleErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.invalidScheduleErrorMsg}}",
+            "messageTextParams": [
+                "{{data.schedules.invalidSchedules[0].props.object_name.dbValues[0]}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addSchedule.callSoa",
+            "action": "createRelationsforPalette"
+        },
+        {
+            "eventId": "addSchedule.throwMessage",
+            "action": "createRelationsMessages"
+        },
+        {
+            "eventId": "psi0SetPinEvent",
+            "cacheEventData": true,
+            "action": "psi0SetPin"
+        },
+        {
+            "eventId": "psi0SetUnPinEvent",
+            "cacheEventData": true,
+            "action": "psi0SetUnPin"
+        }
+    ],
+    "conditions": {
+        "isPaletteTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "i18n": {
+        "RelateScheduleTitle": [
+            "PrgScheduleManagerMessages"
+        ],
+        "addButtonTitle": [
+            "PrgScheduleManagerMessages"
+        ],
+        "invalidScheduleErrorMsg": [
+            "PrgScheduleManagerMessages"
+        ]
+    }
+}

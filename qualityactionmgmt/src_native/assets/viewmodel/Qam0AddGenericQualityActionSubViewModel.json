@@ -1,0 +1,644 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel-section.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-datetime.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-listbox.directive",
+        "js/aw-button.directive",
+        "js/aw-form.directive",
+        "js/visible-when.directive",
+        "js/aw-title-link.directive",
+        "js/aw-list.directive"
+    ],
+    "actions": {
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData":
+            {
+                "input": "{{function:getCreateObjectInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "qam0.createRelation"
+                    }
+                ]
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:createQualityActionRelationInput}}"
+            },
+            "outputData": {
+                "createdRelationObject": "output[0].relation"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "qam0.assignProjectsToCreatedObject"
+                    },
+                    {
+                        "name": "qam0.setResponsiblerUser"
+                    },
+                    {
+                        "name": "qam0QARelationCreated",
+                        "eventData":{
+                            "createdRelationObject":"{{data.createdRelationObject}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "setPropertiesAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:qam0GetProperties}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "getNextId",
+                        "condition": "!data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name":"clearGenericRelationContextData",
+                        "condition": "data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{function:getCreatedDependentAction}}"
+                        },
+                        "condition": "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation' && ctx.preferences && ctx.preferences.Show_actions_in_FMEA_tree && ctx.preferences.Show_actions_in_FMEA_tree.length > 0 && ctx.preferences.Show_actions_in_FMEA_tree[0].toUpperCase() === 'TRUE'"
+                    },
+                    {
+                        "name": "qfm0ActionGroupAndDependentActionsGrid.plTable.reload",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Risk_Analysis' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Risk_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Optimization' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Optimization'"
+
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "getNextId",
+                        "condition": "!data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name":"clearGenericRelationContextData",
+                        "condition": "data.pinnedToForm.dbValue"
+                    }
+                ]
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "loadListOfQAStatus": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qam0QualityActionStatus",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "Qam0QualityAction"
+                    }
+                }
+            },
+            "outputData": {
+                "listOfQualityactstatus": "{{function:getLOVListOfQAStatus}}"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "navigateToNewTabPage": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Qam0AddGenericQualityActionSub"
+                        }
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.modifiedObject}}"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [
+                    {
+                        "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                        "objectToAssign": [
+                            "{{data.createdMainObject}}"
+                        ],
+                        "objectToRemove": []
+                    }
+                ]
+            }
+        },
+        "getUsers": {
+            "actionType": "JSFunction",
+            "method": "getSelectedUsers",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "selectedUserObjects": "",
+                "totalFound": "data.selectedUserObjects.length"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "generateQualityActionId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "generateNextValuesForProperties",
+            "inputData": {
+                "propertyNamingRuleInfo": [ {
+
+                    "clientId": "",
+                    "operationType": 1,
+                    "businessObjectTypeName": "Qam0QualityAction",
+                    "propertyNameAttachedPattern": {
+                        "fnd0ActionItemId": "XXnnnnnnnnnnn"
+                    }
+                } ]
+
+            },
+            "outputData": {
+                "ctx.getQAActionId": "generatedValues[0].generatedValues.fnd0ActionItemId.nextValue"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateID"
+                } ]
+            }
+        },
+        "updateID": {
+            "actionType": "JSFunction",
+            "method": "updateID",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "clearGenericRelationContextData" : {
+            "actionType": "JSFunction",
+            "method": "clearGenericRelationContextData",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "setObjectNameIfAddingFromTemaplte": {
+            "actionType": "JSFunction",
+            "method": "setObjectNameIfAddingFromTemaplte",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        }
+    },
+    "data": {
+        "fnd0ActionItemId": {
+            "displayName": "{{i18n.actionItemID}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.getQAActionId}}",
+            "uiValue": "{{ctx.getQAActionId}}"
+        },
+        "object_name": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "uiValue": "",
+            "maxLength":128
+        },
+        "object_desc": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "uiValue": "",
+            "maxLength":240
+        },
+        "qam0DueDate": {
+            "displayName": "{{i18n.dueDate}}",
+            "type": "DATE",
+            "isRequired": "false",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "qam0ConfirmationRequired": {
+            "displayName": "{{i18n.confirmationRequired}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "qam0FeedbackAtCompletion": {
+            "displayName": "{{i18n.feedbackAtCompletion}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "qam0AutocompleteByDependent": {
+            "displayName": "{{i18n.autocompleteByDependent}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "qam0QualityActionStatus": {
+            "displayName": "{{i18n.qualityActionStatus}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "uiValue": "",
+            "hasLov": true
+        },
+        "qam0Targets": {
+            "type": "OBJECTARRAY",
+            "isRequired": false,
+            "dbValue": [],
+            "isArray": true,
+            "isEditable": true,
+            "isPropertyModifiable": true
+        },
+        "addObjectPanelPinCommands": "qam0_oneStepPinCommands",
+        "qam0ResponsibleUserSectionCommands": "qam0_responsibleUserSectionCommands",
+        "widgetProjectSectionCommands": "uiwidget_projectSectionCommands"
+    },
+    "functions": {
+        "getInputForCreateObject": {
+            "functionName": "getInputForCreateObject",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getPropertyInputForDefect5Why": {
+            "functionName": "getPropertyInputForDefect5Why",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getLOVListOfQAStatus": {
+            "functionName": "getLOVListOfQAStatus",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "createQualityActionRelationInput" : {
+            "functionName": "createQualityActionRelationInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "qam0GetProperties": {
+            "functionName": "qam0GetProperties",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreateObjectInput":{
+            "functionName": "getCreateObjectInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "getCreatedDependentAction": {
+            "functionName": "getCreatedDependentAction",
+            "parameters": [
+                "{{data.createdMainObject}}"
+            ]
+        }
+    },
+    "dataProviders": {
+        "getAssignedProjectsProvider": {
+            "response": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+            "totalFound": "{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0RemoveProjectsCell": {
+                    "id": "cmdRemove",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/removeObjectCellCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "getAssignedResponsibleUserProvider": {
+            "action": "getUsers",
+            "response": "{{data.selectedUserObjects}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "QAM0RemoveResponsibleUserCell": {
+                    "id": "cmdRemove",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/removeObjectCellCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "getOwningProjectsProvider": {
+            "action": "getOwningProjectsAct",
+            "response": [
+                "{{data.owningProjects}}"
+            ],
+            "totalFound": "{{data.owningProjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "qualityActionTemplatesProvider": {
+            "response": "{{ctx.selectedQualityActionTemplate}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "data.activeView": "Qam0AddGenericQualityActionSub"
+            },
+            "action": "loadListOfQAStatus"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "qualityActionTemplatesProvider"
+        },
+        {
+            "eventId": "qam0.setResponsiblerUser",
+            "action": "setPropertiesAction"
+        },
+        {
+            "eventId": "qam0.createRelation",
+            "action": "createRelation"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "getAssignedProjectsProvider"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "navigateToNewTabPage"
+        },
+        {
+            "eventId": "qam0.assignProjectsToCreatedObject",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "qam0QualityAction.assignResponsibleUser",
+            "action": "getAssignedResponsibleUserProvider"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "condition": "((ctx.panelContext && ctx.panelContext.destPanelId === 'Qam0AddGenericQualityActionSub')||scope.panelId === 'Qam0AddGenericQualityActionSub')",
+            "action": "generateQualityActionId"
+        },
+        {
+            "eventId": "updateID",
+            "action": "updateID"
+        },
+        {
+            "eventId": "getNextId",
+            "action": "generateQualityActionId"
+        },
+        {
+            "eventId":"clearGenericRelationContextData",
+            "action":"clearGenericRelationContextData"
+        },
+        {
+            "eventId": "qfm0.addElement",
+            "cacheEventData": true
+        }
+    ],
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "setObjectNameIfAddingFromTemaplte"
+    },
+    "conditions": {
+        "ispinned": {
+            "expression": "data.unpinnedToForm.dbValue"
+        },
+        "isRefreshRequired": {
+            "expression": "ctx.addObject.refreshFlag && !data.unpinnedToForm.dbValue"
+        },
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        }
+    },
+    "i18n": {
+        "description": [
+            "QualityActionMgmtMessages"
+        ],
+        "name": [
+            "QualityActionMgmtMessages"
+        ],
+        "dueDate": [
+            "QualityActionMgmtMessages"
+        ],
+        "confirmationRequired": [
+            "QualityActionMgmtMessages"
+        ],
+        "feedbackAtCompletion": [
+            "QualityActionMgmtMessages"
+        ],
+        "autocompleteByDependent": [
+            "QualityActionMgmtMessages"
+        ],
+        "qualityActionStatus": [
+            "QualityActionMgmtMessages"
+        ],
+        "actionItemID": [
+            "QualityActionMgmtMessages"
+        ],
+        "qam0AddCaption": [
+            "QualityActionMgmtMessages"
+        ],
+        "qam0Add":[
+            "QualityActionMgmtMessages"
+        ],
+        "propertiesTitle":[
+            "QualityActionMgmtMessages"
+        ],
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "owningProject": [
+            "QualityActionMgmtMessages"
+        ],
+        "ownProjectSectionTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "projectsSectionTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "qam0ResponsibleUser": [
+            "QualityActionMgmtMessages"
+        ],
+        "targetTitle":[
+            "QualityActionMgmtMessages"
+        ],
+        "actionsetting":[
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

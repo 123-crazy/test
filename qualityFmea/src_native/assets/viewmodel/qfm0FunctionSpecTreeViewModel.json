@@ -1,0 +1,193 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.functionSpecDataProvider}}",
+
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "sortCriteria": "{{data.columnProviders.functionSpecColumnProvider.sortCriteria}}"
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "searchResults": "result.treeLoadResult.childNodes"
+            },
+            "events": {
+                "success": [ {
+                    "name": "processPWASelection"
+                } ]
+            },
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.functionSpecDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "propertyLoadInput": "request.propertyLoadInput",
+                "delayTimeProperty": "{{data.delayTimeProperty}}"
+            },
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.functionSpecDataProvider.selectionModel}}"
+            },
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "updateDisplayNames": {
+            "actionType": "JSFunction",
+            "method": "updateDisplayNames",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "selectionChanged": {
+            "actionType": "JSFunction",
+            "method": "selectionChanged",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.functionSpecDataProvider.selectionModel}}"
+            },
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "functionSpecExpandTreeNodeAction": {
+            "actionType": "JSFunction",
+            "method": "functionSpecExpandTreeNode",
+            "deps": "js/qfm0FunctionSpecTreeTableService"
+        },
+        "addNewlyAddedElement": {
+            "actionType": "JSFunction",
+            "method": "addNewElement",
+            "inputData": {
+                "addElementResponse": "{{data.eventMap['qfm0.addFunctionSpec'].addElementInput}}"
+            },
+            "outputData": {},
+            "deps": "js/qfm0FunctionSpecEditStructureServices"
+        }
+    },
+    "data": {
+        "delayTimeTree": {
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "20",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "functionSpecDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}"
+        },
+        "functionSpecPropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "functionSpecColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": [ {
+                "fieldName": "object_name",
+                "sortDirection": "ASC"
+            } ]
+        }
+    },
+    "grids": {
+        "functionSpecTree": {
+            "dataProvider": "functionSpecDataProvider",
+            "propertyProvider": "functionSpecPropertyProvider",
+            "columnProvider": "functionSpecColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true
+            }
+        }
+    },
+    "i18n": {
+        "qfm0ElementName": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0ReleaseStatus": [
+            "qualityFmeaMessages"
+        ]
+    },
+    "onEvent": [ {
+            "eventId": "processPWASelection",
+            "cacheEventData": true,
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "functionSpecDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "selectionChanged"
+        },
+        {
+            "eventId": "functionSpecExpandTreeNodeEvent",
+            "action": "functionSpecExpandTreeNodeAction"
+        },
+        {
+            "eventId": "qfm0.addFunctionSpec",
+            "cacheEventData": true,
+            "action": "addNewlyAddedElement"
+        },
+        {
+            "eventId": "qfm0FunctionSpecSelectionUpdateEvent",
+            "action": "updateSelectionInPWA"
+        } ,
+        {
+            "eventId": "functionSpecDataProvider.modelObjectsUpdated",
+            "cacheEventData": true,
+            "action": "updateDisplayNames"
+        },
+        {
+            "eventId": "vmc.modified.functionSpecDataProvider",
+            "cacheEventData": true,
+            "action": "updateDisplayNames"
+        }
+
+    ]
+}

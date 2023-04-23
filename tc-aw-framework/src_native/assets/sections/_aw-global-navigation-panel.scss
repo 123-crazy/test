@@ -1,0 +1,64 @@
+.aw-global-navigation-panel {
+    transition: width $global_navigation_panel_animation_duration ease-in-out;
+    &.hide {
+        width: 0;
+    }
+    &.show {
+        width: $global_navigation_panel_width;
+    }
+
+    aw-property-image {
+        cursor: pointer;
+
+        svg {
+            height: $global_navigation_panel_pin_icon_height;
+            width: $global_navigation_panel_pin_icon_width;
+        }
+    }
+
+    &.unpinned {
+        position: absolute;
+        margin-right: 0;
+        left: $global_navigation_panel_unpinned_state_left;
+        height: $global_navigation_panel_unpinned_state_height;
+        z-index: $global_navigation_panel_unpinned_state_z-index;
+        .aw-layout-popupOverlay {
+            position: fixed;
+            left: $global_navigation_panel_unpinned_state_left !important;
+        }
+
+    }
+
+    &.pinned {
+        transition: none;
+        position: inherit;
+        margin-right: $global_navigation_panel_pinned_state_margin_right;
+        aw-property-image {
+            animation-name: animate-pin;
+            animation-duration: $global_navigation_panel_animation_duration;
+        }
+    }
+    .aw-layout-panelTitle button[button-id="Awp0CloseCommandPanel"] {
+        visibility: hidden;
+    }
+}
+
+@keyframes animate-pin {
+    0% {
+        position: absolute;
+        left: 220px;
+        top: 12px;
+    }
+
+    50% {
+        position: absolute;
+        left: 232px;
+        top: 0;
+    }
+
+    100% {
+        position: absolute;
+        left: 220px;
+        top: 12px;
+    }
+}

@@ -1,0 +1,26 @@
+<aw-cls-filter-category-numeric-range-filter
+    ng-if="category.showNumericRangeFilter"
+    search-action="searchAction"
+    category= "category"
+    checkbox-action="checkboxAction"
+   is-bulk-filter="isBulkFilter"
+    id="{{category.displayName}}">
+</aw-cls-filter-category-numeric-range-filter >
+
+<aw-cls-filter-category-contents
+     search-action="searchAction"
+     checkbox-action="checkboxAction"
+    is-bulk-filter="isBulkFilter"
+    filter="item"
+     category= "category"
+     ng-repeat="item in category.filterValues | limitTo: category.showMoreFilter && ( !category.filterBy || filterAction )  ? category.defaultFilterValueDisplayCount : category.filterValues.length | filter: ( filterAction ? '' : {name:category.filterBy }) as results" ng-if="item.count > 0">
+ </aw-cls-filter-category-contents >
+ <div class="aw-ui-filterCategoryError" ng-if="results.length===0">{{noFiltersText}}</div>
+ <div class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled"
+       ng-show="category.filterValues.length > category.defaultFilterValueDisplayCount"
+       title="{{category.showMoreFilter || category.hasMoreFacetValues ? moreText : lessText}}" ng-click="toggleFiltersSoa()" visible-when="!(category.filterBy && category.filterValues.length < 99)">
+       <span filterNameColorBlockId="filterLabelColorBlock1"  class="aw-ui-filterNameColorBlock {{filter.color}}"
+          visible-when="category.showEnabled && category.showColor">&nbsp;
+        </span>
+        {{category.showMoreFilter || category.hasMoreFacetValues ? moreText : lessText}}
+ </div>

@@ -1,0 +1,640 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-section.directive",
+        "js/exist-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-listbox.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-radiobutton.directive"
+    ],
+
+    "actions":
+    {
+        "initializeDataProvider":
+       {
+          "actionType": "dataProvider",
+          "methods": [ "assigneesDataProvider", "reviewersDataProvider", "acknowledgersDataProvider", "notifyeesDataProvider" ]
+        },
+        "closeCurrentOpenedPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "addSelectedAssignmentUsers": {
+            "actionType": "JSFunction",
+            "method": "addSelectedAssignmentUsers",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "isAssignmentQuestionNeeded": false,
+                "handlerContextObject": "{{ctx.workflowTabContext.handlerContextObject}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateAssignmentPanelService"
+        },
+        "navigateToMainPage":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "{{data.previousView}}",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "populateAssignmentPanelData": {
+            "actionType": "JSFunction",
+            "method": "populateAssignmentPanelData",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateAssignmentPanelService"
+        },
+        "openUserPanelAction":
+        {
+            "actionType": "JSFunction",
+            "method": "openAssignmentUserPanel",
+            "inputData":
+            {
+                "selObject": "{{commandContext.vmo}}",
+                "handlerContextObject": "{{ctx.workflowTabContext.handlerContextObject}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateAssignmentPanelService"
+        },
+        "removeKeyRoleArguments" : {
+            "actionType": "JSFunction",
+            "method": "removeAssignemntKeyRoleArguments",
+            "deps": "js/Awp0WorkflowTemplateAssignmentPanelService",
+            "inputData": {
+                "selObject": "{{commandContext.vmo}}"
+            }
+        },
+        "saveHandler": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2019-06-Workflow",
+            "method": "createOrUpdateHandler",
+            "inputData": {
+                "input": "{{function:getCreateOrUpdateHandlerInput}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "EPMTaskTemplate",
+                        "properties": [
+                            {
+                                "name": "template_name"
+                            },
+                            {
+                                "name": "action_handlers",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                             }
+
+                        ]
+                    },
+                    {
+                        "name": "EPMHandler",
+                        "properties":
+                        [
+                           {
+                              "name": "arguments"
+                           },
+                           {
+                                "name": "parent_action_type"
+                           }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowDesigner.tabReload",
+                        "condition": "!data.createProfileCase && !data.isUpdateProfileCase"
+                    },
+                    {
+                        "name": "closePanel",
+                        "condition": "!data.createProfileCase && !data.isUpdateProfileCase"
+                    },
+                    {
+                        "name": "workflowDesigner.createProfiles",
+                        "condition": "ctx.createProfileInputData && data.isCreateProfileCase"
+                    },
+                    {
+                        "name": "workflowDesigner.updateProfiles",
+                        "condition": "ctx.updateProfileInputData && data.isUpdateProfileCase"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowTemplateAssignmentPanelService"
+        },
+        "removeHandlerObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData": {
+                "objects": [
+                    "{{ctx.workflowTabContext.handlerContextObject.handlerObject}}"
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    },
+                    {
+                        "name": "workflowDesigner.tabReload"
+                    }
+                ]
+            }
+        },
+        "unregisterCtx":
+        {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData":
+            {
+                "name": "workflowTabContext"
+            }
+        },
+        "createProfileObjects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2019-06-Workflow",
+            "method": "createOrUpdateTemplate",
+            "inputData": {
+                "input": "{{ctx.createProfileInputData}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    },
+                    {
+                        "name": "workflowDesigner.tabReload"
+                    },
+                    {
+                        "name": "unregisterCreateProfileContext"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "unregisterCreateProfileContext"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowDesignerUtils"
+        },
+        "saveProfileObjects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData":
+            {
+                "info": "{{ctx.updateProfileInputData}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    },
+                    {
+                        "name": "workflowDesigner.tabReload"
+                    },
+                    {
+                        "name": "unregisterSaveProfileContext"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "unregisterSaveProfileContext"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowTemplateProfileService"
+        },
+        "unregisterSaveProfileCtx":
+        {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData":
+            {
+                "name": "updateProfileInputData"
+            }
+        },
+        "unregisterCreateProfileCtx":
+        {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData":
+            {
+                "name": "createProfileInputData"
+            }
+        }
+    },
+    "data": {
+        "assignmentPanelAnchor": "awp0_addAssignmentPanelAnchor",
+        "isAddButtonVisible": true,
+        "isReviewOptionAvailable": true,
+        "handlerName": "EPM-adhoc-signoffs",
+        "assignmentPolicy" : {
+            "types": [ {
+                    "name": "User",
+                    "properties": [  {
+                            "name": "group"
+                        },
+                        {
+                            "name": "role"
+                        }
+                    ]
+
+                },
+                {
+                    "name": "GroupMember",
+                    "properties": [  {
+                            "name": "group"
+                        },
+                        {
+                            "name": "role"
+                        }
+                    ]
+
+                },{
+                    "name": "ResourcePool",
+                    "properties": [  {
+                            "name": "group"
+                        },
+                        {
+                            "name": "role"
+                        }
+                    ]
+
+                }
+            ]
+        },
+        "handlerConfiguration": [
+            {
+                "handlerName": "EPM-auto-assign",
+                "selectionMode": "single",
+                "projectMembers" : [
+                    {
+                        "internalName": "$PROJECT_ADMINISTRATOR",
+                        "displayName": "{{i18n.PROJECT_ADMINISTRATOR}}"
+                    },
+                    {
+                        "internalName": "$PROJECT_TEAM_ADMINISTRATOR",
+                        "displayName": "{{i18n.PROJECT_TEAM_ADMINISTRATOR}}"
+                    },
+                    {
+                        "internalName": "$PROJECT_AUTHOR",
+                        "displayName": "{{i18n.PROJECT_AUTHOR}}"
+                    },
+                    {
+                        "internalName": "$PROJECT_MEMBER",
+                        "displayName": "{{i18n.PROJECT_MEMBER}}"
+                    } ],
+                "workflowMembers" : [
+                    {
+                        "internalName": "$USER",
+                        "displayName": "{{i18n.USER}}"
+                    },
+                    {
+                        "internalName": "$PROCESS_OWNER",
+                        "displayName": "{{i18n.PROCESS_OWNER}}"
+                    },
+                    {
+                        "internalName": "$TARGET_OWNER",
+                        "displayName": "{{i18n.TARGET_OWNER}}"
+                    } ]
+            },
+            {
+                "handlerName": "EPM-adhoc-signoffs",
+                "selectionMode": "multiple",
+                "projectMembers" : [
+                {
+                    "internalName": "$PROJECT_ADMINISTRATOR",
+                    "displayName": "{{i18n.PROJECT_ADMINISTRATOR}}"
+                },
+                {
+                    "internalName": "$PROJECT_TEAM_ADMINISTRATOR",
+                    "displayName": "{{i18n.PROJECT_TEAM_ADMINISTRATOR}}"
+                },
+                {
+                    "internalName": "$PROJECT_AUTHOR",
+                    "displayName": "{{i18n.PROJECT_AUTHOR}}"
+                },
+                {
+                    "internalName": "$PROJECT_MEMBER",
+                    "displayName": "{{i18n.PROJECT_MEMBER}}"
+                } ],
+                "workflowMembers" : [
+                    {
+                        "internalName": "$USER",
+                        "displayName": "{{i18n.USER}}"
+                    },
+                    {
+                        "internalName": "$PROCESS_OWNER",
+                        "displayName": "{{i18n.PROCESS_OWNER}}"
+                    },
+                    {
+                        "internalName": "$TARGET_OWNER",
+                        "displayName": "{{i18n.TARGET_OWNER}}"
+                    } ]
+            },
+            {
+                "handlerName": "EPM-fill-in-reviewers",
+                "selectionMode": "multiple",
+                "projectMembers" : [                     {
+                    "internalName": "$PROJECT_ADMINISTRATOR",
+                    "displayName": "{{i18n.PROJECT_ADMINISTRATOR}}"
+                },
+                {
+                    "internalName": "$PROJECT_TEAM_ADMINISTRATOR",
+                    "displayName": "{{i18n.PROJECT_TEAM_ADMINISTRATOR}}"
+                },
+                {
+                    "internalName": "$PROJECT_AUTHOR",
+                    "displayName": "{{i18n.PROJECT_AUTHOR}}"
+                },
+                {
+                    "internalName": "$PROJECT_MEMBER",
+                    "displayName": "{{i18n.PROJECT_MEMBER}}"
+                } ],
+                "workflowMembers" : [
+                    {
+                        "internalName": "$USER",
+                        "displayName": "{{i18n.USER}}"
+                    },
+                    {
+                        "internalName": "$PROCESS_OWNER",
+                        "displayName": "{{i18n.PROCESS_OWNER}}"
+                    },
+                    {
+                        "internalName": "$TARGET_OWNER",
+                        "displayName": "{{i18n.TARGET_OWNER}}"
+                    } ]
+            }
+        ],
+        "teamAssignmentOptionValue": {
+            "displayName": "{{i18n.teamAssignmentOption}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "false",
+            "isEnabled": "false",
+            "vertical": true,
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "propertyRadioTrueText": "{{i18n.assignerSelectionFromTeam}}",
+            "propertyRadioFalseText": "{{i18n.assignmentClaimedByAssignee}}"
+        },
+        "reassignOutsideGroupRoleOptionValue": {
+            "displayName": "{{i18n.reassignOutsideGroupRoleQuestion}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEnabled": "false",
+            "isEditable": "false",
+            "dbValue": true,
+            "vertical": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "reviewersSignoffMust":{
+            "displayName": "{{i18n.reviewersSignoffMust}}",
+            "type": "BOOLEAN",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "functions": {
+        "getCreateOrUpdateHandlerInput" : {
+            "functionName": "getCreateOrUpdateHandlerInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.selected}}",
+                "{{ctx.workflowTabContext.handlerContextObject}}",
+                "{{ctx.workflowTabContext.profileObjects}}"
+            ]
+        }
+    },
+    "preferences":
+    [
+        "EPM_ARG_target_user_group_list_separator"
+    ],
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+               "panelId": "Awp0WorkflowEditAssignmentHandlerSub"
+            },
+            "action": "initializeDataProvider"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+               "panelId": "Awp0WorkflowEditAssignmentHandlerSub"
+            },
+            "action": "populateAssignmentPanelData"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "navigateToMainPage"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "addSelectedAssignmentUsers"
+        },
+        {
+            "eventId": "closePanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "workflow.closeOpenedPanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "Awp0WorkflowEditAssignmentHandler.contentUnloaded",
+            "action": "unregisterCtx"
+        },
+        {
+           "eventId": "workflowGraph.selectionChanged",
+           "action": "closeCurrentOpenedPanel"
+        },
+        {
+           "eventId": "Awp0WorkflowDesignerGraph.contentUnloaded",
+           "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "condition": "scope.data._internal.panelId !=='Awp0WorkflowEditAssignmentHandler'",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "removeSelectedHandlerEvent",
+            "action": "removeHandlerObject"
+        },
+        {
+            "eventId": "addKeyRoleArgumentsEvent",
+            "action": "openUserPanelAction"
+        },
+        {
+            "eventId": "removeKeyRoleArgumentsEvent",
+            "action": "removeKeyRoleArguments"
+        },
+        {
+            "eventId": "workflowDesigner.createProfiles",
+            "action": "createProfileObjects"
+        },
+        {
+            "eventId": "workflowDesigner.updateProfiles",
+            "action": "saveProfileObjects"
+        },
+        {
+            "eventId": "unregisterCreateProfileContext",
+            "action": "unregisterCreateProfileCtx"
+        },
+        {
+            "eventId": "unregisterSaveProfileContext",
+            "action": "unregisterSaveProfileCtx"
+        },
+        {
+            "eventId": "workflowDesigner.saveEdit",
+            "action": "closeCurrentOpenedPanel"
+        }
+    ],
+    "messages": {
+    },
+
+    "conditions":
+    {
+        "isReviewAckRouteSSTTaskTemplateSelected" : {
+            "expression":  "ctx.selected && (ctx.selected.modelType.typeHierarchyArray.indexOf( 'EPMReviewTaskTemplate' ) > -1 || ctx.selected.modelType.typeHierarchyArray.indexOf( 'EPMAcknowledgeTaskTemplate' ) > -1 || ctx.selected.modelType.typeHierarchyArray.indexOf( 'EPMRouteTaskTemplate' ) > -1 || ctx.selected.modelType.typeHierarchyArray.indexOf( 'EPMSelectSignoffTaskTemplate' ) > -1)"
+        },
+        "isValidToUpdate": {
+            "expression":  "ctx.workflowTabContext && ctx.workflowTabContext.handlerContextObject && conditions.isHandlerPropModified"
+        },
+        "isHandlerPropModified": {
+            "expression":  "data.reviewersSignoffMust.valueUpdated || data.isValidToModify"
+        },
+        "isAssignerPresent" : {
+            "expression":  "ctx.workflowTabContext.handlerContextObject && ctx.workflowTabContext.handlerContextObject.props.fnd0Assigner.dbValue && ctx.workflowTabContext.handlerContextObject.props.fnd0Assigner.dbValue.length > 0"
+        },
+        "isAssigneePresent" : {
+            "expression":  "ctx.workflowTabContext.handlerContextObject && ctx.workflowTabContext.handlerContextObject.props.fnd0Assignee.dbValue && ctx.workflowTabContext.handlerContextObject.props.fnd0Assignee.dbValue.length > 0"
+        },
+        "isReviewersPresent" : {
+            "expression":  "ctx.workflowTabContext.handlerContextObject && ctx.workflowTabContext.handlerContextObject.props.awp0Reviewers.dbValue && ctx.workflowTabContext.handlerContextObject.props.awp0Reviewers.dbValue.length > 0"
+        },
+        "isAcknowledgersPresent" : {
+            "expression":  "ctx.workflowTabContext.handlerContextObject && ctx.workflowTabContext.handlerContextObject.props.awp0Acknowledgers.dbValue && ctx.workflowTabContext.handlerContextObject.props.awp0Acknowledgers.dbValue.length > 0"
+        },
+        "isNotifyeesPresent" : {
+            "expression":  "ctx.workflowTabContext.handlerContextObject && ctx.workflowTabContext.handlerContextObject.props.awp0Notifyees.dbValue && ctx.workflowTabContext.handlerContextObject.props.awp0Notifyees.dbValue.length > 0"
+        },
+        "isAcknowledgeAssignmentQuestionPresent" :{
+            "expression":  "ctx.selected && ctx.selected.modelType.typeHierarchyArray.indexOf( 'EPMAcknowledgeTaskTemplate' ) > -1 && conditions.isAcknowledgersPresent"
+        },
+        "isTeamAssignmentOptionPresent": {
+            "expression":  "ctx.workflowTabContext.handlerContextObject.isResourcePoolAssignee === true && ctx.workflowTabContext.handlerContextObject.handlerName !== 'EPM-auto-assign' && ( conditions.isReviewersPresent || conditions.isAcknowledgeAssignmentQuestionPresent)"
+        },
+        "isReassignOptionPresent": {
+            "expression":  "ctx.workflowTabContext.handlerContextObject.handlerName !== 'EPM-auto-assign' && ( conditions.isReviewersPresent || conditions.isAcknowledgeAssignmentQuestionPresent)"
+        },
+        "isReviewersSignoffMustDisplayable": {
+            "expression": "ctx.workflowTabContext.handlerContextObject.handlerName === 'EPM-adhoc-signoffs' || ctx.workflowTabContext.handlerContextObject.handlerName === 'EPM-fill-in-reviewers' "
+        },
+        "isTemplateInEditMode" : {
+            "expression": "ctx.xrtSummaryContextObject && ctx.workflowDgmEditCtx.editObjectUids && ctx.workflowDgmEditCtx.editObjectUids.indexOf( ctx.xrtSummaryContextObject.uid ) > -1"
+        }
+    },
+    "dataProviders": {
+        "assignerDataProvider":{
+            "selectionModelMode": "single",
+            "commandsAnchor"  : "aw_workflowKeyRoleCellCommand"
+        },
+        "reviewersDataProvider":{
+            "selectionModelMode": "multiple",
+            "commandsAnchor"  : "aw_workflowKeyRoleCellCommand"
+        },
+        "acknowledgersDataProvider":{
+            "selectionModelMode": "multiple",
+            "commandsAnchor"  : "aw_workflowKeyRoleCellCommand"
+        },
+        "notifyeesDataProvider":{
+            "selectionModelMode": "multiple",
+            "commandsAnchor"  : "aw_workflowKeyRoleCellCommand"
+        }
+    },
+
+    "i18n": {
+        "addCommandTitle": [ "InboxMessages" ],
+        "PROJECT_ADMINISTRATOR": [ "WorkflowDesignerMessages" ],
+        "PROJECT_TEAM_ADMINISTRATOR": [ "WorkflowDesignerMessages" ],
+        "PROJECT_AUTHOR": [ "WorkflowDesignerMessages" ],
+        "PROJECT_MEMBER": [ "WorkflowDesignerMessages" ],
+        "TARGET_OWNER": [ "WorkflowDesignerMessages" ],
+        "PROCESS_OWNER": [ "WorkflowDesignerMessages" ],
+        "USER": [ "WorkflowDesignerMessages" ],
+        "save": [ "TCUICommandPanelsMessages" ],
+        "reviewers": [ "InboxMessages" ],
+        "reassignOutsideGroupRoleQuestion": [ "WorkflowDesignerMessages" ],
+        "teamAssignmentOption": [ "WorkflowDesignerMessages" ],
+        "assignerSelectionFromTeam": [ "WorkflowDesignerMessages" ],
+        "assignmentClaimedByAssignee": [ "WorkflowDesignerMessages" ],
+        "assignments": [ "WorkflowCommandPanelsMessages" ],
+        "Assigner": [ "WorkflowCommandPanelsMessages" ],
+        "assignee" : [ "WorkflowCommandPanelsMessages" ],
+        "Acknowledgers": [ "WorkflowCommandPanelsMessages" ],
+        "addReviewerLabelText": [ "InboxMessages" ],
+        "Notifyees": [ "WorkflowCommandPanelsMessages" ],
+        "reviewersSignoffMust": [ "WorkflowDesignerMessages" ]
+
+    }
+
+}
+

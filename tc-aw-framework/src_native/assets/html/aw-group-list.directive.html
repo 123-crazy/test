@@ -1,0 +1,25 @@
+<div class="aw-widgets-cellListContainer aw-widgets-droppable">
+    <div class="aw-widgets-cellListOffsetter">
+        <div class="aw-widgets-modelObjectList">
+            <!--  popup command bar for context menu -->
+            <!--  LCS-109882 move aw-popup-command-bar to 1st element to make the position calculation correct in position:fixed-->
+            <aw-popup-command-bar ng-if="contextMenuUsed && showContextMenu === true" anchor="{{(dataprovider.json.contextMenuCommandsAnchor) ? (dataprovider.json.contextMenuCommandsAnchor) : 'aw_contextMenu2'}}" own-popup="true" close-on-click="true"></aw-popup-command-bar>
+            <ul role="listbox" tabindex="{{dataprovider.viewModelCollection.totalFound > 0 ? 0 : -1}}" class="aw-widgets-cellListWidget aw-layout-flexColumnContainer" ng-show="!dataprovider.noResults" aw-long-press="handlePressAndHold($event)">
+                <li role="option" tabindex="-1" aria-selected="{{item.selected}}" aria-label="{{(item.cellHeader1) ? (item.cellHeader1 + ' ' + item.cellHeader2): ' '}}" ng-repeat="item in dataprovider.viewModelCollection.loadedVMObjects" class="aw-aria-border aw-widgets-flexWrapWidget aw-widget-cellListBox" ng-mouseenter="hasFloatingCellCommands !== false ? compileListCellCommandsAndAppend($event): ''">
+                    <div class="aw-widgets-cellListItem aw-widgets-cellTop" ng-class="{'aw-widgets-cellListItemSelected': item.selected}">
+                        <div class="aw-widgets-cellListItemContainer aw-widgets-droppable {{item.cellDecoratorStyle}}" ng-class="{'aw-widgets-showCellDecorator' : $parent.dataprovider.showDecorators}" draggable="true">
+                            <div class="aw-widgets-cellListItemCell" aw-transclude></div>
+                            <!-- Cell List Commands -->
+                            <aw-static-list-command exist-when="hasFloatingCellCommands === false"></aw-static-list-command>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!-- No Results Message -->
+            <div class="aw-widgets-noResultsLabel" ng-show="dataprovider.noResults">{{dataprovider.noResultsFound}}</div>
+
+            <!--  put an empty cell for providing a drop area -->
+            <div ng-if="showDropArea === 'true'" class="aw-widgets-emptyCell"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,385 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-scrollpanel.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/exist-when.directive",
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-link.directive",
+        "js/aw-image.directive",
+        "js/aw-class.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "data": {
+        "provider": {
+            "crumbs": [
+                {
+                    "clicked": false,
+                    "displayName": "",
+                    "selectedCrumb": false,
+                    "showArrow": false,
+                    "class_Id": ""
+                }
+            ]
+        },
+        "breadCrumbConfig": {
+            "classBreadcrumbConfig": {
+                "type": "navigate",
+                "id": "clsHierarchyBreadCrumb",
+                "noUpdate": false,
+                "popuplist": "/html/defaultbreadcrumblist.html"
+            }
+        }
+    },
+    "actions": {
+        "viewerChanged": {
+            "actionType": "JSFunction",
+            "method": "viewerChanged",
+            "inputData": {
+                "ctx": "{{ctx.clsLocation}}"
+            },
+            "deps": "js/classifySearchService"
+        },
+        "activateClassificationSearchNavigate": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Awp0ClassificationSearchNavigate",
+                "location": "aw_navigation"
+            }
+        },
+        "updateClassBreadCrumb": {
+            "actionType": "JSFunction",
+            "method": "updateClassBreadCrumb",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.clsLocation}}"
+            },
+            "deps": "js/classifyTreeService"
+        },
+        "getSelectedCrumb": {
+            "actionType": "JSFunction",
+            "method": "getSelectedCrumb",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.clsLocation}}"
+            },
+            "deps": "js/classifyTreeService"
+        },
+        "clearClassBreadCrumb": {
+            "actionType": "JSFunction",
+            "method": "clearClassBreadCrumb",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.clsLocation}}"
+            },
+            "deps": "js/classifyTreeService"
+        },
+        "loadListView": {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "formatSearchResultsForVNC": {
+            "actionType": "JSFunction",
+            "method": "formatSearchResultsForVNC",
+            "inputData": {
+                "data":"{{data}}",
+                "response": "{{data.eventData.response}}",
+                "ctx" : "{{ctx.clsLocation}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "deps": "js/classifySearchService",
+            "method": "loadListData",
+            "inputData": {
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0FullTextSearchProvider",
+                    "searchCriteria": "{{function:getClsSearchCriteria}}",
+                    "searchFilterFieldSortType": "Priority",
+                    "searchFilterMap6": "{{function:getBulkFilterMap}}",
+                    "searchSortCriteria": "{{function:getSearchSortCriteria}}",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}"
+                    }
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "{{function:parsetotalFound}}",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.columnConfig": "columnConfig",
+                "ctx.searchResponseInfo.propDescriptors": "propDescriptors",
+                "ctx.searchResponseInfo.unpopulatedSearchFilterCategories": "searchFilterCategoriesUnpopulated",
+                "ctx.search.filterString": "{{function:getActiveFilterString}}",
+                "ctx.search.saveSearchFilterMap": "{{function:getSaveSearchFilterMap}}",
+                "ctx.searchChart.categoryToChartOn": "{{function:getEmptyString}}",
+                "highlighter": "{{function:getHighlightKeywords}}",
+                "ctx.searchResponseInfo.defaultFilterFieldDisplayCount": "defaultFilterFieldDisplayCount",
+                "ctx.selected":"{{function:setSelectedObj}}",
+                "ctx.searchResponseInfo.hasMoreFacetValues": "additionalSearchInfoMap.categoryHasMoreFacetValuesList"
+            },
+            "events": {
+                "success": [ {
+                    "name": "showClassificationList.selectFocusItem",
+                    "condition": "ctx.clsLocation.focusItemSelected === true"
+                },
+                {
+                    "name": "showClassificationList.updateRecentsAfterObjectSync",
+                    "condition": "ctx.clsLocation.standAloneObjects && ctx.clsLocation.standAloneObjects.length > 0"
+                } ]
+            },
+            "actionMessages":
+            {
+                "failure":
+                [
+                    {
+                        "message": "searchClassificationFailure"
+                    }
+                ]
+            }
+        },
+        "updateRecentsAfterObjectSync": {
+            "actionType": "JSFunction",
+            "method": "updateRecentsAfterObjectSync",
+            "inputData": {
+                "searchResults": "{{data.searchResults}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "changingSelectedTabListMode": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "load.listView"
+                    }
+                ]
+            }
+        },
+
+        "parseVNC": {
+            "actionType": "JSFunction",
+            "method": "parseVNC",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.clsLocation}}"
+            },
+            "deps": "js/classifyTreeService"
+        },
+        "selectFocusItem": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}",
+                "newSelection": "{{ctx.clsLocation.searchSimilarFocusItem}}"
+            },
+            "deps": "js/selectionModelFactory"
+        },
+        "deSelectFocusItem": {
+            "actionType": "JSFunction",
+            "method": "unSetFocusItem",
+            "inputData": {
+            },
+            "deps": "js/searchSimilarService"
+        },
+        "loadMRUData": {
+            "actionType": "JSFunction",
+            "method": "loadMRUData",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.listDataProvider}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/classifySearchService"
+        }
+    },
+    "dataProviders": {
+        "listDataProvider": {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "messages": {
+        "searchClassificationFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "functions": {
+        "setOriginalInputCategories": {
+            "functionName": "setOriginalInputCategories",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getHighlightKeywords": {
+            "functionName": "getHighlightKeywords",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.clsLocation}}"
+            ]
+        },
+        "updateFilterMap": {
+            "functionName": "updateFilterMap",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "getDataProvider": {
+            "functionName": "getDataProvider",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "getSearchCriteria": {
+            "functionName": "getSearchCriteria",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "getSearchSortCriteria": {
+            "functionName": "getSearchSortCriteria",
+            "parameters": [
+                "{{data.columnProviders.clientScopeUI.sortCriteria}}"
+            ]
+        },
+        "getActiveFilterString": {
+            "functionName": "getActiveFilterString",
+            "parameters": []
+        },
+        "getSaveSearchFilterMap": {
+            "functionName": "getSaveSearchFilterMap",
+            "parameters": []
+        },
+        "getEmptyString": {
+            "functionName": "getEmptyString",
+            "parameters": []
+        },
+        "getInternalPropertyName": {
+            "functionName": "getInternalPropertyName",
+            "parameters": []
+        },
+        "getActualTotalFound": {
+            "functionName": "getActualTotalFound",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getActualSearchFilterCategories": {
+            "functionName": "getActualSearchFilterCategories",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getBulkFilterMap": {
+            "functionName": "getBulkFilterMap",
+            "parameters": [
+                "{{ctx.clsLocation.bulkFiltersMap}}"
+            ]
+        },
+        "getClsSearchCriteria": {
+            "functionName": "getClsSearchCriteria",
+            "parameters": []
+        },
+        "setSelectedObj":{
+            "functionName": "getClsSearchCriteria",
+            "parameters": []
+        }
+
+            },
+    "i18n": {
+        "visualNavigation": [ "ClassificationPanelMessages" ],
+        "searchResults": [ "ClassificationPanelMessages" ],
+        "assignedClasses": [ "ClassificationPanelMessages" ],
+        "more": [ "ClassificationPanelMessages" ],
+        "previousButtonTitle": [ "ClassificationPanelMessages" ],
+        "nextButtonTitle": [ "ClassificationPanelMessages" ]
+    },
+    "onEvent": [
+        {
+            "eventId": "showClassificationList.contentLoaded",
+            "action": "viewerChanged"
+        },
+        {
+            "eventId": "showClassificationList.contentLoaded",
+            "condition": "!ctx.sidenavCommandId || ctx.sidenavCommandId !== 'Awp0ClassificationSearchNavigate'",
+            "action": "activateClassificationSearchNavigate"
+        },
+        {
+            "eventId": "showClassificationList.updateRecentsAfterObjectSync",
+            "action": "updateRecentsAfterObjectSync"
+        },
+        {
+            "eventId": "showClassificationList.contentLoaded",
+            "condition": "ctx.clsLocation && !ctx.clsLocation.isVncVisible && !ctx.SearchSimilarActive && ( ctx.ViewModeContext.ViewModeContext === 'ListView' || ctx.ViewModeContext.ViewModeContext === 'SummaryView' )",
+            "action": "loadListView"
+        },
+        {
+            "eventId": "showClassificationList.selectFocusItem",
+            "action": "selectFocusItem"
+        },
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "condition": "ctx.clsLocation.focusItemSelected === true",
+            "action": "deSelectFocusItem"
+        },
+        {
+            "eventId": "load.listView",
+            "action": "loadListView"
+        },
+        {
+            "eventId": "show.listView",
+            "action": "changingSelectedTabListMode"
+        },
+        {
+            "eventId": "getClassTableSummary.firstLevelSearchResultsLoaded",
+            "action": "formatSearchResultsForVNC",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "getClassTableSummary.clearClassBreadCrumb",
+            "action": "clearClassBreadCrumb"
+        },
+        {
+            "eventId": "getClassTableSummary.updateClassBreadCrumb",
+            "action": "updateClassBreadCrumb"
+        },
+        {
+            "eventId": "getClassTableSummary.VNCisSelectedWhenPanelIsClosed",
+            "action": "parseVNC"
+        },
+        {
+            "eventId": "getClassTableSummary.selectBreadCrumb",
+            "condition": "ctx.clsLocation.panelIsClosed === true",
+            "action": "getSelectedCrumb",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "classify.loadMRUObjects",
+            "action": "loadMRUData",
+            "cacheEventData": true
+        }
+    ]
+
+}

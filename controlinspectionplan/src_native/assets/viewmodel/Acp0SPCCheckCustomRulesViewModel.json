@@ -1,0 +1,62 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-widget.directive",
+        "js/aw-flex-row.directive",
+        "js/enable-when.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions": {
+
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0IndustryRuleService"
+        },
+        "editEventAction": {
+            "actionType": "JSFunction",
+            "method": "processEditData",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData":"{{data.eventData}}"
+
+            },
+            "deps": "js/Acp0IndustryRuleService"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "Acp0SPCCheckCustomRules.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "cacheEventData": true,
+            "action": "editEventAction"
+            }
+    ],
+
+    "conditions": {
+    },
+
+    "data": {
+        "ruleProperties":{},
+        "trendProperty":{},
+        "runProperty":{}
+    },
+
+    "functions": {
+    },
+
+    "i18n": {
+        "acp0OutOfRules": [
+            "ControlInspectionPlanMessages"
+        ]
+    }
+}

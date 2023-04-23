@@ -1,0 +1,340 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [],
+    "data": {},
+    "actions": {
+        "addElements": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-06-OccurrenceManagement",
+            "method": "addObject2",
+            "inputData": {
+                "input": {
+                    "objectsToBeAdded": "{{function:getElementsToAdd}}",
+                    "parentElement": "{{ctx.aceActiveContext.context.addElement.parent}}",
+                    "siblingElement": "{{ctx.aceActiveContext.context.addElement.siblingElement}}",
+                    "inputCtxt": {
+                        "productContext": "{{function:getPciForParentSelection}}"
+                    },
+                    "sortCriteria": {
+                        "propertyName": "{{ctx.aceActiveContext.context.sortCriteria[0].fieldName}}",
+                        "sortingOrder": "{{ctx.aceActiveContext.context.sortCriteria[0].sortDirection}}"
+                    },
+                    "addObjectIntent": "{{ctx.aceActiveContext.context.addElement.addObjectIntent}}",
+                    "fetchPagedOccurrences": "{{ctx.aceActiveContext.context.addElement.fetchPagedOccurrences}}",
+                    "requestPref": {
+                        "displayMode": [ "{{function:getDisplayMode}}" ]
+                    },
+                    "numberOfElements": 1
+                }
+            },
+            "outputData": {
+                "addElementResponse": "",
+                "totalObjectsAdded": "{{function:getTotalNumberOfChildrenAdded}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addElement.elementsAdded",
+                    "eventData": {
+                        "objectsToSelect": "{{function:getNewlyAddedChildElements}}",
+                        "addElementResponse": "{{data.addElementResponse}}",
+                        "addElementInput": "{{data.addElementInput}}",
+                        "viewToReact": "{{ctx.aceActiveContext.key}}"
+                    },
+                    "condition": "_internal.conditionStates.areNewElementsAdded"
+                }, {
+                    "name": "acePwa.reset",
+                    "condition": "_internal.conditionStates.areNewElementsAdded && !_internal.conditionStates.isTreeMode && _internal.conditionStates.isParentAndOpenedElementSame"
+                }, {
+                    "name": "addElement.updateSelectionInPWA",
+                    "eventData": {
+                        "objectToSelect": "{{ctx.aceActiveContext.context.addElement.parent.uid}}"
+                    },
+                    "condition": "_internal.conditionStates.areNewElementsAdded && !_internal.conditionStates.isTreeMode && !_internal.conditionStates.isParentAndOpenedElementSame"
+                },
+                {
+                    "name": "ace.elementsMoved",
+                    "condition": "_internal.conditionStates.areNewElementsAdded &&ctx.aceActiveContext.context.addElementInput.addObjectIntent === 'DragAndDropIntent'"
+                } ],
+                "failure": [ {
+                        "name": "addElement.elementsAdded",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedChildElements}}",
+                            "addElementResponse": "{{data.addElementResponse}}",
+                            "viewToReact": "{{ctx.aceActiveContext.key}}"
+                        },
+                        "condition": "_internal.conditionStates.areNewElementsAdded && _internal.conditionStates.isTreeMode"
+                    },
+                    {
+                        "name": "acePwa.reset",
+                        "condition": "_internal.conditionStates.areNewElementsAdded && !_internal.conditionStates.isTreeMode  && _internal.conditionStates.isParentAndOpenedElementSame"
+                    },
+                    {
+                        "name": "addElement.updateSelectionInPWA",
+                        "eventData": {
+                            "objectToSelect": "{{ctx.aceActiveContext.context.addElement.parent.uid}}"
+                        },
+                        "condition": "_internal.conditionStates.areNewElementsAdded && ctx.aceActiveContext.context.addElementInput.parentElement.uid !== ctx.aceActiveContext.context.addElement.parent.uid"
+                    },
+                    {
+                        "name": "ace.elementsMoved",
+                        "condition": "_internal.conditionStates.areNewElementsAdded && ctx.aceActiveContext.context.addElementInput.addObjectIntent === 'DragAndDropIntent'"
+                    }
+
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                        "message": "elementAddSuccessfulMessage",
+                        "condition": "data.totalObjectsAdded === 1 "
+                    },
+                    {
+                        "message": "multipleElementAddSuccessfulMessage",
+                        "condition": "data.totalObjectsAdded > 1"
+                    }
+                ],
+                "failure": [ {
+                    "message": "elementsPartiallyAddedMessage",
+                    "condition": "_internal.conditionStates.areNewElementsAdded"
+                },
+                {
+                    "message": "addElementsFailuresMessage",
+                    "condition": "_internal.conditionStates.areNewElementsAdded === false"
+                },
+                {
+                    "message": "addElementsPartialFailureMessage",
+                    "condition": "_internal.conditionStates.areNewElementsAdded === true && data.addElementResponse.ServiceData.partialErrors"
+                } ]
+            },
+            "deps": "js/addElementService"
+        },
+        "addElementsToBookmark": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2016-03-OccurrenceManagement",
+            "method": "addToBookmark2",
+            "inputData": {
+                "input": "{{function:getAddToBookMarkInput}}"
+            },
+
+            "outputData": {
+                "addToBookMarkResponse": ""
+            },
+
+            "events": {
+                "success": [ {
+                        "name": "addChild.updatePCIInCtx",
+                        "eventData": {
+                            "objectToSelect": "{{function:getNewlyAddedSwcProductInfo}}"
+                        }
+                    },
+                    {
+                        "name": "aceElementsSelectionUpdatedEvent",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedSwcChildElements}}"
+                        }
+                    },
+                    {
+                        "name": "acePwa.reset"
+                    }
+
+                ],
+                "failure": [ {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length >= 1",
+                        "name": "addChild.updatePCIInCtx",
+                        "eventData": {
+                            "objectToSelect": "{{function:getNewlyAddedSwcProductInfo}}"
+                        }
+                    },
+                    {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length >= 1",
+                        "name": "aceElementsSelectionUpdatedEvent",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedSwcChildElements}}"
+                        }
+                    },
+                    {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length >= 1",
+                        "name": "acePwa.reset"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length === 1",
+                        "message": "elementAddSuccessfulMessageForSWC"
+                    },
+
+                    {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length > 1",
+                        "message": "multipleElementAddSuccessfulMessageForSWC"
+                    }
+                ],
+
+                "failure": [ {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length === 1",
+                        "message": "elementAddSuccessfulMessageForSWC"
+                    },
+
+                    {
+                        "condition": "data.addToBookMarkResponse.addedProductsInfo.length > 1",
+                        "message": "multipleElementAddSuccessfulMessageForSWC"
+                    },
+                    {
+                        "condition": "!data.addToBookMarkResponse || !data.addToBookMarkResponse.addedProductsInfo || data.addToBookMarkResponse.addedProductsInfo.length === 0",
+                        "message": "addElementsToBookmarkFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/addElementService"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "updateContextState",
+            "inputData": {
+                "contextKey": "{{ctx.aceActiveContext.key}}",
+                "newState": {
+                    "c_uid": "{{data.eventData.objectToSelect}}"
+                },
+                "mergeWithCurrentState": true
+            },
+            "deps": "js/contextStateMgmtService"
+        },
+        "updatePCIInCtx": {
+            "actionType": "JSFunction",
+            "method": "updateContextState",
+            "inputData": {
+                "contextKey": "{{ctx.aceActiveContext.key}}",
+                "newState": {
+                    "pci_uid": "{{data.eventData.objectToSelect.productCtxInfo.uid}}"
+                },
+                "mergeWithCurrentState": true
+            },
+            "deps": "js/contextStateMgmtService"
+
+        }
+    },
+    "onEvent": [ {
+            "eventId": "addElement.updateSelectionInPWA",
+            "cacheEventData": true,
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "addChild.updatePCIInCtx",
+            "cacheEventData": true,
+            "action": "updatePCIInCtx"
+        }
+    ],
+    "conditions": {
+        "areNewElementsAdded": {
+            "expression": "data.totalObjectsAdded>0"
+        },
+        "isTreeMode": {
+            "expression": "ctx.ViewModeContext && (ctx.ViewModeContext.ViewModeContext === 'TreeView' || ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView')"
+        },
+        "isParentAndOpenedElementSame": {
+            "expression": "ctx.aceActiveContext.context.openedElement.uid === ctx.aceActiveContext.context.addElement.parent.uid "
+        }
+    },
+    "functions": {
+        "getPciForParentSelection": {
+            "functionName": "getPciForParentSelection",
+            "parameters": [
+                "{{ctx.aceActiveContext.context.addElement.parent}}"
+            ]
+        },
+        "getElementsToAdd": {
+            "functionName": "getElementsToAdd",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getNewlyAddedChildElements": {
+            "functionName": "getNewlyAddedChildElements",
+            "parameters": [ "{{data}}" ]
+        },
+
+        "getTotalNumberOfChildrenAdded": {
+            "functionName": "getTotalNumberOfChildrenAdded",
+            "parameters": [ "{{data}}" ]
+        },
+        "getDisplayMode": {
+            "functionName": "getDisplayMode",
+            "parameters": [
+                "", "{{ctx}}", "", "(ctx.ViewModeContext.ViewModeContext === 'TreeView' || ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView') && 'Tree' || 'List'"
+            ]
+        },
+        "getAddToBookMarkInput": {
+            "functionName": "getAddToBookMarkInput",
+            "parameters": [ "{{data}}" ]
+        },
+        "getNewlyAddedSwcProductInfo": {
+            "functionName": "getNewlyAddedSwcProductInfo",
+            "parameters": [ "{{data}}" ]
+        },
+        "getNewlyAddedSwcChildElements": {
+            "functionName": "getNewlyAddedSwcChildElements",
+            "parameters": [ "{{data}}" ]
+        }
+
+    },
+    "messages": {
+        "addElementsFailuresMessage":{
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "addElementsPartialFailureMessage":{
+            "messageType": "INFO",
+            "messageText": "{{errorCode}}"
+        },
+        "elementsPartiallyAddedMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleElementAddSuccessful}}",
+            "messageTextParams": [
+                "{{data.totalObjectsAdded}}",
+                "{{ctx.aceActiveContext.context.addElement.parent.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "addElementsToBookmarkFailureMessage":{
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "multipleElementAddSuccessfulMessageForSWC": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleElementAddSuccessful}}",
+            "messageTextParams": [
+                "{{data.addToBookMarkResponse.addedProductsInfo.length}}",
+                "{{data.targetObjectToAdd.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "elementAddSuccessfulMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.elementAddSuccessful}}",
+            "messageTextParams": [
+                "{{data.addElementResponse.selectedNewElementInfo.newElements[0].props.object_string.dbValues[0]}}",
+                "{{data.addElementInput.parent.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "multipleElementAddSuccessfulMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleElementAddSuccessful}}",
+            "messageTextParams": [
+                "{{data.totalObjectsAdded}",
+                "{{data.addElementInput.parent.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "elementAddSuccessfulMessageForSWC": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.elementAddSuccessful}}",
+            "messageTextParams": [
+                "{{data.addToBookMarkResponse.addedProductsInfo[0].rootElement.props.object_string.dbValues[0]}}",
+                "{{data.targetObjectToAdd.props.object_string.dbValues[0]}}"
+            ]
+        }
+
+    },
+    "i18n": {
+        "multipleElementAddSuccessful": [ "OccurrenceManagementMessages" ],
+        "elementAddSuccessful": [
+            "OccurrenceManagementMessages"
+        ]
+    }
+}

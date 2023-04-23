@@ -1,0 +1,101 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+
+    ],
+
+    "actions": {
+        "reveal": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2014-11-RequirementsManagement",
+            "method": "getExportTemplates",
+            "inputData": {
+                "filter": [ {
+                    "inputObjects": "{{function:getInputObjects}}",
+                    "templateTypes": [
+                        "ExcelTemplate"
+                    ], 
+                    "requestPref": "{{ctx.excelTemplateForExport.templateName}}"
+                } ]
+            },
+
+            "outputData": {
+
+                "excelTemplatesListIn": "outTmplNames.ExcelTemplate"
+
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "ExportToOffice.prepareTemplateLists"
+                } ]
+            },
+
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==141080",
+                    "message": "notificationForExportFailureMsg"
+                } ]
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "unRegisterCmdContext":{
+            "actionType": "JSFunction",
+            "method": "unRegisterCmdContext",
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "registerCmdContext":{
+            "actionType": "JSFunction",
+            "method": "registerCmdContext",
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "unRegisterExcelCommandContext":{
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "excelTemplateForExport"
+            }
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "Arm0ExportToRoundTripExcelDocument.contentUnloaded",
+            "action": "unRegisterCmdContext"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripExcelDocument.contentLoaded",
+            "action": "registerCmdContext"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripExcelDocument.contentUnloaded",
+            "action": "unRegisterExcelCommandContext"
+        }
+    ],
+
+    "data": {},
+
+    "functions": {
+        "getInputObjects": {
+            "functionName": "getInputObjects",
+            "parameters": []
+        }
+    },
+
+    "conditions": {},
+
+    "messages": {},
+
+    "i18n": {
+
+        "exportCmdTitle": [
+            "ExcelRoundTripMessages"
+        ]
+
+    }
+}

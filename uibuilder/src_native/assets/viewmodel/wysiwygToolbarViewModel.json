@@ -1,0 +1,244 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-widget.directive",
+        "js/aw-command-bar.directive"
+    ],
+    "actions": {
+        "updateConfig": {
+            "actionType": "JSFunction",
+            "method": "updateConfig",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/wysiwyg-canvas.service"
+        },
+        "setConfig": {
+            "actionType": "JSFunction",
+            "method": "setConfig",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "isSetUpCompleted": "data.isSetConfigCompleted"
+            },
+            "deps": "js/wysiwyg-canvas.service"
+        },
+        "cleanLoadedViewViewModel": {
+            "actionType": "JSFunction",
+            "method": "cleanLoadedViewViewModel",
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "loadDarsiSavedViewViewModel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "wysiwyg.resetWysiwygEditor",
+                        "excludeLocalDataCtx": true
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "message": "viewAndViewModelReset"
+                    }
+                ]
+            }
+        },
+        "resetWysiwyg": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "cleanLoadedViewViewModel"
+                },
+                {
+                    "action": "loadDarsiSavedViewViewModel"
+                }
+            ]
+        }
+    },
+    "data": {
+        "layout": {
+            "displayName": "{{i18n.layout}}",
+            "type": "STRING",
+            "isRequired": false,
+            "dataProvider": "layoutProvider",
+            "dbValue": "cp",
+            "uiValue": "Command Panel",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "widthRadio": {
+            "displayName": "{{i18n.widthRadio}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dataProvider": "widthProvider",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "uiValue": "Standard"
+        },
+        "heightRadio": {
+            "displayName": "{{i18n.heightRadio}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dataProvider": "heightProvider",
+            "dbValue": "full",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "uiValue": "Full"
+        },
+        "widthValues": [
+            {
+                "propDisplayValue": "Standard",
+                "propInternalValue": true
+            },
+            {
+                "propDisplayValue": "Wide",
+                "propInternalValue": false
+            }
+        ],
+        "heightValues": [
+            {
+                "propDisplayValue": "Default",
+                "propInternalValue": "def"
+            },
+            {
+                "propDisplayValue": "Large",
+                "propInternalValue": "large"
+            },
+            {
+                "propDisplayValue": "Full",
+                "propInternalValue": "full"
+            }
+        ],
+        "layoutValues": [
+            {
+                "propDisplayValue": "Command Panel",
+                "propInternalValue": "cp",
+                "dispValue": "Command Panel"
+            },
+            {
+                "propDisplayValue": "Panel Layout",
+                "propInternalValue": "normal",
+                "dispValue": "Panel Layout"
+            }
+        ]
+    },
+    "dataProviders": {
+        "layoutProvider": {
+            "response": "{{data.layoutValues}}"
+        },
+        "widthProvider": {
+            "response": "{{data.widthValues}}"
+        },
+        "heightProvider": {
+            "response": "{{data.heightValues}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "updateConfig",
+            "criteria": {
+                "condition": "conditions.layoutChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "updateConfig",
+            "criteria": {
+                "condition": "conditions.widthChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "updateConfig",
+            "criteria": {
+                "condition": "conditions.heightChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "wysiwyg.popResetConfirmationBox",
+            "message": "confirmReset"
+        }
+    ],
+    "conditions": {
+        "isCanvasSelected": {
+            "expression": "ctx.wysiwyg.state.current.name === 'wysiwygCanvas'"
+        },
+        "isCommandPanelSelected": {
+            "expression": "data.layout.dbValue === 'cp'"
+        },
+        "layoutChangeCondition": {
+            "expression": "data.isSetUpCompleted && data.layout.dbValue",
+            "trackValues": true
+        },
+        "widthChangeCondition": {
+            "expression": "data.isSetUpCompleted && data.widthRadio.dbValue",
+            "trackValues": true
+        },
+        "heightChangeCondition": {
+            "expression": "data.isSetUpCompleted && data.heightRadio.dbValue",
+            "trackValues": true
+        }
+    },
+    "messages": {
+        "confirmReset": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.resetConfirmationMessage}}",
+            "messageTextParams": [
+                "{{ctx.wysiwygCurrentPanel.id}}"
+            ],
+            "navigationOptions": [
+                {
+                    "option": "Reset",
+                    "text": "{{i18n.RADIO_YES}}",
+                    "action": "resetWysiwyg"
+                },
+                {
+                    "option": "Cancel",
+                    "text": "{{i18n.RADIO_NO}}"
+                }
+            ]
+        },
+        "viewAndViewModelReset": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.fileResetMsg}}"
+        }
+    },
+    "i18n": {
+        "resetChangesTitle": [
+            "locationMessages"
+        ],
+        "resetConfirmationMessage": [
+            "locationMessages"
+        ],
+        "fileResetMsg": [
+            "locationMessages"
+        ],
+        "RADIO_YES": [
+            "BaseMessages"
+        ],
+        "RADIO_NO": [
+            "BaseMessages"
+        ],
+        "layout": [
+            "locationMessages"
+        ],
+        "heightRadio": [
+            "locationMessages"
+        ],
+        "widthRadio": [
+            "locationMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "setConfig"
+    }
+}

@@ -1,0 +1,286 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-column.directive",
+        "js/aw-kanban.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "actions": {
+        "loadDataOfProgarmBoard": {
+            "actionType": "JSFunction",
+            "method": "prepareProgramBoardData",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "loadProgrmBoardColumns": {
+            "actionType": "JSFunction",
+            "method": "loadProgrmBoardColumns",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "createAndDeleteRelations": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:getCreateRelationsInput}}"
+            },
+            "outputData": {
+                "createRelationsResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "deleteRelationsEvent"
+                    }
+                ],
+                "failure": [ {
+                    "name": "ProgramBoard.dragDropFailure",
+                    "eventData": {
+                        "data": "{{data.eventMap['ProgramBoard.onAfterDrop']}}",
+                        "failedUids": "{{function:getFailedUidsForCreateRelations}}"
+                    }
+                }]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "deleteAndCreateRelations": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteRelations",
+            "inputData": {
+                "input": "{{function:getDeleteRelationsInput}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createRelationsEvent"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "deleteRelationsSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteRelations",
+            "inputData": {
+                "input": "{{function:getDeleteRelationsInput}}"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "createRelationsSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:getCreateRelationsInput}}"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "syncProgramBoardSelection": {
+            "actionType": "JSFunction",
+            "method": "syncProgramBoardSelection",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "updateRelatedBoardData": {
+            "actionType": "JSFunction",
+            "method": "updateRelatedBoardData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "updatedKanbanCards": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "ProgramBoard.updateCards",
+                        "eventData": {
+                            "updatedKanbanCards": "{{data.updatedKanbanCards}}"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "dragDropForCriteria": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:setPropertiesInput}}"
+            },
+            "outputData": {
+                "setPropertiesResponse": ""
+            },
+            "events": {
+                "failure": [ {
+                    "name": "ProgramBoard.dragDropFailure",
+                    "eventData": {
+                        "data": "{{data.eventMap['ProgramBoard.onAfterDrop']}}",
+                        "failedUids": "{{function:getFailedUidsForSetProperties}}"
+                    }
+                }]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        }
+    },
+    "dataProviders": {
+        "ProgramObjectsBoardProvider": {
+            "initializeAction": "loadDataOfProgarmBoard",
+            "response": "{{data.loadObjects}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "columnProviders": {
+        "ProgramObjectsColumnProvider": {
+            "loadColumnAction": "loadProgrmBoardColumns",
+            "columns": "{{data.columns}}"
+        }
+    },
+    "grids": {
+        "ProgramBoard": {
+            "dataProvider": "ProgramObjectsBoardProvider",
+            "columnProvider": "ProgramObjectsColumnProvider",
+            "gridOptions": {}
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "prepareProgramBoardEvent",
+            "action": "prepareProgramBoard"
+        },
+        {
+            "eventId": "ProgramBoard.onAfterDrop",
+            "cacheEventData": true,
+            "condition": "conditions.shouldCreateAndDeleteRelations",
+            "action": "createAndDeleteRelations"
+        },
+        {
+            "eventId": "ProgramBoard.onAfterDrop",
+            "cacheEventData": true,
+            "condition": "conditions.shouldDeleteAndCreateRelations",
+            "action": "deleteAndCreateRelations"
+        },
+        {
+            "eventId": "ProgramBoard.onAfterDrop",
+            "cacheEventData": true,
+            "condition": "conditions.isCriteriaAsContext",
+            "action": "dragDropForCriteria"
+        },
+        {
+            "eventId": "deleteRelationsEvent",
+            "action": "deleteRelationsSOA"
+        },
+        {
+            "eventId": "createRelationsEvent",
+            "action": "createRelationsSOA"
+        },
+        {
+            "eventId": "ProgramBoard.cardSelected",
+            "cacheEventData": true,
+            "action": "syncProgramBoardSelection"
+        },
+        {
+            "eventId": "cdm.updated",
+            "condition": "conditions.isProgramBoardActive",
+            "cacheEventData": true,
+            "action": "updateRelatedBoardData"
+        }
+    ],
+    "functions": {
+        "getCreateRelationsInput": {
+            "functionName": "getCreateRelationsInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getDeleteRelationsInput": {
+            "functionName": "getDeleteRelationsInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "setPropertiesInput": {
+            "functionName": "setPropertiesInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getFailedUidsForCreateRelations": {
+            "functionName": "getFailedUidsForCreateRelations",
+            "parameters": [
+                "{{data.createRelationsResponse}}",
+                "{{data.prgBoardUidToConvertedUidMap}}"
+            ]
+        },
+        "getFailedUidsForSetProperties": {
+            "functionName": "getFailedUidsForSetProperties",
+            "parameters": [
+                "{{data.setPropertiesResponse}}",
+                "{{data.prgBoardUidToConvertedUidMap}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isProgramBoardActive": {
+            "expression": "ctx.activeProgramBoard === true"
+        },
+        "shouldDeleteAndCreateRelations":
+        {
+            "expression": "ctx.timelineProgramBoard && ctx.timelineProgramBoard.context && ctx.timelineProgramBoard.context ==='Checklists'"
+        },
+        "isCriteriaAsContext":
+        {
+            "expression": "ctx.timelineProgramBoard && ctx.timelineProgramBoard.context && ctx.timelineProgramBoard.context ==='Criteria'"
+        },
+        "shouldCreateAndDeleteRelations":
+        {
+            "expression": "ctx.timelineProgramBoard && ctx.timelineProgramBoard.context && (ctx.timelineProgramBoard.context !=='Checklists' && ctx.timelineProgramBoard.context !=='Criteria')"
+        }
+
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    }
+}

@@ -1,0 +1,111 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "ports": {
+        "pwaSelection": {
+            "syncObject": {}
+        }
+    },
+    "actions":
+    {
+        "updatePWASelectionPort": {
+            "actionType": "Sync",
+            "inputData": {
+                "port": "pwaSelection",
+                "syncObject": "{{data.eventData.selectedObjects}}"
+            }
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "loadData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "columnFilters": "{{data.columnProviders.clientScopeUI.columnFilters}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType" : "{{ctx.search.sortType}}",
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}"
+                },
+                "inflateProperties": false
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded"
+            }
+        },
+        "refreshSublocation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "condition": "ctx.sublocation.clientScopeURI === 'Awp0MyFavorites'",
+                    "name": "primaryWorkarea.reset"
+                } ]
+            }
+        }
+    },
+
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "favoritesList.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "favorites.changed",
+            "action": "refreshSublocation"
+        },
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "action": "updatePWASelectionPort",
+            "cacheEventData": true
+        }
+    ]
+}

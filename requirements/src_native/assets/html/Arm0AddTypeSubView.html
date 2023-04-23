@@ -1,0 +1,29 @@
+<aw-panel-body>
+    <aw-panel-section visible-when="conditions.isTypeToAdd">
+        <aw-listbox exist-when="data.typePropInfos" prop="data.objectType" list="data.objectTypeList.dbValues" action="getPropertiesFromReqType"></aw-listbox>
+        <aw-list-filter prop="data.filterBoxForType" dataprovider="data.dataProviders.dataProviderForTypeProperties">
+            <aw-checkbox prop="item"></aw-checkbox>
+        </aw-list-filter>
+    </aw-panel-section>
+    <aw-panel-section visible-when="conditions.isTraceLinkToAdd">
+        <aw-listbox exist-when="data.typePropInfos" prop="data.traceLinkType" list="data.tracelinkTypeList.dbValues" action="getPropertiesFromTraceLink"></aw-listbox>
+        <aw-list-filter prop="data.filterBoxForTraceLink" dataprovider="data.dataProviders.dataProviderForTraceLinkProperties">
+            <aw-checkbox prop="item"></aw-checkbox>
+        </aw-list-filter>
+    </aw-panel-section>
+</aw-panel-body>
+
+<aw-panel-footer>
+    <aw-button action="addTypes" visible-when="conditions.isTypeToAdd && !conditions.isTypeToUpdate && data.objectTypeList.dbValues.length > 0">
+        <aw-i18n>i18n.Add</aw-i18n>
+    </aw-button>
+    <aw-button action="addTraceLinks" visible-when="conditions.isTraceLinkToAdd && !conditions.isTraceLinkToUpdate && data.tracelinkTypeList.dbValues.length > 0">
+        <aw-i18n>i18n.Add</aw-i18n>
+    </aw-button>
+    <aw-button action="updateTypes" visible-when="conditions.isTypeToAdd && conditions.isTypeToUpdate ">
+        <aw-i18n>i18n.update</aw-i18n>
+    </aw-button>
+    <aw-button action="updateTraceLinks" visible-when="conditions.isTraceLinkToAdd && conditions.isTraceLinkToUpdate">
+        <aw-i18n>i18n.update</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

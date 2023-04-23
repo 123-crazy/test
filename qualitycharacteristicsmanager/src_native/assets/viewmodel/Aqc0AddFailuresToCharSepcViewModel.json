@@ -1,0 +1,404 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-form.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "data": {
+        "filterBox": {
+            "displayName": "{{i18n.Filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "actions": {
+        "showFailuresList": {
+            "actionType": "dataProvider",
+            "method": "failureListProvider"
+        },
+        "addFailuresInCharSpecBySetProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [ {
+                    "object": "{{ctx.selected}}",
+                    "timestamp": "",
+                    "vecNameVal": [ {
+                        "name": "Qc0HasFailures",
+                        "values": "{{function:getRequiredValuesForOperation}}"
+                    } ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "aqc0NullMapEventForActionAddition",
+                        "condition": "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CharSpecOperationsService"
+        },
+        "addFailures": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-CharManagerAW-2018-12-QualityManagement",
+            "method": "createSpecificationVersion",
+            "inputData": {
+                "specificationInputs": "{{function:getVersionInputFAction}}"
+            },
+            "outputData": {
+                "createdObject": "specificationsOutput[0].newSpecification",
+                "ctx.createdObjectForTreeFromAddAction": "specificationsOutput[0].newSpecification",
+                "ctx.versionCreatedFlag": true
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.locationContext.modelObject === undefined && ctx.ViewModeContext.ViewModeContext !=='TreeSummaryView'",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "failureAdded"
+                    },
+                    {
+                        "name": "aqc0NullMapEventForAddFailuresToSpecs",
+                        "condition" : "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    },
+                    {
+
+                        "name": "primaryWorkarea.reset"
+                    },
+
+                    {
+                        "name": "aqc0.openNewObject",
+                        "condition": "ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Qc0MasterCharSpec' ) > -1",
+                        "eventData": {
+                            "newObjectUid": "{{data.createdObject.uid}}"
+                        }
+
+                    },
+
+
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.locationContext.modelObject !== undefined && ctx.ViewModeContext.ViewModeContext !=='TreeSummaryView'",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "relatedModified": [
+                                "{{ctx.locationContext.modelObject}}",
+                                "{{ctx.selected}}"
+                            ],
+                            "createdObjects": [ "{{data.createdObject}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Qc0MasterCharSpec' ) === -1",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "versioningSuccessfulMessage"
+                    }
+                ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Qc0VariableCharSpec",
+                    "properties": [ {
+                        "name": "Qc0HasActions"
+                    } ]
+                } ]
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "openNewObject": {
+            "actionType": "JSFunction",
+            "method": "openNewObject",
+            "deps": "js/Aqc0CharManagerUtils",
+            "inputData": {
+                "commandId": "Awp0ShowObject",
+                "commandArgs": {
+                    "edit": false
+                },
+                "commandContext": {
+                    "vmo": "{{data.createdObject}}"
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "findSavedQuery": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2010-04-SavedQuery",
+            "method": "findSavedQueries",
+            "inputData": {
+                "inputCriteria": [ {
+                    "queryNames": [
+                        "Failure Specification..."
+                    ]
+                } ]
+            },
+            "outputData": {
+                "generalQuery": "savedQueries[0]"
+            },
+            "events": {
+                "success": [ {
+                    "name": "saveAsqueryRetreived"
+                } ]
+            }
+        },
+        "getSearchResults": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2006-03-SavedQuery",
+            "method": "executeSavedQuery",
+            "inputData": {
+                "query": "{{data.generalQuery}}",
+                "limit": 50,
+                "entries": "{{function:getFailureQueryEntries}}",
+                "values": [
+                    "true",
+                    "true",
+                    "{{function:getSearchFailureFilterBoxValue}}"
+                ]
+            },
+            "outputData": {
+                "searchResults": "objects",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "checkDuplicates": {
+            "actionType": "JSFunction",
+            "method": "checkDuplicatesAndAddFailures",
+            "deps": "js/Aqc0UtilService",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "selectedObjects": "selectedObjects"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "aqc0.addFailuresInCharSpec_TC132Onwards",
+                        "condition": "(ctx.tcSessionData.tcMajorVersion > 13 || ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 2) && (data.selectedObjects.length > 0 && data.selectedObjects[0].type !== 'Older Version')"
+                    },
+                    {
+                        "name": "aqc0.addFailuresInCharSpec",
+                        "condition": "!(ctx.tcSessionData.tcMajorVersion > 13 || ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 2) && (data.selectedObjects.length > 0 && data.selectedObjects[0].type !== 'Older Version')"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                        "condition": "data.selectedObjects[0].type === 'Older Version'",
+                        "message": "OlderVersionAlreadyAddedMessage"
+                    },
+                    {
+                        "condition": "data.selectedObjects.length === 0",
+                        "message": "duplicateFailureAdditionMessage"
+                    }
+                ]
+            }
+        },
+        "closPanelHeader": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "clearMapOfCharGroupAndSpecificationAction": {
+            "actionType": "JSFunction",
+            "method": "clearMapOfCharGroupAndSpecification",
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "getPropertiesforSelectedObject": {
+            "actionType": "JSFunction",
+            "method": "getPropertiesforSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObject": "{{ctx.selected}}",
+                "onlyLoadProps": true
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "getFailureObjects": {
+            "actionType": "JSFunction",
+            "method": "getFailureObjects",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/Aqc0UtilService"
+        }
+    },
+    "dataProviders": {
+        "failureListProvider": {
+            "action": "getFailureObjects",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getVersionInput": {
+            "functionName": "getVersionInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getFailureQueryEntries": {
+            "functionName": "getSavedQueryEntries",
+            "parameters": [
+                "Qc0Failure", "[qc0Status,qc0IsLatest,object_name]"
+            ]
+        },
+        "getSearchFailureFilterBoxValue": {
+            "functionName": "getSearchFailureFilterBoxValue",
+            "parameters": [
+                "{{data.filterBox.dbValue}}"
+            ]
+        },
+        "getRequiredValuesForOperation": {
+            "functionName": "getRequiredValuesForOperation",
+            "parameters": [
+                "{{ctx}}", "{{data}}", "Qc0HasFailures"
+            ]
+        },
+        "getVersionInputFAction": {
+            "functionName": "getVersionInputFAction",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "messages": {
+        "versioningSuccessfulMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.VersionCreated}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_name.dbValues[0]}}"
+            ]
+        },
+        "duplicateFailureAdditionMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.DuplicateFailureAdditionMessage}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_name.dbValues[0]}}"
+            ]
+        },
+        "OlderVersionAlreadyAddedMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.OlderVersionAlreadyAddedMessage}}",
+            "messageTextParams": [
+                "{{data.selectedObjects[0].uid}}"
+            ]
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "getPropertiesforSelectedObject"
+    },
+    "onEvent": [ {
+            "eventId": "failureAdded",
+            "action": "closPanelHeader"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "showFailuresList"
+        },
+        {
+            "eventId": "aqc0.openNewObject",
+            "action": "openNewObject"
+        },
+        {
+        "eventId": "aqc0.addFailuresInCharSpec_TC132Onwards",
+            "action": "addFailuresInCharSpecBySetProperties"
+    },
+    {
+        "eventId": "aqc0.addFailuresInCharSpec",
+        "action": "addFailures"
+        },
+        {
+            "eventId": "aqc0.createVersion",
+            "action": "checkDuplicates"
+        },
+        {
+            "eventId": "saveAsqueryRetreived",
+            "action": "showFailuresList"
+        },
+        {
+            "eventId": "aqc0NullMapEventForAddFailuresToSpecs",
+            "action": "clearMapOfCharGroupAndSpecificationAction"
+        }
+    ],
+    "i18n": {
+        "addButtonTitle": [ "qualitycharacteristicsmanagerMessages" ],
+        "DuplicateFailureAdditionMessage": [ "qualitycharacteristicsmanagerMessages" ],
+        "Filter": [ "qualitycharacteristicsmanagerMessages" ],
+        "OlderVersionAlreadyAddedMessage": [ "qualitycharacteristicsmanagerMessages" ],
+        "VersionCreated": [ "qualitycharacteristicsmanagerMessages" ]
+    }
+}

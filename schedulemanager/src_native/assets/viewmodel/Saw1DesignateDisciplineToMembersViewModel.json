@@ -1,0 +1,121 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getDesigUsersList"
+            ]
+        },
+        "getDesignatedUsers": {
+            "actionType": "JSFunction",
+            "method": "getDesignatedUsers",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getDesigUsersList}}",
+                "selectedDiscipline": "{{ctx.selected.props.resource_tag.dbValues[0]}}"
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "designate": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagementAw-2018-12-ScheduleManagementAw",
+            "method": "designateDiscipline",
+            "inputData": {
+                "schedule": "{{ctx.designateDiscInfo.scheduleObj}}",
+                "discipline": "{{ctx.designateDiscInfo.disciplineObj}}",
+                "user": "{{data.dataProviders.getDesigUsersList.selectedObjects[0]}}",
+                "revert": false,
+                "runInBackground": true
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            }
+        }
+    },
+
+    "data": {
+        "filterBoxUser": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "messages":{
+      "soaErrorMessage": {
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+      },
+    "displayError": {
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+      }
+    },
+    "dataProviders": {
+        "getDesigUsersList": {
+            "action": "getDesignatedUsers",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single"
+        }
+    },
+
+    "conditions": {
+        "isValidToShowDesignateButton": {
+            "expression": "data.dataProviders.getDesigUsersList.selectedObjects.length > 0"
+        }
+    },
+
+  "onEvent": [ {
+      "eventId": "awPanel.reveal",
+      "criteria": {
+        "panelId": "Saw1DesignateDisciplineToMembers"
+      },
+      "action": "reveal"
+    }],
+
+    "i18n": {
+        "DesignateDiscipline": [
+            "ScheduleManagerMessages"
+        ],
+        "designate": [
+            "ScheduleManagerMessages"
+        ]
+    }
+
+}

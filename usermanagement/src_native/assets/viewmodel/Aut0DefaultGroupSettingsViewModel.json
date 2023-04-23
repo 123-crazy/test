@@ -1,0 +1,169 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-widget.directive",
+        "js/aw-label.directive"
+    ],
+    "onEvent": [
+        {
+            "eventId": "editHandlerStateChange",
+            "cacheEventData": true,
+            "action": "updateFields",
+            "condition": "ctx.user.uid === ctx.xrtSummaryContextObject.uid && dataSource.xrtType === 'SUMMARY'"
+        },
+        {
+        "eventId": "condition.expressionValueChanged",
+        "action": "setSelectedDefaultGroup",
+        "criteria": {
+            "condition": "conditions.watchCurrentGroup"
+        }
+    }
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects":
+                [
+                    "{{ctx.xrtSummaryContextObject}}"
+                ],
+                "attributes": [
+                    "default_group",
+                    "volume"
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "currentDefaultGroup": "{{function:getCurrentDefaultGroup}}",
+                "currentGroup.dbValue": "{{function:getCurrentDefaultGroup}}",
+                "currentGroup.uiValue": "{{function:getCurrentDefaultGroup}}"
+            },
+            "deps": "js/aw.UserSettings.Service"
+        },
+        "groupAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-Session",
+            "method": "getGroupMembership",
+            "inputData":
+            {
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Group",
+                        "properties":
+                        [
+                            {
+                                "name": "object_full_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Role",
+                        "properties":
+                        [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "status"
+                            },
+
+                            {
+                                "name": "group"
+                            },
+
+                            {
+                                "name": "role"
+                            },
+
+                            {
+                                "name": "default_role"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "uniqueGroups": "{{function:getGroups}}",
+                "groupFound": "uniqueGroups.length"
+            },
+
+            "deps":"js/aw.UserSettings.Service"
+        },
+        "updateFields": {
+            "actionType":"JSFunction",
+            "method":"modifyUserDefaultGroup",
+            "inputData":{
+                "input":"{{data}}",
+                "eventData": "{{data.eventData}}",
+                "context": "{{ctx}}"
+            },
+            "deps":"js/aw.UserSettings.Service"
+        },
+        "setSelectedDefaultGroup": {
+            "actionType": "JSFunction",
+             "method": "setSelectedDefaultGroup",
+             "inputData":
+             {
+                 "data": "{{data}}"
+             },
+             "outputData": {
+                "selectedDafaultGroup": ""
+            },
+             "deps": "js/aw.UserSettings.Service"
+        }
+    },
+
+    "i18n":
+    {
+         "DefaultGroup": ["UsermanagementMessages"]
+
+    },
+    "dataProviders": {
+        "groupProvider": {
+            "dataProviderType": "Action",
+            "action": "groupAction",
+            "response": "{{data.uniqueGroups}}",
+            "totalFound": "{{data.groupFound}}"
+        }
+    },
+
+    "data": {
+        "currentGroup":
+            {
+                "displayName": "{{i18n.DefaultGroup}}",
+                "hasLov": true,
+                "type": "STRING",
+                "isRequired": false,
+                "isEditable": false,
+                "dataProvider": "groupProvider"
+            }
+    },
+
+    "conditions": {
+        "watchCurrentGroup": {
+            "expression": "data.currentGroup.dbValue",
+            "trackValues": true
+        }
+    }
+}

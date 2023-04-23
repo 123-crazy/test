@@ -1,0 +1,512 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-toolbar.directive",
+        "js/visible-when.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-structure-viewer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-image.directive",
+        "js/exist-when.directive"
+    ],
+
+    "actions": {
+        "setup3DViewer": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "setThumbnailUrl"
+                },
+                {
+                    "action": "setStructureViewerNamespace"
+                },
+                {
+                    "action": "initialize3DViewer"
+                }
+            ]
+        },
+        "cleanup3DView": {
+            "actionType": "JSFunction",
+            "method": "cleanup3DViewer",
+            "inputData": {
+                "viewerCtxNamespace": "{{data.viewerCtxNamespace}}",
+                "occmgmtContextKey": "{{data.occmgmtContextKey}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "initialize3DViewer": {
+            "actionType": "JSFunctionAsync",
+            "method": "initialize3DViewer",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}",
+                "force3DViewerReload": "{{function:isForceReloadViewer}}"
+            },
+            "outputData": {
+                "svInstance": "",
+                "displayImageCapture": false,
+                "loadingViewer": false
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "setStructureViewerNamespace": {
+            "actionType": "JSFunction",
+            "method": "setStructureViewerNamespace",
+            "inputData": {
+                "occmgmtContextKey": "{{subPanelContext.contextKey}}"
+            },
+            "outputData": {
+                "viewerCtxNamespace": "viewerCtxNamespace",
+                "occmgmtContextOnLeft": "occmgmtContextOnLeft",
+                "occmgmtContextOnRight": "occmgmtContextOnRight",
+                "occmgmtContextKey": "occmgmtContextKey"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "setThumbnailUrl": {
+            "actionType": "JSFunction",
+            "method": "setThumbnailUrl",
+            "inputData": {
+                "subPanelContext": "{{subPanelContext.contextKey}}"
+            },
+            "outputData": {
+                "thumbnailImage": ""
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "setViewerLoadingStatus": {
+            "actionType": "JSFunction",
+            "method": "setViewerLoadingStatus",
+            "inputData": {
+                "isLoading": "{{data.eventMap['sv.viewerLoadingStatus'].loadingStatus}}"
+            },
+            "outputData": {
+                "loadingViewer": ""
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "showViewerEmmProgress": {
+            "actionType": "JSFunction",
+            "method": "showViewerEmmProgress",
+            "inputData": {
+                "isShow": "{{data.eventMap['emmProgressIndicator'].emmProgressIndicatorStatus}}"
+            },
+            "outputData": {
+                "showViewerEmmProgress": ""
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "showViewerProgress": {
+            "actionType": "JSFunction",
+            "method": "showViewerProgress",
+            "inputData": {
+                "isShow": "{{data.eventMap['progressIndicator'].progressIndicatorStatus}}"
+            },
+            "outputData": {
+                "showViewerProgress": ""
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "resetParametersFor3DReload": {
+            "actionType": "JSFunction",
+            "method": "resetParametersFor3DReload",
+            "outputData": {
+                "displayImageCapture": "output[0].displayImageCapture",
+                "loadingViewer": "output[0].loadingViewer",
+                "showViewerEmmProgress": "output[0].showViewerEmmProgress",
+                "showViewerProgress": "output[0].showViewerProgress"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "setDisplayImageCapture": {
+            "actionType": "JSFunction",
+            "method": "setDisplayImageCapture",
+            "inputData": {
+                "isShow": "{{data.eventMap['sv.displayImageCapture'].isShow}}"
+            },
+            "outputData": {
+                "displayImageCapture": ""
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "reload3DViewer": {
+            "actionType": "JSFunction",
+            "method": "reload3DViewer",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "reload3DViewerForPCIChange": {
+            "actionType": "JSFunction",
+            "method": "reload3DViewerForPCIChange",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}",
+                "subPanelContext": "{{subPanelContext}}",
+                "reloadSession":"{{data.eventData.reloadSession}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "renderSourceChanged": {
+            "actionType": "JSFunction",
+            "method": "renderSourceChanged",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "set3DViewerSize": {
+            "actionType": "JSFunction",
+            "method": "set3DViewerSize",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "displayImageCapture": {
+            "actionType": "JSFunction",
+            "method": "displayImageCapture",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}",
+                "fileUrl": "{{data.eventMap['imageCapture.updateViewWithCaptureImage'].fileUrl}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "deactivateImageCaptureDisplayInView": {
+            "actionType": "JSFunction",
+            "method": "deactivateImageCaptureDisplayInView",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "processReconfigure": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "getReconfigureDataType"
+                },
+                {
+                    "action": "getBackingObjects",
+                    "condition": "data.reconfigureDataType === 'TempAppSession'"
+                },
+                {
+                    "action": "createTempAppSession",
+                    "condition": "data.reconfigureDataType === 'TempAppSession'"
+                },
+                {
+                    "action": "reconfigure3DViewer",
+                    "condition": "data.reconfigureDataType === 'PCI_UID'"
+                },
+                {
+                    "action": "reload3DViewer",
+                    "condition": "data.reconfigureDataType === 'Reload'"
+                }
+            ]
+        },
+        "getReconfigureDataType": {
+            "actionType": "JSFunction",
+            "method": "getReconfigureDataType",
+            "inputData": {
+                "occmgmtContextKey": "{{data.occmgmtContextKey}}"
+            },
+            "outputData":{
+                "reconfigureDataType": ""
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "getBackingObjects": {
+            "actionType": "JSFunctionAsync",
+            "method": "getBackingObjects",
+            "deps": "js/occmgmtBackingObjectProviderService",
+            "inputData": {
+                "obj": ["{{ctx.aceActiveContext.context.rootElement}}"]
+            },
+            "outputData":
+            {
+                "topLinesArray" : ""
+            }
+        },
+        "createTempAppSession": {
+            "actionType": "TcSoaService",
+            "serviceName": "Cad-2020-01-AppSessionManagement",
+            "method": "createOrUpdateSavedSession",
+            "inputData": {
+                "sessionsToCreateOrUpdate": [ {
+                    "sessionToCreateOrUpdate": {
+                        "objectToCreate": {
+                            "creInp": {
+                                "boName": "Fnd0TempAppSession"
+                            }
+                        }
+                    },
+                    "productAndConfigsToCreate": [ {
+                        "structureRecipe": {
+                            "structureContextIdentifier": {
+                                "product": {
+                                    "uid": "{{function:prepareInputForCreateTempAppSession}}"
+                                }
+                            }
+                        }
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "tempAppSession":"{{function:reconfigure3DViewer}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "reconfigure3DViewer": {
+            "actionType": "JSFunction",
+            "method": "reconfigure3DViewer",
+            "inputData": {
+                "tempAppSessionResponse":null,
+                "viewerInstance": "{{data.svInstance}}",
+                "occmgmtContextNameKey": "{{data.occmgmtContextKey}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "toggleShowSuppressed3DViewer": {
+            "actionType": "JSFunction",
+            "method": "setShowSuppressed3DViewer",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "setSubCommandsToolbarVisibility": {
+            "actionType": "JSFunction",
+            "method": "setSubCommandsToolbarVisibility",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/structureViewerDataService"
+        },
+        "saveVisAutoBookmark": {
+            "actionType": "JSFunction",
+            "method": "saveVisAutoBookmark",
+            "inputData": {
+                "viewerInstance": "{{data.svInstance}}"
+            },
+            "deps": "js/structureViewerDataService"
+        }
+    },
+
+    "data": {
+        "viewContainerProp": {},
+        "displayImageCapture": false,
+        "loadingViewer": true,
+        "showViewerEmmProgress": true,
+        "showViewerProgress": false,
+        "occmgmtContextOnLeft": true,
+        "occmgmtContextOnRight": false,
+        "display3dMarkupToolbar": false
+    },
+
+    "messages": {
+        "reloadViewerToApplyProductSnapshot": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.ReloadForSnapshot}}",
+            "messageTextParams": [
+                "{{data.eventData.snapshotName}}"
+            ]
+        }
+    },
+    "conditions": {
+        "displayImageCapture": {
+            "expression": "data.displayImageCapture"
+        },
+        "displayImageCaptureOnLeft": {
+            "expression": "data.displayImageCapture && data.occmgmtContextOnLeft"
+        },
+        "displayImageCaptureOnRight": {
+            "expression": "data.displayImageCapture && data.occmgmtContextOnRight"
+        },
+        "loadingViewer": {
+            "expression": "data.loadingViewer"
+        },
+        "show3DViewer": {
+            "expression": "!data.loadingViewer && !data.displayImageCapture"
+        },
+        "hasThumbnail": {
+            "expression": "data.hasThumbnail"
+        },
+        "showViewerProgress": {
+            "expression": "data.showViewerProgress"
+        },
+        "showViewerEmmProgress": {
+            "expression": "data.showViewerEmmProgress"
+        },
+        "occmgmtContextOnLeft": {
+            "expression": "!data.displayImageCapture && data.occmgmtContextOnLeft"
+        },
+        "occmgmtContextOnRight": {
+            "expression": "!data.displayImageCapture && data.occmgmtContextOnRight"
+        },
+        "doesPanelChangeRequire3DResize": {
+            "expression": "name === 'activeNavigationCommand' || (name === 'activeToolsAndInfoCommand' && value === undefined) || name === 'fullscreen' || name === 'ViewModeContext'"
+        },
+        "isSideNavConfigChangeRequire3DResize": {
+            "expression": "name === 'awSidenavConfig' && target === 'globalSidenavContext.globalNavigationSideNav'"
+        },
+        "displaySubCommandToolbar": {
+            "expression": "ctx.awDefaultViewer.isSubCommandsToolbarVisible && data.occmgmtContextOnLeft"
+        },
+        "displaySubCommandToolbarRight": {
+            "expression": "ctx.awStructureCompareViewer.isSubCommandsToolbarVisible && data.occmgmtContextOnRight"
+        },
+        "display3dOnScreenMarkupToolbar": {
+            "expression": "data.display3dMarkupToolbar"
+        }
+    },
+    "functions": {
+        "isForceReloadViewer": {
+            "functionName": "isForceReloadViewer",
+            "parameters": [
+                "{{data.occmgmtContextKey}}"
+            ]
+        },
+        "reconfigure3DViewer":{
+            "functionName": "reconfigure3DViewer",
+            "parameters":[
+                "{{data.svInstance}}","{{data.occmgmtContextKey}}"
+            ]
+        },
+        "prepareInputForCreateTempAppSession":{
+            "functionName": "prepareInputForCreateTempAppSession",
+            "parameters":[
+                "{{data.topLinesArray}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "emmProgressIndicator",
+            "action": "showViewerEmmProgress",
+            "condition": "viewerContext === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "progressIndicator",
+            "action": "showViewerProgress",
+            "condition": "viewerContext === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "sv.resetParametersFor3DReload",
+            "action": "resetParametersFor3DReload",
+            "condition": "viewerContext === data.viewerCtxNamespace && !data.loadingViewer",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "sv.reload3DViewer",
+            "action": "reload3DViewer",
+            "condition": "viewerContext === data.viewerCtxNamespace && !data.loadingViewer"
+        },
+        {
+            "eventId": "sv.reload3DViewerForPCI",
+            "action": "reload3DViewerForPCIChange",
+            "condition": "viewerContext === data.viewerCtxNamespace && !data.loadingViewer",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "sv.toggleShowSuppressed3DViewer",
+            "action": "toggleShowSuppressed3DViewer",
+            "condition": "viewerContext === data.viewerCtxNamespace && !data.loadingViewer"
+        },
+        {
+            "eventId": "sv.viewerLoadingStatus",
+            "action": "setViewerLoadingStatus",
+            "condition": "viewerContext === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "sv.displayImageCapture",
+            "action": "setDisplayImageCapture",
+            "condition": "viewerContext === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "sv.renderSourceChanged",
+            "action": "renderSourceChanged",
+            "condition": "viewerContext === data.viewerCtxNamespace"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.doesPanelChangeRequire3DResize",
+            "action": "set3DViewerSize"
+        },
+        {
+            "eventId": "appCtx.update",
+            "condition": "conditions.isSideNavConfigChangeRequire3DResize",
+            "action": "set3DViewerSize"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name==='taskbarfullscreen'",
+            "action": "set3DViewerSize"
+        },
+        {
+            "eventId": "commandBarResized",
+            "action": "set3DViewerSize"
+        },
+        {
+            "eventId": "aw-splitter-update",
+            "action": "set3DViewerSize"
+        },
+        {
+            "eventId": "viewer.setSize",
+            "action":"set3DViewerSize"
+        },
+        {
+            "eventId": "structureViewer.contentsReloaded",
+            "action": "processReconfigure",
+            "condition": "viewToReact === data.occmgmtContextKey"
+        },
+        {
+            "eventId": "viewer.saveVisAutoBookmark",
+            "action": "saveVisAutoBookmark",
+            "condition": "data.occmgmtContextKey === ctx.aceActiveContext.key"
+        },
+        {
+            "eventId": "viewerSettings.renderSourceChanged",
+            "action": "renderSourceChanged"
+        },
+        {
+            "eventId": "imageCapture.updateViewWithCaptureImage",
+            "action": "displayImageCapture",
+            "condition": "viewerCtxNameSpace === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "imageCapture.deactivateImageCaptureDisplay",
+            "action": "deactivateImageCaptureDisplayInView"
+        },
+        {
+            "eventId": "threeDViewer.showSubCommandsToolbar",
+            "action": "setSubCommandsToolbarVisibility",
+            "condition": "viewerCtxNamespace === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "threeDViewer.hideSubCommandsToolbar",
+            "action": "setSubCommandsToolbarVisibility",
+            "condition": "viewerCtxNamespace === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "SnapshotGalley.showReloadInfo",
+            "message": "reloadViewerToApplyProductSnapshot",
+            "cacheEventData": true
+        }
+    ],
+    "lifecycleHooks": {
+        "onMount": "setup3DViewer",
+        "onUnmount": "cleanup3DView"
+    },
+    "i18n": {
+        "LoadingViewer": [ "StructureViewerMessages" ],
+        "ReloadForSnapshot":["StructureViewerMessages"]
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-search-box.directive",
+        "js/aw.searchFilter.service"
+    ],
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.awp0SummaryReports.reportFilter}}",
+            "dispValue": "{{ctx.awp0SummaryReports.reportFilter}}"
+        }
+    },
+    "actions": {
+        "doSearchKeepFilter": {
+            "actionType": "JSFunction",
+            "method": "raiseEventToPerformFiltering",
+            "inputData": {
+                "filterVal": "{{data.searchBox.dbValue}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/showReportBuilderReportsService"
+    }
+},
+"functions": {
+},
+"onEvent": [
+]
+}

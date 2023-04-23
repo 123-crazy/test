@@ -1,0 +1,207 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-xrt.directive",
+        "js/aw-panel-body.directive"
+    ],
+    "data": {
+        "addObjectPanelPinCommands": "aqc0_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "actions": {
+        "createObjects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "",
+                        "data": {
+                            "boName": "Qc0ChecklistSpecification",
+                            "stringProps": {
+                                "qc0ChecklistId": "{{data.qc0ChecklistId.dbValue}}",
+                                "object_name": "{{data.object_name.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}",
+                                "qc0ChecklistType": "{{data.qc0ChecklistType.dbValue}}",
+                                "qc0Number": "{{data.qc0Number.dbValue}}"
+                            },
+                            "boolProps": {
+                                "qc0AssessmentRequired": "{{data.qc0AssessmentRequired.dbValue}}",
+                                "qc0Mandatory": "{{data.qc0Mandatory.dbValue}}"
+                            },
+                            "tagProps": {
+                                "qc0ParentChecklistSpec": "{{function:getParentChecklistSpecProperty}}"
+                            }
+                        }
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "serviceData": "ServiceData",
+                "selectedNodes": "output[0].objects",
+                "rootNode": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "condition": "data.pinnedToForm.dbValue",
+                        "name": "aqc0.refereshLocation"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "selectNewlyCreatedObject"
+                    },
+                    {
+                        "name": "aqc0.addChecklistSpec",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}",
+                            "addElementInput": "{{data.createdObject}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "SOAFailureMsg"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0ChecklistSpecService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "selectNewlyCreatedObject": {
+            "actionType": "JSFunction",
+            "method": "selectNewlyAddedElement",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Aqc0ChecklistSpecTreeTableService"
+        },
+        "generateNextValues": {
+            "actionType": "JSFunction",
+            "method": "autoAssignAllProperties",
+            "inputData": {
+                "data": "{{data}}",
+                "operationType": "CREATE"
+            },
+            "deps": "js/autoAssignService"
+        },
+        "Aqc0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Aqc0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "messages": {
+        "SOAFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        } 
+    },
+    "functions": {
+        "getParentChecklistSpecProperty": {
+            "functionName": "getParentChecklistSpecProperty",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "aqc0.refereshLocation",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "selectNewlyCreatedObject",
+            "action": "selectNewlyCreatedObject"
+        },
+        {
+            "eventId": "aqc0.addChecklistSpec",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awPanel.loadNextValues",
+            "action": "generateNextValues"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        }
+    ],
+    "conditions": {
+        "Aqc0AddButtonVisibleCondition": {
+            "expression": "data.qc0ChecklistId.dbValue && data.object_name.dbValue && data.qc0ChecklistType.dbValue"
+        }
+    },
+    "i18n": {
+        "Aqc0Add": [
+            "qualityfailuremanagerMessages"
+        ]
+    }
+}

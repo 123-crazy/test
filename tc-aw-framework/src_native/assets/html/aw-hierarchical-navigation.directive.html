@@ -1,0 +1,21 @@
+<div class="aw-uiwidgets-navWidgetContainer">
+    <div class="aw-base-normal aw-uiwidgets-navWidgetParent aw-theme-childListContent"
+        ng-click="parentClick( parentNode, $last, $index )"
+        ng-repeat="parentNode in parentnodes"
+        ng-class="{'aw-uiwidgets-activeParent':$last}"
+        title="{{ parentNode[ tooltipprop ] }}">
+        {{ parentNode[ displaynameprop ]}}
+    </div>
+    <div class=" aw-base-normal aw-theme-childListContent"
+        ng-class="{ 'aw-uiwidgets-navWidgetParent' : parentnodes.length == 0, 'aw-uiwidgets-navWidgetChild' : parentnodes.length > 0 }"
+        ng-click="childClick( childNode )"
+        ng-repeat="childNode in childnodes | limitTo: showMore ? '': maxchildrentoshow"
+        title="{{ childNode[ tooltipprop ] }}">
+        {{childNode[ displaynameprop ]}}<span class="aw-ui-filterNameLabelCount"> {{childNode.showCount ? '(' +  childNode.count + ')' : ''}} </span>
+    </div>
+    <div class=" aw-base-normal aw-uiwidgets-navWidgetChild aw-uiwidgets-moreLink aw-theme-childListContent"
+        ng-click="moreClick()"
+        ng-show="childnodes.length > maxchildrentoshow">
+        {{showMore ? lessText : moreText}}
+    </div>
+</div>

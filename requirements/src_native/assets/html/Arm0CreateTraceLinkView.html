@@ -1,0 +1,26 @@
+<aw-popup2 id="Arm0CreateTraceLink" caption="{{i18n.createTraceLinkLabel}}">
+    <aw-panel-body class="aw-requirement-createTracelinkPanelBody">
+        <div class="aw-requirement-createTracelink">
+            <aw-command-panel-section caption="i18n.startLink" anchor="data.startItemListcommands" context="data" >
+            <aw-include name="Arm0RequirementHint" exist-when="conditions.showDropHintForStartBucket" sub-panel-context="data"></aw-include>
+                <aw-include name="Arm0StartItemList" sub-panel-context="data"></aw-include>
+            </aw-command-panel-section>
+        </div>
+
+        <div class="aw-requirement-createTracelink">
+            <aw-command-panel-section caption="i18n.endLink" anchor="data.endItemListcommands" context="data" >
+                <aw-include name="Arm0RequirementHint" exist-when="conditions.showDropHintForEndBucket" sub-panel-context="data"></aw-include>
+                <aw-include name="Arm0EndItemList" sub-panel-context="data"></aw-include>
+            </aw-command-panel-section>
+        </div>
+    </aw-panel-body>
+    <aw-panel-footer class="aw-requirement-tracelinkPopupTypeFooter">
+        <aw-listbox prop="data.traceLinkType" list="data.traceLinkTypeList" action="traceLinkTypeUpdated"></aw-listbox>
+        <aw-form name="commandPanelForm" >
+            <aw-xrt type="CREATE" object-type="{{data.selectedTraceLinkType}}" class="aw-requirements-tracelinkPropertiesPanelSection aw-base-scrollPanel" visible-when="conditions.visiblePropertiesSection" exist-when="data.fetchTracelinkProperty"></aw-xrt>
+        </aw-form>
+    </aw-panel-footer>
+    <aw-panel-footer class="aw-requirement-tracelinkPopupButtonFooter">
+        <aw-button action="createTraceLink" size="auto" aw-class="{'disabled': !(conditions.visibleCreateTracelinkButton || conditions.visibleCreateObjectButton && $$prevSibling.commandPanelForm.$valid)}" ><aw-i18n>i18n.createTraceLink</aw-i18n></aw-button>
+    </aw-panel-footer>
+</aw-popup2>

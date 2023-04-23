@@ -1,0 +1,136 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+        [
+            "js/aw-command-panel.directive",
+            "js/aw-panel-footer.directive",
+            "js/visible-when.directive",
+            "js/aw-button.directive",
+            "js/aw-i18n.directive",
+            "js/aw-add.directive"
+        ],
+    "actions":
+    {
+        
+        "pch0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "pch0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },    
+        "createObject":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                         "name": "addObject.startCreateObject"
+                     }
+                 ]
+            }
+        },
+        "createRelationForPaletteOrSearch":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                         "name": "addObject.startCreateRelation"
+                     }
+                 ]
+            }
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                        "name": "complete",
+                        "condition": "!data.unpinnedToForm.dbValue",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+                 ]
+            }
+        }
+    },
+    "data": 
+    {
+        "pch0pincommands":"pch0_oneStepPinCommands",
+         "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }     
+    },
+    "conditions":
+    {    
+        "isPaletteTabAddButtonVisible":
+        {
+          "expression":"data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible":
+        {
+          "expression":"data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }     
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "addChange.pch0SetPin",
+            "cacheEventData": true,
+            "action": "pch0SetPin"
+          },
+          {
+            "eventId": "addChange.pch0SetUnPin",
+            "cacheEventData": true,
+            "action": "pch0SetUnPin"
+          },
+          {
+            "eventId": "cdm.relatedModified",
+            "action": "closePanel"
+        }
+    ],
+    "i18n": 
+    {   
+        "RelateChangeTitle": ["ProgramChangeConstants"],
+        "addButtonTitle":[ "TCUICommandPanelsMessages"],
+        "Pch0PinButtonToolTip": ["ProgramChangeConstants"],
+        "Pch0UnpinButtonToolTip": ["ProgramChangeConstants"]       
+    }
+}

@@ -1,0 +1,267 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-init.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-radiobutton.directive"
+    ],
+    "data": {
+        "defaultIdsOrIdNamingRuleCheckBox": {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioFalseText": "{{i18n.idNamingRule}}",
+            "propertyRadioTrueText": "{{i18n.defaultIds}}",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "prefixTextBox": {
+            "displayName": "{{i18n.prefix}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "suffixTextBox": {
+            "displayName": "{{i18n.suffix}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "replaceTextBox": {
+            "displayName": "{{i18n.replaceElementBtn}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "withTextBox": {
+            "displayName": "{{i18n.with}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "runInBackgroundCheckBox": {
+            "displayName": "{{i18n.runInBackground}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": true
+        }
+    },
+    "actions": {
+        "openNewObject": {
+            "actionType": "JSFunction",
+            "method": "go",
+            "inputData": {
+                "showObject": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{data.duplicateAndReplaceResponse.created[0]}}",
+                    "page": "Content",
+                    "pageId": "tc_xrt_Content"
+                },
+                "option": {
+                    "inherit": false
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "deps": "js/locationNavigation.service"
+        },
+        "initiateDuplicate": {
+            "actionType": "JSFunction",
+            "method": "preDuplicateProcessing",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "saveAsOrRevise.cloneContent"
+                } ]
+            },
+            "deps": "js/aceInteractiveDuplicateService"
+        },
+        "disableDuplicateMode": {
+            "actionType": "JSFunction",
+            "method": "disableDuplicateMode",
+            "deps": "js/aceInteractiveDuplicateService"
+        },
+        "resetDuplicateModeFlag": {
+            "actionType": "JSFunction",
+            "method": "resetDuplicateModeFlag",
+            "deps": "js/aceInteractiveDuplicateService"
+        },
+        "clearDuplicateInfo": {
+            "actionType": "JSFunction",
+            "method": "clearDuplicateInfo",
+            "deps": "js/aceInteractiveDuplicateService"
+        },
+        "cloneContent": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-06-OccurrenceManagement",
+            "method": "cloneContent",
+            "inputData": {
+                "inputs": [ {
+                    "productContextInfo": "{{data.productContextInfo}}",
+                    "defaultName": {
+                        "autogen": "{{data.defaultIdsOrIdNamingRuleCheckBox.dbValue}}",
+                        "fromString": "{{data.replaceTextBox.dbValue}}",
+                        "toString": "{{data.withTextBox.dbValue}}",
+                        "prefix": "{{data.prefixTextBox.dbValue}}",
+                        "suffix": "{{data.suffixTextBox.dbValue}}"
+                    },
+                    "dataList": "{{data.dataMap}}",
+                    "cloneFlags": "{{data.cloneFlags}}",
+                    "defaultFolder": "{{data.defaultFolder}}"
+                } ]
+            },
+            "outputData": {
+                "duplicateAndReplaceResponse": "",
+                "clonedObject": "{{function:setClonedObject}}"
+            },
+            "actionMessages": {
+                "success": [ {
+                        "message": "cloneContentSyncSuccessMessage",
+                        "condition": "!data.runInBackgroundCheckBox.dbValue && data.duplicateAndReplaceResponse.created[0]"
+                    },
+                    {
+                        "message": "cloneContentAsyncSuccessMessage",
+                        "condition": "data.runInBackgroundCheckBox.dbValue"
+                    }
+                ],
+                "failure": [ {
+                    "message": "cloneContentFailure"
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "aceInteractiveDuplicate.clearDuplicateInfo"
+                    }, {
+                        "name": "aceInteractiveDuplicate.disableDuplicateMode",
+                        "condition": "data.runInBackgroundCheckBox.dbValue"
+                    },
+                    {
+                        "name": "aceInteractiveDuplicate.openNewObject",
+                        "condition": "!data.runInBackgroundCheckBox.dbValue && data.duplicateAndReplaceResponse.created[0]"
+                    }
+                ],
+                "failure": [ {
+                    "name": "aceInteractiveDuplicate.resetDuplicateModeFlag"
+                } ]
+            },
+            "deps": "js/aceInteractiveDuplicateService"
+        }
+    },
+    "functions": {
+        "setClonedObject": {
+            "functionName": "setClonedObject"
+        }
+    },
+    "messages": {
+        "cloneContentSyncSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.cloneContentSyncSuccessMessage}}",
+            "messageTextParams": [
+                "{{ctx.aceActiveContext.context.clonedElement.props.object_string.uiValues}}",
+                "{{ctx.aceActiveContext.context.sourceElement.props.object_string.uiValues}}"
+            ]
+        },
+        "cloneContentAsyncSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.cloneContentAsyncSuccessMessage}}"
+        },
+        "cloneContentFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "saveAsOrRevise.cloneContent",
+            "action": "cloneContent"
+        },
+        {
+            "eventId": "aceInteractiveDuplicate.openNewObject",
+            "action": "openNewObject"
+        },
+        {
+            "eventId": "aceInteractiveDuplicate.disableDuplicateMode",
+            "action": "disableDuplicateMode"
+        },
+        {
+            "eventId": "aceInteractiveDuplicate.resetDuplicateModeFlag",
+            "action": "resetDuplicateModeFlag"
+        },
+        {
+            "eventId": "aceInteractiveDuplicate.clearDuplicateInfo",
+            "action": "clearDuplicateInfo"
+        }
+    ],
+    "conditions": {
+        "idNamingRuleSectionVisible": {
+            "expression": "!data.defaultIdsOrIdNamingRuleCheckBox.dbValue"
+        },
+        "isPrefixPresent": {
+            "expression": "data.prefixTextBox.dbValue !== ''"
+        },
+        "isSuffixPresent": {
+            "expression": "data.suffixTextBox.dbValue !== ''"
+        },
+        "isValidReplaceStringPresent": {
+            "expression": "data.replaceTextBox.dbValue !== ''"
+        },
+        "isNamingRuleValid": {
+            "expression": "conditions.isPrefixPresent || conditions.isSuffixPresent || conditions.isValidReplaceStringPresent"
+        },
+        "isDuplicateSaveButtonVisible": {
+            "expression": "data.defaultIdsOrIdNamingRuleCheckBox.dbValue || conditions.isNamingRuleValid"
+        }
+    },
+    "i18n": {
+        "save": [
+            "TCUICommandPanelsMessages"
+        ],
+        "defaultIds": [
+            "OccurrenceManagementConstants"
+        ],
+        "idNamingRule": [
+            "OccurrenceManagementConstants"
+        ],
+        "runInBackground": [
+            "OccurrenceManagementConstants"
+        ],
+        "prefix": [
+            "OccurrenceManagementConstants"
+        ],
+        "suffix": [
+            "OccurrenceManagementConstants"
+        ],
+        "replaceElementBtn": [
+            "OccurrenceManagementConstants"
+        ],
+        "with": [
+            "OccurrenceManagementConstants"
+        ],
+        "cloneContentSyncSuccessMessage": [
+            "OccurrenceManagementMessages"
+        ],
+        "cloneContentAsyncSuccessMessage": [
+            "OccurrenceManagementMessages"
+        ]
+    }
+}

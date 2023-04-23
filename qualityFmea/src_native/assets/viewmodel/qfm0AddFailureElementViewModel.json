@@ -1,0 +1,496 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-tab-set.directive"
+    ],
+    "data": {
+        "tabs": [
+            {
+                "panelId": "qfm0CreateFailureRepresentation",
+                "name": "{{i18n.qfm0New}}",
+                "recreatePanel": true
+            },
+            {
+                "panelId": "qfm0ListFailureSpecification",
+                "name": "{{i18n.qfm0SearchString}}",
+                "selectedTab": true,
+                "recreatePanel": true
+            }
+        ],
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.qfm0SearchString}}"
+        },
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "qfm0pincommands": "qfm0_oneStepPinCommands"
+    },
+    "actions": {
+        "reveal": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "condition": "data.selectedTab.panelId === 'qfm0ListFailureSpecification'",
+                        "name": "qfm0ListFailureSpecification.reset"
+                    },
+                    {
+                        "condition": "data.selectedTab.panelId === 'qfm0CreateFailureRepresentation'",
+                        "name": "qfm0CreateFailureRepresentation.reset"
+                    }
+                ]
+            }
+        },
+        "getNextId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "generateNextValuesForProperties",
+            "inputData": {
+                "propertyNamingRuleInfo": "{{function:getCreateObjectsInputforgenerateID}}"
+            },
+            "outputData": {
+                "nextId": "generatedValues"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "callcreateFailureElement"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "createFailureElement": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "deps": "js/qfm0FmeaManagerUtils",
+            "inputData": {
+                "input": "{{function:getCreateObjectsInputforFMEAObjects}}"
+            },
+            "outputData": {
+                "addElementResponse": "",
+                "createdObject": "output",
+                "selectedNodes": "output[0].objects",
+                "errorMessage": "{{function:populateErrorString}}",
+                "partialSuccessObjectCount": "{{function:getSuccessAttachObjectCount}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "selectNewlyCreatedObject"
+                    },
+                    {
+                        "name": "elementAddComplete"
+                    },
+                    {
+                        "name": "clearFmeaCtx"
+                    },
+                    {
+                        "name": "qfm0.addToFormsheet",
+                        "eventData": {
+                            "addElementInput": "{{data.createdObject}}",
+                            "formsheetColIdx": 3
+                        },
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet'"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "condition": "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation' || ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualitySystemElementManagerSublocation'",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}",
+                            "addElementInput": "{{data.createdObject}}"
+                        }
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandOutgoing",
+                        "eventData": {
+                            "expansionType" : "structure",
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ]
+                        },
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_StructureAnalysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_StructureAnalysis') || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "selectNewlyCreatedObject",
+                        "condition": "data.createFailureSpec !== undefined && data.createFailureSpec.dbValue === true"
+                    },
+                    {
+                        "name": "qfm0.addToFormsheet",
+                        "eventData": {
+                            "addElementInput": "{{data.createdObject}}",
+                            "formsheetColIdx": 3
+                        },
+                        "condition": "(ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet') && data.createFailureSpec !== undefined && data.createFailureSpec.dbValue === true"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "condition": "data.createFailureSpec !== undefined && data.createFailureSpec.dbValue === true",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}",
+                            "addElementInput": "{{data.createdObject}}"
+                        }
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandOutgoing",
+                        "eventData": {
+                            "expansionType" : "structure",
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ]
+                        },
+                        "condition": "((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_StructureAnalysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_StructureAnalysis') || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Function_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Function_Analysis') && ctx.tcSessionData.tcMajorVersion >= 13) && data.partialSuccessObjectCount > 0)"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.createdObject.length === 1",
+                        "message": "createObjectSuccess"
+                    },
+                    {
+                        "condition": "data.createdObject.length === 1 && data.createFailureSpec.dbValue === true",
+                        "message": "FmeaElementCreateWithSpecCreation"
+                    },
+                    {
+                        "condition": "data.createdObject.length > 1 ",
+                        "message": "MultipleFailureSuccessMessage"
+                    }
+                ],
+                "failure": [
+                    {
+                        "condition": "data.createdObject.length  > 1 && data.partialSuccessObjectCount > 0",
+                        "message": "PartialFailureSuccessMessage"
+                    },
+                    {
+                        "condition": "data.createdObject.length === 1 && data.createFailureSpec !== undefined && data.createFailureSpec.dbValue === true",
+                        "message": "createObjectSuccess"
+                    },
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },
+        "setTargetObjectOnReveal": {
+            "actionType": "JSFunction",
+            "method": "createViewModelObject",
+            "inputData": {
+                "selectedUid": "{{ctx.selected.uid}}"
+            },
+            "outputData": {
+                "targetObject": ""
+            },
+            "deps": "js/viewModelObjectService"
+        },
+        "selectNewlyCreatedObject": {
+            "actionType": "JSFunction",
+            "method": "selectNewlyAddedElement",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/fmeaTreeTableService"
+        },
+        "getSearchResults": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "inflateProperties": false,
+                "saveColumnConfigData": {},
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Aqc0QualityBaseProvider",
+                    "searchFilterMap6": {
+                        "WorkspaceObject.object_type": []
+                    },
+                    "searchCriteria": {
+                        "parentGUID": "",
+                        "searchStatus": "true",
+                        "objectType": "Qc0Failure",
+                        "catalogueObjectType": "",
+                        "objectName": "{{data.filterBox.dbValue}}",
+                        "isReleased": "false"
+                    },
+                    "startIndex": "{{data.dataProviders.loadFilteredList.startIndex}}",
+                    "searchSortCriteria": [
+                        {
+                            "fieldName": "object_name",
+                            "sortDirection": "ASC"
+                        }
+                    ]
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResponse": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded"
+            },
+            "deps": "js/Aqc0FailureManagerUtils"
+        },
+        "qfm0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "qfm0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "loadList": {
+            "actionType": "dataProvider",
+            "method": "loadFilteredList"
+        },
+        "elementAddComplete": {
+            "actionType": "JSFunction",
+            "method": "clearCtx",
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "clearFmeaCtx": {
+            "actionType": "JSFunction",
+            "method": "clearFmeaCtx",
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "dataProviders": {
+        "loadFilteredList": {
+            "action": "getSearchResults",
+            "response": "{{data.searchResponse}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "noResultsFound": "{{i18n.qfm0noSearchResults}}"
+        }
+    },
+    "functions": {
+        "getFmeaRootNodeUid": {
+            "functionName": "getFmeaRootNodeUid",
+            "parameters": []
+        },
+        "getCreateObjectsInputforFMEAObjects": {
+            "functionName": "getCreateObjectsInputforFMEAObjects",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getSuccessAttachObjectCount": {
+            "functionName": "getSuccessAttachObjectCount",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreateObjectsInputforgenerateID": {
+            "functionName": "getCreateObjectsInputforgenerateID",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "i18n": {
+        "toTitle": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FailureSpecification": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0SearchString": [
+            "qualityFmeaMessages"
+        ],
+        "PartialError": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Create": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0New": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0noSearchResults": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0PartialFMEAEleCreateSuccessMessage": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FmeaRootSaveAsSuccessMessage": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0MultipleFMEAEleCreateSuccessMessage": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FmeaElementCreateWithSpecCreation":[
+            "qualityFmeaMessages"
+        ]
+    },
+    "messages": {
+        "createObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qfm0FmeaRootSaveAsSuccessMessage}}",
+            "messageTextParams": [
+                "{{data.createdObject[0].objects[0].props.object_string.dbValues[0]}"
+            ]
+        },
+        "AttachObjectFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.serviceData.partialErrors[0].errorValues[0].message}}"
+            ]
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.errorMessage}}"
+            ]
+        },
+        "PartialFailureSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qfm0PartialFMEAEleCreateSuccessMessage}}",
+            "messageTextParams": [
+                "{{data.createdObject.length}}",
+                "{{data.dataProviders.loadFilteredList.selectedObjects.length}}"
+            ]
+        },
+        "MultipleFailureSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qfm0MultipleFMEAEleCreateSuccessMessage}}",
+            "messageTextParams": [
+                "{{data.createdObject.length}}"
+            ]
+        },
+        "FmeaElementCreateWithSpecCreation": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qfm0FmeaElementCreateWithSpecCreation}}",
+            "messageTextParams": [
+                "{{data.createdObject[0].objects[0].props.object_string.dbValues[0]}"
+            ]
+        },
+        "FmeaElementCreateWithExistingSpec": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.errorMessage}}"
+            ]
+        }
+    },
+    "conditions": {
+
+        "isAddCommandActive": {
+            "expression": "ctx.panelContext === undefined"
+        },
+        "isValidToCreate": {
+            "expression": "((data.object_name.dbValue !== '' && data.object_name.dbValue !== undefined && data.object_name.dbValue !== null && data.selectedTab.panelId === 'qfm0CreateFailureRepresentation') || (data.dataProviders.loadFilteredList.selectedObjects.length > 0 && conditions.isAddCommandActive))"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addElement.qfm0SetPin",
+            "cacheEventData": true,
+            "action": "qfm0SetPin"
+        },
+        {
+            "eventId": "addElement.qfm0SetUnPin",
+            "cacheEventData": true,
+            "action": "qfm0SetUnPin"
+        },
+        {
+            "eventId": "selectNewlyCreatedObject",
+            "action": "selectNewlyCreatedObject"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadList"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setTargetObjectOnReveal",
+            "condition": "conditions.isAddCommandActive"
+        },
+        {
+            "eventId": "elementAddComplete",
+            "action": "elementAddComplete"
+        },
+        {
+            "eventId": "clearFmeaCtx",
+            "action": "clearFmeaCtx"
+        },
+        {
+            "eventId": "qfm0.addElement",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "callcreateFailureElement",
+            "action": "createFailureElement"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        }
+    ]
+}

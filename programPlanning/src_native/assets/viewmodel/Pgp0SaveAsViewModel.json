@@ -1,0 +1,438 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports":
+    [
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-listbox.directive",
+        "js/aw-checkbox.directive"
+    ],
+    "actions":
+    {
+        "populateData":
+        {
+            "actionType": "JSFunction",
+            "method": "populateData",
+           "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData":
+            {
+                "returnedObject": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.isTcVersionSupported === true && data.isProgramPlanchild === true",
+                        "name": "displayLOV"
+                    }
+
+                ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "displayTargetProgLOV":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData":
+            {
+                "initialData":
+                {
+                    "lov":"",
+                    "lovInput":
+                    {
+                        "owningObject":
+                         {
+                            "uid":"AAAAAAAAAAAAAA",
+                            "type":"unknownType"
+                         },
+                         "boName":"Prg0AbsProjectPlan",
+                         "operationName":"Search"
+                     },
+                     "propertyName":"prg0TargetProgram",
+                     "filterData":
+                     {
+                        "filterString":"",
+                        "maxResults":0,
+                        "numberToReturn":300,
+                        "sortPropertyName":"",
+                        "order":1
+                     }
+                }
+            },
+            "outputData": {
+                "domainListInput": "{{function:getDomainList}}",
+                "MapoflovValues": "lovValues"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "GenerateCAEStructure.lovValuesFetched"
+                    },
+                    {
+                        "name": "GenerateCAEStructure.generateDomainList"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+
+        },
+        "createNewObject":
+        {
+            "actionType": "JSFunction",
+            "method": "checkForVersionSupportForProject",
+            "inputData":
+            {},
+
+            "outputData":
+            {
+                "isSupported": ""
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.isSupported === true",
+                        "name": "createInputForClonePlanHierarchy"
+                    },
+                    {
+                        "condition": "data.isSupported === false",
+                        "name": "clonePlan"
+                    }
+
+                ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "clonePlanHierarchy":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "ProgramInfra-2016-04-ProgramManagement",
+            "method": "clonePlanHierarchy",
+            "inputData":
+            {
+                "inputInfo": "{{function:clonePlanHierarchyInput}}"
+            },
+            "outputData":{
+                "createdObj": "planObjects[0].uid"
+            },
+            "events": {
+            "success": [
+               {
+                  "name": "complete",
+                  "eventData": {
+                     "source": "toolAndInfoPanel"
+                  }
+               },
+               {
+                "name": "openOnCreate",
+                "condition": "data.openOnCreate.dbValues[0] === true"
+               }
+            ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "clonePlanHierarchyWithProject":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "ProgramInfra-2016-10-ProgramManagement",
+            "method": "clonePlanHierarchyWithProject",
+            "inputData":
+            {
+                "cloneInfoInput": "{{data.returnedObject.saveAsInputIn}}"
+            },
+            "outputData":{
+                "createdObj": "planObjects[0].uid"
+            },
+            "events": {
+            "success": [
+               {
+                  "name": "refreshTimelineOnCloneProject"
+               }
+            ]
+            },
+            "actionMessages": {
+                "success": [
+                   {
+                      "message": "SaveAsObjectSuccess"
+                   }
+                ],
+                "failure": [ 
+                    {
+                        "message": "SOAFailureMessage"
+                    } 
+                ]
+             },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "convertToDomainList":
+        {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData":
+            {
+                "input": "{{data.domainListInput}}"
+            },
+
+            "outputData":
+            {
+                "domainList": ""
+            },
+
+            "deps": "js/listBoxService"
+        },
+        "refreshTimelineOnCloneProjectWithSameTarget":
+        {
+            "actionType": "JSFunction",
+            "method": "refreshTimelineOnCloneProjectWithSameTarget",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData":
+            {
+                "isSameTargetProgram": ""
+            },
+            "events": {
+            "success": [
+            {
+               "condition": "data.isSameTargetProgram === true ",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.locationContext.modelObject}}"
+                            ]
+                        }
+            },
+            {
+                "name": "openOnCreate",
+                "condition": "data.openOnCreate.dbValues[0] === true"
+            },
+               {
+
+                  "name": "complete",
+                  "eventData": {
+                     "source": "toolAndInfoPanel"
+                  }
+               }
+            ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "createInputForClonePlanHierarchyWithProject":
+        {
+            "actionType": "JSFunction",
+            "method": "clonePlanHierarchyWithProjectInput",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData":
+            {
+                "returnedObject": ""
+            },
+            "events": {
+            "success": [
+               {
+                  "name": "clonePlanWithProject"
+               }
+            ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "openCreatedObject":
+        {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+            "uid": "{{data.createdObj}}"
+        }
+        }
+    },
+
+    "data":
+    {
+        "dcdDateTime":
+        {
+            "displayName": "{{i18n.primeEventDate}}",
+            "type": "DATE",
+            "dbValue": "",
+            "isRequired": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "object_name":
+        {
+            "displayName": "{{i18n.objectName}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.selected.props.object_name.dbValues[0]}}"
+        },
+        "object_desc":
+        {
+            "displayName": "{{i18n.objectDesc}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "target_program":
+        {
+            "displayName": "{{i18n.targetProgram}}",
+            "type":"STRING",
+            "hasLov": true
+        },
+        "program_deliverable":
+        {
+            "displayName": "{{i18n.inludeProgramDeliverable}}",
+            "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "checklist":
+        {
+            "displayName": "{{i18n.includeChecklist}}",
+            "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "openOnCreate":
+        {
+            "displayName": "{{i18n.openOnCreate}}",
+            "dbValue" : false,
+            "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+
+    "functions":
+    {
+      "clonePlanHierarchyWithProjectInput":
+        {
+            "functionName": "clonePlanHierarchyWithProjectInput",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "clonePlanHierarchyInput":
+        {
+            "functionName": "clonePlanHierarchyInput",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "refreshTimelineOnCloneProjectWithSameTarget":
+        {
+            "functionName": "refreshTimelineOnCloneProjectWithSameTarget",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions":
+    {
+        "isProjectSelected":
+        {
+            "expression":"ctx.mselected.modelType.typeHierarchyArray.indexOf( 'Prg0AbsProgramPlan' ) > -1"
+        },
+        "isProgramSelectedAndProgrmTemplate":
+        {
+            "expression":"( ctx.selected.modelType.typeHierarchyArray.indexOf( 'Prg0AbsProgramPlan' ) > -1 || (ctx.selected.modelType.typeHierarchyArray.indexOf( 'Prg0AbsProjectPlan' ) > -1 && conditions.pgp0IsTCVersion116OrLater && !conditions.pgp0IsTCVersion12O ) ) && ctx.selected.props.prg0IsTemplate.dbValues[0] === '1' && data.isTcVersionSupported === true"
+        },
+        "showSaveAsButton":
+        {
+            "expression": "data.dcdDateTime.dateApi.dateValue !== '' && data.object_name.dbValue !== undefined"
+        },
+        "pgp0IsTCVersion116OrLater": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 11  || (ctx.tcSessionData.tcMajorVersion === 11 && (ctx.tcSessionData.tcMinorVersion >= 2 && ctx.tcSessionData.tcQRMNumber >= 7)))"
+        },
+        "pgp0IsTCVersion12O": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion ===0 && ctx.tcSessionData.tcQRMNumber === 0)"
+        }
+    },
+    "messages": {
+       "SaveAsObjectSuccess": {
+          "messageType": "INFO",
+          "messageText": "{{i18n.SaveAsObjectSuccess}}"
+       },
+       "SOAFailureMessage": {
+           "messageType": "ERROR",
+           "messageText": "{{errorCode}}"
+       }
+    },
+    "onEvent": [
+    {
+            "eventId": "GenerateCAEStructure.generateDomainList",
+            "action": "convertToDomainList"
+    },
+    {
+            "eventId": "displayLOV",
+            "action": "displayTargetProgLOV"
+    },
+    {
+            "eventId": "clonePlan",
+            "action": "clonePlanHierarchy"
+    },
+    {
+            "eventId": "createInputForClonePlanHierarchy",
+            "action": "createInputForClonePlanHierarchyWithProject"
+    },
+    {
+            "eventId": "clonePlanWithProject",
+            "action": "clonePlanHierarchyWithProject"
+    },
+    {
+            "eventId": "refreshTimelineOnCloneProject",
+            "action": "refreshTimelineOnCloneProjectWithSameTarget"
+    },
+    {
+            "eventId": "selectionChangedOnTimeline",
+            "action": "populateData"
+    } ,
+    {
+            "eventId": "Pgp0SaveAs.contentLoaded",
+            "action": "populateData"
+    },
+    {
+            "eventId": "openOnCreate",
+            "action": "openCreatedObject"
+    }
+    ],
+
+
+
+    "i18n":
+    {
+        "createObjectTitle": [ "ProgramPlanningCommandPanelsMessages"],
+        "saveAsButtonText": [ "ProgramPlanningCommandPanelsMessages"],
+        "saveAs": [ "ProgramPlanningCommandPanelsMessages"],
+        "objectName": [ "ProgramPlanningCommandPanelsMessages"],
+        "objectDesc": [ "ProgramPlanningCommandPanelsMessages"],
+        "primeEventDate": [ "ProgramPlanningCommandPanelsMessages"],
+        "targetProgram":[ "ProgramPlanningCommandPanelsMessages"],
+        "inludeProgramDeliverable":[ "ProgramPlanningCommandPanelsMessages"],
+        "SaveAsObjectSuccess":[ "ProgramPlanningCommandPanelsMessages"],
+        "includeChecklist":[ "ProgramPlanningCommandPanelsMessages"],
+        "openOnCreate":[ "ProgramPlanningCommandPanelsMessages"]
+    }
+}

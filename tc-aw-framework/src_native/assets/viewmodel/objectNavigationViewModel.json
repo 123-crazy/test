@@ -1,0 +1,84 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-native-sublocation.directive",
+        "js/aw.objectNav.sublocation.controller"
+    ],
+    "actions":{
+        "reloadObjNavState":
+        {
+            "actionType": "JSFunction",
+            "method": "reloadObjNavState",
+            "deps": "js/objectNavigationService"
+        }
+    },
+    "data": {
+        "_sublocation": {
+            "name": "com.siemens.splm.clientfx.tcui.xrt.objectNavigationSubLocation",
+            "label": "Declarative Navigate",
+            "clientScopeURI": "Awp0ObjectNavigation",
+            "nameToken": "com.siemens.splm.clientfx.tcui.xrt.objectNavigationSubLocation",
+            "context": {
+                "search": {
+                    "provider": "Awp0ObjectSetRowProvider",
+                    "sortType": "Alphabetical"
+                }
+            },
+            "viewBase": "objectNavigation",
+            "breadcrumbConfig": {
+                "type": "navigate",
+                "vm": "objectNavigationBreadcrumb",
+                "chevronDataProvider": "objectNavBreadcrumbChevronDataProvider",
+                "crumbDataProvider": "objectNavBreadcrumbDataProvider",
+                "id": "d_uids",
+                "noUpdate": true,
+                "displayProperty": "object_string"
+            },
+            "viewModes": {
+                "SummaryView": {
+                    "primaryWorkArea": "list",
+                    "secondaryWorkArea": true
+                },
+                "TableSummaryView": {
+                    "primaryWorkArea": "table",
+                    "secondaryWorkArea": true
+                },
+                "ListView": {
+                    "primaryWorkArea": "list",
+                    "secondaryWorkArea": false
+                },
+                "TableView": {
+                    "primaryWorkArea": "table",
+                    "secondaryWorkArea": false
+                },
+                "ImageView": {
+                    "primaryWorkArea": "image",
+                    "secondaryWorkArea": false
+                },
+                "TreeView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": false
+                },
+                "TreeSummaryView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": true
+                }
+            },
+            "policy": {
+                "types": [ {
+                    "name": "BusinessObject",
+                    "properties": [ {
+                        "name": "object_string"
+                    } ]
+                } ]
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "context.awGlobalRevisionChange",
+            "action": "reloadObjNavState"
+        }
+
+    ]
+
+}

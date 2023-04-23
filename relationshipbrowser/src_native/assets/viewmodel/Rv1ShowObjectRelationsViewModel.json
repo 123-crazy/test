@@ -1,0 +1,240 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions": {
+        "parseRelatedObjects": {
+            "actionType": "JSFunction",
+            "method": "parseRelatedObjects",
+            "inputData": {
+                "data": "{{data}}",
+                "relationContext": "{{ctx.RelationBrowser}}",
+                "graphContext": "{{ctx.graph}}"
+            },
+            "outputData": {
+                "nodes": ""
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        },
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "dataProviderHiddenNodeList"
+        },
+        "actionHiddenNodeList": {
+            "actionType": "JSFunction",
+            "method": "functionHiddenNodeList",
+            "inputData": {
+                "data": "{{data}}",
+                "incoming": "{{ctx.RelationBrowser.incoming}}",
+                "outgoing": "{{ctx.RelationBrowser.outgoing}}",
+                "both": "{{ctx.RelationBrowser.both}}"
+            },
+            "outputData": {
+                "nodes": ""
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        },
+        "actionHideUnhideNodes": {
+            "actionType": "JSFunction",
+            "method": "functionHideUnhideNodes",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "relationContext": "{{ctx.RelationBrowser}}",
+                "graph": "{{ctx.graph}}",
+                "sortedLayoutPreferenceValue": "{{data.preferences.RV1_DARB_Sorted_Layouts}}"
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        },
+        "itemsAddedToGraph": {
+            "actionType": "JSFunction",
+            "method": "graphVisibilityChanged",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "listedNodes": "{{data.nodes}}",
+                "isHidden" : false
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        },
+        "itemsRemovedFromGraph": {
+            "actionType": "JSFunction",
+            "method": "graphVisibilityChanged",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "listedNodes": "{{data.nodes}}",
+                "isHidden" : true
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        },
+        "setPanelTitle": {
+            "actionType": "JSFunction",
+            "method": "getDisplayName",
+            "inputData": {
+                "modelObject": "{{ctx.selected}}"
+            },
+            "outputData": {
+                "ctx.RelationBrowser.datasetDisplayName": ""
+            },
+            "deps": "js/typeDisplayName.service"
+        },
+        "setFilterInfo": {
+            "actionType": "JSFunction",
+            "method": "setFilterInfo",
+            "inputData": {
+                "relationContext": "{{ctx.RelationBrowser}}",
+                "graph": "{{ctx.graph}}"
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        },
+        "queryNetworkData": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2012-10-NetworkEngine",
+            "method": "queryNetwork2",
+            "inputData": {
+                "input": {
+                    "graphParamMap": {
+                        "direction": [ "all" ]
+                    },
+                    "queryMode": "ExpandAndDegree",
+                    "rootIds": [ "{{ctx.selected.uid}}" ],
+                    "serviceCursor": 0,
+                    "viewName": "{{ctx.graph.legendState.activeView.internalName}}",
+                    "inquiries": []
+                }
+            },
+            "policy": {
+                "types": "{{function:getQueryNetworkPolicy}}"
+            },
+            "outputData": {
+                "graphData": "graph"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "Rv1RelationBrowser.RelationsFetched"
+                } ],
+
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "deps": "js/Rv1ShowObjectRelationsService"
+        }
+    },
+
+    "functions":{
+        "getQueryNetworkPolicy": {
+            "functionName": "getQueryNetworkPolicy",
+            "parameters": [
+                "{{ctx}}",
+                "{{data.preferences.RV1_DARB_Filter_Properties}}"
+            ]
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "updateHiddenList",
+            "action": "reveal"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setPanelTitle"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "queryNetworkData"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setFilterInfo"
+        },
+        {
+            "eventId": "appCtx.register",
+            "action": "setPanelTitle",
+            "condition": "conditions.isSelectionChanged"
+        },
+        {
+            "eventId": "appCtx.register",
+            "action": "queryNetworkData",
+            "condition": "conditions.isSelectionChanged"
+        },
+        {
+            "eventId": "Rv1RelationBrowser.RelationsFetched",
+            "action": "parseRelatedObjects"
+        },
+        {
+            "eventId": "awGraph.itemsRemoved",
+            "action": "itemsRemovedFromGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.itemsAdded",
+            "action": "itemsAddedToGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "dataProviderHiddenNodeList.selectionChangeEvent",
+            "action": "actionHideUnhideNodes",
+            "cacheEventData": true
+        }
+    ],
+
+    "preferences": [
+        "RV1_DARB_Expand_Incoming_Levels",
+        "RV1_DARB_Expand_Outgoing_Levels",
+        "RV1_DARB_Filter_Properties",
+        "RV1_DARB_Concentrated",
+        "RV1_DARB_Expand_All_1_Level_Command_Visible",
+        "RV1_DARB_Expand_Selected_1_Level_Command_Visible",
+        "RV1_DARB_Sorted_Layouts",
+        "RV1_DARB_Hide_Unhide_List_Order_Incoming_First"
+    ],
+
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        }
+
+    },
+
+    "dataProviders": {
+        "dataProviderHiddenNodeList": {
+            "action": "actionHiddenNodeList",
+            "uidInResponse": "uid",
+            "response": "{{data.nodes}}",
+            "totalFound": "{{data.nodes.length}}",
+            "deps": "js/Rv1ShowObjectRelationsService"
+        }
+    },
+    "conditions": {
+        "isSelectionChanged": {
+            "expression": "name == 'selected'"
+        }
+    },
+    "i18n": {
+        "direction": [
+            "RelationBrowserMessages"
+        ],
+        "incoming": [
+            "RelationBrowserMessages"
+        ],
+        "outgoing": [
+            "RelationBrowserMessages"
+        ],
+        "both": [
+            "RelationBrowserMessages"
+        ]
+
+    }
+}

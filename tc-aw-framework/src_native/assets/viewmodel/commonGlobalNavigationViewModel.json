@@ -1,0 +1,113 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-column.directive",
+        "js/aw-layout-slot.directive",
+        "js/aw-sidenav.directive"
+    ],
+    "data": {
+        "sideNavData": {
+            "slide": "FLOAT",
+            "direction": "LEFT_TO_RIGHT",
+            "animation": "true",
+            "width": "STANDARD",
+            "height": "FULL",
+            "isPinnable": true
+        }
+    },
+    "actions": {
+        "updateUserAndUserSessionOnContext": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateUserOnContext"
+                },
+                {
+                    "action": "updateUserSessionOnContext"
+                },
+                {
+                    "action": "updateLandMarkLabel"
+                }
+            ]
+        },
+        "updateLandMarkLabel": {
+            "actionType": "JSFunction",
+            "method": "updateArialabel",
+            "inputData": {
+                "containerDOMElement": null,
+                "childLocator": "aw-layout-slot nav",
+                "messageFile": "BaseMessages"
+            },
+            "deps": "js/wcagService"
+        },
+        "updateUserOnContext": {
+            "actionType": "createViewModelObject",
+            "inputData": {
+                "source": "{{ctx.user}}"
+            },
+            "outputData": {
+                "ctx.user": ""
+            }
+        },
+        "updateUserSessionOnContext": {
+            "actionType": "createViewModelObject",
+            "inputData": {
+                "source": "{{ctx.userSession.uid}}"
+            },
+            "outputData": {
+                "ctx.userSession": ""
+            }
+        },
+        "commonGlobalNavigationMountAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "commonGlobalNavigationMountActionEvent"
+                } ]
+            }
+        }
+    },
+    "dataProviders": {},
+    "functions": {},
+    "onEvent": [ {
+            "eventId": "commonGlobalNavigationMountActionEvent",
+            "action": "updateUserAndUserSessionOnContext",
+            "condition": "conditions.hasTcSessionData"
+        },
+        {
+            "eventId": "cdm.updated",
+            "action": "updateUserSessionOnContext",
+            "condition": "conditions.isSessionVmoUpdated"
+        }
+    ],
+    "i18n": {},
+    "messages": {},
+    "conditions": {
+        "hasTcSessionData": {
+            "expression": "ctx.tcSessionData"
+        },
+        "isSessionVmoUpdated": {
+            "expression": {
+                "$and": [{
+                    "$source":"updatedObjects.length",
+                    "$query":{
+                           "$gt":0
+                    }
+                   },
+                   {
+                    "$source":"updatedObjects",
+                    "$query":{
+                         "$source":"uid",
+                            "$query":{
+                                "$in": ["{{ctx.userSession.uid}}"]
+                            }
+                      }
+                    }
+                ]
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "commonGlobalNavigationMountAction"
+    }
+}

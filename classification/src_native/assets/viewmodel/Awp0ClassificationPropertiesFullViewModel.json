@@ -1,0 +1,140 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-cls-properties.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-search-box.directive"
+    ],
+    "actions": {
+        "clearAllProperties": {
+            "actionType": "JSFunction",
+            "method":"clearAllProperties",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "convertValues": {
+            "actionType": "JSFunction",
+            "method": "convertValues",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "convertedValues": "convertedValues"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "populatePropertyGroupTree": {
+            "actionType": "JSFunction",
+            "method": "populatePropertyGroupTree",
+            "inputData": {
+                "inputArray":"{{data.attr_anno}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "repopulatePropertyGroupTree": {
+            "actionType": "JSFunction",
+            "method": "populatePropertyGroupTree",
+            "inputData": {
+                "inputArray":"{{data.attr_anno}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "filterProperties": {
+            "actionType": "JSFunction",
+            "method": "filterProperties",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "getPropHeight": {
+            "actionType": "JSFunction",
+            "method": "getClsPropContainerHeight",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        }
+    },
+    "functions": {
+        "getUnitSystem": {
+            "functionName": "getUnitSystem",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getConvertValuesRequest": {
+            "functionName": "getConvertValuesRequest",
+            "parameters": [ "{{data}}" ]
+        },
+        "getRequest": {
+            "functionName": "getRequest",
+            "parameters": [ "{{ctx}}" ]
+        }
+    },
+    "dataProviders": {
+
+    },
+    "columnProviders": {
+
+    },
+    "grids": {
+
+    },
+    "data": {
+        "showMinMaxTooltip": {
+            "view": "clsShowMinMaxTooltip"
+        },
+        "showLabelTooltip": {
+            "view": "clsShowLabelTooltip"
+        },
+        "propFilter" : {
+            "dbValue": "",
+            "type": "STRING"
+        },
+        "propertytype" : "Property",
+        "showAllProp": false,
+        "propFilterText": {
+            "dbValue": "{{i18n.searchPlaceholder}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "classify.toggleMetric",
+            "action": "convertValues"
+        },
+        {
+            "eventId": "condition.valueChanged",
+            "criteria": {
+                "condition": "conditions.showAll"
+            },
+            "action": "getPropHeight"
+        }
+    ],
+    "conditions": {
+        "showUnitSystem": {
+            "expression": "data.leafClassDescriptions.unitBase === 'METRIC'"
+        },
+        "classifyFullScreenCmdCondition": {
+            "expression": "!ctx.classifyFullscreen || ctx.classifyFullscreen === false"
+        },
+        "classifyExitFullScreenCmdCondition": {
+            "expression": "ctx.classifyFullscreen === true"
+        }
+    },
+    "i18n": {
+        "createInstances": [ "ClassificationPanelMessages" ],
+        "properties": [ "ClassificationPanelMessages" ],
+        "propertiesPreview": [ "ClassificationPanelMessages" ],
+        "searchPlaceholder": [ "ClassificationPanelMessages" ],
+        "showMinMessage": [ "ClassificationPanelMessages" ],
+        "showMaxMessage": [ "ClassificationPanelMessages" ],
+        "showRangeMessage": [ "ClassificationPanelMessages" ],
+        "minimumConstraintLabel": [ "ClassificationPanelMessages" ],
+        "maximumConstraintLabel": [ "ClassificationPanelMessages" ],
+        "rangeConstraintLabel": [ "ClassificationPanelMessages" ],
+        "dashConstraintLabel": [ "ClassificationPanelMessages" ]
+    }
+}

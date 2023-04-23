@@ -1,0 +1,141 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-image-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "search":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "attributesToInflate": [ "object_name", "owning_user", "object_desc", "fnd0Instructions", "state" ],
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{function:updateFilterMap}}",
+                    "searchSortCriteria": "{{ctx.sublocation.sortCriteria}}",
+                    "focusObjUid": "{{ctx.newlyCreatedTemplateObjUid}}",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.imageDataProvider.startIndex}}"
+                    }
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty"
+            },
+            "deps": "js/Awp0WorkflowDesignerUtils",
+            "events": {
+                "success": [ {
+                    "name": "selectCreatedTemplateObject",
+                    "condition": "ctx.newlyCreatedTemplateObjUid"
+                } ],
+                "failure": [ {
+                    "name": "completedPerformSearch",
+                    "condition": "ctx.newlyCreatedTemplateObjUid"
+                } ]
+            }
+        },
+        "selectTemplateObject" : {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.imageDataProvider.selectionModel}}",
+                "newSelection": "{{ctx.newlyCreatedTemplateObjUid}}"
+            },
+            "deps": "js/selectionModelFactory",
+            "events": {
+                "success": [ {
+                    "name": "completedPerformSearch"
+                } ]
+            }
+        },
+        "unregisterContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "newlyCreatedTemplateObjUid"
+            }
+        }
+    },
+
+    "dataProviders":
+    {
+        "imageDataProvider":
+        {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+
+    "functions": {
+        "updateFilterMap": {
+            "functionName": "updateFilterMap",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        }
+    },
+
+    "onEvent": [{
+        "eventId": "dataProvider.reset",
+        "action": "reveal"
+    }, {
+        "eventId": "workflowTemplatesImage.contentLoaded",
+        "action": "reveal"
+    },{
+        "eventId": "selectCreatedTemplateObject",
+        "action": "selectTemplateObject"
+    },{
+        "eventId": "completedPerformSearch",
+        "action": "unregisterContext"
+    }]
+}

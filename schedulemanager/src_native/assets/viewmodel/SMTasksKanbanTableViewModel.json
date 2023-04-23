@@ -1,0 +1,238 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-kanban.directive"
+    ],
+    "actions": {
+        "loadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagementAw-2019-06-ScheduleManagementAw",
+            "method": "loadAssignedTasks",
+            "inputData": {
+                "loadTasksInfo" : "{{function:prepareLoadAssignTasksContainer}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{function:parseKanbanSOAResponse}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.selectedAttrProxyObjects": []
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "schTaskKanbanTableErrorMsg"
+                    }
+                ]
+            },
+            "deps": "js/SMKanbanBoardHelper"
+        },
+        "processTaskDragDrop": {
+            "actionType": "JSFunction",
+            "method": "prepareDataForSaveEdit",
+            "inputData":
+            {
+                "dragDropInfo": "{{data.eventData}}"
+            },
+            "outputData":
+            {
+                "updateTaskContainer": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "callSaveEditSOA"
+                    }
+                ]
+            },
+            "deps": "js/SMKanbanBoardHelper"
+        },
+        "callSaveEditSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-DataManagement",
+            "method": "saveViewModelEditAndSubmitWorkflow2",
+            "inputData": {
+                "inputs": "{{data.updateTaskContainer}}"
+            },
+            "events": {
+                "failure": [ {
+                    "name": "SMKanban.dragDropFailure",
+                    "eventData": {
+                        "data": "{{data.eventMap['SMKanban.onAfterDrop']}}",
+                        "failedUids": "{{data.eventMap['SMKanban.onAfterDrop'].dragContext.source}}"
+                    }
+                }]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "schTaskKanbanTableErrorMsg"
+                    }
+                ]
+            }
+        },
+        "updateTaskData": {
+            "actionType": "JSFunction",
+            "method": "updateTaskData",
+            "inputData":
+            {
+                "updatedObjects": "{{data}}"
+            },
+            "outputData": {
+                "updatedKanbanCards": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "SMKanban.updateCards",
+                        "eventData": {
+                            "updatedKanbanCards": "{{data.updatedKanbanCards}}"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/SMKanbanBoardHelper"
+        },
+        "onClickOpenSchedule":{
+            "actionType": "JSFunction",
+            "method": "ShowScheduleTaskObject",
+            "inputData":
+            {
+                "onClickOpenCmdInfo": "{{data.eventData}}"
+            },
+            "deps": "js/SMKanbanBoardHelper"
+        }
+    },
+    "columnProviders": {
+        "SMTasksBoardColumnProvider": {
+            "columns": [
+                {
+                    "name": "not_started",
+                    "displayName": "{{data.i18n.Saw1StatusNotStarted}}",
+                    "isGroup": false,
+                    "multiselect": true
+                },
+                {
+                    "name": "in_progress_state",
+                    "groupName": "in_progress",
+                    "displayName": "{{data.i18n.Saw1StateInProgress}}",
+                    "isGroup": true
+                },
+                {
+                    "name": "in_progress",
+                    "displayName": "{{data.i18n.Saw1StatusInProgress}}",
+                    "isGroup": false,
+                    "groupID": "in_progress_state",
+                    "multiselect": true
+                },
+                {
+                    "name": "needs_attention",
+                    "displayName": "{{data.i18n.Saw1StatusNeedsAttention}}",
+                    "isGroup": false,
+                    "groupID": "in_progress_state",
+                    "multiselect": true
+                },
+                {
+                    "name": "late",
+                    "displayName": "{{data.i18n.Saw1StatusLate}}",
+                    "isGroup": false,
+                    "groupID": "in_progress_state",
+                    "multiselect": true
+                },
+                {
+                    "name": "complete",
+                    "displayName": "{{data.i18n.Saw1StatusComplete}}",
+                    "isGroup": false,
+                    "multiselect": true
+                }
+            ]
+        }
+    },
+    "grids": {
+        "SMKanban": {
+            "dataProvider": "SMTasksBoardProvider",
+            "columnProvider": "SMTasksBoardColumnProvider",
+            "gridOptions":{}
+        }
+    },
+    "dataProviders":{
+        "SMTasksBoardProvider": {
+            "initializeAction": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "preferences": [
+        "AWC_SM_Tasks_Board_Display_Limit"
+    ],
+    "functions":{
+        "parseKanbanSOAResponse":{
+            "functionName": "parseKanbanSOAResponse",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "prepareLoadAssignTasksContainer":{
+            "functionName": "prepareLoadAssignTasksContainer",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+
+    },
+    "onEvent": [
+        {
+            "eventId": "SMKanban.onAfterDrop",
+            "cacheEventData": true,
+            "action": "processTaskDragDrop"
+        },
+        {
+            "eventId": "callSaveEditSOA",
+            "action": "callSaveEditSOA"
+        },
+        {
+            "eventId": "cdm.updated",
+            "cacheEventData": true,
+            "action": "updateTaskData"
+        },
+        {
+            "eventId": "SMKanban.cardClicked",
+            "cacheEventData": true,
+            "action": "onClickOpenSchedule"
+        }
+
+    ],
+    "messages": {
+        "schTaskKanbanTableErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "Saw1PriorityLowest": [ "ScheduleManagerMessages" ],
+        "Saw1PriorityLow": [ "ScheduleManagerMessages" ],
+        "Saw1PriorityMediumLow": [ "ScheduleManagerMessages" ],
+        "Saw1PriorityMedium": [ "ScheduleManagerMessages" ],
+        "Saw1PriorityHigh": [ "ScheduleManagerMessages" ],
+        "Saw1PriorityVeryHigh": [ "ScheduleManagerMessages" ],
+        "Saw1PriorityHighest": [ "ScheduleManagerMessages" ],
+        "Saw1StatusNotStarted": ["ScheduleManagerMessages"],
+        "Saw1StatusInProgress": ["ScheduleManagerMessages"],
+        "Saw1StatusNeedsAttention": ["ScheduleManagerMessages"],
+        "Saw1StatusLate": ["ScheduleManagerMessages"],
+        "Saw1StatusComplete": ["ScheduleManagerMessages"],
+        "Saw1StateInProgress": ["ScheduleManagerMessages"],
+        "Saw1FinishDate": ["ScheduleManagerMessages"],
+        "Saw1Priority": ["ScheduleManagerMessages"],
+        "Saw1Schedule": ["ScheduleManagerMessages"],
+        "Saw1ShowScheduleObject": ["ScheduleManagerMessages"],
+        "Saw1OpenObjectTooltip": ["ScheduleManagerMessages"]
+    }
+}

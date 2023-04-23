@@ -1,0 +1,431 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "populateValidIncludeTypes",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/AssignTaskDeliverable"
+        },
+        "createTaskDeliverablefromNew": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2016-09-DataManagement",
+            "method": "createAttachAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}",
+                "datasetInfos" : "{{function:getDatasets}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addObject.startMultiFileUpload",
+                        "condition": "data.targetObject != undefined && data.filesToBeRelated && data.filesToBeRelated.length > 0"
+                    },
+                    {
+                        "name": "CreateTaskDeliverable",
+                        "condition": "(data.datasetInfos.length == 0) || !(data.targetObject != undefined && data.filesToBeRelated && data.filesToBeRelated.length > 0)"
+                    },
+                    {
+                        "name": "assignProjects"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "createDeliverable": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagementAw-2015-07-ScheduleManagementAw",
+            "method": "createTaskDeliverables",
+            "inputData": {
+                "taskDeliverableData": "{{function:getTaskDeliverable}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.scheduleTask.selectedObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Saw1ShiftScheduleService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "checkSchDeliverableName": {
+            "actionType": "JSFunction",
+            "method": "checkSchDeliverableName",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "condition": "data.SoaToBeCalled=='notADataset'",
+                        "name": "newtabfunctionality"
+                    },
+                    {
+                        "condition": "data.SoaToBeCalled=='dataset'",
+                        "name": "fileupload"
+                    },
+                    {
+                        "condition": "!data.SoaToBeCalled",
+                        "name": "CreateTaskDeliverable"
+                    }
+                ]
+            },
+            "deps": "js/Saw1CommandHelper"
+        },
+        "createDatasetforfileupload": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-04-DataManagement",
+            "method": "createDatasets",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "{{data.datasetName.dbValue}}",
+                        "container": {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        },
+                        "datasetFileInfos": [
+                            {
+                                "allowReplace": false,
+                                "clientId": "",
+                                "fileName": "{{data.fileName}}",
+                                "isText": "{{function:getFileFormat}}",
+                                "namedReferenceName": "{{data.reference.dbValue.referenceName}}"
+                            }
+                        ],
+                        "relationType": "",
+                        "description": "{{data.datasetDesc.dbValue}}",
+                        "name": "{{data.datasetName.dbValue}}",
+                        "type": "{{data.datasetType.dbValue.props.object_string.dbValues[0]}}"
+                    }
+                ]
+            },
+            "outputData": {
+                "fmsTicket": "datasetOutput[0].commitInfo[0].datasetFileTicketInfos[0].ticket",
+                "commitInfos": "datasetOutput[0].commitInfo[0]",
+                "relatedModified": "datasetOutput[0].dataset",
+                "createdObject": "datasetOutput[0].dataset"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "deliverableFmsTicketUpdate"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateDeliverableFormData": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "uploadService"
+                    }
+                ]
+            },
+            "deps": "js/declUtils"
+        },
+        "identifyFromWhereAddButtonIsFired": {
+            "actionType": "JSFunction",
+            "method": "identifyFromWhereAddButtonIsFired",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "SoaToBeCalled": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "checkSchDeliverableName"
+                    }
+                ]
+            },
+            "deps": "js/Saw1ShiftScheduleService"
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [
+                    {
+                        "projects": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+                        "objectToAssign": [
+                            "{{data.createdMainObject}}"
+                        ],
+                        "objectToRemove": []
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            }
+        },
+        "commitFileSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-FileManagement",
+            "method": "commitDatasetFiles",
+            "inputData": {
+                "commitInput": [
+                    {
+                        "dataset": "{{data.commitInfos.dataset}}",
+                        "createNewVersion": true,
+                        "datasetFileTicketInfos": [
+                            {
+                                "datasetFileInfo": {
+                                    "clientId": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.clientId}}",
+                                    "fileName": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.fileName}}",
+                                    "namedReferencedName": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.namedReferenceName}}",
+                                    "isText": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.isText}}",
+                                    "allowReplace": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.allowReplace}}"
+                                },
+                                "ticket": "{{data.fmsTicket}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "CreateTaskDeliverable"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "commitFailed"
+                    }
+                ]
+            }
+        },
+        "upload": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+                    "data": "{{data.formData}}"
+                }
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commitFile"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "commitFailed"
+                    }
+                ]
+            }
+        },
+        "deleteDataset": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData": {
+                "objects": [
+                    "{{data.createdObject}}"
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            }
+        }
+    },
+    "messages":{
+        "soaErrorMessage": {
+          "messageType": "ERROR",
+          "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addObject.commitUploadedDataset",
+            "action": "createDeliverable"
+        },
+        {
+            "eventId": "CreateTaskDeliverable",
+            "action": "createDeliverable"
+        },
+        {
+            "eventId": "fileupload",
+            "action": "createDatasetforfileupload"
+        },
+        {
+            "eventId": "checkSchDeliverableName",
+            "action": "checkSchDeliverableName"
+        },
+        {
+            "eventId": "newtabfunctionality",
+            "action": "createTaskDeliverablefromNew"
+        },
+        {
+            "eventId": "assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "commitFile",
+            "action": "commitFileSOA"
+        },
+        {
+            "eventId": "uploadService",
+            "action": "upload"
+        },
+        {
+            "eventId": "commitFailed",
+            "action": "deleteDataset"
+        },
+        {
+            "eventId": "deliverableFmsTicketUpdate",
+            "action": "updateDeliverableFormData"
+        },
+        {
+            "eventId": "syncGanttSplitSelectionDone",
+            "action": "closePanel"
+        }
+    ],
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreatedObject": {
+            "functionName": "getCreatedObject",
+            "parameters": []
+        },
+        "getTaskDeliverable": {
+            "functionName": "getTaskDeliverable",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.scheduleTask.selectedObject}}"
+            ]
+        },
+        "getDatasets":
+        {
+            "functionName": "getDatasets",
+            "parameters":
+            [
+
+            ]
+        }
+    },
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='newTabPageSub' && data.creationType"
+        },
+        "isPaletteTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "i18n": {
+        "assignTaskdeliverableTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "assignButtonText": [
+            "ScheduleManagerMessages"
+        ],
+        "sameInstanceNameErrorMsg": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

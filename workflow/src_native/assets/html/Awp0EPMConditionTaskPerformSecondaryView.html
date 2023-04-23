@@ -1,0 +1,15 @@
+<div class="aw-layout-flexColumn aw-layout-include aw-workflow-performTaskPanel">
+    <aw-panel-body>
+        <aw-widget  prop="data.taskName" hint="label"></aw-widget>
+        <aw-widget  prop="data.description" hint="label" visible-when="conditions.showInstructions"></aw-widget>
+        <aw-widget  prop="data.workflowDescription" hint="label" visible-when="conditions.showWorkflowDescription"></aw-widget>
+        <aw-widget  prop="data.comments" hint="textarea"></aw-widget>
+        <aw-password prop="data.password" visible-when="conditions.isSecureTask"></aw-password>
+    </aw-panel-body>
+    <aw-panel-footer visible-when="conditions.isValidToComplete">
+        <aw-listbox prop="data.taskResult" visible-when="!conditions.showConditionPathsAsButton" list="data.taskResults"></aw-listbox>
+        <aw-button aw-repeat="taskResult : data.taskResults" visible-when="conditions.showConditionPathsAsButton && conditions.isValidToComplete" action="verifySaveTask">{{taskResult.propDisplayValue}}</aw-button>
+        <aw-button action="verifySaveTask" visible-when="conditions.showCompleteButton"><aw-i18n>i18n.complete</aw-i18n></aw-button>
+        <aw-button action="verifySaveTaskUnableToComplete" default="false" visible-when="conditions.showUnableToComplete"><aw-i18n>i18n.unableToComplete</aw-i18n></aw-button>
+    </aw-panel-footer>
+</div>

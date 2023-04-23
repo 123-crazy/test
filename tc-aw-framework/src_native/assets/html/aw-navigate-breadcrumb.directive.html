@@ -1,0 +1,59 @@
+<h1 class="aw-layout-fxbreadCrumbs aw-layout-flexColumn"
+  ng-class="{'aw-widgets-breadCrumbCompact': compact === 'true'}">
+    <div class="aw-layout-flexRow">
+        <div class="aw-layout-overflowAtStart" exist-when="overflowAtStart && showOverflowAtStart">
+            <div class="aw-layout-flexRow">
+                <span>
+                    <aw-property-image  ng-click="onOverflowChevronClick($event)" tabindex="{{chevronDataProvider ? 0 :-1}}" ng-keydown="onOverflowChevronPress($event)" class="aw-aria-border aw-jswidget-controlArrow aw-widgets-overflowChevronIcon" name="miscChevronLeftDouble" aria-label="{{breadCrumb}}" role="button" ></aw-property-image>
+                    <aw-popup-panel class="aw-widgets-overflowChevronPopup">
+                        <ul class="aw-widgets-cellListWidget">
+                            <li class="aw-widgets-cellListItem aw-widgets-cellTop" aw-repeat="crumb : provider.overflowCrumbList">
+                                <a class="aw-aria-border aw-widgets-crumbLink aw-widgets-breadCrumbOverflow" tabindex= "0" title="{{crumb.displayName}}"
+                                  ng-click="setScopedCrumb(crumb)" ng-keydown="setScopedCrumbOnKeyPress($event,crumb)">{{crumb.displayName}}{{crumb.objectsCountDisplay}}</a>
+                            </li>
+                        </ul>
+                    </aw-popup-panel>
+                </span>
+            </div>
+        </div>
+        <div aw-repeat="crumb : provider.crumbs" class="aw-layout-eachCrumb aw-layout-flexRow" >
+            <div exist-when="!crumb.selectedCrumb && !crumb.willOverflow">
+                <a tabindex = "0" class="aw-aria-border aw-widgets-crumbLink aw-widgets-breadCrumbOverflow" title="{{crumb.displayName}}"
+                  ng-click="setScopedCrumb(crumb)"
+                  ng-keydown="setScopedCrumbOnKeyPress($event,crumb)"
+                  ng-class="{'aw-widgets-primaryCrumb': crumb.primaryCrumb}">{{crumb.displayName}}{{crumb.objectsCountDisplay}}</a>
+            </div>
+            <div exist-when="crumb.selectedCrumb && !crumb.willOverflow">
+                <div class="aw-widgets-selectedCrumb aw-widgets-breadCrumbOverflow"
+                  title="{{crumb.displayName}}"
+                  ng-class="{'aw-widgets-primaryCrumb': crumb.primaryCrumb}">{{crumb.displayName}}{{crumb.objectsCountDisplay}}</div>
+            </div>
+
+            <span exist-when="!overflowAtStart && crumb.overflowIconPosition" class="aw-widgets-crumbContent">
+                <aw-property-image ng-click="onOverflowChevronClick($event)" class="aw-aria-border aw-jswidget-controlArrow aw-widgets-overflowChevronIcon" tabindex="0" ng-keydown="onOverflowChevronPress($event)" name="miscChevronLeftDouble"
+                aria-label="{{breadCrumb}}" role="button" aria-haspopup="true" ></aw-property-image>
+                <aw-popup-panel class="aw-widgets-overflowChevronPopup">
+                    <ul class="aw-widgets-cellListWidget">
+                        <li class="aw-widgets-cellListItem aw-widgets-cellTop" aw-repeat="crumb : provider.overflowCrumbList">
+                            <a class="aw-aria-border aw-widgets-crumbLink aw-widgets-breadCrumbOverflow" tabindex= "0" title="{{crumb.displayName}}"
+                               ng-click="setScopedCrumb(crumb)" ng-keydown="setScopedCrumbOnKeyPress($event,crumb)">{{crumb.displayName}}{{crumb.objectsCountDisplay}}</a>
+                        </li>
+                    </ul>
+                </aw-popup-panel>
+            </span>
+
+            <span exist-when="crumb.showArrow && !crumb.overflowIconPosition  && !crumb.willOverflow" class="aw-widgets-crumbContent">
+                <aw-property-image tabindex="{{chevronDataProvider ? 0 :-1}}" ng-click="onChevronClick(crumb, $event)"
+                ng-keydown="onChevronPress(crumb,$event)" class="{{ crumb.clicked ? 'aw-aria-border aw-jswidget-controlArrow aw-jswidget-controlArrowRotateRight' : 'aw-aria-border aw-jswidget-controlArrow' }}" name="miscChevronRight" aria-label="{{breadCrumb}}" role="button" aria-haspopup="true" ></aw-property-image>
+                <aw-popup-panel>
+                    <div visible-when="data.loading" class="aw-layout-contentLabel">{{loadingMsg}}</div>
+                    <aw-scrollpanel>
+                        <div class="aw-widgets-breadcrumbChevronPopup"  ng-class="{'aw-widgets-breadcrumbMS': isIE}" >
+                            <ng-include visible-when="!data.loading" src="popuplist" ></ng-include>
+                        </div>
+                    </aw-scrollpanel>
+                </aw-popup-panel>
+            </span>
+        </div>
+    </div>
+</h1>

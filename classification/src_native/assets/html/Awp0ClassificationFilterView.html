@@ -1,0 +1,33 @@
+<div class="aw-clspanel-locationFilterView">
+    <div class="aw-layout-panelSectionTitle"><span><aw-i18n>i18n.refine</aw-i18n></span></div>
+    <aw-togglebutton prop="data.autoUpdateEnabled"></aw-togglebutton>
+    <!-- Bulk filter enabled -->
+    <div class="aw-clspanel-appliedFilterContainer">
+        <div class="aw-clspanel-bulkActionsContainer">
+            <aw-link prop="data.clearAllButton" action="clearAll" class="aw-clspanel-bulkActions" link-id="#classifyShowClearCmd"></aw-link>
+        </div>
+        <aw-expandable-search-result-filter filters="data.bulkFiltersMap"></aw-expandable-search-result-filter>
+    </div>
+    <aw-panel-section>
+        <!-- Start of the 'refine' section. -->
+        <aw-filter-in-filters-searchbox
+            category="data.categories.refineCategories" class="aw-clspanel-filterCategorySearchBoxDimensions" index= "-1" filterAction="filterAction" text="this" prop="data.searchBox1">
+        </aw-filter-in-filters-searchbox>
+        <div class="aw-clspanel-tileFilterContainer">
+            <aw-cls-bulk-filter-category
+                exist-when="!data.autoUpdateEnabled.dbValue"
+                class="aw-cls-tile-filterItem"
+                add-action="addStringFilter"
+                checkbox-action="addOrRemoveBulkFilters"
+                is-bulk-filter="true"
+                category="item"
+                aw-repeat="item : data.categories.refineCategories | filterInFiltersSearch :data.searchBox1.dbValue:this track by $index"></aw-cls-bulk-filter-category>
+            <aw-filter-category
+                exist-when="data.autoUpdateEnabled.dbValue"
+                class="aw-cls-tile-filterItem"
+                search-action="addOrRemoveSingleFilter"
+                category="item"
+                aw-repeat="item : data.categories.refineCategories | filterInFiltersSearch :data.searchBox1.dbValue:this track by $index"></aw-filter-category>
+        </div>
+    </aw-panel-section>
+</div>

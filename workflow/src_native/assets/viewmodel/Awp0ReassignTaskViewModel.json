@@ -1,0 +1,182 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/Awp0ReassignTask"
+        },
+        "reassign":
+        {
+            "actionType": "JSFunction",
+            "method": "reassignUser",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0ReassignTask"
+        },
+        "reassignInternal":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2014-06-Workflow",
+            "method": "performAction3",
+            "inputData":
+            {
+                 "input":"{{function:getInputData}}"
+             },
+            "deps": "js/Awp0ReassignTask",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation'" ,
+                        "name": "primaryWorkarea.reset"
+                    },
+
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.locationContext['ActiveWorkspace:Location'] !== 'com.siemens.splm.client.inbox.tasksLocation' && (ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('EPMTask') <= -1 || ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('Signoff') <= -1) && (ctx.xrtPageContext.secondaryXrtPageID ==='tc_xrt_Workflow' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Workflow')",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "reassignTaskFailure"
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "data":
+    {
+        "comments":
+        {
+            "displayName": "{{i18n.comments}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "numberOfLines": 3,
+            "maxLength": 4000,
+            "dbValue": "",
+            "uiValue": ""
+        }
+    },
+
+    "functions":
+    {
+        "getInputData":
+        {
+            "functionName": "getInputData",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+
+    "conditions":
+    {
+        "isValidToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        },
+        "checkSelectionChange":
+        {
+            "expression": "name == 'selected' || name == 'mselected'"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Workflow.closeOpenedPanel",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "Awp0ReassignTaskViewModel.reassignTask",
+            "action": "reassignInternal"
+        }
+    ],
+    "messages": {
+        "reassignTaskFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n":
+    {
+        "reassignTaskCommandTitle":
+        [
+            "InboxMessages"
+        ],
+
+        "reassign":
+        [
+            "InboxMessages"
+        ],
+
+        "comments":
+        [
+            "InboxMessages"
+        ]
+    }
+}

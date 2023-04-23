@@ -1,0 +1,119 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-xrt.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "createAddCharGroup": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [ {
+                    "clientId": "createObjects",
+                    "data": {
+                        "boName": "Qc0CharacteristicsGroup",
+                        "stringProps": {
+                            "object_name": "{{data.object_name.dbValues[0]}}",
+                            "object_desc": "{{data.object_desc.dbValues[0]}}",
+                            "qc0CharacteristicsType": "{{data.qc0CharacteristicsType.dbValues[0]}}"
+
+                        }
+                    }
+                } ]
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name":"aqc0CharGroupCreated",
+                        "eventData": {
+                            "createdGroups": [
+                                "{{data.createdObject}}"
+                            ],
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+             ],
+             "failure": 
+             [
+                 {
+                     "name": "complete",
+                     "condition": "data.pinnedToForm.dbValue",
+                     "eventData": 
+                     {
+                         "source": "toolAndInfoPanel"
+                     }
+                 }
+             ]
+            }
+        },
+        "Aqc0SetPin": 
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": 
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        
+        "Aqc0SetUnPin": 
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": 
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "data": {
+        "Aqc0pinCommands": "aqc0_oneStepPinCommands",
+        "pinnedToForm": 
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm": 
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "onEvent": [ 
+        {
+            "eventId": "addCharSpecPanel.Aqc0SetPin",
+            "cacheEventData": true,
+            "action": "Aqc0SetPin"
+          },
+          {
+            "eventId": "addCharSpecPanel.Aqc0SetUnPin",
+            "cacheEventData": true,
+            "action": "Aqc0SetUnPin"
+          }
+   ],
+    "i18n": {
+        "addButtonTitle":["qualitycharacteristicsmanagerMessages"]
+    }
+}

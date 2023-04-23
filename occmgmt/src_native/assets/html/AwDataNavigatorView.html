@@ -1,0 +1,11 @@
+<div aw-class="{'aw-layout-workareaMain aw-layout-row':subPanelContext.layout !== 'HORIZONTAL','aw-layout-workareaMain aw-layout-column':subPanelContext.layout === 'HORIZONTAL' }">
+    <div aw-reset-data-navigator class="aw-layout-primaryWorkarea afx-alt-content-background" aw-class="{
+        'aw-layout-primaryWorkareaLeft aw-layout-summaryList aw-layout-flexRowContainer': subPanelContext.viewConfig.showSecondaryWorkArea && ['table','tree'].indexOf(subPanelContext.viewConfig.view) === -1,
+        'aw-layout-primaryWorkareaLeft aw-layout-summaryList aw-layout-tableSummaryList aw-layout-flexRowContainer': subPanelContext.viewConfig.showSecondaryWorkArea && ['table','tree'].indexOf(subPanelContext.viewConfig.view) !== -1 && subPanelContext.layout !== 'HORIZONTAL',
+        'aw-occmgmt-table-summary-layout aw-layout-flexColumnContainer': subPanelContext.viewConfig.showSecondaryWorkArea && ['table','tree'].indexOf(subPanelContext.viewConfig.view) !== -1 && subPanelContext.layout === 'HORIZONTAL',
+        'aw-layout-primaryWorkareaFill': !subPanelContext.viewConfig.showSecondaryWorkArea}" visible-when="!ctx.fullscreen">
+        <aw-primary-workarea view-base="subPanelContext.viewBase" view="subPanelContext.viewConfig.view" context="subPanelContext.pwaContext"></aw-primary-workarea>
+    </div>
+    <aw-splitter min-size-1="{{subPanelContext.layout === 'HORIZONTAL' && '100' || '0'}}" min-size-2="{{subPanelContext.layout === 'HORIZONTAL' && '100' || '300'}}" isPrimarySplitter=true direction="{{subPanelContext.layout === 'HORIZONTAL' && 'HORIZONTAL' || 'VERTICAL'}}" aw-class="{'hidden': !subPanelContext.viewConfig.showSecondaryWorkArea || ctx.fullscreen}"></aw-splitter>
+    <aw-occmgmt-secondary-workarea show-xrt="subPanelContext.provider.showXrt" exist-when="subPanelContext.viewConfig.showSecondaryWorkArea" selected="subPanelContext.modelObjects" context-key="subPanelContext.contextKey"></aw-occmgmt-secondary-workarea>
+</div>

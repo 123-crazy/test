@@ -1,0 +1,177 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getDisciplines"
+            ]
+        },
+        "searchDisciplines": {
+            "actionType": "JSFunction",
+            "method": "getDisciplines",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getDisciplines}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "Discipline",
+                        "properties": [ {
+                            "name": "discipline_name"
+                        } ]
+                    },
+                    {
+                        "name": "ScheduleTask",
+                        "properties": [ {
+                            "name": "ResourceAssignment",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        } ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "addDisciplinesToSchedule": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2008-06-ScheduleManagement",
+            "method": "addMemberships",
+            "inputData": {
+                "membershipData": "{{function:addSelectedMembers}}"
+            },
+            "events": {
+               "success": [
+                  {
+                     "name": "cdm.relatedModified",
+                     "eventData": {
+                        "relatedModified": [
+                           "{{ctx.schedule.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                    "condition": "!data.unpinnedToForm.dbValue",
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                }
+               ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.dataProviders.getDisciplines.selectedObjects.length==1",
+                        "message": "AddMemberComplete"
+                     },
+                     {
+                        "condition": "data.dataProviders.getDisciplines.selectedObjects.length>1",
+                        "message": "AddMultipleMembersComplete"
+                     }
+                ],
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "deps": "js/userListService"
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "dataProviders": {
+        "getDisciplines": {
+            "action": "searchDisciplines",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "functions": {
+        "addSelectedMembers": {
+            "functionName": "addSelectedMembers",
+            "parameters": [
+               "{{ctx}}",
+               "{{data}}",
+               "{{data.dataProviders.getDisciplines.selectedObjects}}"
+            ]
+         }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1AddDisciplinesToSchedule"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "addDisciplinesToScheduleEvent",
+            "action": "addDisciplinesToSchedule"
+        }
+    ],
+    "messages": {
+        "AddMemberComplete": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addMemberSuccessful}}",
+            "messageTextParams": [
+                "{{data.dataProviders.getDisciplines.selectedObjects[0]}}"
+            ]
+        },
+        "AddMultipleMembersComplete": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addMultipleMembersSuccessful}}",
+            "messageTextParams": [
+                "{{data.dataProviders.getDisciplines.selectedObjects.length}}"
+            ]
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "availableSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "addMemberSuccessful": [
+            "ScheduleManagerMessages"
+        ],
+        "addMultipleMembersSuccessful": [
+            "ScheduleManagerMessages"
+       ]
+    }
+}

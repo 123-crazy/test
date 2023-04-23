@@ -1,0 +1,35 @@
+<aw-panel-body>
+    <aw-panel-section caption="i18n.assignments">
+        <aw-panel-section id="assigner" caption="i18n.Assigner" exist-when="conditions.isAssignerPresent && !ctx.workflowTabContext.hideAssignerCreateData" context="data.dataProviders.assignerDataProvider">
+            <aw-list dataprovider="data.dataProviders.assignerDataProvider" has-floating-cell-commands="false">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="assignee" caption="i18n.assignee" exist-when="!conditions.isAssignerPresent" context="data.dataProviders.assignerDataProvider">
+            <aw-list dataprovider="data.dataProviders.assignerDataProvider" has-floating-cell-commands="false">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="reviewers" exist-when="conditions.isReviewersPresent" caption="i18n.addReviewerLabelText" context="data.dataProviders.reviewersDataProvider">
+            <aw-list dataprovider="data.dataProviders.reviewersDataProvider" has-floating-cell-commands="false">
+                <aw-include name="Awp0SignoffProfileCellContent" exist-when="item.type === 'EPMSignoffProfile'" sub-panel-context="item"></aw-include>
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item" exist-when="item.type !== 'EPMSignoffProfile'"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="acknowledgers" exist-when="conditions.isAcknowledgersPresent" caption="i18n.Acknowledgers" context="data.dataProviders.acknowledgersDataProvider">
+            <aw-list dataprovider="data.dataProviders.acknowledgersDataProvider" has-floating-cell-commands="false">
+                <aw-include name="Awp0SignoffProfileCellContent" exist-when="item.type === 'EPMSignoffProfile'" sub-panel-context="item"></aw-include>
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item" exist-when="item.type !== 'EPMSignoffProfile'"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="notifyees" exist-when="conditions.isRouteTaskTemplateSelected" caption="i18n.Notifyees" context="data.dataProviders.notifyeesDataProvider">
+            <aw-list dataprovider="data.dataProviders.notifyeesDataProvider" has-floating-cell-commands="false">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-checkbox prop="data.reviewersSignoffMust" visible-when="conditions.isSignoffReviewersPresent"></aw-checkbox>
+    <aw-button action="createHandlers" visible-when="conditions.isValidObjectToAddAssignmentHandler"><aw-i18n>i18n.addCommandTitle</aw-i18n></aw-button>
+</aw-panel-footer>

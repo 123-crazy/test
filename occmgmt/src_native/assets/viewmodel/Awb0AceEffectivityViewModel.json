@@ -1,0 +1,851 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-radiobutton.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-textbox.directive",
+        "js/exist-when.directive",
+        "js/aw-init.directive",
+        "js/aw-date.directive",
+        "js/aw-datetime.directive",
+        "js/aw-listbox.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-label.directive",
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-button.directive",
+        "js/aw-property-image.directive",
+        "js/aw-icon-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "flag": {
+            "type": "STRING",
+            "dbValue": "{{subPanelContext.flag.dbValue}}"
+        },
+        "unitMaxValue": {
+            "type": "INTEGER",
+            "dbValue": 2147483647
+        },
+        "dateOrUnitEffectivityTypeRadioButton": {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.dateEffectivity}}",
+            "propertyRadioFalseText": "{{i18n.unitEffectivity}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{conditions.dateOrUnitEffectivity}}"
+        },
+        "isShared": {
+            "displayName": "{{i18n.shareEffectivity}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.sharedCheckbox}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "nameBox": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "dbValue": "{{subPanelContext.nameBox.dbValue}}",
+            "isRequired": "true",
+            "maxLength": 32
+        },
+        "endItemVal": {
+            "type": "STRING",
+            "uiValue":"{{subPanelContext.endItemVal.uiValue}}",
+            "dbValue":"{{subPanelContext.endItemVal.uiValue}}",
+            "isRequired": "true",
+            "dispValue" :"{{subPanelContext.endItemVal.uiValue}}",
+            "displayName": "{{i18n.endItemMessage}}"
+        },
+        "unitRangeText": {
+            "displayName": "{{i18n.unitEffectivity}}",
+            "type": "STRING",
+            "dbValue": "{{subPanelContext.unitRangeText.dbValue}}",
+            "isRequired": "true",
+            "validationCriteria": [
+                {
+                    "condition": "conditions.isUnitPositive",
+                    "value": "{{i18n.shouldBePositiveNumber}}"
+                },
+                {
+                    "condition": "conditions.isTooLarge",
+                    "value": "{{i18n.tooLarge}}"
+                },
+                {
+                    "condition": "conditions.isValidUnitRange",
+                    "value": "{{i18n.rangeInvalidMessage}}"
+                },
+                {
+                    "condition": "conditions.isBadSyntax",
+                    "value": "{{i18n.badSyntax}}"
+                }
+            ]
+        },
+        "startDate":
+        {
+            "dbValue": "{{subPanelContext.startDate.dbValue}}",
+            "type": "{{subPanelContext.startDate.type}}",
+            "isRequired": "true",
+            "displayName": "{{i18n.startDate}}",
+            "isEditable": "true"
+        },
+
+        "endDate":
+        {
+            "dbValue": "{{subPanelContext.endDate.dbValue}}",
+            "type": "{{subPanelContext.endDate.type}}",
+            "isRequired": "true",
+            "validationCriteria": [
+                {
+                    "condition": "data.endDate.dateApi.dateValue !== '' && data.endDate.dateApi.dateValue !== '' && !conditions.isEndDateGreaterThanStartDate",
+                    "value": "{{i18n.dateRangeInvalidMessage}}"
+                }
+            ]
+        },
+        "endDateList":{
+            "type": "STRING",
+            "dbValue":
+            [
+                {"propDisplayValue" :"{{i18n.dateEffectivity}}", "propInternalValue" : "Date"},
+                {"propDisplayValue" :"{{i18n.upText}}", "propInternalValue" : "UP"},
+                {"propDisplayValue" :"{{i18n.soText}}", "propInternalValue" : "SO"}
+            ]
+        },
+        "endDateOptions":
+        {
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov":true,
+            "displayName": "{{i18n.endDate}}",
+            "isEditable": "true",
+            "dbValue": "{{subPanelContext.endDateOptions.dbValue}}"
+        },
+        "endItemLabel":
+        {
+            "displayName": "{{i18n.endItemMessage}}",
+            "type": "STRING"
+        },
+        "navigateCommand": {
+            "action": "navigateToEndItemPanel",
+            "iconName": "Replace",
+            "tooltip": "{{i18n.replaceElementBtn}}"
+        },
+        "isProtected":{
+            "displayName": "{{i18n.protect}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.protectedCheckbox}}",
+            "labelPosition":"PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "i18n": {
+        "dateEffectivity":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "unitEffectivity":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "shareEffectivity":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "name":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "upText":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "soText":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "startDate":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "endDate":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "dateEffectivityPlaceholder":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "endItemMessage":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "replaceElementBtn":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "shouldBePositiveNumber":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "tooLarge":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "rangeInvalidMessage":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "protect":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "badSyntax":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "addElementBtn":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "saveButtonText":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "dateRangeInvalidMessage":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "failedToApplyEffectivity":
+        [
+            "OccurrenceManagementConstants"
+        ],
+        "failedToSaveEffectivityMessage":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "duplicateEffectivityCreationErrorMessage":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "effectivitesSuccessfullyApplied":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "notiMessageForProtectedEffUnit": 
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "notiMessageForProtectedEffDate": 
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "genericServerError":
+        [
+            "OccurrenceManagementMessages"
+        ],
+        "okText": 
+        [
+            "OccurrenceManagementConstants"
+        ]
+    },
+    "actions" : {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "getInitialDateEffectivityConfigurationData"
+                },
+                {
+                    "action": "updateEndItemWidgetVisibility"
+                }
+            ]
+        },        
+        "populateContextKey":{
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "setClearUnitEffectivity" : {
+            "actionType":"JSFunction",
+            "method":"setOrClearDateOrUnitEffectivity",
+            "inputData":{
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/aceEffectivityService"
+        },
+        "clearDate" : {
+            "actionType":"JSFunction",
+            "method":"clearEndDate",
+            "inputData":{
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "endDate.dateApi.dateValue" : "dateValue",
+                "endDate.dateApi.timeValue" : "timeValue",
+                "endDate.dbValue" : "dbValue"
+            },
+            "deps": "js/aceEffectivityService"
+        },
+        "getInitialDateEffectivityConfigurationData": {
+            "actionType":"JSFunction",
+            "method":"getInitialDateEffectivityConfigurationData",
+            "inputData":{
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "activeView": "activeView"
+            },
+            "deps": "js/aceEffectivityService"
+        },
+        "updateEndItemWidgetVisibility": {
+            "actionType":"JSFunction",
+            "method":"updateEndItemWidgetVisibility",
+            "inputData":{
+                "data": "{{data}}"
+            },
+            "deps": "js/aceEffectivityService"
+        },
+        "updateEndItemValue": {
+            "actionType":"JSFunction",
+            "method":"updateEndItemValue",
+            "inputData":{
+                "data": "{{data}}"
+            },
+            "deps": "js/aceEffectivityService"
+        },
+        "navigateToEndItemPanel" : {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "AuthorEffectivityEndItemPanel",
+                            "recreatePanel": true,
+                            "supportGoBack": true,
+                            "title": "{{i18n.endItemMessage}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "validateUnitValue": {
+            "actionType": "JSFunction",
+            "method": "validateUnitValue",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "isUnitRangeValid" : "isUnitRangeValid",
+                "isBadSyntax" : "isBadSyntax",
+                "isPositiveNumber" : "isPositiveNumber",
+                "isTooLarge" : "isTooLarge",
+                "modifiedUnitRangeText" : "modifiedUnitRangeText"
+            },
+            "deps": "js/aceEffectivityService"
+        },
+        "authorEffectivity":{
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2020-12-OccurrenceManagement",
+            "method": "createAndAddElementEffectivity2",
+            "inputData":
+            {
+                    "input":
+                    {
+                        "elements": "{{ctx.mselected}}"
+                        ,
+                        "effectivityInfo":
+                        {
+                            "name":"{{function:getEffectivityName}}",
+                            "endItemRev":{
+                                            "uid": "{{ctx.elementEffectivity.author.endItem.uid}}",
+                                            "type": "{{ctx.elementEffectivity.author.endItem.type}}"
+                                        },
+                            "unitRangeText":"{{data.modifiedUnitRangeText}}",
+                            "dateRange":"{{function:getDateRangeText}}",
+                            "openEndedStatus":"{{data.endDate.openEndedStatus}}",
+                            "isProtected":"{{data.isProtected.dbValue}}",
+                            "isShared":"{{data.isShared.dbValue}}"
+                        },
+                        "effectivityResponseCriteria" : ""
+                    }
+            },
+            "outputData":
+            {
+                "effResp" : ""
+            },
+            "deps": "js/sharedEffectivityService",
+            "events":
+            {
+                "success": [
+                    {
+                        "name": "occurrenceUpdatedByEffectivityEvent",
+                        "eventData":
+                        {
+                            "updated" : "{{data.effResp.ServiceData.updated}}",
+                            "deleted" : "{{data.effResp.ServiceData.deleted}}",
+                            "addedEffectivities": "",
+                            "state" : "COMPLETED",
+                            "source"  : "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "DisplayAndRemoveEffectivities",
+                            "configured":"{{data.effResp.ServiceData.updated}}"
+                        },
+                        "condition": "data.effResp.ServiceData.updated && data.effResp.ServiceData.updated.includes(ctx.selected.uid)"
+                    },
+                    {
+                        "name": "aceElementsDeSelectedEvent",
+                         "eventData":
+                        {
+                            "elementsToDeselect": "{{ctx.mselected}}"
+                        },
+                        "condition": "data.effResp.ServiceData.deleted && data.effResp.ServiceData.deleted.includes(ctx.selected.uid)"
+                    }
+                ]
+            },
+            "actionMessages":
+             {
+                 "failure":
+                 [
+                    {
+                        "condition":"effResp.ServiceData.partialErrors[0].errorValues[0].code==710079",
+                        "message": "duplicateEffectivityCreationErrorMessage"
+                    },
+                    {
+                        "condition": "(ctx.mselected && ctx.mselected.length > 1)",
+                        "message": "addFailureMessage"
+                    }
+                 ],
+                 "success": [
+                    {
+                        "condition": "ctx.mselected.length > 1",
+                        "message": "succsessfullyAddedEffectivityMessage"
+                    }
+                ]
+             }
+        },
+        "authorRevisionEffectivity":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "StructureManagement-2014-12-Effectivity",
+            "method": "createReleaseStatusEffectivity",
+            "inputData":
+            {
+                    "input": [
+                        {
+                            "releaseStatus":"{{ctx.editEffectivityContext.selectedReleaseStatus}}",
+                            "effectivityInfoInput":
+                            {
+                                "effectivityId":"{{function:getEffectivityName}}",
+                                "endItem":
+                                {
+                                    "uid": "{{ctx.elementEffectivity.author.endItem.uid}}",
+                                    "type": "{{ctx.elementEffectivity.author.endItem.type}}"
+                                },
+                                "unitRangeText":"{{data.modifiedUnitRangeText}}",
+                                "dateRange":"{{function:getDateRangeText}}",
+                                "openEndedStatus":"{{data.endDate.openEndedStatus}}",
+                                "isProtected":"{{data.isProtected.dbValue}}"
+                            }
+                        }
+                    ]
+            },
+            "outputData":
+            {
+            },
+            "events":
+            {
+                "success": [
+                    {
+                        "name": "releaseStatusUpdatedByEffectivityEvent"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "DisplayAndRemoveEffectivitiesForRelStatus"
+                        }
+                    }
+                ]
+            },
+            "actionMessages":
+             {
+               "failure":
+                 [
+                     {
+                        "condition": "errorCode.code!==710079",
+                        "message": "failedToApplyEffectivityMessage"
+                     },
+                     {
+                        "condition": "errorCode.code==710079",
+                        "message": "duplicateEffectivityCreationErrorMessage"
+                     }
+                 ]
+                
+             },
+            "deps": "js/sharedEffectivityService"
+        },
+        "editEffectivity":{
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2017-06-OccurrenceManagement",
+            "method": "editElementEffectivity",
+            "inputData":
+            {
+                    "input":
+                    {
+                        "element":{
+                            "uid": "{{ctx.selected.uid}}",
+                            "type": "{{ctx.selected.type}}"
+                        },
+                        "effectivity":{
+                            "uid":"{{data.selectedCell.uid}}",
+                            "type":"{{data.selectedCell.type}}"
+                        },
+                        "effectivityInfo":
+                        {
+                            "name":"{{function:getEffectivityName}}",
+                            "endItemRev":{
+                                            "uid": "{{ctx.elementEffectivity.author.endItem.uid}}",
+                                            "type": "{{ctx.elementEffectivity.author.endItem.type}}"
+                                        },
+                            "unitRangeText":"{{data.modifiedUnitRangeText}}",
+                            "dateRange":"{{function:getDateRangeText}}",
+                            "openEndedStatus":"{{data.endDate.openEndedStatus}}",
+                            "isProtected":"{{data.isProtected.dbValue}}",
+                            "isShared":"{{data.isShared.dbValue}}"
+                        }
+                    }
+            },
+            "outputData":
+            {
+                "occurrenceConfigured": "updated",
+                "occurrenceUnconfigured": "deleted"
+            },
+            "events":
+            {
+                "success": [
+                    {
+                        "name": "occurrenceUpdatedByEffectivityEvent",
+                        "eventData":
+                        {
+                            "updated" : "{{data.occurrenceConfigured}}",
+                            "deleted" : "{{data.occurrenceUnconfigured}}",
+                            "addedEffectivities": "",
+                            "state" : "COMPLETED",
+                            "source"  : "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        },
+                        "condition": "data.occurrenceUnconfigured && data.occurrenceUnconfigured.includes(ctx.selected.uid)"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "DisplayAndRemoveEffectivities",
+                            "configured":"{{data.occurrenceConfigured}}"
+                        },
+                        "condition": "data.occurrenceConfigured && data.occurrenceConfigured.includes(ctx.selected.uid)"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.occurrenceUnconfigured && data.occurrenceUnconfigured.includes(ctx.selected.uid)"
+                    },
+                    {
+                        "name": "aceElementsDeSelectedEvent",
+                         "eventData":
+                        {
+                            "elementsToDeselect": ["{{ctx.selected}}"]
+                        },
+                        "condition": "data.occurrenceUnconfigured && data.occurrenceUnconfigured.includes(ctx.selected.uid)"
+                    }
+                ]
+            },
+
+            "actionMessages":
+            {
+                "failure":
+                [
+                    {
+                        "message": "failedToSaveEffectivityMessage"
+                    },
+
+                    {
+                        "condition": "errorCode==710079",
+                        "message": "duplicateEffectivityCreationErrorMessage"
+                    }
+                ]
+            },
+
+            "deps": "js/sharedEffectivityService"
+        },
+        "editRevisionEffectivity":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "StructureManagement-2015-10-Effectivity",
+            "method": "editReleaseStatusEffectivity",
+            "inputData":
+            {
+                    "input":[
+                        {
+                            "releaseStatus":"{{ctx.editEffectivityContext.selectedReleaseStatus}}",
+                            "effectivityComponent":
+                            {
+                                "uid":"{{data.selectedCell.uid}}",
+                                "type":"{{data.selectedCell.type}}"
+                            },
+                            "effectivityInfoInput":
+                            {
+                                "effectivityId":"{{function:getEffectivityName}}",
+                                "endItem":{
+                                                "uid": "{{ctx.editEffectivityContext.edit.endItem.uid}}",
+                                                "type": "{{ctx.editEffectivityContext.edit.endItem.type}}"
+                                            },
+                                "unitRangeText":"{{data.modifiedUnitRangeText}}",
+                                "dateRange":"{{function:getDateRangeText}}",
+                                "openEndedStatus":"{{data.endDate.openEndedStatus}}",
+                                "isProtected":"{{data.isProtected.dbValue}}"
+                            }
+                        }
+                    ]
+            },
+            "outputData":
+            {
+            },
+            "events":
+            {
+                "success": [
+                    {
+                        "name": "releaseStatusUpdatedByEffectivityEvent"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "DisplayAndRemoveEffectivitiesForRelStatus"
+                        }
+                    }
+                ]
+             },
+             "actionMessages":
+             {
+                 "failure":
+                 [
+                     {
+                         "message": "failedToSaveEffectivityMessage"
+                     },
+                     {
+                        "condition": "errorCode==214011",
+                        "message": "duplicateEffectivityCreationErrorMessage"
+                     }
+                 ]
+             },
+            "deps": "js/sharedEffectivityService"
+        },
+        "refreshSelectedObject":{
+            "actionType":"JSFunction",
+            "method":"updateEffectivities",
+            "inputData":{
+                "selectedModelObject":"{{ctx.selected}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        }
+    },
+    "conditions":
+    {
+        "dateOrUnitEffectivity":
+        {
+            "expression": "subPanelContext.dateOrUnitEffectivityTypeRadioButton.dbValue === true || subPanelContext.dateOrUnitEffectivityTypeRadioButton.dbValue === 'true'"
+        },
+        "sharedCheckbox":
+        {
+            "expression": "subPanelContext.isShared.dbValue === true || subPanelContext.isShared.dbValue === 'true'"
+        },
+        "protectedCheckbox":
+        {
+            "expression": "subPanelContext.isProtected.dbValue === true || subPanelContext.isProtected.dbValue === 'true'"
+        },
+        "isNewTabSelected":
+        {
+            "expression": "ctx.elementEffectivity.selectedPanel == 'NEW'"
+        },
+        "isSearchTabSelected": {
+            "expression": "ctx.elementEffectivity.selectedPanel == 'SEARCH'"
+        },
+        "isEndDateGreaterThanStartDate":
+        {
+            "expression": "data.endDate.dbValue > data.startDate.dbValue"
+        },
+        "isEqualDate": {
+            "expression": "(data.endDate.dateApi.dateValue !== '' && data.startDate.dateApi.dateValue !== '' ) && (data.endDate.dbValue - data.startDate.dbValue) === 0"
+        },
+        "isValidStartAndEndDate": {
+            "expression": "!conditions.dateOrUnitEffectivityTypeRadioButton || (data.startDate.dateApi.dateValue !== '' && !data.startDate.error && (data.endDateOptions.dbValue !== 'Date' || (data.endDate.dateApi.dateValue !== '' && !data.endDate.error && conditions.isEndDateGreaterThanStartDate && !conditions.isEqualDate)))"
+        },
+        "isUnitValueChanged": {
+            "expression": "data.unitRangeText.dbValue",
+            "trackValues": true
+        },
+        "dateOrUnitEffectivityTypeRadioButton": {
+            "expression": "data.dateOrUnitEffectivityTypeRadioButton.dbValue",
+            "trackValues": true
+        },
+        "isValidUnit": {
+            "expression": "conditions.dateOrUnitEffectivityTypeRadioButton || (data.unitRangeText.dbValue && !conditions.isValidUnitRange && !conditions.isUnitPositive && !conditions.isTooLarge && !conditions.isBadSyntax)"
+        },
+        "isValidUnitRange": {
+            "expression": "!data.isUnitRangeValid"
+        },
+        "isUnitPositive": {
+            "expression": "!data.isPositiveNumber"
+        },
+        "isTooLarge": {
+            "expression": "data.isTooLarge"
+        },
+        "isBadSyntax": {
+            "expression": "data.isBadSyntax"
+        },
+        "isValidEffectivityPanel":
+        {
+            "expression": "(!data.isShared.dbValue || data.nameBox.dbValue ) && ( data.dateOrUnitEffectivityTypeRadioButton.dbValue || data.endItemVal.uiValue ) && conditions.isValidUnit && conditions.isValidStartAndEndDate"
+        },
+        "isRevisionEffectivity": {
+            "expression": "data.flag.dbValue === 'AUTHORREVISION'"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "authorEffectivities.updateEndItemValue",
+            "action": "updateEndItemValue"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "criteria": {
+                "condition": "conditions.isUnitValueChanged"
+            },
+            "action": "validateUnitValue"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "condition": "condition==='conditions.dateOrUnitEffectivityTypeRadioButton' && data.flag.dbValue === 'EDIT' && data.isProtected.dbValue && data.dateOrUnitEffectivityTypeRadioButton.dbValue && (oldValue === true || oldValue === false)",
+            "message": "showNotificationMessageForUnit"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "condition": "condition==='conditions.dateOrUnitEffectivityTypeRadioButton' && data.flag.dbValue === 'EDIT' && data.isProtected.dbValue && !data.dateOrUnitEffectivityTypeRadioButton.dbValue && (oldValue === true || oldValue === false)",
+            "message": "showNotificationMessageForDate"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "condition": "condition==='conditions.dateOrUnitEffectivityTypeRadioButton' && oldValue === true || oldValue === false",
+            "action": "setClearUnitEffectivity"
+        },
+        {
+            "eventId": "releaseStatusUpdatedByEffectivityEvent",
+            "action":  "refreshSelectedObject",
+            "criteria": {
+                "data.activeView": "Awb0AceEffectivity"
+            }
+        }
+    ],
+    "functions": {
+        "getEffectivityName": {
+            "functionName": "getEffectivityName",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getDateRangeText": {
+            "functionName": "getDateRangeText",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "messages":
+    {
+        "failedToApplyEffectivityMessage":
+        {
+            "messageType": "INFO",
+           "messageText": "{{i18n.failedToApplyEffectivity}}",
+           "messageTextParams":
+           [
+               "{{ctx.selected.props.awb0Name.dbValue}}"
+           ]
+        },
+        "duplicateEffectivityCreationErrorMessage":{
+           "messageType": "ERROR",
+           "messageText": "{{i18n.duplicateEffectivityCreationErrorMessage}}",
+           "messageTextParams":
+           [
+               "{{data.nameBox.dbValue}}"
+           ]
+        },
+        "failedToSaveEffectivityMessage":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.failedToSaveEffectivityMessage}}"
+        },
+        "succsessfullyAddedEffectivityMessage":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.effectivitesSuccessfullyApplied}}",
+            "messageTextParams":
+            [
+                "{{ctx.mselected.length}}"
+            ]
+        },
+        "addFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.genericServerError}}",
+            "messageTextParams": [
+                "{{data.effResp.ServiceData.partialErrors[0].errorValues[0].message}}"
+            ]
+        },
+         "showNotificationMessageForUnit": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.notiMessageForProtectedEffUnit}}",
+            "navigationOptions": [
+                {
+                    "option": "Ok",
+                    "text": "{{i18n.okText}}"
+                }
+            ]
+        },
+        "showNotificationMessageForDate": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.notiMessageForProtectedEffDate}}",
+            "navigationOptions": [
+                {
+                    "option": "Ok",
+                    "text": "{{i18n.okText}}"
+                }
+            ]
+        }
+    }
+}

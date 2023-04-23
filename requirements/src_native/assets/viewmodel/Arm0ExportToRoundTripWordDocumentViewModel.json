@@ -1,0 +1,594 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/enable-when.directive",
+        "js/visible-when.directive"
+
+    ],
+    "data": {
+        "fieldLabel": {
+            "displayName": "{{i18n.fieldLabel}}"
+        },
+        "exportType": {
+            "type": "STRING",
+            "vertical": true,
+            "dbValue": "readOnly",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "exportTypeValues": {
+            "type": "STRING",
+            "dbValue": [ {
+                    "propDisplayValue": "{{i18n.readOnlyLabel}}",
+                    "propInternalValue": "readOnly"
+                },
+                {
+                    "propDisplayValue": "{{i18n.editableLabel}}",
+                    "propInternalValue": "editable"
+                }
+            ]
+        },
+        "withoutComment": {
+            "displayName": "{{i18n.withoutCommentLabel}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "includeParagraphNumbering": {
+            "displayName": "{{i18n.includeParagraphNumberingLabel}}",
+            "dbValue": true,
+            "type": "BOOLEAN",
+            "dispValue": "{{i18n.includeParagraphNumberingLabel}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "isLockBodyContent":{
+            "displayName": "{{i18n.LockReqContent}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "{{i18n.LockReqContent}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "isIncludeTOC":{
+            "displayName": "{{i18n.includeTOC}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "{{i18n.includeTOC}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "idForObjects": {
+            "displayName": "{{i18n.id}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "{{i18n.id}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "severityOfRule": {
+            "displayName": "{{i18n.severitylabel}}",
+            "dbValue": true,
+            "type": "BOOLEAN",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "configurationSetting": {
+            "displayName": "{{i18n.configurationSettingLabel}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "filterBoxForType": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "requiredText": "{{i18n.filter}}",
+            "dbValue": ""
+        },
+        "objectTypeList": {
+            "type": "STRING",
+            "dbValue": [ {
+                "propDisplayValue": "Requirement Specification",
+                "dispValue": "",
+                "propInternalValue": "RequirementSpec"
+            } ]
+        },
+        "objectType": {
+            "displayName": "{{i18n.objectType}}",
+            "type": "STRING",
+            "hasLov": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "headerFooterList": {
+            "type": "STRING",
+            "dbValue": [ {
+                "propDisplayValue": "",
+                "dispValue": "",
+                "propInternalValue": ""
+            } ]
+        },
+        "headerFooter": {
+            "displayName": "{{i18n.headerFooterTemplate}}",
+            "type": "STRING",
+            "hasLov": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "exportOption": {
+            "displayName": "{{i18n.properties}}",
+            "vertical": true,
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "export_as_seen",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "exportOptionValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.export_as_seen}}",
+                    "propInternalValue": "export_as_seen"
+                },
+                {
+                    "propDisplayValue": "{{i18n.export_properties}}",
+                    "propInternalValue": "export_properties"
+                }
+            ]
+        }
+
+    },
+    "actions": {
+        "updateCtxAndExportToWord":
+        {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "isExportToWordRoundTripEventProgressing",
+                "value": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "Arm0ReuseRequirement.GenerateRoundTripWordDocument"
+                    }
+                ]
+            },
+            "deps": "js/appCtxService"
+        },
+        "unregisterExportCmdContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isExportToWordRoundTripEventProgressing"
+            }
+        },
+        "reveal": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AwReqMgmtSe-2019-12-SpecNavigation",
+            "method": "getSpecificationMetadata",
+            "inputData": {
+                "input": {
+                    "inputCtxt": "{{function:getInputContext}}",
+                    "selectedObjects": [ "{{function:getTopSelectedObjects}}" ],
+                    "typePropMap": {},
+                    "options": []
+                }
+            },
+            "outputData": {
+                "getSpecificationMetadataResponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "Arm0ExportToRoundTripWordDocument.setSpecificationMetadata"
+                },
+                {
+                    "name": "Arm0ExportToRoundTripWordDocument.fetchHeaderFooterTemplates"
+                }
+             ]
+            },
+            "deps": "js/requirementsACEUtils"
+        },
+        "fetchHeaderFooterTemplates": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "inflateProperties": true,
+                "searchInput": {
+                    "maxToLoad": 150,
+                    "maxToReturn": 150,
+                    "providerName": "Awp0SavedQuerySearchProvider",
+                    "searchCriteria": {
+                        "queryName": "Item Revision...",
+                        "searchID": "TRANSL_OFFICE_QUERY",
+                        "typeOfSearch": "ADVANCED_SEARCH",
+                        "utcOffset": "0",
+                        "lastEndIndex": "0",
+                        "object_name": "*",
+                        "Type": "Arm0HeaderFooterRevision"
+                    },
+                    "attributesToInflate": [
+                        "object_name",
+                        "body_text",
+                        "arm0IsGlobal",
+                        "owning_user",
+                        "owning_group"
+                    ],
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap6": {},
+                    "searchSortCriteria": [],
+                    "startIndex": 0
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}"
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name":"Arm0ExportToRoundTripWordDocument.initHeadeFooterList"
+                       }
+                 ]
+            },
+
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+
+        "initHeadeFooterList": {
+            "actionType": "JSFunction",
+            "method": "initHeadeFooterList",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "CreateTracelink.refreshTracelinkedItemList"
+                } ]
+            },
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+        "updateObjectTypeList": {
+            "actionType": "JSFunction",
+            "method": "updateObjectTypeList",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+        "activateExportToWordDocumentPanel": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Arm0ExportToRoundTripWordDocument",
+                "location": "aw_toolsAndInfo"
+            }
+        },
+        "generateRoundTripWordDocument": {
+
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "progress.start"
+                    },
+                    {
+                        "name": "Arm0ExportToRoundTripWordDocument.loadContentFromServer"
+                    }
+                ]
+            }
+        },
+        "loadContentFromServer": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2019-12-SpecNavigation",
+            "method": "getSpecificationContents",
+            "inputData": {
+                "inputData": "{{function:getSpecificationContentInput}}"
+            },
+            "outputData": {
+                "content": "{{function:processResponseOfSpecNavigation}}"
+            },
+
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+        "exportToWord": {
+
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{function:getMicroserviceURL}}",
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "data": {
+                        "htmlContents": "{{data.htmlContents}}",
+                        "exportAsPDF": "false",
+                        "exportType": "{{data.exportType.dbValue}}",
+                        "includeComments": "{{data.withoutComment.dbValue}}",
+                        "markupObjects": "{{data.markUpData}}",
+                        "exportMode": "{{data.exportOption.dbValue}}",
+                        "includeParagraphNumbering": "{{data.includeParagraphNumbering.dbValue}}",
+                        "headerFooter": "{{data.headerFooterData}}",
+                        "isLockBodyContent":"{{data.isLockBodyContent.dbValue}}",
+                        "isIncludeTOC":"{{data.isIncludeTOC.dbValue}}",
+                        "tocLabel":"{{data.i18n.tableOfContents}}"
+                    }
+                }
+            },
+            "events": {
+                "success": [ {
+                        "name": "progress.end"
+                    },
+                    {
+                        "name": "Arm0ExportToRoundTripWordDocument.unregisterExportCmdContext"
+                    },
+                    {
+                        "name": "Arm0ExportToRoundTripWordDocument.activateExportToWordDocumentPanel"
+                    }
+                ],
+                "failure": [ {
+                        "name": "progress.end"
+                    },
+                    {
+                        "name": "Arm0ExportToRoundTripWordDocument.unregisterExportCmdContext"
+                    },
+                    {
+                        "name": "Arm0ExportToRoundTripWordDocument.activateExportToWordDocumentPanel"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "ExportFailedError"
+                } ]
+            },
+            "outputData": {
+                "searchTCObjects": "{{function:processResponse}}"
+            },
+            "deps": "js/Arm0RequirementDocumentationACE"
+        },
+        "getPropertiesFromReqType": {
+            "actionType": "JSFunction",
+            "method": "resetTypePropertiesFilter",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Arm0ExportToRoundTripWordDocument.refreshdataProviderForTypeProperties"
+                } ]
+            },
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+
+        "refreshdataProviderForTypeProperties": {
+            "actionType": "dataProvider",
+            "method": "dataProviderForTypeProperties"
+        },
+        "actionFilterListForType": {
+            "actionType": "JSFunction",
+            "method": "actionFilterListForType",
+            "inputData": {
+                "data": "{{data}}",
+                "subType": "{{data.objectType.dbValue}}"
+            },
+
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+        "setSpecificationMetadata": {
+            "actionType": "JSFunction",
+            "method": "setSpecificationMetadata",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Arm0ExportToRoundTripWordDocument.updateObjectTypeList"
+                } ]
+            },
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Arm0ExportToRoundTripWordDocument.exportToWord",
+            "action": "exportToWord"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.activateExportToWordDocumentPanel",
+            "action": "activateExportToWordDocumentPanel"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.loadContentFromServer",
+            "action": "loadContentFromServer"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.refreshdataProviderForTypeProperties",
+            "action": "refreshdataProviderForTypeProperties"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.setSpecificationMetadata",
+            "action": "setSpecificationMetadata"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.updateObjectTypeList",
+            "action": "updateObjectTypeList"
+        },
+        {
+            "eventId":"Arm0ExportToRoundTripWordDocument.fetchHeaderFooterTemplates",
+            "action":"fetchHeaderFooterTemplates"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.initHeadeFooterList",
+            "action": "initHeadeFooterList"
+        },
+        {
+            "eventId": "Arm0ReuseRequirement.GenerateRoundTripWordDocument",
+            "action": "generateRoundTripWordDocument"
+        },
+        {
+            "eventId": "Arm0ExportToRoundTripWordDocument.unregisterExportCmdContext",
+            "action": "unregisterExportCmdContext"
+        }
+
+
+    ],
+
+    "dataProviders": {
+        "dataProviderForTypeProperties": {
+            "action": "actionFilterListForType",
+            "response": "{{data.typePropertiesToSelect}}",
+            "totalFound": "{{data.typePropertiesToSelect.length}}",
+            "deps": "js/Arm0ImportFromOffice"
+        }
+    },
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getMicroserviceURL": {
+            "functionName": "getMicroserviceURL",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ],
+            "deps": "js/Arm0RequirementDocumentationACE"
+
+        },
+        "getSpecificationContentInput": {
+            "functionName": "getSpecificationContentInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ],
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+
+        },
+        "processResponse": {
+            "functionName": "processResponse",
+            "deps": "js/Arm0RequirementDocumentationACE"
+        },
+        "processResponseOfSpecNavigation": {
+            "functionName": "processResponseOfSpecNavigation",
+            "deps": "js/Arm0ExportToRoundTripWordDocument"
+        },
+        "getInputContext": {
+            "functionName": "getInputContext"
+        },
+        "getTopSelectedObjects": {
+            "functionName": "getTopSelectedObject",
+            "parameters": [ "{{ctx}}" ]
+        }
+    },
+    "conditions": {
+
+        "visibleExportPropertyOption": {
+            "expression": "data.exportOption.dbValue === 'export_properties'"
+        }
+    },
+    "i18n": {
+        "exportToOfficeTitle": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "exportPanelTitle": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "id": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "configurationSettingLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "withoutCommentLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "includeParagraphNumberingLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "fieldLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "readOnlyLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "editableLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "ExportFailedError": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "export_as_seen": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "export_properties": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "export_options": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "objectType": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "properties":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "headerFooterTemplate":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "LockReqContent":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "MicroserviceInstallationError":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "includeTOC":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "tableOfContents":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "filter": [
+            "RichTextEditorCommandPanelsMessages"
+        ]
+    },
+    "messages": {
+        "RequestFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.requestFailureMsg}}"
+        },
+        "ExportFailedError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.MicroserviceInstallationError}}",
+            "messageTextParams": [
+                "{{data.i18n.exportToOfficeTitle}}"
+            ]
+        }
+    }
+}

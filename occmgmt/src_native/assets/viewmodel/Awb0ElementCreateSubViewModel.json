@@ -1,0 +1,153 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-xrt.directive",
+        "js/aw-numeric.directive",
+        "js/aw-command-sub-panel.directive"
+    ],
+    "data": {
+        "numberOfOccurrences": {
+            "displayName": "{{i18n.numberOfElements}}",
+            "type": "INTEGER",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": 1,
+            "dispValue": 1,
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "validationCriteria": [ {
+                "condition": "!conditions.areNumberOfOccurrencesValid",
+                "value": "{{i18n.invalidNoOfElements}}"
+            } ]
+        }
+    },
+    "actions": {
+        "addPropertiesAndSetCreateInputContext": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "addProperties"
+                },
+                {
+                    "action": "setElementCreateInput"
+                },
+                {
+                    "action": "setNumberOFElements"
+                },
+                {
+                    "action": "setCreateInputContextSuccess"
+                }
+            ]
+        },
+
+        "addProperties": {
+            "actionType": "JSFunction",
+            "method": "getCreateInput",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "elementCreateInput": ""
+            },
+            "deps": "js/addObjectUtils"
+        },
+
+        "setElementCreateInput": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.addElement.elementCreateInput",
+                "value": "{{data.elementCreateInput}}"
+            },
+            "deps": "js/appCtxService"
+        },
+
+        "setNumberOFElements": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.addElement.numberOfElements",
+                "value": "{{data.numberOfOccurrences}}"
+            },
+            "deps": "js/appCtxService"
+        },
+
+        "setCreateInputContextSuccess": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "setCreateInputContextSuccess",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+
+        "initializePanelProperties": {
+            "actionType": "JSFunction",
+            "method": "initializePanelProperties",
+            "inputData": {
+                "value": "{{data}}"
+            },
+            "deps": "js/addElementService"
+        },
+
+        "initializePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.addElement.Awb0ElementCreateSubView",
+                "value": true
+            },
+            "deps": "js/appCtxService",
+            "events": {
+                "success": [{
+                    "name": "awb0Element.initializePanelProperties"
+                }]
+            }
+        },
+
+        "teardownPanel": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.addElement.Awb0ElementCreateSubView",
+                "value": false
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awb0Element.addElementProperties",
+            "action": "addPropertiesAndSetCreateInputContext"
+        },
+        {
+            "eventId": "awb0Element.resetCreateInputPropertiesToDefault",
+            "action": "initializePanelProperties"
+        },
+        {
+            "eventId": "awb0Element.initializePanelProperties",
+            "action": "initializePanelProperties"
+        }
+    ],
+    "conditions": {
+        "areNumberOfOccurrencesValid": {
+            "expression": "data.numberOfOccurrences.dbValue>=1 && data.numberOfOccurrences.dbValue<=10000"
+        },
+        "areElementPropertiesSupported": {
+            "expression": "!(ctx.getClipboardProvider.selectedObjects[0].modelType && ctx.getClipboardProvider.selectedObjects[0].modelType.typeHierarchyArray.indexOf('Awb0Element') > -1)"
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "initializePanel",
+        "onMount": "initializePanelProperties",
+        "onUnmount": "teardownPanel"
+    },
+    "i18n": {
+        "numberOfElements": [
+            "OccurrenceManagementConstants"
+        ],
+        "invalidNoOfElements": [
+            "OccurrenceManagementMessages"
+        ]
+    }
+}

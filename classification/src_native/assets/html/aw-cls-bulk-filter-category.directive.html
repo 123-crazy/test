@@ -1,0 +1,33 @@
+<div class="aw-ui-filterCategory" title="{{category.displayName}}">
+    <!--      display expand/collapse icons only when needed -->
+    <aw-icon title="{{category.expand ? collapse : expand}}" aw-class="category.expand ? 'aw-search-filterCategoryLabelExpand' : 'aw-search-filterCategoryLabelCollapse' " icon-id="{{category.expand ? 'miscExpand' : 'miscCollapse'}}" ng-click="toggleExpansionSwitch()" exist-when="category.showExpand">
+    </aw-icon>
+
+    <div class="aw-ui-filterCategoryLabel" aw-class="{'aw-ui-filterCategoryLabelEnabled': category.showEnabled && category.type !== 'ObjectFilter' && !isBulkFilter}" ng-click="select($event)" category-action="categoryAction">
+        {{category.displayName}}
+    </div>
+
+    <div exist-when="category.expand">
+        <aw-cls-bulk-filter-category-string-filter exist-when="category.showStringFilter" expand-collapse-Action="selectCategory2" category="category" filter-action="filterAction" add-action="addAction" checkbox-action="checkboxAction" is-bulk-filter="isBulkFilter" search-action="searchAction">
+        </aw-cls-bulk-filter-category-string-filter>
+    </div>
+    <div exist-when="category.expand">
+        <aw-cls-filter-category-date-filter exist-when="category.showDateFilter" category="category" filter-action="filterAction" checkbox-action="checkboxAction" is-bulk-filter="isBulkFilter" search-action="searchAction">
+        </aw-cls-filter-category-date-filter>
+    </div>
+    <div exist-when="category.expand">
+        <aw-cls-bulk-filter-category-numeric-filter exist-when="category.showNumericFilter" category="category" filter-action="filterAction" checkbox-action="checkboxAction" is-bulk-filter="isBulkFilter" search-action="searchAction">
+        </aw-cls-bulk-filter-category-numeric-filter>
+    </div>
+    <div exist-when="category.expand">
+        <aw-hierarchical-navigation exist-when="category.type === 'ObjectFilter'" parentnodes="category.filterValues.parentnodes" childnodes="category.filterValues.childnodes" displaynameprop="'stringDisplayValue'" tooltipprop="'stringDisplayValue'" displaycountprop="'count'" maxchildrentoshow="5" action="searchAction">
+        </aw-hierarchical-navigation>
+    </div>
+    <div exist-when="category.expand">
+        <aw-filter-category-toggle-filter exist-when="category.showRadioFilter" category="category" filter-action="filterAction" search-action="searchAction">
+        </aw-filter-category-toggle-filter>
+    </div>
+    <div aw-transclude exist-when="category.expand" class="aw-ui-filterCategorySearchBoxWidget">
+        <!-- insert custom code -->
+    </div>
+</div>

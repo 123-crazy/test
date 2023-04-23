@@ -1,0 +1,61 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/visible-when.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+
+    "actions":
+    {
+        "addProcessReferences": {
+            "actionType": "JSFunction",
+            "method": "addProcessAttachments",
+            "inputData": {
+                "data": "{{data.dataProviders.attachReferences}}",
+                "selectedObj": "{{data.sourceObjects}}",
+                "ctx": "{{ctx}}",
+                "dataSrc": "{{data}}"
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+        }
+    },
+    "functions":
+    {
+    },
+
+    "conditions":
+    {
+        "isPaletteSearchTabAddButtonVisibleReferences":{
+            "expression": "(data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0 || ctx.getRecentObjsProvider.selectedObjects.length > 0)) || (data.selectedTab.panelId==='resultsTabPageSub'  && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0)"
+        }
+    },
+
+    "data":
+    {
+
+    },
+    "dataProviders": {
+        "attachReferences":{
+            "response": "{{ctx.workflow_process_references.workFlowObjects}}",
+            "totalFound": "{{ctx.workflow_process_references.workFlowObjects.length}}",
+            "totalLoaded": "{{ctx.workflow_process_references.workFlowObjects.length}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "onEvent":
+   [
+
+   ],
+    "i18n":
+    {
+        "Add_Title": [ "WorkflowCommandPanelsMessages" ],
+        "multipleCheckedOutError": ["WorkflowCommandPanelsMessages"],
+        "singleCheckedOutError": ["WorkflowCommandPanelsMessages"]
+    }
+
+}

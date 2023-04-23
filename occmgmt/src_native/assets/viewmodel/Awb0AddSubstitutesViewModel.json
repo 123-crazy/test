@@ -1,0 +1,379 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-form.directive",
+        "js/aw-add.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "awb0pincommands": "awb0_oneStepPinCommands"
+    },
+    "actions": {
+        "getInfoForSubstituteElementAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceManagement",
+            "method": "getInfoForAddElement3",
+            "inputData": {
+                "getInfoForElementIn": {
+                    "fetchAllowedOccRevTypes": false,
+                    "parentElement": {
+                        "uid":"{{function:getParentElementUid}}"
+                    }
+                }
+            },
+            "outputData": {
+                "allowedTypeInfo": "{{function:extractAllowedTypesInfoFromResponse}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addSubstitute.getItemRevOfSelectedElement"
+                    }
+                ]
+            },
+            "deps": "js/substitutesService"
+        },
+
+        "getItemFromItemRevAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": [
+                    {
+                        "uid" : "{{ctx.aceActiveContext.context.selectedModelObjects[0].props.awb0Archetype.dbValues[0]}}"
+                    }
+                ],
+                "attributes": [
+                    "items_tag"
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "{{data.itemrev.type}}",
+                        "properties": [
+                            {
+                                "name": "items_tag"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "preferredBo":"{{function:getSelectedItem}}"
+            },
+            "deps": "js/substitutesService"
+        },
+        "getItemRevOfSelectedElement": {
+            "actionType": "JSFunction",
+            "method": "getObject",
+            "inputData": {
+                "uid": "{{ctx.aceActiveContext.context.selectedModelObjects[0].props.awb0Archetype.dbValues[0]}}"
+            },
+            "outputData": {
+                "itemrev" : ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "getItemFromItemRev"
+                    }
+                ]
+            },
+            "deps": "soa/kernel/clientDataModel"
+        },
+        "createSubstitute": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "processAddSubstitutesInput"
+                    },
+                    {
+                        "name": "addSubstitute.updateRecentUsedTypes"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "addSubstituteFailure"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+
+            "deps": "js/autoAssignService"
+        },
+        "addSubstitute": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2018-05-OccurrenceManagement",
+            "method": "addSubstitutes",
+            "inputData": {
+                "inputData": {
+                    "element": {
+                        "uid": "{{ctx.aceActiveContext.context.selectedModelObjects[0].uid}}",
+                        "type": "{{ctx.aceActiveContext.context.selectedModelObjects[0].type}}"
+                    },
+                    "substitutesToBeAdded": "{{data.substitutesToBeAdded}}"
+                }
+            },
+            "outputData": {
+                "partialErrors": "partialErrors",
+                "plain": "plain",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relations": "",
+                            "relatedModified": [
+                                "{{ctx.aceActiveContext.context.selectedModelObjects[0]}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!_internal.conditionStates.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "addSubstitute.clearDataAndLoadNextValues",
+                        "condition": "_internal.conditionStates.isPanelPinned"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relations": "",
+                            "relatedModified": [
+                                "{{ctx.aceActiveContext.context.selectedModelObjects[0]}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!_internal.conditionStates.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "addSubstituteMultipleFailureMessage",
+                        "condition": "data.substitutes.length > 1  && data.plain.length > 0"
+                    },
+                    {
+                        "message": "addSubstituteFailure"
+                    }
+                ]
+            },
+            "deps": "js/substitutesService"
+        },
+        "processAddSubstitutesInput": {
+            "actionType": "JSFunction",
+            "method": "processAddSubstitutesInput",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/substitutesService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "condition": "!conditions.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "awb0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "awb0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "clearDataAndLoadNextValues": {
+            "actionType": "JSFunction",
+            "method": "clearCreatedElementField",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "awPanel.loadNextValues"
+                    }
+                ]
+            },
+            "deps": "js/addElementService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "getInfoForSubstituteElementAction"
+    },
+    "onEvent": [
+        {
+            "eventId": "getItemFromItemRev",
+            "action": "getItemFromItemRevAction"
+        },
+        {
+            "eventId": "processAddSubstitutesInput",
+            "action": "processAddSubstitutesInput"
+        },
+        {
+            "eventId": "addSubstitute",
+            "action": "addSubstitute"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "addChildElement.awb0SetPin",
+            "cacheEventData": true,
+            "action": "awb0SetPin"
+        },
+        {
+            "eventId": "addChildElement.awb0SetUnPin",
+            "cacheEventData": true,
+            "action": "awb0SetUnPin"
+        },
+        {
+            "eventId": "addSubstitute.clearDataAndLoadNextValues",
+            "action": "clearDataAndLoadNextValues"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        },
+        {
+            "eventId":"addSubstitute.getItemRevOfSelectedElement",
+            "action": "getItemRevOfSelectedElement"
+        }
+    ],
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{allowedTypeInfos}}"
+            ]
+        },
+        "extractAllowedTypesInfoFromResponse": {
+            "functionName": "extractAllowedTypesInfoFromResponse",
+            "parameters": []
+        },
+        "getSelectedItem": {
+            "functionName": "getSelectedItem",
+            "parameters": [
+            ]
+        },
+        "getParentElementUid":{
+            "functionName": "getParentElementUid",
+            "parameters": [
+            ]
+        }
+    },
+    "conditions": {
+        "shouldShowAddOnNewTab": {
+            "expression": "data.selectedTab.panelId==='newTabPageSub' && data.creationType"
+        },
+        "shouldShowAddOnPaletteTab": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "shouldShowAddOnSearchTab": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        },
+        "isPanelPinned": {
+            "expression": "data.pinnedToForm.dbValue === false"
+        }
+    },
+    "messages": {
+        "addSubstituteMultipleFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.addSubstituteMultipleFailureMessage}}",
+            "messageTextParams": [
+                "{{data.plain.length}}",
+                "{{data.substitutes.length}}",
+                "{{data.errorMessage}}"
+            ]
+        },
+        "addSubstituteFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "addElementBtn": [
+            "OccurrenceManagementConstants"
+        ],
+        "addSubstituteMultipleFailureMessage": [
+            "OccurrenceManagementMessages"
+        ]
+    }
+}

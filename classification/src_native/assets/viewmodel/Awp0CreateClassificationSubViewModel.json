@@ -1,0 +1,991 @@
+{
+  "schemaVersion": "1.0.0",
+  "imports":
+  [
+    "js/aw-button.directive",
+    "js/aw-class.directive",
+    "js/aw-click.directive",
+    "js/aw-cls-properties.directive",
+    "js/aw-command-panel-section.directive",
+    "js/aw-hierarchical-navigation.directive",
+    "js/aw-i18n.directive",
+    "js/aw-image.directive",
+    "js/aw-message-params.directive",
+    "js/aw-panel-body.directive",
+    "js/aw-panel-footer.directive",
+    "js/aw-repeat.directive",
+    "js/aw-search-box.directive",
+    "js/exist-when.directive",
+    "js/visible-when.directive"
+  ],
+
+  "actions":
+  {
+    "clearAllProperties": {
+        "actionType": "JSFunction",
+        "method":"clearAllProperties",
+        "inputData": {
+            "data": "{{data}}"
+        },
+        "deps": "js/classifyPanelService"
+    },
+    "checkForInvalidSearch":{
+      "actionType": "JSFunction",
+      "method": "checkForInvalidSearch",
+      "inputData":
+      {
+          "data": "{{data}}",
+          "eventName": "classifyPanel.doSearch"
+      },
+      "actionMessages":
+      {
+          "failure":
+          [
+              {
+                  "message": "NotAllowedSearchMessage"
+              }
+          ]
+      },
+      "deps": "js/classifyService"
+    },
+    "edit":
+    {
+      "actionType": "JSFunction",
+      "method": "editMode",
+      "inputData":
+      {
+        "data": "{{data}}"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "navigateToView":
+    {
+      "actionType": "JSFunction",
+      "method": "setIsAlreadyPrompted",
+      "inputData":
+      {
+        "data": "{{data}}"
+      },
+
+      "events":
+      {
+        "success":
+        [
+          {
+            "name": "awPanel.navigate",
+            "eventData":
+            {
+              "destPanelId": "Awp0ViewClassificationSub"
+            }
+          }
+        ]
+      },
+      "deps": "js/classifyService"
+    },
+
+    "mandatoryPropValidation": {
+        "actionType": "JSFunction",
+        "method": "onSaveButtonValidation",
+        "inputData": {
+            "data": "{{data}}"
+        },
+        "outputData": {
+            "results": ""
+        },
+        "events": {
+            "success": [
+                {
+                    "name": "classifyPanel.performSaveEdits",
+                    "condition": "data.results.isValidtoSave && data.results.iskeyValid && data.results.isInRange && data.results.isValidValue && data.panelMode === 1 "
+                },
+                {
+                    "name": "classifyPanel.performClassifyAndView",
+                    "condition": "data.results.isValidtoSave && data.results.iskeyValid && data.results.isInRange && data.results.isValidValue && data.panelMode === 0 "
+                },
+                {
+                    "name": "classifyPanel.showComplexMinMaxError",
+                    "condition": "data.results.isValidMinMax === false"
+                },
+                {
+                    "name": "classifyPanel.showComplexNominalError",
+                    "condition": "data.results.isValidNominal === false"
+                },
+                {
+                    "name": "classifyPanel.showComplexTypicalError",
+                    "condition": "data.results.isValidTolerance === false"
+                },
+                {
+                    "name": "classifyPanel.showComplexEmptyFieldsError",
+                    "condition": "data.results.isAllComplexFilled === false"
+                },
+                {
+                    "name": "classifyPanel.showError",
+                    "condition": "!data.results.isValidtoSave && !( data.results.iskeyValid === false || data.results.isInRange === false || data.results.isValidValue == false || data.results.isValidMinMax === false || data.results.isValidTolerance === false || data.results.isAllComplexFilled === false || data.results.isValidNominal === false )"
+                },
+                {
+                    "name": "classifyPanel.showInValidKeyError",
+                    "condition": "data.results.iskeyValid === false"
+                },
+                {
+                    "name": "classifyPanel.showOutOfRangeError",
+                    "condition": "data.results.isInRange === false"
+                },
+                {
+                    "name": "classifyPanel.showInvalidValueError",
+                    "condition": "data.results.isValidValue === false"
+                }
+            ]
+        },
+        "deps": "js/classifyFullViewService"
+    },
+
+    "saveEdits":
+    {
+      "actionType": "TcSoaService",
+      "serviceName": "Internal-IcsAw-2018-12-Classification",
+      "method": "saveClassificationObjects2",
+      "inputData":
+      {
+        "classificationObjects":
+        [
+          {
+            "clsObject": "{{data.ico}}",
+            "properties": "{{function:getClassProperties}}",
+            "blockDataMap": "{{function:getClassBlocks}}",
+            "workspaceObject":
+            {
+              "uid": "{{data.targetObjectForSelection[0].uid}}",
+              "type": "{{data.targetObjectForSelection[0].type}}"
+            }
+          }
+        ]
+      },
+
+      "events":
+      {
+        "success":
+        [
+          {
+            "name": "classifyPanel.navigateToView"
+          },
+          {
+            "name": "classifyPanel.fireEventsAfterCreateOperation"
+          },
+          {
+            "name": "classifyPanel.resetAttributesVisibleAndFireRefreshSecWorkAreaEvent"
+          },
+          {
+            "name": "cdm.relatedModified",
+            "eventData": {
+                "relatedModified": ["{{ctx.selected}}"],
+                "refreshLocationFlag" : true
+               }
+          }
+        ]
+      },
+
+      "actionMessages":
+      {
+        "failure":
+        [
+          {
+            "condition": "errorCode.code===71369",
+            "message": "createOrUpdateFailedMessage"
+          },
+
+          {
+            "condition": "errorCode.code===71061",
+            "message": "editObjectAccessPermissionErrorMessage"
+          },
+          {
+            "condition": "errorCode.code===71067 || errorCode.code===132606",
+            "message": "multipleClassificationInSameClassMessage"
+          },
+          {
+              "condition": "errorCode.code!==71067 && errorCode.code!==132606 && errorCode.code!==71369 && errorCode.code!==71061",
+              "message": "classifyAndViewFailure"
+          }
+        ]
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "search":
+    {
+      "actionType": "TcSoaService",
+      "serviceName": "Internal-IcsAw-2019-12-Classification",
+      "method": "findClassificationInfo3",
+      "inputData":
+      {
+        "workspaceObjects":
+        [
+
+        ],
+
+        "searchCriterias": "{{function:parseSearchString}}",
+        "classificationDataOptions": 1024
+      },
+
+      "outputData":
+      {
+        "classificationSearchResults": "{{function:formatSearchResults}}",
+        "classificationSearchResultsCount": "classes[0].length",
+        "hierarchyVisible": "false",
+        "attributesVisible": "false",
+        "selectedClass": "",
+        "advancedData": "false"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "searchEvent":
+    {
+      "actionType": "Event",
+      "method": "Event",
+      "inputData":
+      {
+        "events":
+        [
+          {
+            "name": "classifyPanel.checkForInvalid",
+            "condition": "conditions.searchInput"
+          },
+          {
+            "name": "classifyPanel.invalidSearchString",
+            "condition": "!conditions.searchInput"
+          }
+        ]
+      }
+    },
+
+    "searchResultSelected":
+    {
+      "actionType": "JSFunction",
+      "method": "searchResultSelected",
+      "inputData":
+      {
+        "data": "{{data}}"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "getAttributes":
+    {
+      "actionType": "JSFunction",
+      "method": "getAttributes",
+      "inputData":
+      {
+        "data": "{{data}}"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "convertValues":
+    {
+      "actionType": "JSFunction",
+      "method": "convertValues",
+      "inputData":
+      {
+        "data": "{{data}}"
+      },
+
+      "outputData":
+      {
+        "convertedValues": "convertedValues"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "fieldValidation":
+    {
+        "actionType": "JSFunction",
+        "method": "keyLovValidation",
+        "deps": "js/classifyService",
+        "inputData": {
+                "data" : "{{data}}"
+        },
+        "outputData": {
+                "isValidKeyLovData": ""
+        },
+        "events": {
+            "success": [  {
+                "name": "classifyPanel.propValidation",
+                "condition":"data.isValidKeyLovData.iskeyValid && data.panelMode === 0"
+            },
+            {
+                "name": "classifyPanel.showInvalidKeyLovMessage",
+                "condition":"!data.isValidKeyLovData.iskeyValid"
+            },
+            {
+                "name":"classifyPanel.propValidation",
+                "condition": "data.isValidKeyLovData.iskeyValid && data.panelMode === 1"
+            } ]
+        }
+    },
+
+
+    "classifyAndView":
+    {
+      "actionType": "TcSoaService",
+      "serviceName": "Internal-IcsAw-2018-12-Classification",
+      "method": "saveClassificationObjects2",
+      "inputData":
+      {
+        "classificationObjects": [ {
+            "clsObject": "",
+            "properties": "{{function:getClassProperties}}",
+            "blockDataMap": "{{function:getClassBlocks}}",
+            "workspaceObject": {
+                "uid": "{{data.targetObjectForSelection[0].uid}}",
+                "type": "{{data.targetObjectForSelection[0].type}}"
+            }
+        } ]
+        },
+        "outputData": {
+            "classifiedWorkspaceObjectID": "{{function:getClassifiedWorkspaceObjectID}}"
+        },
+
+
+      "events":
+      {
+        "success":
+        [
+          {
+            "name": "classifyPanel.navigateToView"
+          },
+          {
+            "name": "classifyPanel.fireEventsAfterCreateOperation"
+          },
+          {
+            "name": "classifyPanel.resetAttributesVisibleAndFireRefreshSecWorkAreaEvent"
+          },
+          {
+            "name": "cdm.relatedModified",
+            "eventData": {
+                "relatedModified": ["{{ctx.selected}}"],
+                "refreshLocationFlag" : true
+               }
+          }
+
+        ]
+      },
+
+      "actionMessages":
+      {
+        "success":
+        [
+          {
+            "message": "classifySuccessMessage"
+          }
+        ],
+
+        "failure":
+        [
+          {
+            "condition": "errorCode.code===71369",
+            "message": "createOrUpdateFailedMessage"
+          },
+
+          {
+            "condition": "errorCode.code===71061",
+            "message": "classifyObjectAccessPermissionErrorMessage"
+          },
+          {
+              "condition": "errorCode.code===71067 || errorCode.code===132606",
+              "message": "multipleClassificationInSameClassMessage"
+          },
+          {
+              "condition": "errorCode.code!==71067 && errorCode.code!==132606 && errorCode.code!==71369 && errorCode.code!==71061",
+              "message": "classifyAndViewFailure"
+          }
+        ]
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "classifyStandalone":
+    {
+      "actionType": "TcSoaService",
+      "serviceName": "Internal-IcsAw-2018-12-Classification",
+      "method": "saveClassificationObjects2",
+    "inputData": {
+        "classificationObjects": [
+            {
+                "clsObject": "{{data.clsObjTag}}",
+                "properties": "{{function:getClassProperties}}",
+                "blockDataMap": "{{function:getClassBlocks}}",
+                "workspaceObject": {
+                    "uid": "{{data.targetObjectForSelection[0].uid}}",
+                    "type": "{{data.targetObjectForSelection[0].type}}"
+                }
+            }
+        ]
+    },
+    "outputData": {
+        "classifiedWorkspaceObjectID": "{{function:getClassifiedWorkspaceObjectID}}"
+    },
+
+      "events":
+      {
+        "success":
+        [
+          {
+            "name": "classifyPanel.navigateToView"
+          },
+          {
+            "name": "classifyPanel.fireEventsAfterCreateOperation"
+          },
+          {
+            "name": "classifyPanel.resetAttributesVisibleAndFireRefreshSecWorkAreaEvent"
+          },
+          {
+            "name": "cdm.relatedModified",
+            "eventData": {
+                "relatedModified": ["{{ctx.selected}}"],
+                "refreshLocationFlag" : true
+               }
+          }
+
+        ],
+        "failure": [
+            {
+                "condition": "errorCode.code===132625 || errorCode.code===71740",
+                "message": "classifyAndViewFailure"
+            }
+        ]
+      },
+
+      "actionMessages":
+      {
+        "success":
+        [
+          {
+            "message": "classifySuccessMessage"
+          }
+        ],
+
+        "failure":
+        [
+          {
+            "condition": "errorCode.code===71369",
+            "message": "createOrUpdateFailedMessage"
+          }
+        ]
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "revealCreate":
+    {
+      "actionType": "JSFunction",
+      "method": "revealCreate",
+      "inputData":
+      {
+        "data": "{{data}}",
+        "ctx": "{{ctx}}"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+
+    "setViewMode":
+    {
+      "actionType": "JSFunction",
+      "method": "setViewMode",
+      "inputData":
+      {
+        "data": "{{data}}",
+        "isPanel": true
+      },
+
+      "deps": "js/classifyService"
+    },
+
+    "getHierarchy":
+    {
+      "actionType": "JSFunction",
+      "method": "detectNodeType",
+      "inputData":
+      {
+        "selectedNode": "{{selectedNode}}",
+        "data": "{{data}}"
+      },
+
+      "deps": "js/classifyPanelService"
+    },
+    "showHideMetric": {
+        "actionType": "JSFunction",
+        "method": "showHideMetricSystem",
+        "inputData":
+        {
+            "data": "{{data}}"
+        },
+        "deps": "js/classifyPanelService"
+    }
+  },
+
+  "data":
+  {
+    "selectedSearchResult":
+    {
+
+    },
+
+    "searchPlaceHolder":
+    {
+      "displayName": "",
+      "type": "STRING",
+      "dbValue": "{{i18n.searchPlaceholder}}"
+    },
+
+    "searchBox":
+    {
+      "displayName": "",
+      "type": "STRING"
+    },
+
+    "unitSystem":
+    {
+      "displayName": "{{i18n.unitSystemLabel}}",
+      "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+      "type": "BOOLEAN",
+      "isRequired": "true",
+      "propertyRadioTrueText": "{{i18n.unitSystemMetric}}",
+      "propertyRadioFalseText": "{{i18n.unitSystemNonMetric}}",
+      "dbValue": "{{data.unitSystem.dbValue}}"
+    },
+    "clearAllButton": {
+        "displayName": "{{i18n.Reset}}",
+        "type": "STRING",
+        "isRequired": "false",
+        "propertyLabelDisplay": "PROPERTY_LABEL_AT_RIGHT"
+    },
+    "classifyPropCommands": "classify_propPanelCommands"
+  },
+
+  "onEvent":
+  [
+    {
+      "eventId": "awPanel.reveal",
+      "criteria":
+      {
+        "panelId": "Awp0CreateClassificationSub"
+      },
+
+      "action": "revealCreate"
+    },
+
+    {
+      "eventId": "classifyPanel.displayView",
+      "action": "setViewMode"
+    },
+
+    {
+        "eventId": "classifyPanel.navigateToView",
+        "action": "navigateToView"
+    },
+
+    {
+      "eventId": "classifyPanel.fireEventsAfterCreateOperation",
+      "action": "submitToHostAction"
+    },
+    {
+      "eventId": "classifyPanel.doSearch",
+      "action": "search"
+    },
+    {
+      "eventId": "classifyPanel.checkForInvalid",
+      "action": "checkForInvalidSearch"
+    },
+    {
+        "eventId": "classifyPanel.invalidSearchString",
+        "message": "InvalidSearchStringLength"
+    },
+    {
+        "eventId": "classifyPanel.performClassifyAndView",
+        "action": "classifyAndView"
+    },
+    {
+        "eventId": "classifyPanel.showInvalidKeyLovMessage",
+        "message": "showInvalidKLErrorMsg"
+    },
+    {
+        "eventId":"classifyPanel.performSaveEdits",
+        "action":"saveEdits"
+    },
+    {
+        "eventId": "classifyPanel.propValidation",
+        "action": "mandatoryPropValidation",
+        "cacheEventData": true
+    },
+    {
+        "eventId": "classifyPanel.showError",
+        "message": "onSaveErrorMsg"
+    },
+    {
+        "eventId": "classifyPanel.showOutOfRangeError",
+        "message": "outOfRangeError"
+    },
+    {
+        "eventId": "classifyPanel.showInValidKeyError",
+        "message": "inValidKeyError"
+    },
+    {
+        "eventId": "classifyPanel.showComplexMinMaxError",
+        "message": "complexMinMaxError"
+    },
+    {
+        "eventId": "classifyPanel.showComplexNominalError",
+        "message": "complexNominalError"
+    },
+    {
+        "eventId": "classifyPanel.showComplexTypicalError",
+        "message": "complexTypicalError"
+    },
+    {
+        "eventId": "classifyPanel.showComplexEmptyFieldsError",
+        "message": "complexEmptyFieldsError"
+    },
+    {
+        "eventId": "classify.showHideMetric",
+        "cacheEventData": true,
+        "action": "showHideMetric"
+     },
+     {
+        "eventId": "classify.clearAllProps",
+        "action": "clearAllProperties"
+    }
+  ],
+
+  "functions":
+  {
+    "parseSearchString":
+    {
+      "functionName": "parseSearchString",
+      "parameters":
+      [
+        "{{data.searchBox.dbValue}}"
+      ]
+    },
+
+    "getChildren":
+    {
+      "functionName": "getChildren",
+      "parameters":
+      [
+
+      ]
+    },
+
+    "detectNodeType":
+    {
+      "functionName": "detectNodeType",
+      "parameters":
+      [
+        "{{selectedNode}}",
+        "{{data}}"
+      ]
+    },
+
+    "getClassProperties": {
+        "functionName": "getClassProperties",
+        "parameters": [
+            "{{data}}"
+        ]
+    },
+    "getClassBlocks": {
+        "functionName": "getClassBlocks",
+        "parameters": [
+            "{{data}}"
+        ]
+    },
+
+    "getUnitSystem":
+    {
+      "functionName": "getUnitSystem",
+      "parameters":
+      [
+        "{{data}}"
+      ]
+    },
+
+    "getConvertValuesRequest":
+    {
+      "functionName": "getConvertValuesRequest",
+      "parameters":
+      [
+        "{{data}}"
+      ]
+    },
+
+    "getRequest":
+    {
+      "functionName": "getRequest",
+      "parameters":
+      [
+        "{{ctx}}"
+      ]
+    },
+
+    "getClsObject":
+    {
+      "functionName": "getClsObject",
+      "parameters":
+      [
+        "{{data}}"
+      ]
+    }
+  },
+
+  "messages":
+  {
+    "NotAllowedSearchMessage":{
+      "messageType": "INFO",
+      "messageText": "{{i18n.NotAllowedSearch}}",
+      "messageTextParams": []
+    },
+    "InvalidSearchStringLength":{
+        "messageType": "INFO",
+        "messageText": "{{i18n.InvalidSearchStringLength}}",
+        "messageTextParams": [ ]
+    },
+    "nonStorageClassMessage":
+    {
+      "messageType": "INFO",
+      "messageText": "{{i18n.nonStorageClass}}",
+      "messageTextParams":
+      [
+        "{{data.selectedClass.name}}"
+      ]
+    },
+
+    "classifySuccessMessage":
+    {
+      "messageType": "INFO",
+      "messageText": "{{i18n.classifySuccess}}",
+      "messageTextParams":
+      [
+        "{{data.classifiedWorkspaceObjectID}}",
+        "{{data.selectedClass.className}}"
+      ]
+    },
+
+    "createOrUpdateFailedMessage":
+    {
+      "messageType": "ERROR",
+      "messageText": "{{i18n.createOrUpdateFailedError}}",
+      "messageTextParams":
+      [
+        "{{data.classTarget.cellHeader1}}"
+      ]
+    },
+
+    "multipleClassificationInSameClassMessage": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.multipleClassificationInSameClass}}",
+        "messageTextParams": [
+            "{{data.targetObjectForSelection[0].cellHeader1}}",
+            "{{data.selectedClass.className}}"
+        ]
+    },
+
+    "classifyObjectAccessPermissionErrorMessage":
+    {
+      "messageType": "ERROR",
+      "messageText": "{{i18n.classifyObjectAccessPermissionError}}",
+      "messageTextParams":
+      [
+        "{{data.targetObjectForSelection[0].cellHeader1}}"
+      ]
+    },
+
+    "editObjectAccessPermissionErrorMessage":
+    {
+      "messageType": "ERROR",
+      "messageText": "{{i18n.editObjectAccessPermissionError}}",
+      "messageTextParams":
+      [
+        "{{data.targetObjectForSelection[0].cellHeader1}}"
+      ]
+    },
+    "showInvalidKLErrorMsg":{
+        "messageType": "ERROR",
+        "messageText": "{{i18n.inValidKeyError}}",
+        "messageTextParams":[
+            "{{data.isValidKeyLovData.invalidAttr}}"
+        ]
+    },
+    "classifyAndViewFailure": {
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+    },
+    "outOfRangeError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.outOfRangeError}}",
+        "messageTextParams": [
+            "{{data.results.invalidRangeAttr}}"
+        ]
+    },
+    "complexMinMaxError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.outOfRangeError}}",
+        "messageTextParams": [
+            "{{data.results.invalidComplexAttr}}"
+        ]
+    },
+    "complexNominalError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.invalidValueError}}",
+        "messageTextParams": [
+            "{{data.results.invalidComplexAttr}}"
+        ]
+    },
+    "complexTypicalError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.invalidValueError}}",
+        "messageTextParams": [
+            "{{data.results.invalidComplexAttr}}"
+        ]
+    },
+    "complexEmptyFieldsError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.invalidValueError}}",
+        "messageTextParams": [
+            "{{data.results.invalidComplexAttr}}"
+        ]
+    },
+    "onSaveErrorMsg": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.onSaveErrorMsg}}",
+        "messageTextParams": []
+    },
+    "invalidValueError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.invalidValueError}}",
+        "messageTextParams": [
+            "{{data.results.invalidAttr}}"
+        ]
+    },
+    "inValidKeyError": {
+        "messageType": "ERROR",
+        "messageText": "{{i18n.inValidKeyError}}",
+        "messageTextParams": [
+            "{{data.results.invalidAttr}}"
+        ]
+    }
+  },
+
+  "conditions":
+  {
+    "createMode":
+    {
+      "expression": "data.panelMode === 0"
+    },
+
+    "editMode":
+    {
+      "expression": "data.panelMode === 1"
+    },
+
+    "showHierarchy":
+    {
+      "expression": "data.hierarchyVisible"
+    },
+
+    "showSetClass":
+    {
+      "expression": "(data.selectedClass.type === 'StorageClass') && !data.attributesVisible"
+    },
+
+    "showAttributes":
+    {
+      "expression": "data.attributesVisible"
+    },
+
+    "showUnitSystem":
+    {
+      "expression": "data.leafClassDescriptions.unitBase === 'METRIC'"
+    },
+
+    "showClassify":
+    {
+      "expression": "(data.selectedClass.unitBase ==='METRIC') || (data.selectedClass.unitBase ==='NONMETRIC') || (data.selectedClass.unitBase ==='UNSPECIFIED')"
+    },
+
+    "showNoSearchResultsMessage":
+    {
+      "expression": "!data.hierarchyVisible && data.classificationSearchResultsCount === 0"
+    },
+
+    "hierarchyDirty":
+    {
+      "expression": "data.selectedClass.id !== data.ico.classID"
+    },
+
+    "multiClassification": {
+      "expression": "data.icoCells"
+    },
+
+    "searchInput": {
+      "expression": {
+        "$source": "data.searchBox.dbValue",
+        "$query": {
+          "$regexp": "(.*[a-zA-Z0-9$&+,:;=?@#|'<>.-^()%!]){3}"
+        }
+      }
+    },
+
+    "hasAdvancedData":
+    {
+      "expression": "data.advancedData"
+    }
+  },
+
+  "i18n":
+  {
+        "Add":                                    [ "ClassificationPanelMessages" ],
+        "Class":                                  [ "ClassificationPanelMessages" ],
+        "classifySuccess":                        [ "ClassificationPanelMessages" ],
+        "Classify":                               [ "ClassificationPanelMessages" ],
+        "edit":                                   [ "ClassificationPanelMessages" ],
+        "nonStorageClass":                        [ "ClassificationPanelMessages" ],
+        "noSearchResults":                        [ "ClassificationPanelMessages" ],
+        "properties":                             [ "ClassificationPanelMessages" ],
+        "save":                                   [ "ClassificationPanelMessages" ],
+        "multipleClassificationInSameClass":      [ "ClassificationPanelMessages" ],
+        "SearchCountLabel":                       [ "ClassificationPanelMessages" ],
+        "searchPlaceholder":                      [ "ClassificationPanelMessages" ],
+        "Reset":                                  [ "ClassificationPanelMessages" ],
+        "unitSystemLabel":                        [ "ClassificationPanelMessages" ],
+        "unitSystemMetric":                       [ "ClassificationPanelMessages" ],
+        "unitSystemNonMetric":                    [ "ClassificationPanelMessages" ],
+        "images":                                 [ "ClassificationPanelMessages" ],
+        "createOrUpdateFailedError":              [ "ClassificationPanelMessages" ],
+        "classifyObjectAccessPermissionError":    [ "ClassificationPanelMessages" ],
+        "editObjectAccessPermissionError":        [ "ClassificationPanelMessages" ],
+        "assignClass":                            [ "ClassificationPanelMessages" ],
+        "NotAllowedSearch":                       ["ClassificationPanelMessages"],
+        "assignedClasses":                        ["ClassificationPanelMessages"],
+        "advancedDataPanelMessage":               ["ClassificationPanelMessages"],
+        "inValidKeyError":                        ["ClassificationPanelMessages"],
+        "minimumConstraintLabel":                 [ "ClassificationPanelMessages" ],
+        "maximumConstraintLabel":                 [ "ClassificationPanelMessages" ],
+        "rangeConstraintLabel":                   [ "ClassificationPanelMessages" ],
+        "dashConstraintLabel":                    [ "ClassificationPanelMessages" ],
+        "InvalidSearchStringLength": [ "ClassificationPanelMessages" ],
+        "ClearAll": [ "ClassificationPanelMessages" ],
+        "outOfRangeError":                        [ "ClassificationPanelMessages" ],
+        "onSaveErrorMsg":                         [ "ClassificationPanelMessages" ],
+        "invalidValueError":                      [ "ClassificationPanelMessages" ]
+
+  }
+}

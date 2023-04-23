@@ -1,0 +1,119 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports": [
+      "js/aw-command-panel.directive",
+      "js/aw-command-sub-panel.directive",
+      "js/aw-init.directive",
+      "js/aw-panel-footer.directive",
+      "js/aw-button.directive",
+      "js/aw-i18n.directive",
+      "js/visible-when.directive"
+   ],
+   "actions": {
+      "reassign": {
+         "actionType": "Event",
+         "method": "Event",
+         "inputData": {
+            "events": [
+               {
+                  "name": "reassignTask.showMessage",
+                  "condition": ""
+               }
+            ]
+         }
+      },
+      "finalReassign": {
+         "actionType": "TcSoaService",
+         "serviceName": "ProjectManagementAw-2016-12-ScheduleManagementAw",
+         "method": "replaceMemberAssignments",
+         "inputData": {
+            "replaceMemberAssignmentData": [
+               {
+                  "oldResource": "{{ctx.schedule.ScheduleMember}}",
+                  "newResource": "{{data.userObject[0]}}"
+               }
+            ],
+            "runInBackground": true
+         },
+         "events": {
+            "success": [
+               {
+                  "name": "cdm.relatedModified",
+                  "eventData": {
+                     "relatedModified": [
+                        "{{ctx.schedule.selectedObject}}"
+                     ]
+                  }
+               },
+               {
+                  "name": "complete",
+                  "eventData": {
+                     "source": "toolAndInfoPanel"
+                  }
+               }
+            ]
+         }
+      },
+      "actionMessages": {
+         "failure": [
+             {
+                 "message": "soaFailureMessage"
+             }
+         ]
+      }
+   },
+   "messages": {
+      "reassignTask": {
+         "messageType": "WARNING",
+         "messageText": "{{i18n.replaceConfirmation}}",
+         "messageTextParams": [
+            "{{ctx.schedule.ScheduleMember}}",
+            "{{data.userObject[0].props.user_name.uiValues[0]}}"
+         ],
+         "navigationOptions": [
+            {
+               "option": "Cancel",
+               "text": "{{i18n.cancel}}",
+               "action": ""
+            },
+            {
+               "option": "Reassign",
+               "text": "{{i18n.reassign}}",
+               "action": "finalReassign"
+            }
+         ]
+      },
+      "soaFailureMessage": {
+         "messageType": "ERROR",
+         "messageText": "{{errorCode}}"
+      }
+   },
+   "onEvent": [
+      {
+         "eventId": "reassignTask.showMessage",
+         "message": "reassignTask"
+      }
+   ],
+   "conditions": {
+      "isValidToAdd": {
+         "expression": "data.userObject && data.userObject.length === 1"
+      }
+   },
+   "i18n": {
+      "reassignTask": [
+         "ScheduleManagerMessages"
+      ],
+      "reassign": [
+         "ScheduleManagerMessages"
+      ],
+      "cancel": [
+         "ScheduleManagerMessages"
+      ],
+      "replaceConfirmation": [
+         "ScheduleManagerMessages"
+      ],
+      "users": [
+         "ScheduleManagerMessages"
+      ]
+   }
+}

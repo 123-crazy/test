@@ -1,0 +1,102 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-list.directive"
+    ],
+
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "setColumns",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "exportExcelColumns.refreshDataProviderForProperties"
+                } ]
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "setSelectionVariable": {
+            "actionType": "JSFunction",
+            "method": "setSelectionVariable",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "refreshDataProviderForProperties": {
+            "actionType": "dataProvider",
+            "method": "dataProviderForProperties"
+        },
+        "addNewPropertiesAsColumn":{
+            "actionType": "JSFunction",
+            "method": "addColumns",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "exportExcelColumns.refreshDataProviderForProperties"
+                } ]
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "changeColumnSelectionForProperties":{
+            "actionType": "JSFunction",
+            "method": "changeColumnSelectionForProperties",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        }
+    },
+
+    "data": {
+        "allProperties":"",
+        "areAllPropertiesDeselected": false
+    },
+
+    "dataProviders": {
+        "dataProviderForProperties": {
+            "response": "{{data.allProperties}}",
+            "totalFound": "{{data.allProperties.length}}"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "exportExcelColumns.refreshDataProviderForProperties",
+            "action": "refreshDataProviderForProperties"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },
+        {
+            "eventId": "dataProviderForProperties.selectionChangeEvent",
+            "action": "changeColumnSelectionForProperties"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setSelectionVariable"
+        }
+    ],
+
+    "conditions": {
+
+    },
+
+    "i18n": {
+        "Add": [
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

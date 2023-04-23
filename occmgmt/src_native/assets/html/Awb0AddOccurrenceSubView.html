@@ -1,0 +1,27 @@
+<aw-panel-header>
+    <aw-panel-section caption="i18n.toTitle">
+        <aw-default-cell vmo="data.targetObjectToAdd"></aw-default-cell>
+    </aw-panel-section>
+</aw-panel-header>
+<aw-form name="addOccurrenceCommandPanelForm">
+    <aw-panel-body visible-when="conditions.isSelectedTypeEmpty">
+        <aw-panel-section caption="i18n.objectType" ></aw-panel-section>
+        <aw-list dataprovider="data.dataProviders.getAllowableTypesProvider">
+            <aw-type-cell vmo="item"></aw-type-cell>
+        </aw-list>
+    </aw-panel-body>
+    <aw-panel-body exist-when="!conditions.isSelectedTypeEmpty">
+        <aw-command-panel-section caption="i18n.part" anchor="data.addRevision" context="data" visible-when="conditions.isROCreationCase">
+            <aw-list dataprovider="data.dataProviders.getChildRevisionDataProvider">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-title-link prop="data.displayedType" action="clearSelectedType" exist-when="!conditions.isSelectedTypeEmpty"></aw-title-link>
+        <aw-xrt type="CREATE" object-type="{{data.selectedType.dbValue}}"></aw-xrt>
+    </aw-panel-body>
+</aw-form>
+<aw-panel-footer>
+    <aw-button action="createAndAddElementWithUsage" visible-when="addOccurrenceCommandPanelForm.$valid && !conditions.isSelectedTypeEmpty && ( conditions.isROCreationCase ? conditions.isRevisionDataPopulated : true )">
+        <aw-i18n>i18n.addElementBtn</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

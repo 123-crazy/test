@@ -1,0 +1,273 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+        [
+            "js/aw-command-panel.directive",
+            "js/aw-panel-body.directive",
+            "js/aw-panel-section.directive",
+            "js/aw-panel-footer.directive",
+            "js/aw-button.directive",
+            "js/aw-widget.directive",
+            "js/aw-i18n.directive",
+            "js/visible-when.directive"
+        ],
+
+    "actions":
+    {
+        "createBaseline":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2016-04-ScheduleManagement",
+            "method": "createNewBaselines",
+            "inputData":
+            {
+                "createBaselineContainer":
+                [
+                    {
+                        "name": "{{data.bsName.dbValue}}",
+                        "schedule":
+                        {
+                            "uid":"{{ctx.Scheduletag.selected.uid}}",
+                            "type":"Schedule"
+                        },
+                        "parentBaseline":
+                        {
+                                "uid" :"{{ctx.Scheduletag.isActiveBaseline.uid}}",
+                                "type" :"Schedule"
+
+                        },
+                        "isActive":"{{function:checkIsActiveChkboxVisibility}}",
+                        "includeNewTasks":true,
+                        "updateScheduleBaselineCost":true,
+                        "taskRebaseOption":0
+                    }
+                ],
+                "runInBackground" : false
+            },
+            "outputData": {
+                "newBaseline": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                   {
+                        "name": "updateBaselineDescriptionEvent",
+                        "eventData":
+                        {
+                            "newBaselineUid": "{{data.newBaseline.created[0]}}"
+                        }
+                   },
+                   {
+                        "condition": "!data.unpinnedToForm.dbValue",
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "condition": "ctx.state.params.pageId !== 'tc_xrt_Gantt'",
+                         "name": "cdm.relatedModified",
+                         "eventData":
+                         {
+                            "refreshLocationFlag": false,
+                            "isPinnedFlag": "{{conditions.ispinned}}",
+                            "relations": "",
+                            "relatedModified":
+                             [
+                                 "{{ctx.locationContext.modelObject}}"
+                             ],
+                             "createdObjects": "{{data.createdMainObject.createdObjects}}"
+                          }
+                     }
+                ]
+            },
+            "actionMessages":
+             {
+                 "failure":
+                 [
+                     {
+                         "message": "failedToCreateBaselineMessage"
+                     }
+                 ]
+             },
+            "deps": "js/Saw1BaselineScheduleService"
+        },
+        "updateBaselineDescriptionAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2012-02-ScheduleManagement",
+            "method": "updateSchedules",
+            "inputData":
+            {
+                "scheduleUpdates":
+                [
+                    {
+                        "object": {
+                            "uid": "{{data.eventData.newBaselineUid}}",
+                            "type": "Schedule"
+                        },
+                        "updates":
+                        [
+                            {
+                                "attrName": "object_desc",
+                                "attrValue": "{{data.description.dbValue}}",
+                                "attrType": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            }
+        },
+        "saw1SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "saw1SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+
+    "functions": {
+        "checkIsActiveChkboxVisibility": {
+           "functionName": "checkIsActiveChkboxVisibility",
+           "parameters": [
+              "{{data}}",
+              "{{ctx}}"
+           ]
+        }
+    },
+
+
+   "data":
+    {
+        "bsName":
+        {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dbValue" : "{{ctx.selected.props.object_name.dbValues[0]}}"
+        },
+
+        "description":
+        {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 70,
+            "numberOfLines": 2,
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+
+        "isActive":
+        {
+            "displayName": "{{i18n.isActive}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "dbValue": false
+        },
+        "saw1Pincommands":"saw1_oneStepPinCommands",
+         "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+
+    "conditions":
+    {
+        "isValidToDisplay":
+        {
+            "expression": "(ctx.Scheduletag.isActiveBaseline!=null && ctx.Scheduletag.isActiveBaseline != false)"
+        },
+        "isValidToSubmit":
+        {
+           "expression": "(data.bsName.dbValue && data.bsName.dbValue!='')"
+        }
+
+    },
+
+    "onEvent": [
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetPin",
+                "cacheEventData": true,
+                "action": "saw1SetPin"
+            },
+            {
+                "eventId": "createScheduleTaskWorkSpace.saw1SetUnPin",
+                "cacheEventData": true,
+                "action": "saw1SetUnPin"
+            },
+            {
+                "eventId": "updateBaselineDescriptionEvent",
+                "cacheEventData": true,
+                "action": "updateBaselineDescriptionAction"
+            }
+    ],
+    "messages":
+    {
+        "failedToCreateBaselineMessage":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n":
+    {
+        "name":
+        [
+            "ScheduleManagerMessages"
+        ],
+        "description":
+        [
+            "ScheduleManagerMessages"
+        ],
+        "isActive":
+        [
+            "ScheduleManagerMessages"
+        ],
+        "baselineSchedule":
+        [
+            "ScheduleManagerMessages"
+        ],
+        "Baseline":
+        [
+            "ScheduleManagerMessages"
+        ]
+    }
+}
+

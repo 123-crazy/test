@@ -1,0 +1,45 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-search-box.directive"
+    ],
+    "data":
+    {
+        "searchBox": {
+            "displayName":"",
+            "type":"STRING",
+            "isRequired":"true",
+            "dbValue":"{{ctx.tcadmconsole.searchCriteria.searchString}}",
+            "dispValue":"{{ctx.tcadmconsole.searchCriteria.searchString}}"
+        }
+    },
+    "actions":
+    {
+        "doSearchKeepFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "setSearchString",
+            "inputData":
+            {
+                "searchString": "{{data.searchBox.dbValue}}"
+            },
+            "deps": "js/adminPreferencesService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

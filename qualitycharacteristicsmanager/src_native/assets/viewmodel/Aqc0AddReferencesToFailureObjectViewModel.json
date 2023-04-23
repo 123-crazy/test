@@ -1,0 +1,190 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel.directive"
+    ],
+    "actions": {
+        "addReference": {
+            "actionType": "JSFunction",
+            "method": "getCreateInputForCreateObject",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "createdObjectForFailReferences": "createdObject",
+                "addElementResponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "getPropertiesForFailureObject",
+                    "condition": "data.sourceModelObjects"
+                }],
+                "failure": [ {
+                    "name": "addObject.addOprfailed"
+                } ]
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "loadProperties":{
+            "actionType": "JSFunction",
+            "method": "getPropertiesforSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjFProp": "{{ctx.selected}}",
+                "onlyLoadProps": false,
+                "relationProp": "Qc0FailureReferences"
+            },
+            "outputData": {
+                "versionInputDataFVM": "",
+                "createdObject":"specificationsOutput[0].newSpecification"
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "createVersion": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-CharManagerAW-2018-12-QualityManagement",
+            "method": "createSpecificationVersion",
+            "inputData": {
+                "specificationInputs": "{{data.versionInputDataFVM}}"
+
+            },
+            "outputData": {
+                "createdObject":"specificationsOutput[0].newSpecification"
+             } ,
+            "events": {
+                "success": [ {
+                    "name":"cdm.relatedModified",
+                    "condition":"ctx.locationContext.modelObject === undefined",
+                    "eventData": {
+                        "relatedModified": [
+                            "{{ctx.selected}}"
+                        ]
+                    }
+                },
+                {
+                    "name": "aqc0.openNewObject",
+                    "condition":"ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Qc0MasterCharSpec' ) > -1",
+                    "eventData":
+                    {
+                        "newObjectUid": "{{data.createdObject.uid}}"
+                    }
+                },
+                {
+                    "name":"cdm.relatedModified",
+                    "condition":"ctx.locationContext.modelObject !== undefined",
+                    "eventData":{
+                        "refreshLocationFlag":false,
+                        "relatedModified":[
+                            "{{ctx.locationContext.modelObject}}"
+                        ],
+                        "createdObjects": ["{{data.createdObject}}"]
+                    }
+                },
+                {
+                    "name":"complete",
+                    "condition":"ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Qc0MasterCharSpec' ) === -1",
+                    "eventData":{
+                        "source":"toolAndInfoPanel"
+                    }
+                },
+                {
+                    "name":"complete",
+                    "condition":"ctx.locationContext.modelObject === undefined",
+                    "eventData":{
+                        "source":"toolAndInfoPanel"
+                    }
+                },
+                {
+                    "name":"cdm.relatedModified",
+                    "condition":"ctx.pselected !== undefined",
+                    "eventData": {
+                        "relatedModified":[
+                            "{{ctx.pselected}}",
+                            "{{ctx.selected}}"
+                        ]
+                    }
+                },
+                {
+                    "name":"primaryWorkarea.reset",
+                    "condition":"ctx.pselected === undefined"
+                },
+                {
+                    "name":"aqc0.pushSelectedNodeInFailureContext",
+                    "condition":"ctx.mselected[0].modelType.name === 'Qc0Failure' && ctx.failureManagerContext !== undefined"
+                } ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "versioningSuccessfulMessage"
+                } ]
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "pushSelectedNodeInFailureContext":{
+            "actionType": "JSFunction",
+            "method": "pushSelectedNodeInFailureContext",
+            "inputData": {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Aqc0UtilService"
+        }
+    },
+    "functions": {
+        "getCreatedObject": {
+            "functionName": "getCreatedObject",
+            "parameters": []
+        },
+        "getVersionInputForRef":{
+            "functionName": "getVersionInputForRef",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "getPropertiesForFailureObject",
+            "action": "loadProperties"
+        },
+        {
+            "eventId": "aqc0.createVersion",
+            "action": "createVersion"
+        },
+        {
+            "eventId": "aqc0.pushSelectedNodeInFailureContext",
+            "action": "pushSelectedNodeInFailureContext"
+        }
+    ],
+    "messages": {
+        "versioningSuccessfulMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.VersionCreated}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_name.dbValues[0]}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        }
+    },
+    "data": {
+        "performAddOperation": true
+    },
+    "i18n": {
+        "addButtonTitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "VersionCreated": [
+            "qualitycharacteristicsmanagerMessages"
+        ]
+    }
+}

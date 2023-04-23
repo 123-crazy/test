@@ -1,0 +1,439 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+    ],
+    "actions": {
+        "addObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2008-06-ScheduleManagement",
+            "method": "createSchedule",
+            "inputData": {
+                "newSchedules": "{{function:getNewSchedules}}",
+                "preference": "{{data.preferences.AWC_Unit_Of_Measure}}"
+            },
+            "outputData": {
+                "createdMainObject": "schedules[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createSchdeule.assignProjects",
+                        "condition": "data.totalTypeFound>0"
+                    },
+                    {
+                        "name": "createScheduleComplete"
+                    },
+                    {
+                        "name": "openOnCreate",
+                        "condition": "data.isOpenOnCreate.dbValues[0] === true"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        },
+                        "condition": "!data.unpinnedToForm.dbValue && data.createRelationForSched !== true"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.createRelationForSched !== true"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "message": "createObjectSuccess",
+                        "condition": "data.createRelationForSched !== true"
+                    }
+                ],
+                "failure": [
+                    {
+                        "condition": "errorCode=='invalidStartDateOrFinishDate'",
+                        "message": "invalidStartDateOrFinishDate"
+                    },
+                    {
+                        "condition": "errorCode !=='invalidStartDateOrFinishDate'",
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "deps": "js/CAW0CreatePanelService"
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [
+                    {
+                        "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                        "objectToAssign": [
+                            "{{data.createdMainObject}}"
+                        ],
+                        "objectToRemove": []
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            }
+        },
+        "openCreatedObject": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{data.createdMainObject.uid}}"
+            }
+        },
+        "createRelationForSchedAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "execute",
+            "inputData": {
+                "targetObject": "{{ctx.PaletteAndSearchData.createRelationTargetObj}}",
+                "sourceObjects": "{{data.sourceObjsForCreateRelations}}",
+                "relationName": "{{ctx.PaletteAndSearchData.relationName}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.PaletteAndSearchData.createRelationTargetObj}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.sourceObjsForCreateRelations.length == 1",
+                        "message": "createRelationSuccessForSched"
+                    },
+                    {
+                        "condition": "data.sourceObjsForCreateRelations.length > 1",
+                        "message": "createMultiRelationSuccessForSched"
+                    }
+                ]
+            },
+            "deps": "js/pasteService"
+        },
+        "getSourceAndCreateRelations": {
+            "actionType": "JSFunction",
+            "method": "getSecondaryObjForCreateRelations",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "sourceObjsForCreateRelations": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createRelationForSchedEvent"
+                    }
+                ]
+            },
+            "deps": "js/CAW0CreatePanelService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "handleDefaultSelectionForPalette": {
+            "actionType": "JSFunction",
+            "method": "handleDefaultSelectionForPalette",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0CreatePanelService"
+        },
+        "schedPaletteSelectionChangeEvent": {
+            "actionType": "JSFunction",
+            "method": "handlePaletteSelection",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "dataProviderId": "{{data.eventData.dataProviderId}}",
+                "context": "{{data.eventData.context}}"
+            },
+            "deps": "js/CAW0CreatePanelService"
+        },
+        "handleRecentPaletteSelection": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "schedPaletteTabPage.selectionChangeEvent",
+                        "eventData": {
+                            "dataProviderId": "getRecentObjsProvider",
+                            "context": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "handleFavoritePaletteSelection": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "schedPaletteTabPage.selectionChangeEvent",
+                        "eventData": {
+                            "dataProviderId": "getFavoriteProvider",
+                            "context": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "handleClipboardPaletteSelection": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "schedPaletteTabPage.selectionChangeEvent",
+                        "eventData": {
+                            "dataProviderId": "getClipboardProvider",
+                            "context": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "saw1SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "saw1SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "functions": {
+        "getNewSchedules": {
+            "functionName": "getNewSchedules",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.Object.DefaultAttributeMap}}"
+            ]
+        }
+    },
+    "messages": {
+        "createObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.scheduleObjectAdded}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValue}}"
+            ]
+        },
+        "invalidStartDateOrFinishDate": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.invalidStartDateOrFinishDate}}"
+        },
+        "createRelationSuccessForSched": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pasteSuccessful}}",
+            "messageTextParams": [
+                "{{data.sourceObjsForCreateRelations[0].props.object_string.dbValues[0]}}"
+            ]
+        },
+        "createMultiRelationSuccessForSched": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.mutiRelationObject}}",
+            "messageTextParams": [
+                "{{data.sourceObjsForCreateRelations.length}}"
+            ]
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "data": {
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "name": "{{i18n.newTabTitle}}",
+                    "panelId": "CAW0CreatePanelSub",
+                    "selectedTab": true
+                },
+                {
+                    "name": "{{i18n.paletteTabTitle}}",
+                    "panelId": "paletteTabPageSub",
+                    "visibleWhen": "ctx.PaletteAndSearchData.showPaletteAndSearch"
+                },
+                {
+                    "name": "{{i18n.searchText}}",
+                    "panelId": "searchTabPageSub",
+                    "visibleWhen": "ctx.PaletteAndSearchData.showPaletteAndSearch"
+                }
+            ]
+        },
+        "typeFilter": "Schedule",
+        "visibleSearchFilterPanelTabKeys": "[ 'results', 'filters' ]",
+        "createRelationForSched": "{{ctx.PaletteAndSearchData.showPaletteAndSearch}}",
+        "saw1PinCommands": "saw1_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "isPanelPinned": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "createSchdeule.assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "openOnCreate",
+            "action": "openCreatedObject"
+        },
+        {
+            "eventId": "createScheduleComplete",
+            "action": "getSourceAndCreateRelations",
+            "condition": "data.createRelationForSched"
+        },
+        {
+            "eventId": "createRelationForSchedEvent",
+            "action": "createRelationForSchedAction"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel",
+            "condition": "data.createRelationForSched"
+        },
+        {
+            "eventId": "cdm.relatedModified",
+            "action": "closePanel",
+            "condition": "data.createRelationForSched && !data.unpinnedToForm.dbValue"
+        },
+        {
+            "eventId": "getClipboardProvider.modelObjectsUpdated",
+            "action": "handleDefaultSelectionForPalette"
+        },
+        {
+            "eventId": "getClipboardProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleClipboardPaletteSelection"
+        },
+        {
+            "eventId": "getFavoriteProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleFavoritePaletteSelection"
+        },
+        {
+            "eventId": "getRecentObjsProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleRecentPaletteSelection"
+        },
+        {
+            "eventId": "schedPaletteTabPage.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "schedPaletteSelectionChangeEvent"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetPin",
+            "cacheEventData": true,
+            "action": "saw1SetPin"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetUnPin",
+            "cacheEventData": true,
+            "action": "saw1SetUnPin"
+        }
+    ],
+    "conditions": {
+        "isValidToShowforOneType": {
+            "expression": "!data.selectedObject && data.totalTypeFound === 1"
+        },
+        "isValidToShowForCustomType": {
+            "expression": "data.selectedObject && data.totalTypeFound>1"
+        },
+        "isValidToShow": {
+            "expression": "data.selectedTab.panelId==='CAW0CreatePanelSub' && (conditions.isValidToShowforOneType || conditions.isValidToShowForCustomType) && (data.object_name.dbValue && data.object_name.dbValue!='') && (data.fnd0TimeZone.dbValue && data.fnd0TimeZone.dbValue!='') && (data.start_date.dbValue && data.start_date.dbValue!='') && (data.finish_date.dbValue && data.finish_date.dbValue!='') "
+        },
+        "isPaletteTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='CAW0CreatePanelSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "i18n": {
+        "createScheduleTitle": [
+            "CAW0CapaMessages"
+        ],
+        "create": [
+            "CAW0CapaMessages"
+        ],
+        "scheduleObjectAdded": [
+            "CAW0CapaMessages"
+        ],
+        "invalidStartDateOrFinishDate": [
+            "CAW0CapaMessages"
+        ],
+        "newTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "paletteTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "searchText": [
+            "UIMessages"
+        ],
+        "add": [
+            "CAW0CapaMessages"
+        ],
+        "pasteSuccessful": [
+            "awAddDirectiveMessages"
+        ],
+        "mutiRelationObject": [
+            "awAddDirectiveMessages"
+        ]
+    }
+}

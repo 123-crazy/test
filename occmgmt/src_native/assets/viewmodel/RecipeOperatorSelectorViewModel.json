@@ -1,0 +1,58 @@
+{
+    "imports": [
+        "js/aw-icon.directive",
+        "js/aw-class.directive",
+        "js/aw-click.directive",
+        "js/visible-when.directive",
+        "js/aw-popup-panel2.directive"
+    ],
+
+
+    "data": {
+
+    },
+
+    "actions": {
+        "initializeClickListener": {
+            "actionType": "JSFunction",
+            "method": "initializeClickListener",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "deps": "js/recipeOperatorService"
+        },
+      "modifyRecipeFilter":{
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+            "events": [
+                {
+                    "name": "operatorModified",
+                    "eventData": {
+                        "criteriaOperatorType" : "{{subPanelContext.currentSelection}}",
+                        "recipeIndex": "{{subPanelContext.index}}"
+                    }
+                }
+            ]
+        }
+      }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "RecipeOperatorSelector.contentLoaded",
+            "action": "initializeClickListener"
+        }
+    ],
+    "i18n": {
+        "filterButtonTitle": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "subsetRecipeOperatorInclude": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "subsetRecipeOperatorExclude": [
+            "OccurrenceManagementSubsetConstants"
+        ]
+    }
+}

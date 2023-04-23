@@ -1,0 +1,314 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-row.directive",
+        "js/aw-global-search.directive",
+        "js/aw-logo.directive",
+        "js/visible-when.directive",
+        "js/aw-header-title.directive",
+        "js/aw-workarea-title.directive",
+        "js/exist-when.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-class.directive"
+    ],
+    "data": {
+        "locationPanelStyle": "",
+        "layoutSummaryOnlyStyle": "",
+        "preNarrowTitle": null
+    },
+    "actions": {
+        "updateTabs": {
+            "actionType": "JSFunction",
+            "method": "updateTabs",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/defaultLocationService"
+        },
+        "switchSubLocation": {
+            "actionType": "JSFunction",
+            "method": "switchSubLocation",
+            "inputData": {
+                "pageId": "{{data.pageId}}",
+                "tabTitle": "{{data.tabTitle}}",
+                "subLocationTabs": "{{data.subLocationTabs}}"
+            },
+            "deps": "js/awHeaderService"
+        },
+        "registerLocationContext": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "getLocationName"
+                },
+                {
+                    "action": "registerLocationName"
+                },
+                {
+                    "action": "registerKeyBoardEvents"
+                },
+                {
+                    "action": "subscribeForUnloadEvent"
+                }
+            ]
+        },
+        "subscribeForUnloadEvent": {
+            "actionType": "JSFunction",
+            "method": "subscribeForLocationUnloadEvent",
+            "inputData": {
+                "name": "tcLocation"
+            },
+            "deps": "js/defaultLocationService"
+        },
+        "checkNarrowMode": {
+            "actionType": "JSFunction",
+            "method": "checkNarrowMode",
+            "deps": "js/aw.narrowMode.service"
+        },
+        "getLocationName": {
+            "actionType": "JSFunction",
+            "method": "normalizeStateName",
+            "deps": "js/defaultLocationService",
+            "outputData": {
+                "normalizeStateName": ""
+            }
+        },
+        "registerLocationName": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "locationContext",
+                "value": {
+                    "ActiveWorkspace:Location": "{{data.normalizeStateName}}"
+                }
+            }
+        },
+        "registerKeyBoardEvents": {
+            "actionType": "JSFunction",
+            "method": "registerKeyDownEvent",
+            "deps": "js/keyboardService"
+        },
+        "cleanupCDM": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "cdm.cleanCache",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "constructHeader": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "constructTitles"
+                },
+                {
+                    "action": "setTitlesInCtx"
+                },
+                {
+                    "action": "getPreferences",
+                    "outputArg": [
+                        "additionalEvalEnv.preferences"
+                    ]
+                },
+                {
+                    "action": "getAvailableSubPages",
+                    "inputArg": {
+                        "parentState": null,
+                        "additionalEvalEnv": "{{actionData.additionalEvalEnv}}"
+                    },
+                    "outputArg": [
+                        "availablePages"
+                    ]
+                },
+                {
+                    "action": "constructTabs",
+                    "inputArg": {
+                        "availablePages": "{{actionData.availablePages}}"
+                    }
+                }
+            ]
+        },
+        "constructTitles": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTitles",
+            "deps": "js/awHeaderService",
+            "outputData": {
+                "browserTitle": "result.browserTitle",
+                "browserSubTitle": "result.browserSubTitle",
+                "headerTitle": "result.headerTitle"
+            }
+        },
+        "setTitlesInCtx": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "location.titles",
+                "value": {
+                    "browserTitle": "{{data.browserTitle}}",
+                    "browserSubTitle": "{{data.browserSubTitle}}",
+                    "headerTitle": "{{data.headerTitle}}"
+                }
+            }
+        },
+        "getPreferences": {
+            "actionType": "JSFunctionAsync",
+            "method": "queryAll",
+            "deps": "soa/preferenceService",
+            "outputData": {
+                "additionalEvalEnv": ""
+            }
+        },
+        "getAvailableSubPages": {
+            "actionType": "JSFunctionAsync",
+            "method": "getAvailableSubpages",
+            "deps": "js/page.service",
+            "inputData": {
+                "parentState": null,
+                "additionalEvalEnv": "{{parameters.additionalEvalEnv}}"
+            },
+            "outputData": {
+                "availablePages": ""
+            }
+        },
+        "constructTabs": {
+            "actionType": "JSFunctionAsync",
+            "method": "constructTabs",
+            "deps": "js/awHeaderService",
+            "inputData": {
+                "availablePages": "{{parameters.availablePages}}"
+            },
+            "outputData": {
+                "subLocationTabs": ""
+            }
+        },
+        "updateBreadcrumbAction": {
+            "actionType": "JSFunction",
+            "method": "updateBreadCrumb",
+            "deps": "js/awHeaderService",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "outputData": {
+                "breadCrumbProvider": "result.breadCrumbProvider",
+                "breadcrumbConfig": "result.breadcrumbConfig",
+                "objFound": "result.objFound"
+            }
+        },
+        "updateTitles": {
+            "actionType": "JSFunction",
+            "method": "updateDocumentTitles",
+            "deps": "js/awHeaderService"
+        },
+        "refreshSearchProviders": {
+            "actionType": "JSFunction",
+            "method": "refreshSearchProviders",
+            "deps": "js/tcDefaultLocationService"
+        },
+        "narrowModeChangeAction": {
+            "actionType": "JSFunction",
+            "method": "narrowModeChange",
+            "deps": "js/aw.narrowMode.service",
+            "inputData": {
+                "eventData": "{{data.eventMap['narrowModeChangeEvent']}}",
+                "layoutSummaryOnlyStyle": "{{data.layoutSummaryOnlyStyle}}",
+                "headerTitle": "{{data.headerTitle}}",
+                "preNarrowTitle": "{{data.preNarrowTitle}}"
+            },
+            "outputData": {
+                "layoutSummaryOnlyStyle": "result.layoutSummaryOnlyStyle",
+                "headerTitle": "result.headerTitle",
+                "preNarrowTitle": "result.preNarrowTitle"
+            }
+        },
+        "narrowSummaryLocationTitleClickAction": {
+            "actionType": "JSFunction",
+            "method": "narrowSummaryLocationTitleClick",
+            "deps": "js/aw.narrowMode.service",
+            "inputData": {
+                "layoutSummaryOnlyStyle": "{{data.layoutSummaryOnlyStyle}}",
+                "headerTitle": "{{data.headerTitle}}",
+                "preNarrowTitle": "{{data.preNarrowTitle}}"
+            },
+            "outputData": {
+                "layoutSummaryOnlyStyle": "result.layoutSummaryOnlyStyle",
+                "headerTitle": "result.headerTitle",
+                "preNarrowTitle": "result.preNarrowTitle"
+            }
+        },
+        "gwtSubLocationContentSelectionChangeAction": {
+            "actionType": "JSFunction",
+            "method": "subLocationContentSelectionChange",
+            "deps": "js/aw.narrowMode.service",
+            "inputData": {
+                "eventData": "{{data.eventMap['gwt.SubLocationContentSelectionChangeEvent']}}",
+                "layoutSummaryOnlyStyle": "{{data.layoutSummaryOnlyStyle}}",
+                "headerTitle": "{{data.headerTitle}}",
+                "preNarrowTitle": "{{data.preNarrowTitle}}",
+                "subLocationTabs": "{{data.subLocationTabs}}"
+            },
+            "outputData": {
+                "layoutSummaryOnlyStyle": "result.layoutSummaryOnlyStyle",
+                "headerTitle": "result.headerTitle",
+                "preNarrowTitle": "result.preNarrowTitle"
+            }
+        }
+    },
+    "dataProviders": {},
+    "functions": {},
+    "onEvent": [ {
+            "eventId": "aw.windowResize",
+            "action": "checkNarrowMode"
+        },
+        {
+            "eventId": "tcLocation.contentLoaded",
+            "action": "registerLocationContext"
+        },
+        {
+            "eventId": "tcLocation.contentLoaded",
+            "action": "cleanupCDM"
+        },
+        {
+            "eventId": "tcLocation.contentLoaded",
+            "action": "constructHeader"
+        },
+        {
+            "eventId": "refreshBreadCrumb",
+            "cacheEventData": true,
+            "action": "updateBreadcrumbAction"
+        },
+        {
+            "eventId": "appCtx.update",
+            "condition": "name === 'location.titles'",
+            "action": "updateTitles"
+        },
+        {
+            "eventId": "appCtx.update",
+            "condition": "name === 'search' && target",
+            "action": "refreshSearchProviders"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'state' ",
+            "action": "updateTabs"
+        },
+        {
+            "eventId": "narrowModeChangeEvent",
+            "cacheEventData": true,
+            "action": "narrowModeChangeAction"
+        },
+        {
+            "eventId": "narrowSummaryLocationTitleClickEvent",
+            "action": "narrowSummaryLocationTitleClickAction"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "cacheEventData": true,
+            "action": "gwtSubLocationContentSelectionChangeAction"
+        }
+    ],
+    "i18n": {},
+    "messages": {},
+    "conditions": {}
+}

@@ -1,0 +1,76 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-bar.directive"
+    ],
+
+    "data": {
+
+    },
+
+    "actions": {
+
+        "noop": {
+            "actionType": "JSFunction",
+            "method": "getRandObjId",
+            "deps": "js/Ac0ConversationService"
+        },
+
+        "saveComment":{
+            "actionType": "JSFunctionAsync",
+            "method": "saveEditComment",
+            "deps": "js/Ac0EditCollabObjectService",
+
+            "inputData": {
+                "commentObject": "{{subPanelContext}}"
+            }
+        },
+
+        "discardComment":{
+            "actionType": "JSFunction",
+            "method": "discardEditComment",
+            "deps": "js/Ac0EditCollabObjectService",
+
+            "inputData": {
+                "commentObject": "{{subPanelContext}}"
+            }
+        },
+        "isInputTextValidAction":
+        {
+            "actionType": "JSFunction",
+            "method": "isInputTextValid",
+            "inputData": {
+                "data": "{{data}}",
+                "isInputTextValidVal": "{{data.eventData.isTextValid}}"
+            },
+            "deps": "js/Ac0CreateCollabObjectService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "isInputTextValidEvent",
+            "cacheEventData": true,
+            "action": "isInputTextValidAction"
+        }
+    ],
+
+    "conditions": {
+        "isDiscussionLocation":
+        {
+            "expression":"ctx.sublocation.historyNameToken==='feed' || ctx.sublocation.historyNameToken==='actionableFeed'"
+        },
+        "validInputDataForSaveDiscardComment":
+        {
+            "expression":"( !conditions.isDiscussionLocation && data.isInputTextValid ) || ( conditions.isDiscussionLocation && ctx.Ac0ConvCtx.isInputTextValid )"
+        }
+    },
+
+    "i18n": {
+        "save": [ "ActiveCollabDeclarativeMessages" ],
+        "discard": ["ZeroCompileCommandMessages"]
+    }
+}

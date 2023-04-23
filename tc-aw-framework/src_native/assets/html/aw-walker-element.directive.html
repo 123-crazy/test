@@ -1,0 +1,62 @@
+<aw-column class="aw-xrt-columnContentPanel" width="{{::child.width ? child.width : 'fill'}}"
+    ng-repeat="child in (elemdata.children ? elemdata.children : [elemdata]) track by $index"
+    ng-if="::child.elementType === 'column'">
+    <aw-walker-element class="aw-xrt-element" elemdata="::child" view-model="::viewModel"></aw-walker-element>
+</aw-column>
+
+<aw-panel-section caption="{{::child.displayTitle}}" collapsed="{{child.collapsed}}"
+    ng-repeat="child in (elemdata.children ? elemdata.children : [elemdata]) track by $index"
+    ng-if="::child.elementType === 'section'">
+    <aw-walker-element class="aw-xrt-element" elemdata="::child" view-model="::viewModel"></aw-walker-element>
+</aw-panel-section>
+
+<div ng-repeat="child in ::(elemdata.children ? elemdata.children:[elemdata]) track by $index" ng-switch="::child.elementType"
+  ng-if="::child.elementType !== 'column' && child.elementType !== 'section'">
+    <div ng-switch-when="property">
+        <aw-walker-property propdata="::child" view-model="::viewModel"></aw-walker-property>
+    </div>
+
+    <div ng-switch-when="objectSet">
+        <aw-walker-objectset objsetdata="::child" view-model="::viewModel" titlekey="{{elemdata.titleKey}}" displaytitle="{{elemdata.displayTitle}}"></aw-walker-objectset>
+    </div>
+
+    <div ng-switch-when="label">
+       <aw-walker-label labeldata="::child"></aw-walker-label>
+    </div>
+
+    <div ng-switch-when="separator">
+       <aw-separator></aw-separator>
+    </div>
+
+    <div ng-switch-when="break">
+       <aw-break ></aw-break>
+    </div>
+
+    <div ng-switch-when="image">
+       <aw-walker-image imgdata="::child" view-model="::viewModel"></aw-walker-image>
+    </div>
+
+    <div ng-switch-when="htmlpanel">
+       <aw-walker-htmlpanel htmlpaneldata="::child" view-model="::viewModel"></aw-walker-htmlpanel>
+    </div>
+
+    <div ng-switch-when="command">
+       <aw-walker-command cmddata="::child"></aw-walker-command>
+    </div>
+
+    <div ng-switch-when="tableProperty">
+       <aw-walker-tableproperty tablepropertydata="::child" view-model="::viewModel"></aw-walker-tableproperty>
+    </div>
+
+    <div ng-switch-when="nameValueProperty">
+       <aw-walker-namevalueproperty namevaluepropertydata="::child" view-model="::viewModel" ></aw-walker-namevalueproperty>
+    </div>
+
+    <div ng-switch-when="classificationProperties">
+       <aw-walker-classificationproperties classificationdata="::child"></aw-walker-classificationproperties>
+    </div>
+
+    <div ng-switch-when="classificationTrace">
+       <aw-walker-classificationtrace classificationdata="::child"></aw-walker-classificationtrace>
+    </div>
+</div>

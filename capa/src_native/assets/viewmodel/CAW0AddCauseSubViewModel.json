@@ -1,0 +1,566 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-title-link.directive",
+        "js/aw-list.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-icon.directive",
+        "js/extended-tooltip.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive"
+    ],
+    "actions": {
+        "createCauseObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateObjectInput}}"
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "addElementResponse": ""
+            },
+            "deps": "js/Caw0PropertyUpdateService",
+            "events": {
+                "success": [ {
+                    "name": "caw0.relateCauseAndFailure",
+                    "condition": "data.selectedFailureObjects.length > 0 && ctx.tcSessionData.tcMajorVersion >= 13"
+                },
+                {
+                    "name": "caw0.createRelation",
+                    "condition": "data.selectedFailureObjects === undefined || data.selectedFailureObjects.length === 0"
+                }
+             ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==26050 || errorCode.code==214200",
+                    "message": "createRelFailureMsg"
+                } ]
+            }
+        },
+        "relateCauseAndFailure": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{data.createdObject}}",
+                    "secondaryObject": "{{data.selectedFailureObjects[0]}}",
+                    "relationType": "CAW0RelatedFailure",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "caw0.createRelation"
+                } ],
+                "failure": [ {
+                    "name": "caw0.createRelation"
+                } ]
+            }
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.selected}}",
+                    "secondaryObject": "{{data.createdObject}}",
+                    "relationType": "CAW0RelatedMs",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "addElement.added",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        },
+                        "condition": "data.pinnedToForm.dbValue"
+                    },
+                   {
+                    "name":"caw0.setCauseForIshikawa",
+                    "condition": "ctx.selectedValueForCause === 'Ishikawa'"
+                    },
+                    {
+                    "name": "caw0.markWhyAsRootCauseOncause",
+                    "condition": "data.isRootCause.dbValue === true"
+                    }
+
+                ],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "loadIshikawaCauses": {
+            "actionType": "JSFunction",
+            "method": "loadIshikawaCauses",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "causeGroups": "causeGroups"
+            }
+        },
+        "caw0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "caw0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "updatePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "autoSelectType":{
+          "actionType":"JSFunction",
+          "method":"autoSelectType",
+          "inputData":{
+             "data":"{{data}}"
+          },
+          "deps":"js/Caw0PropertyUpdateService"
+        },
+        "getSelectedFailures": {
+            "actionType": "JSFunction",
+            "method": "getSelectedFailures",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "selectedFailureObjects": "selectedFailureObjects"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "navigateToCreateDefectPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "CAW0AddCauseSub",
+                        "eventData": "{{data.eventData}}"
+                    }
+                } ]
+            }
+        },
+        "removeFailure": {
+            "actionType": "JSFunction",
+            "method": "removeFailure",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0FailuerFiltercommandHandler"
+        },
+        "resetUiValuesCause": {
+            "actionType": "JSFunction",
+            "method": "resetUiValues",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "markWhyAsRootCauseOncause": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Capaonawc-2020-12-QualityIssueManagement",
+            "method": "markObjectAsRootCause2",
+            "inputData": {
+                "input": [{
+                    "clientId": "",
+                    "relationName": "CPA0RootCause",
+                    "itemRevision": {
+                        "type": "{{ctx.parentCAPA.type}}",
+                        "uid": "{{ctx.parentCAPA.uid}}"
+                    },
+                    "rootCauseObject": {
+                        "type": "{{data.createdObject.type}}",
+                        "uid": "{{data.createdObject.uid}}"
+                    }
+                }],
+                "removeRootCauseMark": false,
+                "multipleRootCauseAllowed": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.setCauseFor5why",
+                        "condition": "ctx.selectedValueForCause === '5why'"
+                    },
+                     {
+                        "name": "doPostRootCauseActionSuccess",
+                        "condition": "ctx.selectedValueForCause === ''"
+
+                    }
+                ]
+            },
+            "outputData": {
+                "serviceData": ""
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "message": "successMessage"
+                    }
+                ]
+            }
+        },
+    "doPostRootCauseActionSuccess": {
+        "actionType": "JSFunction",
+        "method": "updateTreeTableForRootCause",
+        "inputData": {
+            "ctx": "{{ctx}}",
+            "data": "{{data}}"
+        },
+        "deps": "js/CAW0EditTreeStructure",
+        "events": {
+            "success": [
+                {
+                    "name": "cdm.relatedModified",
+                    "eventData": {
+                        "refreshLocationFlag": true,
+                        "relatedModified": [
+                            "{{ctx.xrtSummaryContextObject}}"
+                        ]
+                    }
+                },
+                {
+                    "name":"closePanel"
+                }
+            ]
+        }
+    },
+     "getSelected5why": {
+        "actionType": "JSFunction",
+        "method": "getSelected5why",
+        "inputData": {
+            "data": "{{data}}",
+            "ctx": "{{ctx}}"
+        },
+        "deps": "js/Caw0PropertyUpdateService"
+    },
+    "getSelectedIshikawa": {
+       "actionType": "JSFunction",
+       "method": "getSelectedIshikawa",
+       "inputData": {
+           "data": "{{data}}",
+           "ctx": "{{ctx}}"
+       },
+       "deps": "js/Caw0PropertyUpdateService"
+   },
+   "setCauseForIshikawa": {
+       "actionType": "JSFunction",
+       "method": "setCauseForIshikawa",
+       "inputData": {
+           "data": "{{data}}",
+           "ctx": "{{ctx}}"
+       },
+       "deps": "js/Caw0PropertyUpdateService",
+       "events": {
+           "success": [ {
+                   "name": "openAdIshikawaPanel"
+               }
+           ]
+       }
+   }
+    },
+    "conditions": {
+        "isNameDescIshiCauseGroupEmpty": {
+            "expression": "data.caw0CauseGroup.dbValue !==''  && data.caw0CauseGroup.dbValue !==null && data.caw0CauseGroup.dbValue !== undefined && data.object_name.dbValue !=='' && data.object_name.dbValue !==null && data.object_name.dbValue !== undefined"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "caw0.relateCauseAndFailure",
+            "action": "relateCauseAndFailure"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadIshikawaCauses"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "caw0SetPin"
+        },
+        {
+            "eventId": "addWhy.caw0SetUnPin",
+            "cacheEventData": true,
+            "action": "caw0SetUnPin"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updatePanel"
+        },
+        {
+          "eventId": "awTypeSelector.modelObjectsUpdated",
+          "action": "autoSelectType"
+        },
+        {
+            "eventId": "caw0.createRelation",
+            "action": "createRelation"
+        },
+        {
+            "eventId": "caw0addFailureToDefect",
+            "action": "getFailureProvider"
+        },
+        {
+            "eventId": "caw0addFailureToDefect",
+            "action": "navigateToCreateDefectPanel"
+        },
+        {
+            "eventId": "Caw0RemoveFailureCommand.removeFailure",
+            "action": "removeFailure"
+        },
+        {
+            "eventId": "caw0.relateDefectAndFailure",
+            "action": "relateDefectAndFailure"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true,
+            "action": "resetUiValuesCause"
+        },
+        {
+            "eventId": "caw0.markWhyAsRootCauseOncause",
+            "action": "markWhyAsRootCauseOncause"
+        },
+        {
+            "eventId": "caw0.setCauseForIshikawa",
+            "action": "setCauseForIshikawa"
+        }
+
+    ],
+    "data": {
+        "addFailureCommand": "caw0_addFailureCommand",
+        "object_name": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "maxLength":128
+        },
+        "caw0CauseGroup": {
+            "displayName": "{{i18n.ishikawaCauseGroup}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "object_desc": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "dbValue": "",
+            "maxLength":240
+        },
+        "caw0PinWhyCommands": "caw0_whyPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "isRootCause": {
+            "displayName": "{{i18n.caw0RootCause}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "uiValue": "",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "fiveWhyOption": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "vertical": true
+        },
+        "ishikawaOption": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "vertical": true
+        },
+        "caw0tooltipFor5Why": {
+            "extendedTooltipContent": "{{i18n.caw0tooltipFor5Why}}"
+        },
+        "caw0tooltipForIshikawa": {
+            "extendedTooltipContent": "{{i18n.caw0tooltipForIshikawa}}"
+        },
+        "fiveWhyOptionList": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "5 Why",
+                    "propInternalValue": "5why"
+                }
+            ]
+        },
+        "ishikawaOptionList": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "Ishikawa",
+                    "propInternalValue": "Ishikawa"
+                }
+            ]
+        }
+    },
+    "messages": {
+        "createRelFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "functions": {
+        "getCreateObjectInput": {
+            "functionName": "getCreateObjectInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}",
+                "addingCause"
+            ]
+        }
+    },
+    "i18n": {
+        "description": [
+            "CAW0CapaMessages"
+        ],
+        "name": [
+            "CAW0CapaMessages"
+        ],
+        "ishikawaCauseGroup": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Cause": [
+            "CAW0CapaMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ],
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "failure": [
+            "CAW0CapaMessages"
+        ],
+        "caw0RootCause": [
+            "CAW0CapaMessages"
+        ],
+        "caw0tooltipFor5Why": [
+            "CAW0CapaMessages"
+        ],
+        "caw0tooltipForIshikawa": [
+            "CAW0CapaMessages"
+        ],
+        "caw0AddNew": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "dataProviders": {
+        "getFailureProvider": {
+            "action": "getSelectedFailures",
+            "response": "{{data.selectedFailureObjects}}",
+            "totalFound": "{{data.selectedFailureObjects.length}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "caw0_removeFailureCommand"
+        }
+    }
+}

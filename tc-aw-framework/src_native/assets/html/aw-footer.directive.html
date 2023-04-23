@@ -1,0 +1,30 @@
+<div class="aw-commands-narrowCommands">
+    <div class="aw-commands-commandBarPanel aw-commands-commandBarHorizontalCenter">
+        <aw-avatar size="xsmall" source="avatarSource" ng-click="toggleAvatarPanel()"></aw-avatar>
+        <div class="aw-layout-flex"></div>
+        <!-- The first 4 visible commands -->
+        <aw-command ng-repeat="command in commandsList | filter:{visible:true} | limitTo:4 as visibleCommands" command-id="{{$index}}"></aw-command>
+        <!-- The overflow button -->
+        <div class="aw-layout-flex"></div>
+        <div class="aw-commands-commandOverflow"  ng-show="overflowCommands.length > 0" ng-click="toggleOverflow($event)" title="{{showDownArrow ? collapseText : expandText}}">...</div>
+        <!-- The same overflow button that regular command bar uses. Probably should be used, but is not currently. -->
+        <!-- <div class="aw-command-overflowIcon" ng-show="overflowCommands.length > 0">
+            <button type="button"
+                class="aw-commands-commandIconButton aw-commands-commandWrapperVertical"
+                ng-click="toggleOverflow($event)" title="{{showDownArrow ? collapseText : expandText}}">
+                <aw-icon icon-id="miscChevronDown" ng-class="['aw-commands-svg', {'aw-icon-rotate': !showDownArrow}]"></aw-icon>
+                <div class="aw-commands-showIconLabel aw-commands-commandIconButtonText">{{showDownArrow ? collapseText : expandText}}</div>
+            </button>
+        </div> -->
+    </div>
+</div>
+<div class="aw-commands-moreNarrowCommands aw-base-scrollPanel" ng-show="showDownArrow">
+    <div class="aw-commands-commandBarPanel aw-commands-commandBarVertical">
+        <!-- All of the currently visible overflow commands command.title -->
+        <div ng-repeat="command in commandsList | filter:{visible:true} | limitTo:commandsList.length:4 as overflowCommands" class="aw-commands-narrowCommandComtainer">
+            <!-- Uncomment to center button <div class="aw-layout-flex"></div> -->
+            <aw-command command-id="{{$index}}" show-label="true"></aw-command>
+            <div class="aw-layout-flex"></div>
+        </div>
+    </div>
+</div>

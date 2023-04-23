@@ -1,0 +1,22 @@
+<aw-command-panel caption="i18n.CreateSessionCmd">            
+    <aw-form name="createInputs">
+        <aw-panel-body>    
+            <aw-listbox prop="data.sessionType" list="data.sessionTypeList" exist-when="data.sessionTypeList.length>1"></aw-listbox>
+            <aw-row exist-when="data.sessionTypeList.length==1">
+                <aw-column width="5">
+                    <aw-label prop="data.sessionType" ></aw-label>
+                </aw-column>
+                <aw-column width="5">
+                    <!-- Dummy column to get the Type lable and it's value closer -->
+                </aw-column>
+            </aw-row>
+            <aw-break></aw-break>
+            <aw-xrt type="CREATE" object-type="{{data.sessionType.dbValue}}" exist-when="data.sessionType.dbValue"></aw-xrt>
+        </aw-panel-body>
+    </aw-form>    
+    <aw-panel-footer>
+        <aw-button action="triggerBackgroundSBM" visible-when="createInputs.$valid">
+            <aw-i18n>i18n.createButtonText</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>    
+</aw-command-panel>

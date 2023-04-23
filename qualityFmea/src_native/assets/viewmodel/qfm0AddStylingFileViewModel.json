@@ -1,0 +1,375 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-file-upload.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "datasetType": {
+            "displayName": "{{i18n.DatasetType}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "actions": {
+        "updateFormData": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "name",
+                    "value": "{{data.fileName}}"
+                },
+                "data": "{{data}}"
+            },
+            "deps": "js/declUtils"
+        },
+        "getDatasetTypesWithDefaultRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2015-10-DataManagement",
+            "method": "getDatasetTypesWithDefaultRelation",
+            "inputData": {
+                "fileExtensions": [
+                    "{{data.fileExt}}"
+                ],
+                "parent": {
+                    "type": "{{ctx.selected.type}}",
+                    "uid": "{{ctx.selected.uid}}"
+                }
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "DatasetType",
+                        "properties": [
+                            {
+                                "name": "datasettype_name"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "datasetTypesWithDefaultRelInfo": "output[0].datasetTypesWithDefaultRelInfo",
+                "fileExtension": "output[0].fileExtension",
+                "fileFormat": "output[0].datasetTypesWithDefaultRelInfo[0].refInfos.fileFormat",
+                "datasetTypeList": "{{function:getDatasetTypesFromTypesWithRelInfo}}",
+                "reference": "output[0].datasetTypesWithDefaultRelInfo[0].refInfos"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "dataset.attachDatasetToGuidelineObj"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "attachDatasetToGuidelineObj": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-04-DataManagement",
+            "method": "createDatasets",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "{{data.fileNameNoExt}}",
+                        "container": {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        },
+                        "datasetFileInfos": [
+                            {
+                                "fileName": "{{data.fileName}}",
+                                "namedReferenceName": "Qfm0FormsheetStyling",
+                                "isText": true,
+                                "allowReplace": true
+                            }
+                        ],
+                        "relationType": "",
+                        "description": "",
+                        "name": "{{data.fileNameNoExt}}",
+                        "type": "Qfm0FormSheetConfigFile"
+                    }
+                ]
+            },
+            "outputData": {
+                "fmsTicket": "datasetOutput[0].commitInfo[0].datasetFileTicketInfos[0].ticket",
+                "commitInfos": "datasetOutput[0].commitInfo[0]",
+                "relatedModified": "datasetOutput[0].dataset",
+                "createdAttachmentObject": "datasetOutput[0].dataset",
+                "createdImageDatasetObject": "datasetOutput[0].dataset"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "fmsTicket.update"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateFormDataWithTicket": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "fmsFile.correctFormFileOrientation"
+                    }
+                ]
+            },
+            "deps": "js/declUtils"
+        },
+        "correctFormFileOrientation": {
+            "actionType": "JSFunctionAsync",
+            "method": "correctFormFileOrientation",
+            "inputData": {
+                "formData": "{{data.formData}}",
+                "formFileKey": "fmsFile"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "qfm0DatasetCreated"
+                    }
+                ]
+            },
+            "deps": "js/imageOrientationUtils"
+        },
+        "uploadFile": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+                    "data": "{{data.formData}}"
+                }
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "qfm0FileUploaded"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "qfm0CommitFailed"
+                    }
+                ]
+            }
+        },
+        "commitDatasetFiles": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-FileManagement",
+            "method": "commitDatasetFiles",
+            "inputData": {
+                "commitInput": [
+                    {
+                        "dataset": "{{data.commitInfos.dataset}}",
+                        "createNewVersion": false,
+                        "datasetFileTicketInfos": [
+                            {
+                                "datasetFileInfo": {
+                                    "clientId": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.clientId}}",
+                                    "fileName": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.fileName}}",
+                                    "namedReferencedName": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.namedReferenceName}}",
+                                    "isText": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.isText}}",
+                                    "allowReplace": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.allowReplace}}"
+                                },
+                                "ticket": "{{data.fmsTicket}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "newlyCreatedAttachmentObject": "updated[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "loadPropertiesSelected"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "qfm0CommitFailed"
+                    }
+                ]
+            }
+        },
+        "loadPropertiesSelected": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [
+                    {
+                        "object": "{{ctx.selected}}",
+                        "timestamp": "",
+                        "vecNameVal": [
+                            {
+                                "name": "qfm0FormSheetStylingFile",
+                                "values": [
+                                    "{{data.newlyCreatedAttachmentObject}}"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "serviceData": "ServiceData",
+                "updateElementResponse": "",
+                "updatedObject": "ServiceData.updated[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "attachObjectFailureMessage"
+                    }
+                ]
+            }
+        },
+        "deleteDataset": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData": {
+                "objects": [
+                    "{{data.createdAttachmentObject}}"
+                ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "invalidFileSelected",
+            "message": "invalidFileError"
+        },
+        {
+            "eventId": "dataset.attachDatasetToGuidelineObj",
+            "action": "attachDatasetToGuidelineObj"
+        },
+        {
+            "eventId": "fmsTicket.update",
+            "action": "updateFormDataWithTicket"
+        },
+        {
+            "eventId": "fmsFile.correctFormFileOrientation",
+            "action": "correctFormFileOrientation"
+        },
+        {
+            "eventId": "qfm0DatasetCreated",
+            "action": "uploadFile"
+        },
+        {
+            "eventId": "qfm0FileUploaded",
+            "action": "commitDatasetFiles"
+        },
+        {
+            "eventId": "loadPropertiesSelected",
+            "action": "loadPropertiesSelected"
+        },
+        {
+            "eventId": "qfm0CommitFailed",
+            "action": "deleteDataset"
+        }
+    ],
+    "messages": {
+        "invalidFileError": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.qfm0InvalidStylingFileError}}",
+            "navigationOptions": [
+                {
+                    "option": "Cancel",
+                    "text": "{{i18n.qfm0Cancel}}"
+                }
+            ]
+        },
+        "attachObjectFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.serviceData.partialErrors[0].errorValues[0].message}}"
+            ]
+        }
+    },
+    "conditions": {
+        "validFile": {
+            "expression": "data.validFile == true"
+        }
+    },
+    "i18n": {
+        "qfm0Add": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0UploadFile": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Cancel": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0InvalidStylingFileError": [
+            "qualityFmeaMessages"
+        ],
+        "PartialError": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

@@ -1,0 +1,159 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/wysiwyg-tree.directive",
+        "js/aw-search-box.directive",
+        "js/exist-when.directive",
+        "js/aw-tree.directive",
+        "js/visible-when.directive"
+    ],
+    "functions": {
+        "getViewData": {
+            "functionName": "getViewData",
+            "parameters": []
+        }
+    },
+    "actions": {
+        "filterBasedOnEnteredValue": {
+            "actionType": "JSFunction",
+            "method": "processWysiwygJson",
+            "outputData": {
+                "wysiwygMasterJson": "wysiwygJson"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "wysiwygJsonMasterCreated"
+                    }
+                ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "filterNodesForProductGroupList": {
+            "actionType": "JSFunction",
+            "method": "filterNodesOnSearchValue",
+            "deps": "js/wysiwygFilterService",
+            "inputData": {
+                "data": "{{data}}",
+                "node": "{{data.wysiwygMasterJson}}"
+            }
+        },
+        "loadWysiwygJsonWithNoFilters": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "wysiwygTree.refresh"
+                    }
+                ]
+            }
+        },
+        "parseForNestedView": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "parseView"
+                },
+                {
+                    "action": "createNestedViewTreeModel"
+                }
+            ]
+        },
+        "parseView": {
+            "actionType": "JSFunction",
+            "method": "createHTMLModel",
+            "inputData": {
+                "viewXML": "{{function:getViewData}}"
+            },
+            "outputData": {
+                "htmlModel": ""
+            },
+            "deps": "js/wysiwyg-view-editorUtils.service"
+        },
+        "createNestedViewTreeModel": {
+            "actionType": "JSFunctionAsync",
+            "method": "createNestedViewTreeModel",
+            "inputData": {
+                "htmlModel": "{{data.htmlModel}}",
+                "currentViewName": "{{ctx.wysiwygCurrentPanel.id}}"
+            },
+            "outputData": {
+                "nestedViewModel": ""
+            },
+            "deps": "js/wysiwyg-view-editorUtils.service"
+        },
+        "refreshWysiwyg": {
+            "actionType": "JSFunction",
+            "method": "updateUrlSubpanelId",
+            "inputData": {
+                "panelId": "{{data.eventMap['nestedViewTree.treeNodeSelected'].node.label}}"
+            },
+            "deps": "js/wysiwygUtilService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "wysiwygJsonMasterCreated",
+            "action": "filterNodesForProductGroupList"
+        },
+        {
+            "eventId": "wysiwyg.refreshNestedView",
+            "action": "parseForNestedView"
+        },
+        {
+            "eventId": "condition.valueChanged",
+            "action": "loadWysiwygJsonWithNoFilters",
+            "condition": "conditions.refreshTree"
+        },
+        {
+            "eventId": "nestedViewTree.treeNodeSelected",
+            "cacheEventData": true,
+            "action": "refreshWysiwyg"
+        }
+    ],
+    "conditions": {
+        "isSearchTestBlank": {
+            "expression": "data.searchBox.dbValue===''"
+        },
+        "refreshTree": {
+            "expression": "condition === 'conditions.isSearchTestBlank'"
+        }
+    },
+    "data": {
+        "navigationPanelAnchor": "navigationPanelAnchor",
+        "searchBox": {
+            "displayName": "{{i18n.searchBox}}",
+            "type": "STRING"
+        },
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.searchString}}"
+        },
+        "nestedViewTree": {
+            "dbValue": "nestedViewTree"
+        }
+    },
+    "i18n": {
+        "searchString": [
+            "locationMessages"
+        ],
+        "navigationPanelHeader": [
+            "locationMessages"
+        ],
+        "views": [
+            "locationMessages"
+        ],
+        "elements": [
+            "locationMessages"
+        ],
+        "searchBox": [
+            "locationMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "parseForNestedView"
+    }
+}

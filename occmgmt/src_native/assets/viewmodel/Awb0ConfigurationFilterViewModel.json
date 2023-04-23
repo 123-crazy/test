@@ -1,0 +1,59 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                "js/aw-command-panel.directive",
+                "js/aw-command-sub-panel.directive",
+                "js/visible-when.directive",
+                "js/aw-init.directive"
+               ],
+
+    "actions":
+    {
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                },
+                {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "navigationPanel"
+                    }
+                } ]
+            }
+        }
+    },
+
+    "data":
+    {
+    },
+
+    "messages":
+    {
+    },
+
+    "conditions":
+    {
+        "isConfigurationFilterNotSupported": {
+            "expression": "ctx.aceActiveContext.context.supportedFeatures.Awb0EnableConfigurationPanelFeature === undefined || ctx.aceActiveContext.context.supportedFeatures.Awb0EnableConfigurationPanelFeature === false"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "ace.productChangedEvent",
+            "condition": "conditions.isConfigurationFilterNotSupported",
+            "action": "closePanel"
+        }
+    ],
+
+    "i18n":
+    {
+        "occmgmtConfigurationFilterTitle": ["OccurrenceManagementConstants"]
+    }
+}

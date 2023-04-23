@@ -1,0 +1,437 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-listbox.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "checkVersionSupportForProject",
+            "inputData": {
+                "major": "11",
+                "minor": "2",
+                "qrm": "4"
+            },
+            "outputData":
+            {
+                "isVersionSupported": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.isVersionSupported === true",
+                        "name": "revealWithProject"
+                    },
+                    {
+                        "condition": "data.isVersionSupported === false",
+                        "name": "revealWithoutProject"
+                    }
+                ]
+            },
+            "deps": "js/pgp0UserListService"
+        },
+        "revealWithoutProjectPanel": {
+            "actionType": "dataProvider",
+            "methods": ["userPerformSearch"]
+        },
+        "revealWithProjectPanel": {
+            "actionType": "dataProvider",
+            "methods": [
+                 "getPropertiesProvider"
+            ]
+        },
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:addResponsibleUser}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData":
+                        {
+
+                            "relatedModified": [ "{{ctx.xrtSummaryContextObject}}" ]
+                        }
+                    },
+                    {
+                      "name": "complete",
+                      "eventData": {
+                         "source": "toolAndInfoPanel"
+                      }
+                   }
+
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/pgp0UserListService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Group",
+                        "properties": [
+                            {
+                                "name": "object_full_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_member",
+                        "properties": [
+                            {
+                                "name": "user",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [
+                            {
+                                "name": "group",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "userName"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [
+                            {
+                                "name": "person",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties": [
+                            {
+                                "name": "user_name"
+                            },
+                            {
+                                "name": "PA9"
+                            },
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "deps": "js/pgp0UserListService"
+        },
+        "addSelection": {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+            },
+            "deps": "js/pgp0UserListService"
+        },
+        "getProjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2017-05-ProjectLevelSecurity",
+            "method": "getProjectsForAssignOrRemove",
+            "inputData":
+            {
+                "projectsInput":
+                [
+                    {
+                        "user":{
+                            "uid": "{{ctx.user.uid}}",
+                            "type": "{{ctx.user.type}}"
+                        },
+                        "selectedObjects": "{{function:processSelectedObjects}}",
+                        "assignedObjects": [],
+                        "filterText": "",
+                        "isAceContext": false,
+                        "paginationInfo":
+                        {
+                            "startIndexForAvailableProjects": 0,
+                            "maxToReturnForAvailableProjects": 50
+                        }
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "availableProjectsList"   : "ServiceData.modelObjects",
+                "commonProjectList" :  "projectOutput.assignedProjectsList"
+            },
+            "policy": {
+                "types": [
+                {
+
+                    "name": "TC_Project",
+                  "properties": [
+                     {
+                        "name": "object_string"
+                     },
+                     {
+                        "name": "project_id"
+                     }
+                  ]
+                 }
+              ]
+           },
+           "events": {
+               "success": [ {
+                   "name": "getProperties"
+               } ]
+           },
+           "actionMessages": {
+               "failure": [ {
+                   "message": "SOAFailureMessage"
+               } ]
+           },
+           "deps": "js/pgp0UserListService"
+        },
+     "populateProjectData": {
+         "actionType": "JSFunction",
+         "method": "populateProjectData",
+         "inputData": {
+            "data": "{{data}}",
+            "selectedArray": "{{ctx.mselected}}"
+         },
+         "deps": "js/pgp0UserListService"
+      },
+      "getProperties": {
+          "actionType": "TcSoaService",
+          "serviceName": "Core-2006-03-DataManagement",
+          "method": "getProperties",
+          "inputData": {
+              "objects": "{{ctx.mselected}}",
+              "attributes": [
+                  "project_list"
+              ]
+          },
+          "policy": {
+              "types": [
+                  {
+                      "name": "Prg0AbsCriteria",
+                      "properties": [
+                          {
+                              "name": "project_list"
+                          }
+                      ]
+                  }
+              ]
+          },
+          "outputData":
+          {
+              "objectsWithProjectList"   : "modelObjects"
+          },
+          "events": {
+              "success": [
+                {
+                   "name": "projectPropertiesLoaded"
+                }
+              ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "userProjectObject": {
+            "displayName": "{{i18n.project}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true
+        },
+        "showProjectList": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "true"
+        }
+    },
+    "dataProviders": {
+        "userPerformSearch": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "getPropertiesProvider": {
+            "action": "getProjects"
+        }
+    },
+    "conditions": {
+        "isSelectedObjectListEmpty": {
+            "expression": "data.dataProviders.userPerformSearch.selectedObjects.length>0"
+        },
+        "isProjectObjectListEmpty": {
+         "expression": "data.projectObjectList.length <= 0"
+       }
+    },
+    "functions": {
+        "processSelectedObjects": {
+            "functionName": "processSelectedObjects",
+            "parameters": [
+                "{{ctx}}"
+               ]
+        },
+        "addResponsibleUser": {
+            "functionName": "addResponsibleUser",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+               ]
+        }
+    },
+    "preferences": [
+        "WRKFLW_allow_resourcepool_assignments",
+        "WRKFLW_show_user_assignment_options"
+    ],
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "createObjectTitle": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "pgp0AssignResponsibleUser": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+         "add": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+         "assign": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+         "project": [
+             "ProgramPlanningCommandPanelsMessages"
+         ],
+          "none": [
+             "ProgramPlanningCommandPanelsMessages"
+         ]
+    },
+    "onEvent": [
+        {
+            "eventId": "userPerformSearch.selectionChangeEvent",
+            "action": "addSelection"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Pgp0AddResponsibleUser"
+            },
+            "action": "reveal"
+        },
+        {
+           "eventId": "revealWithProject",
+           "action": "revealWithProjectPanel"
+        },
+        {
+           "eventId": "revealWithoutProject",
+           "action": "revealWithoutProjectPanel"
+        },
+        {
+           "eventId": "projectPropertiesLoaded",
+           "action": "populateProjectData"
+        },
+        {
+            "eventId": "getProperties",
+            "action": "getProperties"
+        }
+    ]
+}

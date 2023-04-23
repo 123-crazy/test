@@ -1,0 +1,222 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-form.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-add.directive",
+        "js/visible-when.directive"
+    ],
+    "i18n": {
+        "addElementBtn": [
+            "OccmgmtRevOccConstants"
+        ]
+    },
+    "actions": {
+        "addRevisionCmdAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceManagement",
+            "method": "getInfoForAddElement3",
+            "inputData": {
+                "getInfoForElementIn": {
+                    "parentElement": "{{ctx.aceActiveContext.context.addElement.parent}}",
+                    "fetchAllowedOccRevTypes": false
+                }
+            },
+            "outputData": {
+                "allowedTypeInfo2": "{{function:extractAllowedTypesInfoFromResponse}}"
+            },
+            "deps": "js/addElementService"
+        },
+        "addExistingRevision": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "referenceProperty.update",
+                        "eventData": {
+                            "property": "{{data.typeRefProperty.dbValue}}",
+                            "selectedObjects": "{{data.sourceObjects}}"
+                        },
+                        "condition": "data.typeRefProperty !== undefined"
+                    },
+                    {
+                        "name": "referenceAdded.updateContext",
+                        "condition": "data.typeRefProperty !== undefined"
+                    },
+                    {
+                        "name": "referenceAdded.closePanel",
+                        "condition": "data.typeRefProperty !== undefined"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Awb0AddOccurrenceSub"
+                        },
+                        "condition": "data.typeRefProperty === undefined"
+                    },
+                    {
+                        "name": "addObject.revisionCreated",
+                        "eventData": {
+                            "data": "{{data}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "createPartRevision": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateObject"
+                } ]
+            }
+        },
+
+        "partRevisionCreated": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "referenceProperty.update",
+                        "eventData": {
+                            "property": "{{data.typeRefProperty.dbValue}}",
+                            "selectedObjects": [ "{{data.createdObject}}" ]
+                        },
+                        "condition": "data.typeRefProperty !== undefined"
+                    },
+                    {
+                        "name": "referenceAdded.updateContext",
+                        "condition": "data.typeRefProperty !== undefined"
+                    },
+                    {
+                        "name": "referenceAdded.closePanel",
+                        "condition": "data.typeRefProperty !== undefined"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Awb0AddOccurrenceSub"
+                        },
+                        "condition": "data.typeRefProperty === undefined"
+                    },
+                    {
+                        "name": "addObject.revisionCreated",
+                        "eventData": {
+                            "data": "{{data}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "createAndAddUsagesInBulk": {
+            "actionType": "JSFunctionAsync",
+            "method": "getBulkCreateInput",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "createBulkInput": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "revOcc.setElementBulkCreateInput"
+                } ]
+            },
+            "deps": "js/addRevOccService"
+        },
+        "setCreateInputContextAndAddBulkUsages": {
+            "actionType": "batchJob",
+            "steps": [ 
+                {
+                    "action": "revOccSetElementBulkCreateInput"
+                },
+                {
+                    "action": "bulkAddObject"
+                }
+            ]
+        },
+        "revOccSetElementBulkCreateInput": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.addElement.elementCreateInput",
+                "value": "{{data.createBulkInput}}"
+            },
+            "deps": "js/appCtxService"
+            },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "bulkAddObject": {
+            "actionType": "JSFunction",
+            "method": "bulkAddObject",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevOccService"
+        }
+    },
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getBulkCreateInput": {
+            "functionName": "getBulkCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isPaletteTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && data.sourceObjects.length === 1"
+        },
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length === 1"
+        },
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='newTabPageSub' && data.creationType"
+        },
+        "isPaletteTabBulkCreateAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && data.sourceObjects.length > 1"
+        },
+        "isSearchTabBulkCreateAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 1"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Awb0AddRevision"
+            },
+            "action": "addRevisionCmdAction"
+        },
+        {
+            "eventId": "referenceAdded.closePanel",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "addObject.objectcreated",
+            "action": "partRevisionCreated"
+        },
+        {
+            "eventId":"revOcc.setElementBulkCreateInput",
+            "action":"setCreateInputContextAndAddBulkUsages"
+        }
+    ]
+}

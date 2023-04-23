@@ -1,0 +1,600 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "treeLoadInputNew": "request.treeLoadInput",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "dataProvider": "{{data.dataProviders.rootCauseDataProvider}}"
+            },
+            "outputData": {
+                "ctx.search.totalFound": "result.treeLoadResult.totalChildCount",
+                "ctx.search.totalLoaded": "result.treeLoadResult.childNodes.length"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "doDataProvider": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    }
+                ]
+            }
+        },
+        "loadTreeTablePropertiesOnInitialLoad": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTablePropertiesOnInitialLoad",
+            "deps": "js/CAW0RootCauseDataService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.rootCauseDataProvider.viewModelCollection.loadedVMObjects}}",
+                "declViewModel": "{{data}}",
+                "uwDataProvider": "{{data.dataProviders.rootCauseDataProvider}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "typesForArrange": "{{data.dataProviders.rootCauseDataProvider.columnConfig.typesForArrange}}"
+                }
+            },
+            "outputData": {
+                "dataProviders.rootCauseDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            }
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "methodArgument": {
+                    "propertyLoadInput": "request.propertyLoadInput",
+                    "propertyLoadContext": {
+                        "clientName": "AWClient",
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "typesForArrange": "{{data.dataProviders.occDataProvider.columnConfig.typesForArrange}}"
+                    },
+                    "declViewModel": "{{data}}",
+                    "uwDataProvider": "{{data.dataProviders.occDataProvider}}"
+                }
+            },
+            "outputData": {
+                "dataProviders.occDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "addNewlyAddedElement": {
+            "actionType": "JSFunction",
+            "method": "addNewElement",
+            "inputData": {
+                "addElementResponse": "{{data.eventMap['addElement.added'].addElementResponse}}",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/CAW0EditTreeStructure",
+            "events": {
+                "success": [
+                    {
+                        "name": "addElement.addedToTree"
+                    },
+                    {
+                        "name": "Caw0Methodology.activeViewUpdated",
+                        "condition": "ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Methodology'"
+                    },
+                    {
+                        "name": "Caw0Relations.activeViewUpdated",
+                        "condition": "ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Relations'"
+                    }
+                ]
+            }
+        },
+        "updateTreeTable": {
+            "actionType": "JSFunction",
+            "method": "updateTreeTable",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/CAW0EditTreeStructure"
+        },
+        "updateTreeTableOnDelete": {
+            "actionType": "JSFunction",
+            "method": "updateTreeTableOnDelete",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/CAW0EditTreeStructure"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.rootCauseDataProvider}}"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "resetSelection": {
+            "actionType": "JSFunction",
+            "method": "resetSelection",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "refreshTree": {
+            "actionType": "JSFunction",
+            "method": "resetSelection",
+            "inputData": {
+                "flag": "Added5Why"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.rootCauseDataProvider.selectionModel}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "setRootCauseContext": {
+            "actionType": "JSFunction",
+            "method": "setRootCauseContext",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "setParentWhyObject": {
+            "actionType": "JSFunction",
+            "method": "setParentWhyObject",
+            "inputData": {
+                "fiveWhyObject": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0RootCauseDataService",
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.createObjectComplete"
+                    }
+                ]
+            }
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [
+                    {
+                        "scope": "LoginUser",
+                        "scopeName": "",
+                        "clientName": "AWClient",
+                        "resetColumnConfig": true,
+                        "columnConfigQueryInfos": [
+                            {
+                                "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                                "operationType": "union",
+                                "typeNames": [
+                                    "CAW0Defect",
+                                    "CAW05Why"
+                                ]
+                            }
+                        ],
+                        "businessObjects": [
+                            {}
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "dataProviders.rootCauseDataProvider.resetColumnConfigs": "columnConfigurations"
+            }
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [
+                    {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "columnConfigId": "rootCauseColConfig",
+                        "columns": "{{data.dataProviders.rootCauseDataProvider.newColumns}}",
+                        "scope": "LoginUser",
+                        "scopeName": ""
+                    }
+                ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [
+                    {
+                        "name": "occmgmtColumnConfig.saved"
+                    }
+                ]
+            }
+        },
+        "saveColumnConfigData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [
+                    {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "columnConfigId": "rootCauseColConfig",
+                        "columns": "{{data.dataProviders.rootCauseDataProvider.newColumns}}",
+                        "scope": "LoginUser",
+                        "scopeName": ""
+                    }
+                ]
+            },
+            "outputData": {}
+        },
+        "caw0SetSelection": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0EditTreeStructure",
+            "events": {
+                "success": [
+                    {
+                        "name": "openAddWhyPanel",
+                        "condition": "data.eventData.createdObject.type === 'CAW05Why'"
+                    },
+                    {
+                     "name":"caw0.CAW0AddCauseOnIshikawa",
+                     "condition": "data.eventData.createdObject.type === 'CAW0Ishikawa'"
+                    }
+                ]
+            }
+        },
+        "CAW0AddWhy": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "0": "CAW0AddWhy",
+                "1": "aw_toolsAndInfo",
+                "3": "{{commandContext}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addWhy.caw0SetPin",
+                        "eventData": {
+                            "data": "{{commandContext}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "doPostSaveEdit5WhyActionSuccess11": {
+            "actionType": "JSFunction",
+            "method": "updateTreeTable",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {   "condition": "ctx.tcSessionData.tcMajorVersion > 12 &&state === 'saved'  && state !== 'starting' && state !== 'canceling' && ctx.selected.modelType && ctx.selected.modelType.typeHierarchyArray.indexOf('CAW0Defect')>-1 && ctx.selected.props.caw0Context.dbValues[0] !== 'Ishikawa'",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "deps": "js/CAW0EditTreeStructure"
+        },
+        "setPropertyInfoEdit": {
+            "actionType": "JSFunction",
+            "method": "setPropertyInfoEdit",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "doPostSaveEdit5WhyEventSuccess11"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "doPostSaveEdit5WhyEventFailure"
+                    }
+                ]
+            }
+        },
+        "setSelectionOf5Why": {
+            "actionType": "JSFunction",
+            "method": "setSelectionOf5Why",
+            "inputData": {
+                "dataProvider": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService",
+            "events": {
+                "success": [
+                    {
+                        "name": "openAdd5WhyPanel"
+                    }
+                ]
+            }
+        },
+        "CAW0Add5Why": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "0": "CAW0Add5Why",
+                "1": "aw_toolsAndInfo",
+                "3": "{{commandContext}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "clearCTXfor5Why"
+                    }
+                ]
+            }
+        },
+        "CAW0AddIshikawa": {
+            "actionType": "JSFunctionAsync",
+            "deps": "js/command.service",
+            "method": "executeCommand",
+            "inputData": {
+                "0": "CAW0AddIshikawa"
+            }
+        },
+        "clearCTXfor5Why":{
+            "actionType": "JSFunction",
+            "method": "clearCTXfor5Why",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "caw0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "CAW0AddCauseOnIshikawa": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "0": "CAW0AddCause",
+                "1": "aw_toolsAndInfo",
+                "3": "{{commandContext}}"
+            }
+        },
+        "setCauseFor5why": {
+            "actionType": "JSFunction",
+            "method": "setCauseFor5why",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService",
+            "events": {
+                "success": [
+                    {
+                        "name": "openAdd5WhyPanel"
+                    }
+                ]
+            }
+        }
+    },
+    "data": {
+        "delayTimeTree": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "rootCauseDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "single",
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "contextMenuCommandsAnchor": "rootCauseTreeContextMenu"
+        },
+        "rootCausePropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "rootCauseColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "saveColumnAction": "saveColumnConfigData",
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig"
+        }
+    },
+    "grids": {
+        "rootCauseTree": {
+            "dataProvider": "rootCauseDataProvider",
+            "propertyProvider": "rootCausePropertyProvider",
+            "columnProvider": "rootCauseColumnProvider",
+            "addIconColumn": false,
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true,
+                "useStaticFirstCol": true
+            }
+        }
+    },
+    "functions": {
+        "getParentOfCurr5Why": {
+            "functionName": "getParentOfCurr5Why",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true,
+            "action": "addNewlyAddedElement"
+        },
+        {
+            "eventId": "treeTableUpdated",
+            "action": "refreshTree"
+        },
+        {
+            "eventId": "processPWASelection",
+            "cacheEventData": true,
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "rootCauseDataProvider.modelObjectsUpdated",
+            "action": "setRootCauseContext"
+        },
+        {
+            "eventId": "addElement.addedToTree",
+            "action": "setParentWhyObject",
+            "condition": "ctx.selected.modelType && (ctx.selected.modelType.typeHierarchyArray.indexOf('CAW05Why') > -1 || (ctx.selected.modelType.typeHierarchyArray.indexOf('CAW0Defect') > -1 && (ctx.selected.props.caw0Context.dbValues[ 0 ] === 'Why' || ctx.selected.props.caw0Context.dbValues[ 0 ] === '5Why'))) && !data.pinnedToForm.dbValue"
+        },
+        {
+            "eventId": "rootCauseDataProvider.treeNodesLoaded",
+            "cacheEventData": true,
+            "condition": "!data.dataProviders.rootCauseDataProvider.columnConfigLoadingInProgress",
+            "action": "loadTreeTablePropertiesOnInitialLoad"
+        },
+        {
+            "eventId": "updateTreeTableOnDelete",
+            "action": "updateTreeTableOnDelete"
+        },
+        {
+            "eventId": "call.caw0SetSelection",
+            "action": "caw0SetSelection",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved' && state !== 'canceling' && ctx.selected.type !== 'CAW05Why' && ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Overview' && ctx.selected.type !== 'CAW0Ishikawa' && ctx.selected.type !== 'CAW0Defect'",
+            "action": "updateTreeTable",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "doPostSaveEdit5WhyEventSuccess11",
+            "action": "doPostSaveEdit5WhyActionSuccess11"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved'  && state !== 'starting' && state !== 'canceling' && ctx.selected.modelType && ((ctx.selected.modelType.typeHierarchyArray.indexOf('CAW05Why')>-1 || ctx.selected.modelType.typeHierarchyArray.indexOf('CAW0Ishikawa')>-1) || (ctx.selected.modelType.typeHierarchyArray.indexOf('CAW0Defect')>-1  && ctx.selected.props.caw0Context.dbValues[0] !== 'Ishikawa'))",
+            "action": "setPropertyInfoEdit",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "caw0.setSelection",
+            "action": "setSelectionOf5Why"
+        },
+        {
+            "eventId": "openAdd5WhyPanel",
+            "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Relations'",
+            "action": "CAW0Add5Why"
+        },
+        {
+            "eventId": "caw0.openAdd5WhyPanel",
+            "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Relations'",
+            "action": "setSelectionOf5Why"
+        },
+        {
+            "eventId": "openAdIshikawaPanel",
+            "action": "CAW0AddIshikawa"
+        },
+        {
+            "eventId": "clearCTXfor5Why",
+            "action": "clearCTXfor5Why"
+        },
+        {
+            "eventId": "caw0.CAW0AddCauseOnIshikawa",
+            "action": "CAW0AddCauseOnIshikawa"
+        },
+        {
+            "eventId": "caw0.setCauseFor5why",
+            "action": "setCauseFor5why"
+        }
+    ],
+    "i18n": {
+        "TwistieTooltipCollapsed": [
+            "CAW0CapaMessages"
+        ],
+        "TwistieTooltipExpanded": [
+            "CAW0CapaMessages"
+        ]
+    }
+}

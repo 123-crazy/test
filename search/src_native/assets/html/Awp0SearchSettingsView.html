@@ -1,0 +1,15 @@
+<aw-command-panel caption="i18n.searchSettings">
+    <aw-panel-body>
+        <aw-panel-section caption="i18n.filterPanelRelated" collapsed="false">
+            <aw-widget-with-tooltip  class="aw-search-settings" prop="preference" aw-repeat="preference : ctx.searchSettings.searchPreferencesForSettings | filter:{category:'filterPanelRelated'} | filter:{propertyName:'!AWC_Limited_Filter_Categories_Expanded'}"></aw-widget-with-tooltip>
+            <aw-checkbox-with-reset  class="aw-search-settings" prop="preference" visible-when="ctx.searchSettings.AWC_Limited_Filter_Categories_Enabled === 'true' || ctx.searchSettings.AWC_Limited_Filter_Categories_Enabled === true" reset-action='resetFiltersExpanded' aw-repeat="preference : ctx.searchSettings.searchPreferencesForSettings | filter:{propertyName:'AWC_Limited_Filter_Categories_Expanded'}"></aw-checkbox-with-reset>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.generalSearchRelated" collapsed="false">
+            <aw-widget-with-tooltip  class="aw-search-settings" prop="preference" aw-repeat="preference : ctx.searchSettings.searchPreferencesForSettings | filter:{category:'generalSearchRelated'}"></aw-widget-with-tooltip>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+            <aw-button action="saveSettings" visible-when="awPanelBody.$valid && conditions.isValidToSave"><aw-i18n>i18n.Save</aw-i18n></aw-button>
+    </aw-panel-footer>
+</aw-command-panel>
+

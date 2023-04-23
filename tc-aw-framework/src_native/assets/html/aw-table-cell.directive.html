@@ -1,0 +1,58 @@
+<!-- Allows editing of Object and Object Array in table -->
+<div class="aw-jswidgets-cellTop" ng-if="prop" ng-attr-tabindex="{{prop.isEditable ? rowindex + 1 : -1 }}" ng-class="{'aw-jswidgets-editableGridCell': (prop.isEditable)&&modifiable != 'false', 'aw-jswidgets-uiNonEditCell': !prop.isEditable||modifiable == 'false', 'changed': prop.valueUpdated, 'aw-jswidgets-isEditing': prop.isEditing}" ng-focus="startEdit($event)" ng-click="startEdit($event)" _colname="{{prop.propertyName}}">
+
+    <!-- All non array properties and non rich text read only if
+                    ( prop not richtext  AND prop not editable OR prop modifiable is false ) OR
+                    ( prop isEditable AND  prop is not editing AND modifiable is not false AND prop type not OBJECT or OBJECTARRY )
+            Show tooltip
+         -->
+    <div class="aw-jswidgets-tableNonEditContainer aw-layout-flexRowContainer" ng-if=" !prop.isArray && !prop.isRichText && ( ( !prop.isEditable || modifiable === 'false' ) ||
+                        ( prop.isEditable && !prop.isEditing && modifiable !== 'false' && prop.type !== 'OBJECT' && prop.type !== 'OBJECTARRAY' ) )" title="{{ prop.uiValue }}">
+        <div class="aw-jswidgets-dataGridCellText">
+            <aw-property-non-edit-val prop="prop" in-table-cell="true"></aw-property-non-edit-val>
+        </div>
+    </div>
+
+    <!-- All non array properties rich text read only if
+                    ( prop is richtext  AND prop not editable OR prop modifiable is false ) OR
+                    ( prop isEditable AND  prop is not editing AND modifiable is not false AND prop type not OBJECT or OBJECTARRY )
+            Do not show tooltip
+         -->
+    <div class="aw-jswidgets-tableNonEditContainer aw-layout-flexRowContainer" ng-if=" !prop.isArray && prop.isRichText && ( ( !prop.isEditable || modifiable === 'false' ) ||
+                        ( prop.isEditable && !prop.isEditing && modifiable !== 'false' && prop.type !== 'OBJECT' && prop.type !== 'OBJECTARRAY' ) )">
+        <div class="aw-jswidgets-dataGridCellText">
+            <aw-property-non-edit-val prop="prop" in-table-cell="true"></aw-property-non-edit-val>
+        </div>
+    </div>
+
+    <!-- All array properties read only if
+                    ( prop not editable OR prop modifiable is false ) OR
+                    ( prop isEditable AND  prop is not editing AND modifiable is not false AND prop type not OBJECT or OBJECTARRY )
+            Do not show tooltip
+         -->
+    <div class="aw-jswidgets-tableNonEditContainer aw-layout-flexRowContainer" ng-if=" prop.isArray && ( ( !prop.isEditable || modifiable === 'false' ) || ( prop.isEditable && !prop.isEditing && modifiable !== 'false' && prop.type !== 'OBJECT' && prop.type !== 'OBJECTARRAY' ) )">
+        <div class="aw-jswidgets-dataGridCellText">
+            <aw-property-non-edit-array-val prop="prop" in-table-cell="true"></aw-property-non-edit-array-val>
+        </div>
+    </div>
+
+    <!-- All properties editable if
+                prop is editing AND
+                modifiable is not false
+                prop type is not OBJECT and OBJECT ARRAY
+        -->
+    <div class="aw-jswidgets-tableEditContainer" ng-if=" prop.isEditable && prop.isEditing  && modifiable !== 'false' && prop.type !== 'OBJECT' && prop.type !== 'OBJECTARRAY'">
+        <aw-property-val prop="prop" hint="hint" in-table-cell="true" ></aw-property-val>
+    </div>
+
+    <!-- All properties editable if
+                prop is isEditable AND
+                modifiable is not false
+                prop type is OBJECT or OBJECT ARRAY
+        -->
+    <div class="aw-jswidgets-tableEditContainer" ng-if="( prop.isEditable ) && modifiable !== 'false' && (prop.type === 'OBJECT' || prop.type === 'OBJECTARRAY')">
+        <aw-property-val prop="prop" hint="hint" parameter-map="parameterMap" in-table-cell="true" ></aw-property-val>
+    </div>
+
+    <div ng-if="prop.isEditable && !prop.isArray" class="aw-jswidgets-draghandle" aw-fill></div>
+</div>

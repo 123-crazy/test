@@ -1,0 +1,75 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-popup2.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "subProcessList"
+        },
+        "populateSubProcessData": {
+            "actionType": "JSFunction",
+            "method": "populateSubProcessData",
+            "inputData": {
+                "node": "{{ctx.graph.commandContextItem}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "deps": "js/Awp0WorkflowViewerGraphService"
+        },
+        "closePopupWindow": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "inputData": {
+                "popupId": "{{data.popupId}}"
+            },
+            "deps": "js/popupService"
+        },
+        "openSubProcessInViewer": {
+            "actionType": "JSFunction",
+            "method": "openSubProcessInFixedLayout",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "selectedJob": "{{data.dataProviders.subProcessList.selectedObjects[0]}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0WorkflowService"
+        }
+    },
+    "data": {
+    },
+    "dataProviders":
+    {
+        "subProcessList":
+        {
+            "action": "populateSubProcessData",
+            "response":"{{data.searchResults}}",
+            "totalFound":"{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "Awp0MySubProcessPopup.closePopup",
+            "action": "closePopupWindow"
+        },
+        {
+            "eventId": "Awp0MySubProcessPopup.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "subProcessList.selectionChangeEvent",
+            "action": "openSubProcessInViewer"
+        }
+    ],
+    "i18n": {
+    }
+}

@@ -1,0 +1,391 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/enable-when.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-break.directive",
+        "js/aw-widget.directive",
+        "js/exist-when.directive",
+        "js/aw-property-label.directive"
+
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "search":
+        {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}",
+                "participantType":"{{ctx.workflow.participantType}}"
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Group",
+                        "properties":
+                        [
+                            {
+                                "name": "object_full_name"
+                            },
+                            {
+                                "name": "name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties":
+                        [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_member",
+                        "properties":
+                        [
+                            {
+                                "name": "user",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+
+                            {
+                                "name": "role",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "userName"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "User",
+                        "properties":
+                        [
+                            {
+                                "name": "person",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            },
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "default_group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Person",
+                        "properties":
+                        [
+                            {
+                                "name": "user_name"
+                            },
+
+                            {
+                                "name": "PA9"
+                            },
+
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+
+            "deps": "js/userPanelService"
+        },
+
+        "addSelection":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled":"{{function:getMultiSelectMode}}",
+                "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+            },
+
+            "deps": "js/userPanelService"
+        },
+        "addUsers":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectionToMainPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled":"{{function:getMultiSelectMode}}",
+                "selection": "{{data.selectedObjects}}"
+            },
+
+            "deps": "js/userPanelService"
+        },
+        "revealGroupRoleLOV":
+        {
+            "actionType": "JSFunction",
+            "method": "revealGroupRoleLOV",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/userPanelService"
+        }
+    },
+
+    "data":
+    {
+         "reassignOutsideGroupRoleOption": {
+            "displayName": "{{i18n.reassignOutsideGroupRoleQuestion}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": true,
+            "vertical": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "filterBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "searchString":
+        {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "userProjectObject":
+        {
+            "displayName": "{{i18n.project}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allGroups":
+        {
+            "displayName": "{{i18n.group}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allRoles":
+        {
+            "displayName": "{{i18n.role}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "showUsersWithoutGroupRole": {
+            "displayName": "{{i18n.showUsersWithoutGroupRole}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": false
+        },
+        "showUserGroupFlag": {
+            "dbValue": false
+        },
+        "displayGroupRoleList": {
+            "dbValue": false
+        },
+        "previousGroup": {
+            "dbValue": ""
+        },
+        "previousRole": {
+            "dbValue": ""
+        }
+
+    },
+    "dataProviders":
+    {
+        "userPerformSearch":
+        {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode":"{{ctx.workflow.selectionModelMode}}",
+            "commands": {
+               "Awp0ShowObjectCell":
+               {
+                   "id": "cmdOpen",
+                   "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                   "priorities": [ 300 ],
+                   "dependencies": [ "js/showObjectCommandHandler" ],
+                   "displayOption": "ON_HOVER_AND_SELECTION",
+                   "position": "TOP_RIGHT"
+               }
+           },
+           "noResultsFound" : "{{i18n.noResultsFound}}"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "userPerformSearch.selectionChangeEvent",
+            "action": "addSelection"
+        },
+        {
+            "eventId": "awPopupWidget.close",
+            "action": "userPerformSearch"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0WorkflowUserTab"
+            },
+
+            "action": "reveal"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0WorkflowUserTab"
+            },
+
+            "action": "revealGroupRoleLOV"
+        }
+    ],
+
+    "functions":
+    {
+        "getMultiSelectMode":
+        {
+            "functionName": "getMultiSelectMode",
+            "parameters":
+            [
+                "{{ctx.workflow.selectionModelMode}}"
+            ]
+        }
+    },
+
+    "conditions":
+    {
+        "isValidToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        },
+        "isValidObjectToAdd":
+        {
+            "expression": "conditions.isValidToAdd && data.isAddButtonVisible"
+        },
+        "isShowNoResultMessage":
+        {
+           "expression": "data.dataProviders.userPerformSearch.noResults"
+        },
+        "showGroupRoleCheckbox":
+        {
+            "expression": "data.preferences.WRKFLW_user_panel_content_display=='1' || data.preferences.WRKFLW_user_panel_content_display=='3'"
+        },
+        "enableGroupSelection":
+        {
+            "expression": "!data.disabledGroup"
+        },
+        "enableRoleSelection":
+        {
+            "expression": "!data.disabledRole"
+        },
+        "enableGroupRoleView":
+        {
+            "expression": "!data.showUsersWithoutGroupRole.dbValue"
+        }
+    },
+
+    "preferences":
+    [
+        "WRKFLW_user_panel_content_display"
+    ],
+
+    "i18n":
+    {
+        "Add_Title": [ "WorkflowCommandPanelsMessages"],
+        "noResultsFound": [ "InboxMessages"],
+        "showUsersWithoutGroupRole": ["WorkflowCommandPanelsMessages"],
+        "group": ["WorkflowCommandPanelsMessages"],
+        "role": ["WorkflowCommandPanelsMessages"],
+        "allGroups": ["WorkflowCommandPanelsMessages"],
+        "allRoles": ["WorkflowCommandPanelsMessages"],
+        "reassignOutsideGroupRoleQuestion": [ "WorkflowDesignerMessages" ]
+    }
+}

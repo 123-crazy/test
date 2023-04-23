@@ -1,0 +1,44 @@
+<aw-command-panel caption="i18n.advancedSearch">
+    <aw-panel-body>
+        <aw-tab-set tabs="data.tabModels.dbValues" visible-when="conditions.showAdvancedSearchSection">
+            <aw-panel-section visible-when="data.selectedTab.pageId==0">
+                <aw-property-lov-val prop="data.awp0QuickSearchName"></aw-property-lov-val>
+            </aw-panel-section>
+            <aw-panel-body visible-when="data.selectedTab.pageId==0">
+                <aw-panel-section>
+                    <aw-widget prop="attribute" aw-repeat="attribute : data.awp0QuickQueryAttributes"></aw-widget>
+                </aw-panel-section>
+            </aw-panel-body>
+            <span class="aw-search-preferredSearchSettings" visible-when="data.selectedTab.pageId==1 && data.awp0AdvancedQueryName.dbValue && conditions.showPreferredSearchSettings">
+                <aw-command-bar anchor="aw_preferredSearchToolbar" alignment="HORIZONTAL">
+                </aw-command-bar>
+            </span>
+            <aw-panel-section visible-when="data.selectedTab.pageId==1">
+                <aw-advsearch-lov-val prop="data.awp0AdvancedQueryName"></aw-advsearch-lov-val>
+            </aw-panel-section>
+            <aw-panel-body visible-when="data.selectedTab.pageId==1">
+                <aw-panel-section visible-when="conditions.showAdvancedSearchAttributes">
+                    <span class="aw-search-advancedSearchClearAll">
+                            <aw-link  prop="data.advancedSearchClearAll" visible-when="conditions.showClearAll" action="clearAllAction"></aw-link>
+                        </span>
+                    <div aw-repeat="prop : data.awp0AdvancedQueryAttributes">
+                        <aw-widget prop="prop" exist-when="prop.hint !=='checkboxoptionlov'"></aw-widget>
+                        <aw-checkbox-multiselect prop="prop" exist-when="prop.hint ==='checkboxoptionlov'"></aw-checkbox-multiselect>
+                    </div>
+                </aw-panel-section>
+            </aw-panel-body>
+        </aw-tab-set>
+        <aw-panel-section visible-when="!conditions.showAdvancedSearchSection">
+            <aw-property-lov-val prop="data.awp0QuickSearchName"></aw-property-lov-val>
+            <aw-widget prop="attribute" aw-repeat="attribute : data.awp0QuickQueryAttributes"></aw-widget>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-button visible-when="conditions.showAdvancedSearchButton" action="doAdvancedSearch">
+            <aw-i18n>i18n.searchBtn</aw-i18n>
+        </aw-button>
+        <aw-button visible-when="!conditions.showAdvancedSearchButton" action="doQuickSearch">
+            <aw-i18n>i18n.searchBtn</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

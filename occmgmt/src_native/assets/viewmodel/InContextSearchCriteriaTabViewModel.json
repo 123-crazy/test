@@ -1,0 +1,156 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-property-lov-val.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-search-box.directive",
+        "js/aw-property-label.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-link.directive"
+    ],
+    "actions": {
+        "updateSearchScopeLabel": {
+            "actionType": "JSFunction",
+            "method": "updateSearchScopeLabel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "resetPanelAndHideShowTabsBasedOnQueryCriteria": {
+            "actionType": "JSFunction",
+            "method": "resetPanelAndHideShowTabsBasedOnQueryCriteria",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "updateContextQuerySearchAttributes": {
+            "actionType": "JSFunction",
+            "method": "updateContextQuerySearchAttributes",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "preProcessAndPerformNonIndexedSearch": {
+            "actionType": "JSFunction",
+            "method": "preProcessAndPerformNonIndexedSearch",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "preProcessAndPerformQuickSearch": {
+            "actionType": "JSFunction",
+            "method": "preProcessAndPerformQuickSearch",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/nonIndexedSearchService"
+        },
+        "launchResultsPanelAndSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "awTab.setSelected",
+                        "eventData": {
+                            "tabKey": "Results"
+                        }
+                    },
+                    {
+                        "name": "resultPanelActivated",
+                        "condition": "data.dataProviders.icsPerformSearch"
+                    }
+                ]
+            }
+        },
+        "performNonIndexedSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "navigate.doSearch",
+                    "eventData": {
+                        "showKeywordLabel": true,
+                        "keyword": "{{data.nonIndexedKeyword}}",
+                        "populateDataProvider": true,
+                        "searchString": "{{data.searchCriteria.uiValue}}",
+                        "savedQueryUID": "{{data.awb0ContextQuery.dbValue.uid}}"
+                    }
+                } ]
+            }
+        },
+
+        "clearAllQueryCriteriasInAdvancedSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "navigate.clearAllQueryCriteria",
+                    "eventData": {
+                        "data": "{{data}}"
+                    }
+                } ]
+            }
+        }
+    },
+    "conditions": {
+        "isValidSelection": {
+            "expression": "ctx[data.navigateContext.dbValue].currentState.c_uid !== ctx[data.navigateContext.dbValue].currentState.t_uid"
+        },
+        "isLeafNode": {
+            "expression":"ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren && ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren.dbValues[0] === '0' && conditions.isSearchScopeToShowOnLeafNode"
+        },
+        "isSearchScopeToShowOnLeafNode": {
+            "expression": "ctx[data.navigateContext.dbValue].structureSearchConfig && ctx[data.navigateContext.dbValue].structureSearchConfig.showSearchScopeOnleafNode === true ? false : ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren && ctx[data.navigateContext.dbValue].selectedModelObjects[0].props.awb0NumberOfChildren.dbValues[0] === '0'"
+        },
+        "isSearchScopeDisable": {
+            "expression": "ctx[data.navigateContext.dbValue].structureSearchConfig && ctx[data.navigateContext.dbValue].structureSearchConfig.disableSearchScope === true"
+        }
+    },
+    "data": {
+        "searchScope": {
+            "displayName": "{{i18n.searchScopeText}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "awb0ContextQueryAttributes": {},
+         "advancedSearchClearAll": {
+            "displayName": "{{i18n.clearAll}}",
+            "type": "STRING"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "resultPanelActivated",
+            "action": "performNonIndexedSearch"
+        },
+        {
+            "eventId": "launchResultsPanelAndSearch",
+            "action": "launchResultsPanelAndSearch"
+        },
+        {
+            "eventId": "navigate.queriesFetched",
+            "action": "updateContextQuerySearchAttributes"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "condition": "dataProvider.selectedObjects.length === 1",
+            "action": "updateSearchScopeLabel"
+        }
+    ],
+    "i18n": {
+        "find": [ "OccurrenceManagementConstants" ],
+        "searchScopeText": [ "OccurrenceManagementConstants" ],
+        "clearAll": [ "OccurrenceManagementConstants" ]
+    }
+}

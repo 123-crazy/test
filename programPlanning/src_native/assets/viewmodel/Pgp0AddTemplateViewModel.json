@@ -1,0 +1,133 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/visible-when.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "initializeTemplates": {
+            "actionType": "dataProvider",
+            "method": "planTemplateSearchProvider"
+        },
+        "getPlanTemplates": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": {
+                        "selectedPlanUID": "{{ctx.selected.uid}}",
+                        "searchContentType": "PlanObjectTemplates",
+                        "searchString": "{{data.filterText.dbValue}}",
+                        "groupUID": "{{data.groupUID}}",
+                        "userUID": "{{data.userUID}}"
+                    },
+                    "startIndex": "{{data.dataProviders.planTemplateSearchProvider.startIndex}}",
+                    "searchFilterFieldSortType": "Alphabetical"
+                }
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded",
+                "noResultsFound": "{{i18n.noResultsFound}}"
+            }
+        },
+        "revealGroupUserLOV": {
+            "actionType": "JSFunction",
+            "method": "revealGroupUserLOV",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel",
+            "actionMessages": {
+                "failure": [ {
+                    "message": "displayError"
+                } ]
+            }
+        },
+        "processTemplateSelection": {
+            "actionType": "JSFunction",
+            "method": "setSelectedTemplate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        }
+    },
+    "dataProviders": {
+        "planTemplateSearchProvider": {
+            "action": "getPlanTemplates",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_pgp0TemplateCellCommand",
+            "noResultsFound": "{{i18n.noResultsFound}}"
+        }
+    },
+    "data": {
+        "allGroups": {
+            "displayName": "{{i18n.owningGroup}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allUsers": {
+            "displayName": "{{i18n.owningUser}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "filterText": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING"
+        }
+
+    },
+    "conditions": {
+        "isTemplateSelected": {
+            "expression": "data.dataProviders.planTemplateSearchProvider.selectedObjects.length > 0"
+        }
+    },
+
+    "functions": {
+
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Pgp0AddTemplate"
+            },
+            "action": "initializeTemplates"
+        },
+        {
+            "eventId": "awPopupWidget.close",
+            "action": "planTemplateSearchProvider"
+        }
+
+    ],
+    "messages": {},
+
+    "i18n": {
+        "owningGroup": [ "ProgramPlanningCommandPanelsMessages" ],
+        "owningUser": [ "ProgramPlanningCommandPanelsMessages" ],
+        "allGroups": [ "ProgramPlanningCommandPanelsMessages" ],
+        "allUsers": [ "ProgramPlanningCommandPanelsMessages" ],
+        "noResultsFound": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0AddTemplate": [ "ProgramPlanningCommandPanelsMessages" ],
+        "addButtonCommandTitle": [ "ProgramPlanningCommandPanelsMessages" ]
+    },
+
+    "lifecycleHooks": {
+        "onInit": "revealGroupUserLOV"
+    }
+}

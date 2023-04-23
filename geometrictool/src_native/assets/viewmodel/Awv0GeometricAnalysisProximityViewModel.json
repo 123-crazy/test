@@ -1,0 +1,145 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+                 "js/aw-command-panel-section.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-list.directive",
+                 "js/aw-occmgmt-cell.directive",
+                 "js/aw-numeric.directive",
+                 "js/aw-i18n.directive",
+                 "js/visible-when.directive",
+                 "js/aw-button.directive",
+                 "js/aw-label.directive",
+                 "js/aw-row.directive",
+                 "js/aw-column.directive",
+                 "js/exist-when.directive"],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "proximityPanelRevealed",
+            "inputData":
+            {
+                "proximityUnitText":"{{data.proximityUnitText}}",
+                "localeTextBundle": "{{data.i18n}}"
+            },
+
+            "outputData":
+            {
+                "proximityUnitText":"proximityUnitText"
+            },
+
+            "deps": "js/Awv0GeometricAnalysisProximitySearchService"
+        },
+
+
+        "getAllTargetsAction":
+        {
+            "actionType": "dataProvider",
+            "method": "proximitySearchPanelDataProvider"
+        },
+        "getAllTargets":
+        {
+            "actionType": "JSFunction",
+            "method": "getAllTargets",
+            "inputData":
+            {
+            },
+            "outputData":
+            {
+                "allTargets": "allTargets",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/Awv0GeometricAnalysisProximitySearchService"
+        },
+        "executeProximitySearch":
+        {
+            "actionType": "JSFunction",
+            "method": "executeProximitySearch",
+            "inputData":
+            {
+                "range": "{{data.targetRange.dbValue}}"
+            },
+            "deps": "js/Awv0GeometricAnalysisProximitySearchService"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "geoanalysis.proximitySearchTargetListUpdated",
+            "action": "getAllTargetsAction"
+        },
+        {
+            "eventId": "geoanalysis.proximityPanelRevealed",
+            "action": "getAllTargetsAction"
+        }
+    ],
+    "data": {
+        "addRemoveCommands" :"awv0_addRemoveCommands",
+        "targetRange":
+        {
+            "displayName": "{{i18n.proximityLabelText}}",
+            "type": "DOUBLE",
+            "isEditable": "true",
+            "dbValue": "",
+            "validationCriteria":
+            [
+                {
+                    "condition": "conditions.invalidProximityRangeValue",
+                    "value": "{{i18n.invalidProximityValue}}"
+                }
+            ]
+        },
+        "proximityUnitText":
+        {
+            "type": "STRING",
+            "uiValue": "{{i18n.proximityUnitText}}"
+        }
+    },
+    "dataProviders":
+    {
+        "proximitySearchPanelDataProvider":
+        {
+            "action": "getAllTargets",
+            "response": "{{data.allTargets}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "viewer_proximity_cell_commands"
+        }
+    },
+    "conditions":
+    {
+        "hasTargets":
+        {
+            "expression": "data.totalFound !== undefined && data.totalFound > 0"
+        },
+        "invalidProximityRangeValue":
+        {
+            "expression": "data.targetRange.dbValue === '' || data.targetRange.dbValue < 0 "
+        }
+    },
+     "i18n":
+    {
+        "proximityTabText":["GeometricAnalysisMessages"],
+        "emptyTargetList":["GeometricAnalysisMessages"],
+        "filterButtonText":["GeometricAnalysisMessages"],
+        "seedPartsText":["GeometricAnalysisMessages"],
+        "proximityLabelText":["GeometricAnalysisMessages"],
+        "proximityUnitText":["GeometricAnalysisMessages"],
+        "removeTarget":["GeometricAnalysisMessages"],
+        "openTarget":["GeometricAnalysisMessages"],
+        "invalidProximityValue":["GeometricAnalysisMessages"],
+        "mm":["GeometricAnalysisMessages"],
+        "cm":["GeometricAnalysisMessages"],
+        "m":["GeometricAnalysisMessages"],
+        "in":["GeometricAnalysisMessages"],
+        "ft":["GeometricAnalysisMessages"],
+        "yd":["GeometricAnalysisMessages"],
+        "um":["GeometricAnalysisMessages"],
+        "dm":["GeometricAnalysisMessages"],
+        "km":["GeometricAnalysisMessages"],
+        "mils":["GeometricAnalysisMessages"]
+    }
+
+}

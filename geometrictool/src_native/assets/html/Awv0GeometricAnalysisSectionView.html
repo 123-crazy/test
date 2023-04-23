@@ -1,0 +1,33 @@
+<aw-command-panel caption="i18n.sectionTabText">
+    <aw-panel-body>
+        <aw-command-panel-section caption="i18n.sectionsTitleText" anchor="data.analysisSectionCommands" context="data">
+            <aw-checkbox prop="data.capsValue" width="4" action="showCaps"></aw-checkbox>
+            <aw-list visible-when="conditions.hasSections" dataprovider="data.dataProviders.sectionsDataProvider">
+                <aw-include name="Awv0SectionCellContent" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer exist-when="data.dataProviders.sectionsDataProvider.selectedObjects.length == 1">
+        <aw-command-panel-section caption="{{i18n.editSection}}">
+            <aw-flex-column width="fill">
+                <aw-flex-row height="4f">
+                    <aw-checkbox prop="data.sectionToggle" width="4" action="toggleBtnAction"></aw-checkbox>
+                    <aw-checkbox prop="data.cutLineProp" width="4" action="showCutLinesPerSection"></aw-checkbox>
+                </aw-flex-row>
+                <aw-listbox prop="data.sectionPlane" list="data.sectionProps.dbValue" action="viewerSectionPlaneChanged" is-select-only="true"></aw-listbox>
+                <aw-listbox prop="data.clipState" list="data.clipStateProps.dbValue" action="sectionClipStateChanged" is-select-only="true"></aw-listbox>
+                <aw-flex-row height="4f" justify="space-between">
+                    <aw-label prop="data.offsetPropLabel"></aw-label>
+                    <aw-flex-column width="16.3f">
+                        <aw-numeric prop="data.offsetProp"></aw-numeric>
+                    </aw-flex-column>
+                </aw-flex-row>
+                <aw-row exist-when="conditions.showSlider">
+                    <aw-column>
+                        <aw-slider class="aw-geometrictool-slider" prop="data.sectionPanelOffsetSliderProp"></aw-slider>
+                    </aw-column>
+                </aw-row>
+            </aw-flex-column>
+        </aw-command-panel-section>
+    </aw-panel-footer>
+</aw-command-panel>

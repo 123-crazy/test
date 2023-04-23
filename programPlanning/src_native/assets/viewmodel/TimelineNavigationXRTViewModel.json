@@ -1,0 +1,897 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-flex-column.directive"
+    ],
+    "actions": {
+        "deleteEventDependency": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData": {
+                "objects": {
+                    "$adapt": "{{ctx.mselected}}"
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "refreshTimelineManager"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "timelineDataRefresh": {
+            "actionType": "JSFunction",
+            "method": "deletTimelineDependency",
+            "inputData": {
+                "selected": "{{ctx.selected}}"
+            },
+            "deps": "js/Timeline/prgTimelineUtils"
+        },
+        "setUpdateSecondaryEventToFalse": {
+            "actionType": "JSFunction",
+            "method": "setUpdateSecondaryEventFlag",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "isUpdateSecondaryEvent": false
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "setUpdateSecondaryEventToTrue": {
+            "actionType": "JSFunction",
+            "method": "setUpdateSecondaryEventFlag",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "isUpdateSecondaryEvent": true
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "callMoveEventSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProgramInfra-2021-12-ProgramManagement",
+            "method": "moveEvents",
+            "inputData": {
+                "events": "{{function:prepareInputEvents}}",
+                "newEventDate": "{{function:formatNewEventDate}}",
+                "updateSecondaryEvents": "{{data.eventData.updateSecondaryEvents}}",
+                "runInBackground": false
+            },
+            "events": {
+                "failure": [ {
+                    "name": "cdm.updated",
+                    "eventData": {
+                        "updatedObjects": [ "{{data.eventData.event}}" ]
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "checkForDependentEvents": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": [ "{{data.eventData.event}}" ],
+                "attributes": [
+                    "Prg0EventDependencyRel"
+                ]
+            },
+            "events": {
+                "success": [ {
+                        "condition": "data.eventMap.eventDraggedOnTimeline.event.props.Prg0EventDependencyRel.dbValues.length > 0",
+                        "name": "showEventDragErrorMsg",
+                        "eventData": {
+                            "updateTaskInfo": "{{data.eventMap.eventDraggedOnTimeline}}"
+                        }
+                    },
+                    {
+                        "condition": "data.eventMap.eventDraggedOnTimeline.event.props.Prg0EventDependencyRel.dbValues.length === 0",
+                        "name": "callMoveEventSOA",
+                        "eventData": {
+                            "updateTaskInfo": "{{data.eventMap.eventDraggedOnTimeline}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "populateEventLinks": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForPrimary",
+            "inputData": {
+                "primaryObjects": "{{data.eventData}}",
+                "pref": {
+                    "expItemRev": false,
+                    "returnRelations": true,
+                    "info": [ {
+                        "relationTypeName": "Prg0EventDependencyRel"
+                    } ]
+                }
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Prg0EventDependencyRel",
+                    "properties": [ {
+                            "name": "primary_object",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        },
+                        {
+                            "name": "secondary_object",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        }
+                    ]
+                } ]
+            },
+            "outputData": {
+                "eventLinks": "{{function:processEventLinksInfo}}"
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "callForDependency": {
+            "actionType": "JSFunction",
+            "method": "renderEventDependency",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "createEventLink": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{data.eventMap.linkCreatedViaDrag.succTask}}",
+                    "secondaryObject": "{{data.eventMap.linkCreatedViaDrag.predTask}}",
+                    "relationType": "Prg0EventDependencyRel",
+                    "clientId": ""
+                } ]
+            },
+            "outputData": {
+                "serviceData": "ServiceData",
+                "createdRelationObject": "output[0].relation"
+            },
+            "events": {
+                "success": [ {
+                    "name": "eventDependencyRelationCreated"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "initializeTimeline": {
+            "actionType": "JSFunction",
+            "method": "initializeTimeline",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/UITimeline"
+        },
+        "refreshTimelineForUpdatedObjects": {
+            "actionType": "JSFunction",
+            "method": "refreshTimeline",
+            "inputData": {
+                "timelines": "{{data.timelineDataToRefresh.timelineData}}",
+                "events": "{{data.timelineDataToRefresh.eventData}}"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "paginateData": {
+            "actionType": "JSFunction",
+            "method": "paginatePlanAndEvents",
+            "inputData": {
+                "response": "{{data.PaginatedSOAresponse}}"
+            },
+            "outputData": {
+                "plansAndEvents": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "callForShowMoreData"
+                } ]
+            },
+            "deps": "js/TimelineDataSourceService"
+        },
+        "loadPlanForPagination": {
+            "actionType": "TcSoaService",
+            "serviceName": "PrgPlanningAw-2017-06-ProgramPlanning",
+            "method": "loadPlanHierarchy",
+            "inputData": {
+                "contextPlan": "{{ctx.locationContext.modelObject}}",
+                "referencePlan": "{{data.eventMap.callForPagination}}"
+            },
+            "outputData": {
+                "PaginatedSOAresponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "processPaginatedData"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "showMoreDataInTimeline": {
+            "actionType": "JSFunction",
+            "method": "showMoreData",
+            "inputData": {
+                "plansAndEvents": "{{data.plansAndEvents}}"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "onObjectsDeleted": {
+            "actionType": "JSFunction",
+            "method": "onObjectsDeleted",
+            "inputData": {
+                "eventMap": "{{data.eventMap}}"
+            },
+            "deps": "js/TimelineDataSourceService"
+        },
+        "removeDeletedObjectsOnTimeline2": {
+            "actionType": "JSFunction",
+            "method": "removeDeletedObjectsOnTimeline2",
+            "deps": "js/Timeline/uiTimelineUtils",
+            "inputData": {
+                "deletedUids": "{{data.eventMap.deleteFromTimelineEvent}}"
+            },
+            "outputData": {
+                "resetSelectionContext": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "condition": "data.resetSelectionContext === true",
+                        "name": "contextUpdateEvent"
+                    }
+                ]
+            }
+        },
+        "removeMilestoneFromTimeline": {
+            "actionType": "JSFunction",
+            "method": "removeDeletedObjectsOnTimeline",
+            "inputData": {
+                "event": "{{data.eventData}}"
+            },
+            "deps": "js/Timeline/uiTimelineUtils",
+            "events": {
+                "success": [ {
+                    "name": "contextUpdateEvent"
+                } ]
+            }
+        },
+        "contextUpdate": {
+            "actionType": "JSFunction",
+            "method": "revertCtx",
+            "deps": "js/TimelineDataSourceService",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            }
+        },
+        "updatePreferenceTimelineZoomClkAction": {
+            "actionType": "JSFunction",
+            "method": "updatePreferenceForTimelineZoom",
+            "deps": "js/Timeline/uiTimelineUtils",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "setPreferenceTimelineClkAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Administration-2012-09-PreferenceManagement",
+            "method": "setPreferences2",
+            "inputData": {
+                "preferenceInput": [ {
+                    "preferenceName": "AWC_Timeline_Zoom_Level",
+                    "values": [
+                        "{{data.eventData.viewType}}"
+                    ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "updatePreferenceTimelineZoomClkEvent"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "initTimelineWidgetForTree": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "registerContextForStacked"
+                },
+                {
+                    "action": "initTimelineWidget"
+                },
+                {
+                    "action": "initializeTimeline"
+                }
+            ]
+        },
+        "initTimelineWidget": {
+            "actionType": "JSFunction",
+            "method": "initTimelineWidget",
+            "deps": "js/PlanNavigationTimelineSync",
+            "events": {
+                "success": [ {
+                    "name": "PlanTimeline.timelineInitialized"
+                } ]
+            }
+        },
+        "registerContextForStacked": {
+            "actionType": "JSFunction",
+            "method": "registerContextForStackedEvents",
+            "deps": "js/StackedEventsService"
+        },
+        "closeTimelineBatch": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "destroyTimeline"
+                },
+                {
+                    "action": "closeStackPopup"
+                }
+            ]
+        },
+        "destroyTimeline": {
+            "actionType": "JSFunction",
+            "method": "cleanup",
+            "deps": "js/TimelineDataSourceService"
+        },
+        "closeStackPopup": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "deps": "js/popupService"
+        },
+        "changeRowHeightForTimeline": {
+            "actionType": "JSFunction",
+            "method": "changeRowHeightForTimeline",
+            "inputData": {
+                "eventData": "{{data.eventMap.LayoutChangeEvent}}"
+            },
+            "deps": "js/TimelineUtils"
+        },
+        "getEventsAndUpdateColorPropertyAction": {
+            "actionType": "JSFunction",
+            "method": "getEventsAndUpdateColorProperty",
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "updateEventsColorPropertyAction": {
+            "actionType": "JSFunction",
+            "method": "updateEventsColorProperty",
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "scrollToAndSelectEvent": {
+            "actionType": "JSFunction",
+            "method": "scrollToAndSelectEvent",
+            "inputData": {
+                "eventObject": "{{data.eventMap.scrollToAndSelectEvent}}"
+            },
+            "deps": "js/TimelineUtils"
+        },
+        "selectNewlyAddedEvent": {
+            "actionType": "JSFunction",
+            "method": "updateEventSelection",
+            "inputData": {
+                "eventObject": "{{data.eventMap.selectNewlyAddedEvent}}"
+            },
+            "deps": "js/TimelineUtils"
+        },
+        "callSetPropertiesSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [ {
+                    "object": "{{data.eventData.event}}",
+                    "vecNameVal": [ {
+                        "name": "prg0PlannedDate",
+                        "values": [
+                            "{{function:formatPlannedDateForEvent}}"
+                        ]
+                    } ]
+                } ]
+            },
+            "events": {
+                "failure": [ {
+                    "name": "cdm.updated",
+                    "eventData": {
+                        "updatedObjects": [ "{{data.eventData.event}}" ]
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineUtils"
+        }
+    },
+    "functions": {
+        "prepareInputEvents": {
+            "functionName": "prepareInputEvents",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "formatNewEventDate": {
+            "functionName": "formatNewEventDate",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "processEventLinksInfo": {
+            "functionName": "processEventLinksInfo",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getDeleteEventDependencyInput": {
+            "functionName": "getDeleteEventDependencyInput",
+            "parameters": [
+                "{{ctx.selected}}"
+            ]
+        },
+        "formatPlannedDateForEvent": {
+            "functionName": "formatPlannedDateForEvent",
+            "parameters": [
+                "{{data.eventData.plannedDate}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "removeMilestoneFromTimelineEvent",
+            "cacheEventData": true,
+            "action": "removeMilestoneFromTimeline"
+        },
+        {
+            "eventId": "showEventDragErrorMsg",
+            "cacheEventData": true,
+            "message": "showEventDragErrorMsg"
+        },
+        {
+            "eventId": "callMoveEventSOA",
+            "cacheEventData": true,
+            "action": "callMoveEventSOA"
+        },
+        {
+            "eventId": "eventDraggedOnTimeline",
+            "cacheEventData": true,
+            "action": "checkForDependentEvents",
+            "condition": "conditions.pgp0IsTCVersion133OrLater"
+        },
+        {
+            "eventId": "eventDraggedOnTimeline",
+            "cacheEventData": true,
+            "action": "callSetPropertiesSOA",
+            "condition": "conditions.pgp0IsLessThanTC133"
+        },
+        {
+            "eventId": "processedEventsInfo",
+            "cacheEventData": true,
+            "action": "populateEventLinks"
+        },
+        {
+            "eventId": "eventDependencyRelationCreated",
+            "cacheEventData": true,
+            "action": "callForDependency"
+        },
+        {
+            "eventId": "linkCreatedViaDrag",
+            "cacheEventData": true,
+            "action": "createEventLink"
+        },
+        {
+            "eventId": "warningMessageForDeletingEventDependency",
+            "cacheEventData": true,
+            "message": "removeEventDependency"
+        },
+        {
+            "eventId": "refreshTimelineManager",
+            "action": "timelineDataRefresh"
+        },
+        {
+            "eventId": "updatePreferenceTimelineZoomClkEvent",
+            "action": "updatePreferenceTimelineZoomClkAction"
+        },
+        {
+            "eventId": "onScaleClickEvent",
+            "cacheEventData": true,
+            "action": "setPreferenceTimelineClkAction"
+        },
+        {
+            "eventId": "timelineRefresh",
+            "action": "refreshTimelineForUpdatedObjects"
+        },
+        {
+            "eventId": "callForPagination",
+            "cacheEventData": true,
+            "action": "loadPlanForPagination"
+        },
+        {
+            "eventId": "processPaginatedData",
+            "action": "paginateData"
+        },
+        {
+            "eventId": "callForShowMoreData",
+            "action": "showMoreDataInTimeline"
+        },
+        {
+            "eventId": "cdm.deleted",
+            "cacheEventData": true,
+            "action": "onObjectsDeleted"
+        },
+        {
+            "eventId": "deleteFromTimelineEvent",
+            "cacheEventData": true,
+            "action": "removeDeletedObjectsOnTimeline2"
+        },
+        {
+            "eventId": "contextUpdateEvent",
+            "action": "contextUpdate"
+        },
+        {
+            "eventId": "LayoutChangeEvent",
+            "action": "changeRowHeightForTimeline",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "timeline.getEventsAndUpdateColorProperty",
+            "action": "getEventsAndUpdateColorPropertyAction"
+        },
+        {
+            "eventId": "updateEventsColorPropertyEvent",
+            "action": "updateEventsColorPropertyAction"
+        },
+        {
+            "eventId": "scrollToAndSelectEvent",
+            "cacheEventData": true,
+            "action": "scrollToAndSelectEvent"
+        },
+        {
+            "eventId": "selectNewlyAddedEvent",
+            "cacheEventData": true,
+            "action": "selectNewlyAddedEvent"
+        }
+    ],
+    "conditions": {
+        "onObjectsUpdatedToBeCalled": {
+            "expression": "ctx.mselected[0].modelType.typeHierarchyArray.indexOf('Prg0AbsEvent') > -1 || ctx.mselected[0].modelType.typeHierarchyArray.indexOf('Prg0AbsPlan') > -1"
+        },
+        "pgp0IsTCVersion133OrLater": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 3))"
+        },
+        "pgp0IsLessThanTC133": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion < 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion <= 2))"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initTimelineWidgetForTree",
+        "onUnmount": "closeTimelineBatch"
+    },
+    "preferences": [
+        "AWC_PAGE_SIZE",
+        "AWC_Timeline_Zoom_Level",
+        "PP_Quick_Create_Plan_Types",
+        "PP_Quick_Create_Event_Types"
+    ],
+    "messages": {
+        "showEventDragErrorMsg": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.Pgp0DragPrimaryEventErrorMsg}}",
+            "messageTextParams": [
+                "{{data.eventData.updateTaskInfo.event.props.object_string.dbValues[0]}}",
+                "{{data.eventData.updateTaskInfo.formattedDate}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "{{i18n.noOptionText}}",
+                    "text": "{{i18n.noOptionText}}",
+                    "action": "setUpdateSecondaryEventToFalse"
+                },
+                {
+                    "option": "{{i18n.yesOptionText}}",
+                    "text": "{{i18n.yesOptionText}}",
+                    "action": "setUpdateSecondaryEventToTrue"
+                }
+            ]
+        },
+        "removeEventDependency": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.removeEventDependencyMessageConfirmation}}",
+            "messageTextParams": [
+                "{{data.eventMap.warningMessageForDeletingEventDependency.secondaryEventName}}",
+                "{{data.eventMap.warningMessageForDeletingEventDependency.primaryEventName}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancelOptionText}}",
+                    "action": ""
+                },
+                {
+                    "option": "Delete",
+                    "text": "{{i18n.DeleteCommandTitle}}",
+                    "action": "deleteEventDependency"
+                }
+            ]
+        },
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "gantt_month_January": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_February": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_March": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_April": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_May": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_June": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_July": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_August": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_September": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_October": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_November": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_December": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Jan": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Feb": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Mar": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Apr": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_May_short": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Jun": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Jul": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Aug": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Sep": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Oct": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Nov": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Dec": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Sunday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Monday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Tuesday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Wednesday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Thursday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Friday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Saturday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_sun": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_mon": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_tue": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_wed": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_thu": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_fri": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_sat": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_new_task": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_save": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_cancel": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_details": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_edit": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_delete": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_confirm_deleting": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_section_description": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_section_time": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_section_type": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_column_text": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_column_start_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_column_duration": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_link": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_link_start": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_link_end": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_type_task": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_type_project": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_type_milestone": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_minutes": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_hours": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_days": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_weeks": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_months": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_years": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_today": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_column_levels": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_forecastDate": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_actualDate": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_plannedDate": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_deliverables": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_changes": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_schedules": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_risks": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_issues": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_opportunities": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_criteria": [
+            "GanttInterfaceConstants"
+        ],
+        "timeline_label_checklist": [
+            "GanttInterfaceConstants"
+        ],
+        "DeleteCommandTitle": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "cancelOptionText": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "removeEventDependencyMessageConfirmation": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0DragPrimaryEventErrorMsg": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "noOptionText": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "yesOptionText": [
+            "ProgramPlanningCommandPanelsMessages"
+        ]
+    }
+}

@@ -1,0 +1,218 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-textbox.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/wysiwyg-prop.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-flex-row.directive"
+    ],
+    "data": {
+        "actionProp": {
+            "displayName": "{{i18n.action}}",
+            "type": "STRING",
+            "isEditable": true,
+            "hasLov": true,
+            "dispValue": "",
+            "dbValue": "",
+            "dataProvider": "getActions"
+        }
+    },
+    "dataProviders": {
+        "mockEditorDataprovider": {
+            "action": "loadColumnConfiguration",
+            "commandsAnchor": "wys_delete",
+            "response": "{{data.mockEditorData}}",
+            "totalFound": "{{data.mockEditorData.length}}"
+        },
+        "getActions": {
+            "dataProviderType": "TcLOV",
+            "action": "getActions",
+            "response": "{{data.viewModelActionsList}}",
+            "totalFound": "{{data.viewModelActionsList.length}}"
+        }
+    },
+    "grids": {
+        "mockEditorGrid": {
+            "dataProvider": "mockEditorDataprovider",
+            "columnProvider": "mockEditorColumnprovider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        }
+    },
+    "columnProviders": {
+        "mockEditorColumnprovider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "sortCriteria": []
+        }
+    },
+    "actions": {
+        "loadColumnConfiguration": {
+            "actionType": "JSFunction",
+            "method": "loadMockEditorRows",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/mockDataEditorService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunction",
+            "method": "loadMockEditorColumns",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/mockDataEditorService"
+        },
+        "updateActivePlacementObject": {
+            "actionType": "JSFunction",
+            "method": "updateActiveObject",
+            "inputData": {
+                "placementObject": "{{data.eventData.vmo}}",
+                "gridId": "{{data.eventData.gridId}}"
+            },
+            "outputData": {
+                "activePlacementObject": "activeVMO",
+                "activeGridId": "activeGridId"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "getActions": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "getActionsList",
+                    "outputArg": [
+                        "actionsList"
+                    ]
+                },
+                {
+                    "action": "convertActionsToLovs",
+                    "inputArg": {
+                        "actions": "{{actionData.actionsList}}"
+                    }
+                }
+            ]
+        },
+        "getActionsList": {
+            "actionType": "JSFunctionAsync",
+            "method": "retrieveActions",
+            "inputData": {
+                "viewModelId": "{{ctx.state.params.viewModelId? ctx.state.params.viewModelId: 'Untitled'}}",
+                "filter": "{{data.actionProp.dbValue}}"
+            },
+            "outputData": {
+                "actionsList": ""
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "convertActionsToLovs": {
+            "actionType": "JSFunction",
+            "method": "convertActionsToLovEntries",
+            "parameters": {
+                "actions": "{{result.actionsList}}"
+            },
+            "inputData": {
+                "listOfActions": "{{parameters.actions}}"
+            },
+            "outputData": {
+                "viewModelActionsList": ""
+            },
+            "deps": "js/wysActionTypePropertyService"
+        },
+        "storesubPanelContext": {
+            "actionType": "JSFunction",
+            "method": "storesubPanelContext",
+            "inputData": {
+                "data": "{{data}}",
+                "canvasData": "{{subPanelContext}}"
+            },
+            "deps": "js/wysPropertiesPanelService"
+        },
+        "createProperties": {
+            "actionType": "JSFunction",
+            "method": "createProp",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "props.baseproperty": ""
+            },
+            "deps": "js/wysPropertiesPanelService"
+        },
+        "updatePropValue": {
+            "actionType": "JSFunction",
+            "method": "updatePropValue",
+            "inputData": {
+                "baseprop": "{{data.props.baseproperty}}"
+            },
+            "deps": "js/wysPropertiesPanelService"
+        },
+        "fireMockEditorEditHandlerStateChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "editHandlerStateChange",
+                        "eventData": {
+                            "dataSource": "{{data.dataProviders.mockEditorDataprovider}}",
+                            "state": "starting"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "messages": {
+        "showPropertyValueInvalidError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.invalidPropertyValue}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "wysiwyg.widgetSelected",
+            "action": "createProperties"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "storesubPanelContext",
+            "criteria": {
+                "panelId": "wysPropPanel"
+            }
+        },
+        {
+            "eventId": "wysiwyg.propertyValueError",
+            "message": "showPropertyValueInvalidError"
+        },
+        {
+            "eventId": "mockEditorGrid.plTable.loadMorePages",
+            "action": "fireMockEditorEditHandlerStateChange"
+        }
+    ],
+    "i18n": {
+        "properties": [
+            "propEditorMessages"
+        ],
+        "caption": [
+            "propEditorMessages"
+        ],
+        "invalidPropertyValue": [
+            "propEditorMessages"
+        ],
+        "action": [
+            "ActionBuilderMessages"
+        ],
+        "updateParams": [
+            "ActionBuilderMessages"
+        ]
+    }
+}

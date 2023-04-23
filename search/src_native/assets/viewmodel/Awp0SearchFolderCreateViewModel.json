@@ -1,0 +1,83 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-panel-section.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-button.directive",
+                 "js/aw-widget.directive",
+                 "js/aw-i18n.directive",
+                 "js/visible-when.directive"],
+    "actions":
+    {
+        "save": {
+            "actionType": "JSFunction",
+            "method": "addActiveFolder",
+            "inputData": {
+                "parentFolderUID": "{{ctx.mselected[0].uid}}",
+                "searchFolderName": ["{{data.searchFolderName.dbValue}}"],
+                "searchFolderDescription": "{{data.searchFolderDesp.dbValue}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/searchFolderService"
+        }
+    },
+    "data":
+    {
+        "searchFolderName":
+        {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "maxLength": 128,
+            "autofocus": true
+        },
+
+        "searchFolderDesp":
+        {
+            "displayName": "{{i18n.Description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "maxLength": 128
+        }
+    },
+
+    "functions":
+    {
+    },
+
+    "messages":
+    {
+    },
+    "conditions":
+    {
+        "isValidToSave":
+        {
+            "expression": "data.searchFolderName.dbValue && data.searchFolderName.dbValue!=''"
+        }
+    },
+    "onEvent": [
+    ],
+    "i18n":
+    {
+        "Name":[ "SearchMessages" ],
+        "Description":[ "SearchMessages"],
+        "addActiveFolder": ["SearchMessages"],
+        "ADD_BUTTON_TITLE":["BaseMessages"],
+        "properties": ["SearchMessages"]
+    }
+
+}

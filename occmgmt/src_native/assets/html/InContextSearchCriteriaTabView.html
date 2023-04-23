@@ -1,0 +1,25 @@
+<aw-panel-section>
+    <div visible-when="ctx[data.navigateContext.dbValue].supportedFeatures.Awb0ScopedFindInStructure
+    && (!ctx[data.navigateContext.dbValue].pwaSelectionModel.multiSelectEnabled && ctx[data.navigateContext.dbValue].pwaSelectionModel.getCurrentSelectedCount() < 2)
+    && !(data.awb0ContextQuery.uiValue === data.i18n.keyword) && conditions.isValidSelection && !conditions.isLeafNode && !(ctx[data.navigateContext.dbValue].selectedModelObjects[0].modelType.typeHierarchyArray.indexOf('Fgf0PartitionElement') > -1)" aw-class="{'disabled': conditions.isSearchScopeDisable}">
+        <aw-checkbox prop="data.searchScope"></aw-checkbox>
+    </div>
+    <br/>
+    <div visible-when="data.isQueryAttributeMoreThanOne && !(data.awb0ContextQuery.uiValue === data.i18n.keyword)">
+          <span class="aw-occmgmt-advancedSearchClearAll">
+             <aw-link  class="aw-occmgmt-advancedSearchClearAll" prop="data.advancedSearchClearAll" action="clearAllQueryCriteriasInAdvancedSearch"></aw-link>
+          </span>
+        <aw-widget prop="attribute" aw-repeat="attribute : data.awb0ContextQueryAttributes"></aw-widget>
+    </div>
+
+    <div visible-when="!data.isQueryAttributeMoreThanOne && !(data.awb0ContextQuery.uiValue === data.i18n.keyword)">
+        <aw-property-label prop="attribute" aw-repeat="attribute : data.awb0ContextQueryAttributes"></aw-property-label>
+        <aw-search-box prop="attribute" aw-repeat="attribute : data.awb0ContextQueryAttributes" action="preProcessAndPerformNonIndexedSearch"></aw-search-box>
+    </div>
+</aw-panel-section>
+<aw-panel-footer>
+    <aw-button visible-when="data.isQueryAttributeMoreThanOne && !(data.awb0ContextQuery.uiValue === data.i18n.keyword)" action="preProcessAndPerformNonIndexedSearch">
+        <aw-i18n>i18n.find</aw-i18n>
+    </aw-button>
+</aw-panel-footer>
+

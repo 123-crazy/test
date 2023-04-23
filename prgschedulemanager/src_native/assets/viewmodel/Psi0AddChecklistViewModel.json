@@ -1,0 +1,262 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "actions": {
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+
+            },
+
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addChecklist.callSoa"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+
+        "addChecklist": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:getCreateRelationsInput}}"
+            },
+
+            "outputData": {
+
+            },
+            "events": {
+                "success": [ {
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Timeline'",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "isPinnedFlag": "data.unpinnedToForm.dbValue"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.locationContext.modelObject}}"
+                            ],
+                            "isPinnedFlag": "data.unpinnedToForm.dbValue"
+                        }
+                    },
+                    {
+                        "name": "gwt.CreateOrAddObjectCompleteEvent",
+                        "eventData": {
+                            "createdObjs": "{{data.sourceModelObjects}}"
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValues",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Timeline'"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                        "condition": "data.object_name.dbValue && data.selectedTab.panelId === 'newTabPageSub'",
+                        "message": "checklistAddedInfoMessage"
+                    },
+                    {
+                        "condition": "data.sourceObjects.length === 1 && data.selectedTab.panelId !== 'newTabPageSub'",
+                        "message": "addSingleChecklistFromPalatteSearch"
+                    },
+                    {
+                        "condition": "data.sourceObjects.length > 1 && data.selectedTab.panelId !== 'newTabPageSub'",
+                        "message": "addMultipleChecklistFromPalatteSearch"
+                    }
+                ],
+                "failure": [ {
+                    "condition": "errorCode.code === 89010",
+                    "message": "AddChecklistErrorMessage"
+                } ]
+            },
+            "deps": "js/Psi0ChecklistService"
+        },
+        "psi0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "psi0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "populateDefaultValuesFromEvent": {
+            "actionType": "JSFunction",
+            "method": "populateDefaultValuesFromEvent",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Psi0CreatePanelService"
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+            "deps": "js/autoAssignService"
+        }
+    },
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreatedObject": {
+            "functionName": "getCreatedObject",
+            "parameters": [
+
+            ]
+        },
+        "getCreateRelationsInput": {
+            "functionName": "getCreateRelationsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "ispinned": {
+            "expression": "data.unpinnedToForm.dbValue"
+        },
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "AddChecklistErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.Psi0AddChecklistErrorMsg}}",
+            "messageTextParams": [
+                "{{data.sourceObjects[0].props.object_name.uiValue}}"
+            ]
+        },
+        "checklistAddedInfoMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Psi0AbsChecklistAdd}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValue}}"
+            ]
+        },
+        "addSingleChecklistFromPalatteSearch": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Psi0AbsChecklistAdd}}",
+            "messageTextParams": [
+                "{{data.sourceObjects[0].props.object_name.dbValue}}"
+            ]
+        },
+        "addMultipleChecklistFromPalatteSearch": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Psi0addMultipleChecklistFromPaletteSearch}}",
+            "messageTextParams": [
+                "{{data.sourceObjects.length}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "addChecklist.callSoa",
+            "action": "addChecklist"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "populateDefaultValuesFromEvent"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        }
+    ],
+    "i18n": {
+        "addChecklistCommandTitle": [
+            "PrgScheduleManagerMessages"
+        ],
+        "addButtonTitle": [
+            "PrgScheduleManagerMessages"
+        ],
+        "Psi0AbsChecklistAdd": [
+            "PrgScheduleManagerMessages"
+        ],
+        "Psi0addMultipleChecklistFromPaletteSearch": [
+            "PrgScheduleManagerMessages"
+        ],
+        "Psi0AddChecklistErrorMsg": [
+            "PrgScheduleManagerMessages"
+        ]
+    }
+}

@@ -1,0 +1,48 @@
+// Copyright (c) 2020 Siemens
+// splitter OR aw-splitter
+
+// mixins
+@import 'mixins/mixins';
+
+.aw-layout-splitter {
+    -webkit-flex: 0 0 $splitter_width;
+    flex: 0 0 $splitter_width;
+    position: relative;
+    touch-action: none;
+    &:hover {
+        .aw-layout-splitterLine {
+            border-left: $splitter_border_width_hover solid;
+        }
+        .aw-layout-splitterLineHorizontal  {
+            border-bottom: $splitter_border_width_hover solid;
+        }
+    }
+    &:active {
+        .aw-layout-splitterLine {
+            border-left: $splitter_border_width_active solid;
+            @include transition(border, 500ms, ease-out);
+        }
+        .aw-layout-splitterLineHorizontal  {
+            border-bottom: $splitter_border_width_active solid;
+            @include transition(border, 500ms, ease-out);
+        }
+    }
+}
+
+.aw-layout-splitterLine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: $splitter_line_offset;
+    border-left: $splitter_border_width solid;
+    @include transition(border, 500ms, ease-out);
+}
+
+.aw-layout-splitterLineHorizontal {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: $splitter_line_offset;
+    border-bottom: $splitter_border_width solid;
+    @include transition(border, 500ms, ease-out);
+}

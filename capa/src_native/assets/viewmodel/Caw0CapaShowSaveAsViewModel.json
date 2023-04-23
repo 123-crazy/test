@@ -1,0 +1,489 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-form.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-xrt.directive"
+    ],
+
+    "actions": {
+        "navigateToSaveAsNewTabPage": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "saveAsNewCapa"
+                    }
+                } ]
+            }
+        },
+        "loadUserProjects": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "inputData": {
+                "data": [ "{{ctx.userSession.props.project.dbValues[0]}}" ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "getOwningProj.event"
+                } ]
+            },
+            "deps": "soa/dataManagementService"
+        },
+        "saveas": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startSaveAsObject"
+                } ]
+            }
+        },
+
+        "updateCtxVariable": {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "addItemEventProgressing",
+                "value": true
+            },
+
+            "deps": "js/appCtxService"
+        },
+        "startSaveAs": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2012-09-DataManagement",
+            "method": "saveAsObjectAndRelate",
+            "inputData": {
+                "saveAsInput": "{{function:getSaveAsInput}}",
+                "relateInfo": [ {
+                    "relate": true
+                } ]
+            },
+
+            "outputData": {
+                "newObject": "{{dataParseDefinitions:convertSavedAsObject}}",
+                "newObjectCreated": "output[0].objects[0]"
+            },
+
+            "events": {
+                "success": [ {
+                        "name": "saveAsObject.assignProjects"
+                    },
+                    {
+                        "name": "Caw0CapaShowSaveAs.saveAsComplete",
+                        "eventData": {
+                            "newObjectUid": "{{data.newObject.uid}}"
+                        }
+                    }
+                ]
+            },
+
+            "actionMessages": {
+                "success": [ {
+                    "message": "createSuccessMsg"
+                } ],
+                "failure": [ {
+                    "condition": "errorCode.code==26050 || errorCode.code==214426",
+                    "message": "saveAsFailureMsg"
+                } ]
+            },
+
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+        "clearAddEventProgContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "0": "addItemEventProgressing"
+            },
+
+            "deps": "js/appCtxService"
+        },
+
+        "getOwningProjectsAct": {
+            "actionType": "JSFunction",
+            "method": "createViewModelObjectById",
+            "inputData": {
+                "uid": "{{ctx.userSession.props.project.dbValues[0]}}",
+                "operationName": "CREATE"
+            },
+
+            "outputData": {
+                "owningProjects": ""
+            },
+
+            "deps": "js/tcViewModelObjectService"
+        },
+        "saveAsBaseline": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-RequirementsManagement",
+            "method": "createBaseline",
+            "inputData": {
+                "input": [ {
+                    "objectToBaseline": {
+                        "uid": "{{ctx.selected.uid}}",
+                        "type": "{{ctx.selected.type}}"
+                    },
+                    "baselineRevisionId": "",
+                    "baselineDescription": "{{function:getDescription}}",
+                    "baselineReleaseProcedureName": "{{data.baselineTemplate.dbValue}}",
+                    "baselineJobName": "BaselineJobName",
+                    "baselineLabelName": "",
+                    "baselineJobDescription": "baselineJobDescription",
+                    "isDryRun": false,
+                    "isPreciseBaseline": true
+                } ]
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+
+            "actionMessages": {
+                "success": [ {
+                    "message": "notificationForBaselineCreationMsg"
+                } ]
+
+            },
+
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+        "autoAssignProperty":
+        {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData":
+            {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "SAVEAS",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{ctx['SaveAsReviseWorkSpace'].SelectedObjects[0]}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+
+            "deps": "js/autoAssignService"
+        },
+        "saveAsComplete": {
+            "actionType": "JSFunction",
+            "method": "saveAsComplete",
+            "deps": "js/Awp0ShowSaveAsService",
+            "inputData": {
+                "commandId": "Awp0ShowObject",
+                "commandArgs": {
+                    "edit": true
+                },
+                "commandContext": {
+                    "vmo": "{{data.newObject}}"
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [ {
+                    "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                    "objectToAssign": [
+                        "{{data.newObjectCreated}}"
+                    ],
+
+                    "objectToRemove": [
+
+                    ]
+                } ]
+            }
+        },
+        "assignProjectsToRevisedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [ {
+                    "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                    "objectToAssign": [
+                        "{{data.revisedObjectCreated}}"
+                    ],
+
+                    "objectToRemove": [
+
+                    ]
+                } ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "!data.isDestroyed()",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+
+    "dataParseDefinitions": {
+        "convertRevisedObject": {
+            "outputFormatType": "ViewModelObject",
+            "dataInput": "reviseTrees[0].objectCopy.uid",
+            "operationType": "CREATE"
+        },
+
+        "convertSavedAsObject": {
+            "outputFormatType": "ViewModelObject",
+            "dataInput": "saveAsTrees[0].objectCopy.uid",
+            "operationType": "CREATE"
+        }
+    },
+
+    "preferences": [
+        "Baseline_release_procedures"
+    ],
+
+    "functions": {
+        "getReviseInputs": {
+            "functionName": "getReviseInputs",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+
+        "getSaveAsInput": {
+            "functionName": "getSaveAsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx['SaveAsReviseWorkSpace']}}"
+            ]
+        },
+
+        "getDescription": {
+            "functionName": "getDescription",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+
+    "data": {
+        "widgetProjectSectionCommands": "uiwidget_projectSectionCommands",
+        "openNewRevision": {
+            "displayName": "{{i18n.openNewRevision}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.isOpenNewRevision}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "addObject.startSaveAsObject",
+            "action": "updateCtxVariable"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadUserProjects"
+        },
+        {
+            "eventId": "addObject.startSaveAsObject",
+            "action": "startSaveAs"
+        },
+        {
+            "eventId": "Caw0CapaShowSaveAs.saveAsComplete",
+            "action": "saveAsComplete"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "getAssignedProjectsProvider"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "condition": "data.selectedTab.panelId === 'saveAsNewCapa'",
+            "action": "navigateToSaveAsNewTabPage"
+        },
+        {
+            "eventId": "getOwningProj.event",
+            "action": "getOwningProjectsProvider"
+        },
+        {
+            "eventId": "saveAsObject.assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "reviseObject.assignProjects",
+            "action": "assignProjectsToRevisedObject"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'mselected'",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        }
+    ],
+    "lifecycleHooks": {
+        "onUnmount": "clearAddEventProgContext"
+    },
+    "messages": {
+        "createSuccessMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveAsOperationSuccessful}}",
+            "messageTextParams": [
+                "{{data.newObject.props.object_string.uiValue}}"
+            ]
+        },
+        "saveAsFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+
+        "createFailureMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveAsOperationFailed}}",
+            "messageTextParams": [
+                "{{ctx['SaveAsReviseWorkSpace'].SelectedObjects[0].modelType.displayName}}"
+            ]
+        },
+
+        "reviseFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.reviseFailureMessage}}",
+            "messageTextParams": [
+                "{{ctx.mselected[0].props.object_string.uiValues}}"
+            ]
+        },
+
+        "notificationForBaselineCreationMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.notificationForBaselineCreation}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_string.uiValues[0]}}"
+            ]
+        }
+    },
+
+    "dataProviders": {
+        "getAssignedProjectsProvider": {
+            "response": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+            "totalFound": "{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0RemoveProjectsCell": {
+                    "id": "cmdRemove",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/removeObjectCellCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "getOwningProjectsProvider": {
+            "action": "getOwningProjectsAct",
+            "response": [ "{{data.owningProjects}}" ],
+            "totalFound": "{{data.owningProjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities": [
+                        300
+                    ],
+
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+
+    },
+
+    "conditions": {
+        "isOpenNewRevision": {
+            "expression": "ctx.SaveAsReviseWorkSpace.OpenNewRevision === true"
+        }
+    },
+
+    "i18n": {
+        "saveas": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "new": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "save": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "saveAsOperationSuccessful": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "saveAsOperationFailed": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "description": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "openNewRevision": [
+            "TCUICommandPanelsMessages"
+        ],
+        "ownProjectSectionTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "projectsSectionTitle": [
+            "TCUICommandPanelsMessages"
+        ]
+    }
+}

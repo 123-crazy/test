@@ -1,0 +1,148 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-search-box.directive"
+    ],
+    "data": {
+        "sharedTableSearchBox": {
+            "displayName": "{{i18n.orgTreeFilterText}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "sharedTableSearchBoxPlaceHolder": {
+            "dbValue": "{{i18n.orgTreeFilterText}}"
+        }
+    },
+    "actions": {
+        "getSearchFolderAccessors": {
+            "actionType": "JSFunction",
+            "method": "getSearchFolderAccessors",
+            "inputData": {
+                "selectedSearchFolderUID": "{{ctx.xrtSummaryContextObject.uid}}",
+                "searchString": "{{data.sharedTableSearchBox.dbValue}}"
+            },
+            "outputData": {
+                "accessors": ""
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        },
+        "removeSearchFolderAccessor": {
+            "actionType": "JSFunction",
+            "method": "removeSearchFolderAccessor",
+            "inputData": {
+                "selectedSearchFolderUID": "{{ctx.xrtSummaryContextObject.uid}}",
+                "vmData": "{{data}}"
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        },
+        "setSearchFolderUidInCtx": {
+            "actionType": "JSFunction",
+            "method": "setSearchFolderUidInCtx",
+            "inputData": {
+                "searchFolderUID": "{{ctx.xrtSummaryContextObject.uid}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "gridView.plTable.reload"
+                    }
+                ]
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        },
+        "plTableClientRefresh": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "gridView.plTable.clientRefresh"
+                } ]
+            }
+        },
+        "disableAddButton": {
+            "actionType": "JSFunction",
+            "method": "disableButton",
+            "inputData": {
+                "buttonName": "add",
+                "dataProvider": "{{data.dataProviders.getSearchFolderAccessorsProvider}}"
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        },
+        "doGridDataProvider": {
+            "actionType": "dataProvider",
+            "method": "getSearchFolderAccessorsProvider"
+        }
+    },
+    "dataProviders": {
+        "getSearchFolderAccessorsProvider": {
+            "action": "getSearchFolderAccessors",
+            "response": "{{data.accessors}}",
+            "totalFound": "{{data.accessors.length}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "columnProviders": {
+        "clientScopeUI": {
+            "frozenColumnIndex": 0,
+            "columns": [
+                {
+                    "name": "icon",
+                    "displayName": "",
+                    "maxWidth": 70,
+                    "minWidth": 70,
+                    "width": 70,
+                    "enableColumnMenu": false,
+                    "pinnedLeft": true,
+                    "enableColumnResizing": false
+                },
+                {
+                    "name": "object_string",
+                    "displayName": "",
+                    "maxWidth": 375,
+                    "minWidth": 250,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "pinnedLeft": false,
+                    "enableColumnResizing": false,
+                    "enableColumnMoving": false
+                }
+            ],
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "gridView": {
+            "dataProvider": "getSearchFolderAccessorsProvider",
+            "columnProvider": "clientScopeUI",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableSorting": false,
+                "isFilteringEnabled": false
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Awp0SearchFolderShareRuleAccessorsTable.load",
+            "action": "setSearchFolderUidInCtx"
+        },
+        {
+            "eventId": "getSearchFolderAccessors",
+            "action": "getSearchFolderAccessors"
+        },
+        {
+            "eventId": "refreshTable",
+            "action": "plTableClientRefresh"
+        },
+        {
+            "eventId": "getSearchFolderAccessorsProvider.selectionChangeEvent",
+            "action": "disableAddButton"
+        }
+    ],
+    "i18n": {
+        "orgTreeFilterText": [ "ProjmgmtConstants" ]
+    }
+}

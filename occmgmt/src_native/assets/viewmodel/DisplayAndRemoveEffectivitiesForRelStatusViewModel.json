@@ -1,0 +1,233 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[ "js/aw-panel-body.directive",
+                "js/aw-command-panel-section.directive",
+                "js/aw-list.directive",
+                "js/aw-default-cell.directive",
+                "js/aw-listbox.directive" ],
+    "i18n":
+    {
+        "failedToRemoveEffectivity":["OccurrenceManagementConstants"],
+        "relStatusffectivities": ["OccurrenceManagementConstants"],
+        "edit":["OccurrenceManagementConstants"]
+    },
+    "data":
+    {
+        "releaseStatus":
+        {
+            "type": "STRING",
+            "hasLov":true,
+            "isEditable": "true"
+        },
+
+        "relStatusList":
+        {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "commandDisplayAndRemoveEffectivityForRelnStatus":"awb0_displayAndRemoveEffectivityForRelnStatus"
+    },
+
+    "dataProviders":
+    {
+        "getRelStatusEffectivities":
+        {
+            "action": "getRelStatusEffectivitiesAction",
+            "response": "{{data.effectivityObjectsFound}}",
+            "totalFound" : "{{data.effectivityObjectsFound.length}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "occmgmt_effectivity_cell_commands"
+        }
+    },
+
+    "actions":
+    {
+        "setReleaseStatusListFromSelectedObjectInPWAAction" : {
+            "actionType": "JSFunctionAsync",
+            "method": "setReleaseStatusListFromSelectedObjectInPWA",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        },
+
+        "setEffectivityTypeOncontext" : {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path" : "elementEffectivity.currentEffectivityType",
+                "value" : "Release"
+            },
+            "deps": "js/appCtxService"
+        },
+
+        "setReleaseStatusToAppContextAction" :
+        {
+            "actionType": "JSFunction",
+            "method": "setReleaseStatusToAppContext",
+            "inputData":
+            {
+                "releaseStatus" : "{{data.releaseStatus.dbValue}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        },
+
+        "getRelStatusEffectivitiesDPAction":
+        {
+            "actionType": "dataProvider",
+            "method": "getRelStatusEffectivities"
+        },
+
+        "getRelStatusEffectivitiesAction":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData":
+            {
+                "objects":
+                [
+                    { "uid" : "{{data.releaseStatus.dbValue}}"}
+                ],
+
+                "attributes":
+                [
+                    "effectivities"
+                ]
+            },
+
+            "outputData":
+            {
+                "effectivityObjectsFound" : "{{function:getEffectivitiesArray}}"
+            },
+
+            "deps": "js/sharedEffectivityService"
+        },
+
+        "removeEffectivitiesForRelnStatus":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-EffectivityManagment",
+            "method": "addOrRemoveRelStatusEffectivities",
+            "inputData":
+            {
+                "input": {
+                    "addOrRemove": false,
+                    "effectivities": "{{data.dataProviders.getRelStatusEffectivities.selectedObjects}}",
+                    "status": {
+                        "uid" : "{{data.releaseStatus.dbValue}}"
+                    }
+                }
+            },
+            "outputData":
+            {
+                "occurrenceConfigured": "updated",
+                "occurrenceUnconfigured": "deleted",
+                "error": "error",
+                "errorValues":"errorValues"
+            },
+            "events":
+            {
+                "success": [
+                    {
+                        "name": "releaseStatusUpdatedByEffectivityEvent"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "releaseStatusUpdatedByEffectivityEvent"
+                    }
+                ]
+            },
+             "actionMessages":
+             {
+                 "failure":
+                 [
+                    {
+                        "condition": "errorCode.code==126225",
+                        "message": "failedToRemoveEffectivityMessage"
+                    }
+                ]
+             },
+
+             "deps": "js/sharedEffectivityService"
+        },
+        "refreshSelectedObject":{
+            "actionType":"JSFunction",       
+            "method":"updateEffectivities",
+            "inputData":{
+                "selectedModelObject":"{{ctx.selected}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        }
+    },
+
+    "functions":
+    {
+        "getEffectivitiesArray":
+        {
+            "functionName": "getEffectivitiesArray",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+    },
+
+    "onEvent": [
+        {
+        "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "DisplayAndRemoveEffectivitiesForRelStatus"
+            },
+            "action": "setReleaseStatusListFromSelectedObjectInPWAAction"
+        },
+        {
+        "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "DisplayAndRemoveEffectivitiesForRelStatus"
+            },
+            "action": "setEffectivityTypeOncontext"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "condition": "dataProvider.selectedObjects.length === 1",
+            "action": "setReleaseStatusListFromSelectedObjectInPWAAction"
+        },
+        {
+            "eventId": "releaseStatusUpdatedByEffectivityEvent",
+            "action" : "getRelStatusEffectivitiesDPAction"
+        },
+        {
+            "eventId": "editEffectivityContext.selectedReleaseStatusUpdated",
+            "action": "getRelStatusEffectivitiesDPAction"
+        },
+        {
+            "eventId": "removeEffectivitiesForRelnEvent",
+            "cacheEventData": true,
+            "action": "removeEffectivitiesForRelnStatus"
+        },
+        {
+            "eventId": "releaseStatusUpdatedByEffectivityEvent",
+            "action":  "refreshSelectedObject",
+            "criteria": {
+                "commandContext.activeView": "DisplayAndRemoveEffectivitiesForRelStatus"
+            }
+        }
+    ],
+
+     "messages":
+     {
+         "failedToRemoveEffectivityMessage":
+         {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.failedToRemoveEffectivity}}",
+            "messageTextParams":
+            [
+                "{{ctx.editEffectivityContext.selectedReleaseStatus.uiValue}}"
+            ]
+         }
+     }
+}

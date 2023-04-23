@@ -1,0 +1,437 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "createAddActionForCharSpec": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [ {
+                    "clientId": "",
+                    "data": {
+                        "boName": "Qam0QualityAction",
+                        "stringProps": {
+                            "fnd0ActionItemId": "{{data.fnd0ActionItemId.dbValue}}",
+                            "object_desc": "{{data.object_desc.dbValue}}",
+                            "object_name": "{{data.object_name.dbValue}}",
+                            "qam0QualityActionStatus":"Template"
+                        }
+
+                    }
+                } ]
+            },
+            "outputData": {
+                "createdActionObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                {
+                    "name": "aqc0.setPropAsPartOfActionCreate",
+                    "condition" : "!(ctx.tcSessionData.tcMajorVersion > 13 || ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 2)"
+                },
+                {
+
+                    "name": "aqc0.setPropAsPartOfActionCreate_TC132Onwards",
+                    "condition" : "ctx.tcSessionData.tcMajorVersion > 13 || ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 2"
+                }
+             ]
+            }
+        },
+        "setProperties_TC132Onwards":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info":
+                [
+                    {
+                        "object": "{{data.createdActionObject}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "qam0QualityActionType",
+                                "values":
+                                [
+                                    "Control Plan"
+                                ]
+                            },
+                            {
+                                "name": "qam0QualityActionSubtype",
+                                "values":
+                                [
+                                    "Containment Action"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                       "object": "{{ctx.selected}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "Qc0HasActions",
+                                "values":"{{function:getRequiredValuesForOperation}}"
+                            }
+                        ] 
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name":"cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name":"complete",
+                        "eventData":{
+                            "source":"toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "aqc0NullMapEventForActionAddition",
+                        "condition" : "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    }                   
+                ]
+            },
+            "deps": "js/Aqc0CharSpecOperationsService"
+        },
+        "setProperties":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info":
+                [
+                    {
+                        "object": "{{data.createdActionObject}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "qam0QualityActionType",
+                                "values":
+                                [
+                                    "Control Plan"
+                                ]
+                            },
+                            {
+                                "name": "qam0QualityActionSubtype",
+                                "values":
+                                [
+                                    "Containment Action"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "aqc0.getPropertiesforSelectedObject"
+                    }
+                ]
+            }
+        },
+        "createVersion": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-CharManagerAW-2018-12-QualityManagement",
+            "method": "createSpecificationVersion",
+            "inputData": {
+                "specificationInputs": "{{data.versionInputDataFVM}}"
+
+            },
+            "outputData": {
+                "createdObject":"specificationsOutput[0].newSpecification",
+                "ctx.createdObjectForTreeFromAddAction": "specificationsOutput[0].newSpecification",
+                "ctx.versionCreatedFlag": true
+            },
+            "events": {
+                "success": [ {
+
+                    "name":"cdm.relatedModified",
+                    "condition":"ctx.locationContext.modelObject === undefined && ctx.ViewModeContext.ViewModeContext !=='TreeSummaryView'",
+                    "eventData": {
+                        "relatedModified": [
+                            "{{ctx.selected}}"
+                        ]
+                    }
+                },
+                {
+                    "name": "aqc0.openNewObject",
+                    "condition":"ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Qc0MasterCharSpec' ) > -1",
+                    "eventData":
+                    {
+                        "newObjectUid": "{{data.createdObject.uid}}"
+                    }
+                },
+                {
+                    "name":"cdm.relatedModified",
+                    "condition":"ctx.locationContext.modelObject !== undefined && ctx.ViewModeContext.ViewModeContext !=='TreeSummaryView'",
+                    "eventData":{
+                        "refreshLocationFlag":false,
+                        "relatedModified":[
+                            "{{ctx.locationContext.modelObject}}"
+                        ],
+                        "createdObjects": ["{{data.createdObject}}"]
+                    }
+                },
+                {
+                    "name":"complete",
+                    "condition":"ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Qc0MasterCharSpec' ) === -1",
+                    "eventData":{
+                        "source":"toolAndInfoPanel"
+                    }
+                },
+                {
+                    "name":"complete",
+                    "condition":"ctx.locationContext.modelObject === undefined",
+                    "eventData":{
+                        "source":"toolAndInfoPanel"
+                    }
+                },
+                {
+                    "name":"cdm.relatedModified",
+                    "condition":"ctx.pselected !== undefined",
+                    "eventData": {
+                        "relatedModified":[
+                            "{{ctx.pselected}}",
+                            "{{ctx.selected}}"
+                        ]
+                    }
+                },
+                {
+                    "name":"primaryWorkarea.reset",
+                    "condition":"ctx.pselected === undefined"
+                },
+                {
+                    "name":"aqc0.pushSelectedNodeInFailureContext",
+                    "condition":"ctx.mselected[0].modelType.name === 'Qc0Failure' && ctx.failureManagerContext !== undefined"
+                },
+                {
+                    "name": "aqc0NullMapEventForActionAddition",
+                    "condition" : "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                }
+            ],
+            "failure": [
+                    {
+                        "name": "aqc0.versionCreationFailed"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "versioningSuccessfulMessage"
+                } ]
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+
+        "openNewObject": {
+            "actionType": "JSFunction",
+            "method": "openNewObject",
+            "deps": "js/Aqc0CharManagerUtils",
+            "inputData": {
+                "commandId": "Awp0ShowObject",
+                "commandArgs": {
+                    "edit": false
+                },
+                "commandContext": {
+                    "vmo": "{{data.createdObject}}"
+                }
+            },
+            "events":{
+                "success":[
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "closPanelHeader": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "deleteQualityActionObject":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData":
+            {
+                "objects":
+                [
+                    "{{data.createdActionObject}}"
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "aqc0.closPanelHeader"
+                    }
+                ]
+            }
+        },
+        "pushSelectedNodeInFailureContext":{
+            "actionType": "JSFunction",
+            "method": "pushSelectedNodeInFailureContext",
+            "inputData": {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Aqc0UtilService"
+        },
+        "clearMapOfCharGroupAndSpecificationAction" : {
+            "actionType" : "JSFunction",
+            "method": "clearMapOfCharGroupAndSpecification",
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "getPropertiesforSelectedObject":{
+            "actionType": "JSFunction",
+            "method": "getPropertiesforSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObject": "{{ctx.selected}}",
+                "onlyLoadProps": true
+            }, 
+            "deps": "js/Aqc0UtilService" 
+        },
+        "getPropertiesforSelectedObjectForOperations":{
+            "actionType": "JSFunction",
+            "method": "getPropertiesforSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObject": "{{ctx.selected}}",
+                "onlyLoadProps": false
+            },
+            "deps": "js/Aqc0UtilService"
+        }
+    },
+    "functions": {
+        "getRequiredValuesForOperation":
+        {
+            "functionName": "getRequiredValuesForOperation",
+            "parameters":
+            [
+                "{{ctx}}","{{data}}","Qc0HasActions"
+            ]
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "getPropertiesforSelectedObject"
+    },
+    "onEvent": [
+        {
+            "eventId": "aqc0.setPropAsPartOfActionCreate",
+            "action": "setProperties"
+        },
+        {
+            "eventId": "aqc0.setPropAsPartOfActionCreate_TC132Onwards",
+            "action": "setProperties_TC132Onwards"
+        },
+        {
+            "eventId": "aqc0.createVersion",
+            "action": "createVersion"
+        },
+        {
+            "eventId": "aqc0.closPanelHeader",
+            "action": "closPanelHeader"
+        },
+        {
+            "eventId": "aqc0.openNewObject",
+            "action": "openNewObject"
+        },
+        {
+            "eventId": "aqc0.versionCreationFailed",
+            "action": "deleteQualityActionObject"
+        },
+        {
+            "eventId": "aqc0.pushSelectedNodeInFailureContext",
+            "action": "pushSelectedNodeInFailureContext"
+        },
+        {
+            "eventId" : "aqc0NullMapEventForActionAddition",
+            "action" : "clearMapOfCharGroupAndSpecificationAction"
+        },
+        {
+            "eventId": "aqc0.getPropertiesforSelectedObject",
+            "action": "getPropertiesforSelectedObjectForOperations"
+        }
+    ],
+    "data": {
+        "fnd0ActionItemId": {
+            "displayName": "{{i18n.ActionItemId}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.gActionId}}"
+        },
+        "object_name": {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": ""
+        },
+        "object_desc": {
+            "displayName": "{{i18n.Description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        }
+    },
+    "messages": {
+        "versioningSuccessfulMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.VersionCreated}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_name.dbValues[0]}}"
+            ]
+        }
+    },
+    "i18n": {
+        "ActionItemId": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "addButtonTitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Name": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Description": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "create": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "VersionCreated": [
+            "qualitycharacteristicsmanagerMessages"
+        ]
+    }
+}

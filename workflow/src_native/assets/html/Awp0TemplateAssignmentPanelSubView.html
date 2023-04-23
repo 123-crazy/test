@@ -1,0 +1,44 @@
+<aw-panel-body>
+    <aw-panel-section caption="i18n.task">
+        <aw-label prop="data.name"></aw-label>
+    </aw-panel-section>
+    <aw-panel-section caption="i18n.assignments">
+        <aw-command-panel-section id="assigner" caption="i18n.Assigner" exist-when="(conditions.isRouteTaskTemplateSelected || conditions.isReviewOrAckTaskTemplateSelected)" anchor="data.assignmentPanelAnchor" context="data.dataProviders.assignerDataProvider">
+            <aw-list dataprovider="data.dataProviders.assignerDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-command-panel-section id="assignee" caption="i18n.assignee" exist-when="!(conditions.isRouteTaskTemplateSelected || conditions.isReviewOrAckTaskTemplateSelected)" anchor="data.assignmentPanelAnchor" context="data.dataProviders.assignerDataProvider">
+            <aw-list dataprovider="data.dataProviders.assignerDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-command-panel-section id="reviewers" exist-when="(conditions.isRouteTaskTemplateSelected || conditions.isReviewOrAckTaskTemplateSelected)" caption="i18n.addReviewerLabelText" anchor="data.assignmentPanelAnchor" context="data.dataProviders.reviewersDataProvider">
+            <aw-list dataprovider="data.dataProviders.reviewersDataProvider">
+                <aw-include name="Awp0SignoffProfileCellContent" exist-when="item.modelType.typeHierarchyArray.indexOf( 'EPMSignoffProfile' ) > -1" sub-panel-context="item"></aw-include>
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item" exist-when="item.type && item.type !== 'EPMSignoffProfile'"></aw-include>
+                <aw-include name="Awp0WorkflowRequiredCellContent" exist-when="!item.type" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-command-panel-section id="additionalReviewers" exist-when="(conditions.isRouteTaskTemplateSelected || conditions.isReviewOrAckTaskTemplateSelected )&& conditions.isProfileExist" caption="i18n.additionalReviewers" anchor="data.assignmentPanelAnchor" context="data.dataProviders.adhocReviewersDataProvider">
+                <aw-list dataprovider="data.dataProviders.adhocReviewersDataProvider">
+                    <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                </aw-list>
+            </aw-command-panel-section>
+        <aw-command-panel-section id="acknowledgers" exist-when="conditions.isRouteTaskTemplateSelected" caption="i18n.Acknowledgers" anchor="data.assignmentPanelAnchor" context="data.dataProviders.acknowledgersDataProvider">
+            <aw-list dataprovider="data.dataProviders.acknowledgersDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-command-panel-section id="notifyees" exist-when="conditions.isRouteTaskTemplateSelected" caption="i18n.Notifyees" anchor="data.assignmentPanelAnchor" context="data.dataProviders.notifyeesDataProvider">
+            <aw-list dataprovider="data.dataProviders.notifyeesDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="updateTemplatePalData" visible-when="conditions.isValidToModify">
+        <aw-i18n>i18n.modify</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

@@ -1,0 +1,219 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getInputForCreateObject}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateChecklistView"
+                } ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Psi0ChecklistQuestion",
+                    "properties": [ {
+                            "name": "psi0QuestionNumber"
+                        },
+                        {
+                            "name": "object_name"
+                        },
+                        {
+                            "name": "psi0Answer"
+                        },
+                        {
+                            "name": "psi0State"
+                        },
+                        {
+                            "name": "psi0Comment"
+                        },
+                        {
+                            "name": "psi0DueDate"
+                        },
+                        {
+                            "name": "psi0ClosedDate"
+                        },
+                        {
+                            "name": "psi0ResponsibleUser"
+                        },
+                        {
+                            "name": "psi0IsMandatory"
+                        }
+                    ]
+                } ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "condition": "data.object_name.dbValue",
+                    "message": "checklistQuestionAddedInfoMessage"
+                } ],
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/Psi0AddChecklistQuestionService"
+        },
+        "refreshPrimaryLocation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "data.pinnedToForm.dbValue",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "isPinnedFlag": "data.unpinnedToForm.dbValue"
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValues",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "refreshSecondaryLocation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.locationContext}}"
+                            ],
+                            "isPinnedFlag": "data.unpinnedToForm.dbValue"
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValues",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+            "deps": "js/autoAssignService"
+        }
+    },
+    "functions": {
+        "getInputForCreateObject": {
+            "functionName": "getInputForCreateObject",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "updateChecklistView",
+            "condition": "ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_ChecklistQuestion'",
+            "action": "refreshPrimaryLocation"
+        },
+        {
+            "eventId": "updateChecklistView",
+            "condition": "ctx.xrtPageContext.primaryXrtPageID ==='tc_xrt_ChecklistQuestion'",
+            "action": "refreshSecondaryLocation"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        },
+        "ispinned": {
+            "expression": "data.unpinnedToForm.dbValue"
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "checklistQuestionAddedInfoMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Psi0AbsChecklistAdd}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValue}}"
+            ]
+        }
+    },
+    "i18n": {
+        "addButtonTitle": [
+            "PrgScheduleManagerMessages"
+        ],
+        "Psi0AbsChecklistAdd": [
+            "PrgScheduleManagerMessages"
+        ]
+    }
+}

@@ -1,0 +1,33 @@
+<aw-panel-body visible-when="!data.selectedObject && data.totalTypeFound>1">
+    <aw-panel-section caption="i18n.objectTypes">
+        <aw-type-selector prop="data.filterBox" override-id="SM" include="{{ctx.Object.CreatePanelIncludeType}}"></aw-type-selector>
+    </aw-panel-section>
+</aw-panel-body>
+
+<aw-panel-body>
+    <aw-panel-body visible-when="!data.selectedObject && data.totalTypeFound==1 && data.autoSelectedObject">
+        <div class="aw-layout-panelSectionTitle">{{data.autoSelectedObject.props.type_name.dbValues[0]}}</div>
+        <aw-form>
+            <aw-xrt type="CREATE" object-type="{{data.autoSelectedObject.props.type_name.dbValues[0]}}"></aw-xrt>
+            <aw-widget prop="data.isOpenOnCreate" class="aw-capa-createScheduleWidget"></aw-widget>
+        </aw-form>
+    </aw-panel-body>
+    <aw-panel-body exist-when="data.selectedObject && data.totalTypeFound>1 ">
+        <div class="aw-layout-panelSectionTitle">{{data.selectedObject.props.object_string.dbValue}}</div>
+        <aw-form>
+            <aw-xrt type="CREATE" object-type="{{data.selectedObject.props.type_name.dbValue}}"></aw-xrt>
+            <aw-widget prop="data.isOpenOnCreate" class="aw-capa-createScheduleWidget"></aw-widget>
+        </aw-form>
+    </aw-panel-body>
+
+    <aw-panel-section caption="i18n.ownProjectSectionTitle">
+        <aw-list dataprovider="data.dataProviders.getSchOwningProjectsProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-panel-section>
+    <aw-command-panel-section caption="i18n.projectsSectionTitle" anchor="data.projectSectionCommands">
+        <aw-list dataprovider="data.dataProviders.getAssignedProjectsProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>

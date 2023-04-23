@@ -1,0 +1,201 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-source-editor.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "data": {
+        "viewModelConfig": {
+            "language": "json",
+            "theme": "vs-light",
+            "automaticLayout": true,
+            "formatOnType": true
+        },
+        "viewModelSrc": {
+            "name": "actionViewModelEditor",
+            "data": ""
+        }
+    },
+    "actions": {
+        "updateEditorContent": {
+            "actionType": "JSFunction",
+            "method": "updateEditorContent",
+            "deps": "js/actionEditorService"
+        },
+        "setViewModelEditorValue": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($actionId:ID!){action(id:$actionId){id flow}}",
+                    "variables": {
+                        "actionId": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "actionFlow": "data.action.flow",
+                "actionFlowLoaded": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "actionEditorSWA.flowRetrieved"
+                    }
+                ]
+            }
+        },
+        "setEditorAsInvalid": {
+            "actionType": "JSFunction",
+            "method": "setEditorAsInvalid",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/actionEditorService"
+        },
+        "setEditorAsDirty": {
+            "actionType": "JSFunction",
+            "method": "setEditorAsDirty",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "content": "{{data.eventMap['sourceEditor.contentChanged']}}",
+                "origContent": "{{data.actionFlow}}"
+            },
+            "deps": "js/actionEditorService"
+        },
+        "resetState": {
+            "actionType": "JSFunction",
+            "method": "resetEditorState",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/actionEditorService"
+        },
+        "discardChanges": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "actionBuilder.confirmUnsavedChanges",
+                        "eventData": {
+                            "action": "discard"
+                        }
+                    }
+                ]
+            }
+        },
+        "saveChanges": {
+            "actionType": "JSFunctionAsync",
+            "method": "saveActionFlow",
+            "inputData": {
+                "context": "{{ctx}}",
+                "persistentSave": true,
+                "commandContext": "{{data.actionFlow}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "actionBuilder.confirmUnsavedChanges",
+                        "eventData": {
+                            "action": "save"
+                        }
+                    },
+                    {
+                        "name": "wysiwyg.updateConfigService"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "actionBuilder.confirmUnsavedChanges",
+                        "eventData": {
+                            "action": "cancel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/saveActionFlowService"
+        },
+        "confirmUnsavedChangesAction": {
+            "actionType": "JSFunction",
+            "method": "unsavedChangesAction",
+            "inputData": {
+                "data": "{{data.eventMap['actionBuilder.confirmUnsavedChanges']}}"
+            },
+            "deps": "js/saveActionFlowService"
+        }
+    },
+    "messages": {
+        "confirmLeave": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.navigationConfirmationSingle}}",
+            "messageTextParams": [
+                "{{ctx.state.processed.s_uid}}"
+            ],
+            "navigationOptions": [
+                {
+                    "option": "Discard",
+                    "text": "{{i18n.discard}}",
+                    "action": "discardChanges"
+                },
+                {
+                    "option": "Save",
+                    "text": "{{i18n.save}}",
+                    "action": "saveChanges"
+                }
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "updateEditorContent"
+        },
+        {
+            "eventId": "actionEditorSWA.refreshEditor",
+            "action": "setViewModelEditorValue"
+        },
+        {
+            "eventId": "actionEditorSWA.flowRetrieved",
+            "action": "resetState"
+        },
+        {
+            "eventId": "sourceEditor.contentChanged",
+            "condition": "name === 'actionViewModelEditor'",
+            "action": "setEditorAsDirty",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "sourceEditor.invalidContent",
+            "condition": "name === 'actionViewModelEditor'",
+            "action": "setEditorAsInvalid"
+        },
+        {
+            "eventId": "actionBuilder.confirmLeave",
+            "condition": "view === 'Editor'",
+            "message": "confirmLeave"
+        },
+        {
+            "eventId": "actionBuilder.confirmUnsavedChanges",
+            "cacheEventData": true,
+            "action": "confirmUnsavedChangesAction"
+        }
+    ],
+    "i18n": {
+        "navigationConfirmationSingle": [
+            "locationMessages"
+        ],
+        "save": [
+            "XRTMessages"
+        ],
+        "discard": [
+            "XRTMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "setViewModelEditorValue"
+    }
+}

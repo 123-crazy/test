@@ -1,0 +1,184 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "getCauses": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-Session",
+            "method": "getPreferences",
+            "inputData": {
+                "requestedPrefs": [ {
+                    "scope": "Site",
+                    "names": [ "CAW0IshikawaCauseGroupVal" ]
+                } ]
+
+            },
+            "outputData": {
+                "preferences": "{{function:getICGValues}}"
+            },
+            "events": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "validateList": {
+            "actionType": "JSFunction",
+            "method": "rejectSuggestions",
+            "inputData": {
+                "selected": "request.selected",
+                "suggestion": "request.suggestion",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "valid": "valid",
+                "message": "message"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "updateICGValues": {
+            "actionType": "JSFunction",
+            "method": "updateICGValues",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "flag": "fromEdit"
+            }
+        },
+        "updateIshikawaCauseGroup": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [ {
+                    "object": "{{ctx.selected}}",
+                    "timestamp": "",
+                    "vecNameVal": [ {
+                        "name": "caw0IshikawaCauseGroup",
+                        "values": "{{data.caw0IshikawaCauseGroup.dbValue}}"
+
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "updatedIshikawa": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "Caw0IshikawaMethodology.CategoryUpdated",
+                    "eventData": {
+                        "updatedIshikawa": "{{data.updatedIshikawa}}"
+                    }
+                } ],
+                "failure": [ {
+                    "name": "resetICGValues"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [{
+                    "message": "failureMessageOfCauseAssociated"
+                }]
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "resetICGValues": {
+            "actionType": "JSFunction",
+            "method": "resetCauseGroupInMethodology",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            }
+        }
+    },
+    "dataProviders": {
+        "getCausesProvider": {
+            "initializeAction": "getCauses",
+            "validateAction": "validateList",
+            "response": "{{data.preferences}}",
+            "valid": "{{data.valid}}",
+            "message": "{{data.message}}",
+            "moreValuesExist": false
+        }
+    },
+    "data": {
+        "caw0IshikawaCauseGroup": {
+            "displayName": "{{i18n.causeGroup}}",
+            "type": "STRINGARRAY",
+            "isArray": true,
+            "dataProvider": "getCausesProvider"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "updateICGValues"
+        },
+        {
+            "eventId": "resetICGValues",
+            "action": "resetICGValues"
+        },
+        {
+            "eventId": "Caw0IshikawaMethodology.CategoryUpdated",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "GraphRefreshed",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        }
+    ],
+    "messages": {
+        "failureMessageOfCauseAssociated": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "conditions": {
+
+    },
+    "i18n": {
+        "causeGroup": [
+            "CAW0CapaMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ],
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "caw0save": [
+            "CAW0CapaMessages"
+        ]
+    }
+}

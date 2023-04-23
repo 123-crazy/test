@@ -1,0 +1,174 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-section.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-toolbar.directive"
+    ],
+
+    "actions":
+    {
+        "loadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "ResourcePool",
+                    "operationType": "as_arranged"
+                },
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "objectSet": "subscribed_resourcepools.ResourcePool",
+                        "parentUid": "{{ctx.locationContext.modelObject.uid}}"
+                    },
+                    "startIndex": "{{data.dataProviders.ResourcePoolDataProvider.startIndex}}"
+                },
+                "inflateProperties": true,
+                "noServiceData": false
+            },
+            "outputData": {
+                "resourcePoolTotalFound": "totalFound",
+                "resourcePoolTotalLoaded": "totalLoaded",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "resourcePoolSearchResults": "{{function:processResourcePoolObjects}}",
+                "dataProviders.ResourcePoolDataProvider.columnConfig": "{{function:setNonModifiablePropForResourcePool}}"
+            },
+            "deps": "js/Awp0AddResourcePool"
+       },
+       "saveColumnConfigLoadData": {
+        "actionType": "TcSoaService",
+        "serviceName": "Internal-AWS2-2019-06-Finder",
+        "method": "performSearchViewModel4",
+        "inputData": {
+            "columnConfigInput": {
+                "clientName": "AWClient",
+                "operationType": "as_arranged",
+                "clientScopeURI": "ResourcePool"
+            },
+            "saveColumnConfigData": {
+                "clientScopeURI": "ResourcePool",
+                "columnConfigId": "{{data.dataProviders.ResourcePoolDataProvider.columnConfig.columnConfigId}}",
+                "columns": "{{data.dataProviders.ResourcePoolDataProvider.newColumns}}"
+            },
+            "searchInput": {
+                "maxToLoad": 50,
+                "maxToReturn": 50,
+                "providerName": "{{ctx.search.provider}}",
+                "searchCriteria": "{{ctx.search.criteria}}",
+                "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                "searchSortCriteria": "{{data.columnProviders.clientScopeUI.sortCriteria}}",
+                "startIndex": "{{data.dataProviders.ResourcePoolDataProvider.startIndex}}"
+            },
+            "inflateProperties": true
+        },
+        "outputData": {
+            "totalFound": "totalFound",
+            "searchResults": "{{json:searchResultsJSON}}",
+            "dataProviders.ResourcePoolDataProvider.columnConfig": "columnConfig",
+            "ctx.search.totalFound": "totalFound",
+            "ctx.search.totalLoaded": "totalLoaded",
+            "ctx.search.filterMap": "searchFilterMap6",
+            "ctx.search.filterCategories": "searchFilterCategories",
+            "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+            "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+            "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+            "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+            "ctx.searchResponseInfo.columnConfig": "columnConfig"
+        }
+      },
+      "resetColumnConfig": {
+        "actionType": "TcSoaService",
+        "serviceName": "Internal-AWS2-2017-06-UiConfig",
+        "method": "getOrResetUIColumnConfigs2",
+        "inputData": {
+            "getOrResetUiConfigsIn": [ {
+                "clientName": "AWClient",
+                "resetColumnConfig": true,
+                "columnConfigQueryInfos": [ {
+                    "clientScopeURI": "ResourcePool",
+                    "operationType": "configured",
+                    "typeNames": [ "WorkspaceObject" ],
+                    "columnsToExclude": []
+                } ],
+                "businessObjects": [ {} ]
+            } ]
+        },
+        "outputData": {
+            "dataProviders.ResourcePoolDataProvider.resetColumnConfigs": "columnConfigurations"
+        }
+    }
+    },
+
+    "data":
+    {
+
+    },
+    "dataProviders":{
+        "ResourcePoolDataProvider": {
+            "action": "loadData",
+            "editContext": "TABLE_CONTEXT",
+            "response": "{{data.resourcePoolSearchResults}}",
+            "totalFound": "{{data.resourcePoolTotalFound}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "functions":
+    {
+        "processResourcePoolObjects":{
+            "functionName": "processResourcePoolObjects",
+            "parameters": []
+        },
+        "setNonModifiablePropForResourcePool":{
+            "functionName": "setNonModifiablePropForResourcePool",
+            "parameters": []
+        }
+
+    },
+    "columnProviders": {
+        "clientScopeUI": {
+            "saveColumnAndLoadAction" : "saveColumnConfigLoadData",
+            "resetColumnAction" : "resetColumnConfig",
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "gridView": {
+            "dataProvider": "ResourcePoolDataProvider",
+            "columnProvider": "clientScopeUI",
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enableSorting": false
+            }
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Workflow.closeOpenedPanel",
+            "action": "closePanel"
+        }
+    ],
+    "messages": {
+        "reassignTaskFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n":
+    {
+        "resourcePoolSubscription":
+        [
+            "InboxMessages"
+        ]
+    }
+}

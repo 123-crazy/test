@@ -1,0 +1,83 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-form.directive",
+        "js/aw-widget.directive",
+        "js/aw-enter-key.directive"
+    ],
+    "actions": {
+        "getCommandContext": {
+            "actionType": "JSFunction",
+            "method": "getCommandContextFromParent",
+            "inputData": {
+                "parent": "{{$parent}}"
+            },
+            "outputData": {
+                "context": ""
+            },
+            "deps": "js/aceExpandBelowService"
+        },
+        "performExpandToLevel": {
+            "actionType": "JSFunction",
+            "method": "performExpandBelow",
+            "inputData": {
+                "expansionLevel": "{{data.expansionLevel.dbValue}}",
+                "viewKey": "{{data.context.viewKey}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "hideExpandOptionsPopup"
+                } ]
+            },
+            "deps": "js/aceExpandBelowService"
+        },
+        "performExpandToLevelIfApplicable": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "performExpandToLevelIfApplicable",
+                    "eventData": {
+                        "data": "{{data}}"
+                    }
+                } ]
+            }
+        },
+        "hideExpandOptionsPopup": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "deps": "js/popupService"
+        }
+    },
+
+    "data": {
+        "expansionLevel": {
+            "type": "INTEGER",
+            "displayName": "{{i18n.expandToLevel}}",
+            "isEditable": "true",
+            "requiredText": "{{i18n.n}}",
+            "isEnabled":"{{ctx.aceActiveContext.context.selectedModelObjects[ 0 ].modelType.typeHierarchyArray.indexOf( 'Awb0Element' ) > -1 && ctx.aceActiveContext.context.supportedFeatures[ 'Awb0ExpandBelowFeature' ] === true && ctx.mselected.length === 1 && ctx.aceActiveContext.context.selectedModelObjects[ 0 ].props.awb0NumberOfChildren !== 'undefined' && ctx.aceActiveContext.context.selectedModelObjects[ 0 ].props.awb0NumberOfChildren.dbValues > 0}}"
+
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "getCommandContext"
+    },
+    "onEvent": [
+        {
+            "eventId": "hideExpandOptionsPopup",
+            "action": "hideExpandOptionsPopup"
+        },
+        {
+            "eventId": "performExpandToLevelIfApplicable",
+            "action": "performExpandToLevel",
+            "condition": "data.expansionLevel.dbValue && data.expansionLevel.dbValue > 0"
+        }
+    ],
+    "i18n": {
+        "expandToLevel": [ "OccurrenceManagementConstants" ],
+        "n": [ "OccurrenceManagementConstants" ]
+    }
+}

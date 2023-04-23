@@ -1,0 +1,30 @@
+<div class="aw-toolbar-layout" aw-class="{'aw-toolbar-horizontal':orientation==='HORIZONTAL','aw-toolbar-vertical':orientation==='VERTICAL'}">
+    <!-- Current scenario without overflow -->
+    <div class="aw-commandBars" ng-if="::!overflow" aw-class="{'aw-commandBar-horizontal': orientation==='HORIZONTAL','aw-commandBar-vertical': orientation==='VERTICAL'}">
+        <aw-command-bar anchor="{{firstAnchor}}" reverse="isReverse" show-command-labels="showCommandLabels" context="context" alignment="{{orientation}}" hide-more="true"></aw-command-bar>
+        <aw-command-bar anchor="{{secondAnchor}}" reverse="isReverseSecond" show-command-labels="showCommandLabels" context="context" alignment="{{orientation}}" hide-more="true"></aw-command-bar>
+    </div>
+
+    <!-- With overflow -->
+    <div class="aw-commandBars aw-commandBar-horizontal" ng-if="::overflow && orientation==='HORIZONTAL'">
+        <aw-command-bar anchor="{{firstAnchor}}" reverse="isReverse" show-command-labels="showCommandLabels" context="context" alignment="{{orientation}}" hide-more="true" overflow="overflow"></aw-command-bar>
+        <aw-command-bar class="aw-second-barHorizontal" anchor="{{secondAnchor}}" reverse="isReverseSecond" show-command-labels="showCommandLabels" context="context" alignment="{{orientation}}" hide-more="true" overflow="overflow"></aw-command-bar>
+    </div>
+
+     <!-- With overflow vertical bar needs to handled separately for wrapping -->
+    <div class="aw-commandBars aw-commandBar-vertical" ng-if="::overflow && orientation==='VERTICAL'" aw-class="{'aw-commandBar-verticalOverflow': !hideMore}">
+        <aw-flex-row height="fill">
+            <aw-command-bar anchor="{{firstAnchor}}" reverse="isReverse" show-command-labels="showCommandLabels" context="context" alignment="{{orientation}}" hide-more="true" overflow="overflow"></aw-command-bar>
+        </aw-flex-row>
+        <aw-flex-row class="aw-bottom-bar">
+            <aw-command-bar class="aw-second-barVertical" anchor="{{secondAnchor}}" reverse="isReverseSecond" show-command-labels="showCommandLabels" context="context" alignment="{{orientation}}" hide-more="true" overflow="overflow"></aw-command-bar>
+        </aw-flex-row>
+    </div>
+
+    <!-- The more button visible when overflow occurred-->
+    <div class="aw-toolbarIcon aw-commands-moreButton" ng-if="overflow" aw-class="{'hidden':hideMore}">
+        <button type="button" class="aw-commands-commandToolbarIconButton" extended-tooltip-options="{alignment : '{{orientation}}'}" extended-tooltip="{extendedTooltipContent: '{{moreCommandExtendedTooltip}}' }" aw-click="handleOverflowClick($event)" aria-label="{{moreCommandExtendedTooltip}}">
+            <aw-icon icon-id="cmdMore" class="aw-commands-svg"></aw-icon>
+        </button>
+    </div>
+</div>

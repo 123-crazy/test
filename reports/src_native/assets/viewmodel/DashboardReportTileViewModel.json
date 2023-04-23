@@ -1,0 +1,137 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-row.directive",
+        "js/aw-chart.directive",
+        "js/aw-link.directive",
+        "js/aw-column.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-cell-command-bar.directive"
+    ],
+    "actions": {
+        "tileRevealed": {
+            "actionType": "JSFunctionAsync",
+            "method": "dashboardTileRevealed",
+            "inputData": {
+                "subPanelContext": "{{subPanelContext}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "dataProviders.gridDataProvider.columnConfig": "columnConfig",
+                "displayTable": "displayTable",
+                "displayChart": "displayChart",
+                "chartPoints": "chartPoints",
+                "totalObjectFound": "totalObjectFound",
+                "ChartConfiguration": "ChartConfiguration",
+                "searchAndChartInfo": "searchAndChartInfo",
+                "dataProviders":"dataProviderDefinition",
+                "columnProviders":"columnProviderDefinition",
+                "dataProviderId":"dataProviderId",
+                "columnProviderId":"columnProviderId",
+                "gridId": "id",
+                "grids": "gridDefinition",
+                "isActiveItem": "isActiveItem"
+            },
+            "deps": "js/myDashboardTileService"
+        },
+        "getChartDataAction": {
+            "actionType": "JSFunction",
+            "method": "getChartDataAction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "chartProviders.myChartProvider.chartPoints": ""
+            },
+            "deps": "js/myDashboardTileService"
+        },
+        "goToReport": {
+            "actionType": "Navigate",
+            "navigateTo": "showReport",
+            "navigationParams": {
+                "uid": "{{subPanelContext.uid}}",
+                "reportId": "{{subPanelContext.props.rd_id.dbValues[0]}}",
+                "title": "{{subPanelContext.props.rd_name.dbValues[0]}}",
+                "configure": false,
+                "referenceId": "{{subPanelContext.props.rd_sourceObject.dbValue}}"
+            },
+            "options": {
+                "inherit": false
+            }
+        },
+        "goToSource": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{subPanelContext.props.rd_sourceObject.dbValue}}"
+            }
+        },
+        "getSourceObject":{
+            "actionType": "JSFunctionAsync",
+            "method": "getSourceObject",
+            "inputData": {
+                "sourceUid": "{{subPanelContext.props.rd_sourceObject.dbValue}}",
+                "data":"{{data}}"
+            },
+            "outputData":{
+                "startShowSourceLink": ""
+            },
+            "deps": "js/myDashboardTileService"
+        }
+    },
+    "chartProviders": {
+        "myChartProvider": {
+            "title": "",
+            "chartType": "line",
+            "loadDataAction": "getChartDataAction",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "logarithmic",
+                "xAxisLabel": "",
+                "yAxisLabel": "{{i18n.objectCount}}",
+                "isDataLabelOnChartEnabled": true
+            }
+        }
+    },
+    "data": {
+        "chartConfig": {},
+        "displayChart": false,
+        "displayTable": false,
+        "startShowSourceLink": false,
+        "reportlink": {
+            "displayName": "{{subPanelContext.props.rd_name.uiValues[0]}}",
+            "type": "STRING",
+            "isRequired": "false"
+        },
+        "reportSource":{
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "tileRevealed"
+    },
+    "conditions": {
+        "showtheChart": {
+            "expression": "data.displayChart"
+        },
+        "showtheTable": {
+            "expression": "data.displayTable"
+        },
+        "showSourceLink":{
+            "expression": "data.startShowSourceLink"
+        }
+    },
+    "onEvent":[{
+     "eventId": "reportDashboard.getSourceObject",
+     "action": "getSourceObject"
+    }],
+    "i18n": {
+        "viewReport": [ "ReportChartMessages" ],
+        "totalObjectFound":["ReportChartMessages"],
+        "objectCount":["ReportChartMessages"]
+    }
+}

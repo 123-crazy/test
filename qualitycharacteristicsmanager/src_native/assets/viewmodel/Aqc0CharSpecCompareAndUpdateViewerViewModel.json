@@ -1,0 +1,125 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-xrt-2.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-splitter.directive",
+        "js/aw-column.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/exist-when.directive",
+        "js/aw-row.directive"
+    ],
+    "actions":
+    {
+        "loadCharesticsData":{
+            "actionType": "JSFunction",
+            "method": "loadCharesticsData",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "removeCurrentRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteRelations",
+            "inputData": {
+                "input": [
+                    {
+                        "primaryObject": "{{data.charRepRev}}",
+                        "secondaryObject": "{{data.currentCharSpec}}",
+                        "relationType": "Aqc0LinkToSpec",
+                        "clientId": "CreateObject",
+                        "userData": ""
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "currentRelationRemoved"
+                    }
+                ]
+            }
+        },
+        "updateLatestRelation":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [
+                    {
+                        "primaryObject": "{{data.charRepRev}}",
+                        "secondaryObject": "{{data.latestCharSpec}}",
+                        "relationType": "Aqc0LinkToSpec",
+                        "clientId": "CreateObject",
+                        "userData": ""
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "gwt.CreateOrAddObjectCompleteEvent",
+                        "eventData": {
+                            "createdObjs": [
+                                "{{data.charRepRev}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{data.charRepRev}}"
+                            ],
+                            "createdObjects": [
+                                "{{data.charRepRev}}"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "closeCompareView": {
+            "actionType": "JSFunction",
+            "method": "closeCompareView",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "loadCharesticsData"
+    },
+    "onEvent": [
+        {
+            "eventId": "currentRelationRemoved",
+            "action": "updateLatestRelation"
+        }
+    ],
+    "data":
+    {
+        "currentCharSpecxrtViewModel":null,
+        "latestCharSpecxrtViewModel":null,
+        "currentCharSpec": null,
+        "latestCharSpec": null,
+        "charRepRev": null
+    },
+    "i18n": {
+        "Current": [ "qualitycharacteristicsmanagerMessages" ],
+        "Latest": [ "qualitycharacteristicsmanagerMessages" ],
+        "UpdateToLatest": [ "qualitycharacteristicsmanagerMessages" ],
+        "Close":  [ "qualitycharacteristicsmanagerMessages" ]
+    }
+}

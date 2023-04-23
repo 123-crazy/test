@@ -1,0 +1,441 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-form.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-checkbox.directive"
+    ],
+
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData": {
+                "input": "{{data.preferences.Baseline_release_procedures}}"
+            },
+
+            "outputData": {
+                "baselineTemplateList": ""
+            },
+
+            "deps": "js/listBoxService"
+        },
+
+        "revise": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-DataManagement",
+            "method": "reviseObjects",
+            "inputData": {
+                "reviseIn": [ {
+                    "targetObject": "{{ctx['SaveAsReviseWorkSpace'].SelectedObjects[0]}}",
+                    "reviseInputs": "{{function:getReviseInputs}}",
+                    "deepCopyDatas": "{{data.deepCopyDatas.dbValue}}"
+                } ]
+            },
+
+            "outputData": {
+                "newObject": "{{dataParseDefinitions:convertRevisedObject}}",
+                "partialErorrs": "partialErrors"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "Awp0ShowSaveAs.saveAsComplete",
+                    "eventData": {
+                        "newObjectUid": "{{data.newObject.uid}}"
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "reviseFailureMsg",
+                    "condition": "errorCode.code===48071 || errorCode.code===51003 || errorCode.code===48020"
+                } ]
+            },
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+
+        "saveas": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2012-09-DataManagement",
+            "method": "saveAsObjectAndRelate",
+            "inputData": {
+                "saveAsInput": "{{function:getSaveAsInput}}",
+                "relateInfo": [ {
+                    "relate": true
+                } ]
+            },
+
+            "outputData": {
+                "newObject": "{{dataParseDefinitions:convertSavedAsObject}}"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "Awp0ShowSaveAs.saveAsComplete",
+                    "eventData": {
+                        "newObjectUid": "{{data.newObject.uid}}"
+                    }
+                } ]
+            },
+
+            "actionMessages": {
+                "success": [ {
+                    "message": "createSuccessMsg"
+                } ]
+            },
+
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+
+        "saveAsBaseline": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-RequirementsManagement",
+            "method": "createBaseline",
+            "inputData": {
+                "input": [ {
+                    "objectToBaseline": {
+                        "uid": "{{ctx.selected.uid}}",
+                        "type": "{{ctx.selected.type}}"
+                    },
+                    "baselineRevisionId": "",
+                    "baselineDescription": "{{function:getDescription}}",
+                    "baselineReleaseProcedureName": "{{data.baselineTemplate.dbValue}}",
+                    "baselineJobName": "BaselineJobName",
+                    "baselineLabelName": "",
+                    "baselineJobDescription": "baselineJobDescription",
+                    "isDryRun": false,
+                    "isPreciseBaseline": "{{function:getPreciseBaseline}}"
+                } ]
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+
+            "actionMessages": {
+                "success": [ {
+                    "message": "notificationForBaselineCreationMsg"
+                } ],
+                "failure": [
+                    {
+                        "message": "startSaveAsFailure",
+                        "condition": "errorCode.code===3104"
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+        "saveAsComplete": {
+            "actionType": "JSFunction",
+            "method": "saveAsComplete",
+            "deps": "js/Awp0ShowSaveAsService",
+            "inputData": {
+                "commandId": "Awp0ShowObject",
+                "commandArgs": {
+                    "edit": true
+                },
+                "commandContext": {
+                    "vmo": "{{data.newObject}}"
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "enableDisableUIContent": {
+            "actionType": "JSFunction",
+            "method": "enableDisableUIContent",
+            "deps": "js/aceInteractiveDuplicateService",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "enableDuplicateMode": {
+            "actionType": "JSFunction",
+            "method": "enableDuplicateMode",
+            "deps": "js/aceInteractiveDuplicateService",
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "dataParseDefinitions": {
+        "convertRevisedObject": {
+            "outputFormatType": "ViewModelObject",
+            "dataInput": "reviseTrees[0].objectCopy.uid",
+            "operationType": "CREATE"
+        },
+
+        "convertSavedAsObject": {
+            "outputFormatType": "ViewModelObject",
+            "dataInput": "saveAsTrees[0].objectCopy.uid",
+            "operationType": "CREATE"
+        }
+    },
+
+    "preferences": [
+        "Baseline_release_procedures",
+        "Baseline_precise_bvr"
+    ],
+
+    "functions": {
+        "getReviseInputs": {
+            "functionName": "getReviseInputs",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+
+        "getSaveAsInput": {
+            "functionName": "getSaveAsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx['SaveAsReviseWorkSpace']}}"
+            ]
+        },
+
+        "getDescription": {
+            "functionName": "getDescription",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getPreciseBaseline": {
+            "functionName": "getPreciseBaseline",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+
+    "data": {
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "panelId": "saveAsRevision",
+                    "name": "{{i18n.revision}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx['SaveAsReviseWorkSpace'].ReviseHidden!='true'"
+                },
+
+                {
+                    "panelId": "saveAsNew",
+                    "name": "{{i18n.new}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx['SaveAsReviseWorkSpace'].SaveAsHidden!='true'"
+                }
+            ]
+        },
+
+        "saveAsBaseline": {
+            "displayName": "{{i18n.saveAsBaseline}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "selectChildrenToDuplicate": {
+            "displayName": "{{i18n.selectChildrenToDuplicate}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "baselineTemplate": {
+            "displayName": "{{i18n.baselineTemplate}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov": true
+        },
+
+        "baselineDescription": {
+            "type": "STRING",
+            "displayName": "{{i18n.description}}"
+        },
+        "baselinePrecise": {
+            "type": "BOOLEAN",
+            "dbValue": "{{conditions.isPrecise}}",
+            "displayName": "{{i18n.preciseBaseline}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Awp0ShowSaveAs.saveAsComplete",
+            "action": "saveAsComplete"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "condition": "data.selectedTab.panelId === 'saveAsNew'",
+            "action": "enableDisableUIContent"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        }
+    ],
+    "messages": {
+        "createSuccessMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveAsOperationSuccessful}}",
+            "messageTextParams": [
+                "{{data.newObject.props.object_string.uiValue}}"
+            ]
+        },
+
+        "createFailureMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveAsOperationFailed}}",
+            "messageTextParams": [
+                "{{ctx['SaveAsReviseWorkSpace'].SelectedObjects[0].modelType.displayName}}"
+            ]
+        },
+
+        "reviseFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.reviseFailureMessage}}",
+            "messageTextParams": [
+                "{{ctx.mselected[0].props.object_string.uiValues}}"
+            ]
+        },
+
+        "notificationForBaselineCreationMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.notificationForBaselineCreation}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_string.uiValues[0]}}"
+            ]
+        },
+        "startSaveAsFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+
+    "conditions": {
+        "isReviseVisible": {
+            "expression": "!data.saveAsBaseline.dbValue  &&  data.selectedTab.panelId=='saveAsRevision' && !data.selectChildrenToDuplicate.dbValue"
+        },
+        "isSaveVisible": {
+            "expression": "data.saveAsBaseline.dbValue  &&  data.selectedTab.panelId=='saveAsRevision' && data.baselineTemplate.dbValue.length>0 && !data.selectChildrenToDuplicate.dbValue"
+        },
+        "isDuplicateVisible": {
+            "expression": "data.selectedTab.panelId=='saveAsNew' && !ctx.splitView.mode && ctx.mselected.length === 1 && ctx.aceActiveContext.context.openedElement.uid === ctx.selected.uid && !ctx.aceActiveContext.context.isDuplicateEnabled && ctx.aceActiveContext.context.supportedFeatures.Awb0InteractiveDuplicateFeature && !ctx.aceActiveContext.context.isMarkupEnabled && !conditions.isOverrideContextApplied"
+        },
+        "isOverrideContextApplied": {
+            "expression": "ctx.aceActiveContext.context.currentState && ctx.aceActiveContext.context.currentState.incontext_uid && ctx.aceActiveContext.context.currentState.incontext_uid !== ''"
+        },
+        "isCheckboxEnable": {
+            "expression": "data.preferences.Baseline_precise_bvr[0] !== '2'"
+        },
+        "isPrecise": {
+            "expression": "data.preferences.Baseline_precise_bvr[0] === '2'"
+        }
+    },
+    "i18n": {
+        "saveas": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "revision": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "new": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "save": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "saveAsOperationSuccessful": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "reviseOperationFailed": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "reviseFailureMessage": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "saveAsOperationFailed": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "saveAsBaseline": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "baselineTemplate": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "description": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "notificationForBaselineCreation": [
+            "TCUICommandPanelsMessages"
+        ],
+
+        "selectChildrenToDuplicate": [
+            "OccurrenceManagementConstants"
+        ],
+        "saveAsAndReplace": [
+            "OccurrenceManagementConstants"
+        ],
+        "aceRemove": [
+            "OccurrenceManagementConstants"
+        ],
+        "aceContextReference": [
+            "OccurrenceManagementConstants"
+        ],
+        "pending": [
+            "OccurrenceManagementConstants"
+        ],
+        "select": [
+            "OccurrenceManagementConstants"
+        ],
+        "preciseBaseline":
+        [
+            "TCUICommandPanelsMessages"
+        ]
+    }
+}

@@ -1,0 +1,371 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-numeric.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-button.directive"
+    ],
+
+    "actions":
+    {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "populateProfilePanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "profileObject": "{{ctx.workflowTabContext.handlerContextObject}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateProfileService"
+        },
+        "resetGroupRoleValue": {
+            "actionType": "JSFunction",
+            "method": "resetGroupRoleValue",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "groupPropObject": "{{data.allGroups}}",
+                "rolePropObject": "{{data.allRoles}}",
+                "changedPropObject": "{{data.eventMap['awPopupWidget.close'].propObject}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateProfileService"
+        },
+        "closeCurrentOpenedPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "createOrUpdateProfile": {
+            "actionType": "JSFunction",
+            "method": "createOrUpdateProfile",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selectedTemplate": "{{ctx.selected}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.createProfileInputData && !data.updateProfileInputVector",
+                        "name": "workflowDesigner.createAndDeleteProfileEvent"
+                    },
+                    {
+                        "condition": "data.updateProfileInputVector && !data.createProfileInputData",
+                        "name": "workflowDesigner.updateProfileEvent"
+                    },
+                    {
+                        "condition": "!data.updateProfileInputVector && !data.createProfileInputData",
+                        "name": "closePanel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowTemplateProfileService"
+        },
+        "saveProfileObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData":
+            {
+                "info":
+                [
+                    {
+                        "object": "{{ctx.workflowTabContext.handlerContextObject}}",
+                        "timestamp": "",
+                        "vecNameVal": "{{data.updateProfileInputVector}}"
+                    }
+                ]
+            },
+            "policy": {
+                "types": [ {
+                        "name": "EPMTaskTemplate",
+                        "properties": [
+                            {
+                                "name": "template_name"
+                            },
+                            {
+                                "name": "signoff_profiles",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMSignoffProfile",
+                        "properties":
+                        [
+                            {
+                                "name": "number_of_signoffs"
+                            },
+                            {
+                                "name": "allow_subgroups"
+                            },
+                            {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    },
+                    {
+                        "name": "workflowDesigner.tabReload"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowTemplateProfileService"
+        },
+        "createProfileObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2019-06-Workflow",
+            "method": "createOrUpdateTemplate",
+            "inputData": {
+                "input": "{{data.createProfileInputData}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "EPMTaskTemplate",
+                        "properties": [
+                            {
+                                "name": "template_name"
+                            },
+                            {
+                                "name": "signoff_profiles",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMSignoffProfile",
+                        "properties":
+                        [
+                            {
+                                "name": "number_of_signoffs"
+                            },
+                            {
+                                "name": "allow_subgroups"
+                            },
+                            {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowDesigner.deleteProfileEvent"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowDesignerUtils"
+        },
+        "deleteProfileObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData": {
+                "objects": [
+                    "{{ctx.workflowTabContext.handlerContextObject}}"
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    },
+                    {
+                        "name": "workflowDesigner.tabReload"
+                    }
+                ]
+            }
+        }
+    },
+    "functions":
+    {
+    },
+
+    "conditions":
+    {
+        "isValidToSave":
+        {
+            "expression":  "data.allGroups.dbValue !== 'All Groups' ||  data.allRoles.dbValue!== 'All Roles'"
+        }
+    },
+
+    "data":
+    {
+        "allGroups":
+        {
+            "displayName": "{{i18n.group}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allRoles":
+        {
+            "displayName": "{{i18n.role}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allowSubGroupMembers":
+        {
+            "displayName": "{{i18n.allowSubGroupMembers}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "numberOfReviewers":
+        {
+            "displayName": "{{i18n.number_of_signoffs}}",
+            "type": "INTEGER",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "workflowDesigner.updateProfileEvent",
+            "action": "saveProfileObject"
+        },
+        {
+            "eventId": "workflowDesigner.createAndDeleteProfileEvent",
+            "action": "createProfileObject"
+        },
+        {
+            "eventId": "workflowDesigner.deleteProfileEvent",
+            "action": "deleteProfileObject"
+        },
+        {
+            "eventId": "closePanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "workflowGraph.selectionChanged",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "Awp0WorkflowDesignerGraph.contentUnloaded",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "condition": "scope.data._internal.panelId !=='Awp0TemplateEditProfileInfo'",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awPopupWidget.close",
+            "action": "resetGroupRoleValue",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "workflowDesigner.saveEdit",
+            "action": "closeCurrentOpenedPanel"
+        }
+    ],
+
+    "i18n":
+    {
+        "Awp0StartEditTableTitle": [ "ZeroCompileCommandMessages"],
+        "save": [ "TCUICommandPanelsMessages" ],
+        "group": [ "WorkflowCommandPanelsMessages" ],
+        "role": [ "WorkflowCommandPanelsMessages" ],
+        "allGroups": [ "WorkflowCommandPanelsMessages" ],
+        "allRoles": [ "WorkflowCommandPanelsMessages" ],
+        "allowSubGroupMembers": [ "WorkflowDesignerMessages" ],
+        "number_of_signoffs": [ "WorkflowDesignerMessages" ]
+    }
+
+}

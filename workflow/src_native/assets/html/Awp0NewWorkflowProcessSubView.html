@@ -1,0 +1,28 @@
+<aw-panel-body visible-when="data.activeView !=='Awp0TemplateAssignmentSubPanel'">
+    <aw-panel-section caption="i18n.Workflow" collapsed="false">
+        <aw-radiobutton prop="data.allowAlternateProcedures" enable-when="conditions.isAllowAlternateProcedureEnable" visible-when="conditions.isAllowAlternateProcedures" action="getValidTemplates"></aw-radiobutton>
+        <aw-listbox prop="data.workflowTemplates" list="data.templates" action="getProcessParticipantAssignments"></aw-listbox>
+        <aw-widget prop="data.workFlowName"></aw-widget>
+        <aw-widget prop="data.description" hint="textarea"></aw-widget>
+    </aw-panel-section>
+    <aw-panel-section caption="i18n.assignments" collapsed="true" exist-when="ctx.isDynamicParticipantAssignmentPresent">
+        <aw-include name="Awp0NewWorkflowProcessParticipantAssignmentsSection" sub-panel-context="data" exist-when="ctx.isTemplateListboxValueChanged"></aw-include>
+    </aw-panel-section>
+    <aw-panel-section caption="i18n.assignments" collapsed="true" exist-when="!ctx.isDynamicParticipantAssignmentPresent">
+        <aw-include name="Awp0NewWorkflowProcessTasksAssignmentsSection" sub-panel-context="data" exist-when="ctx.isTemplateListboxValueChanged"></aw-include>
+    </aw-panel-section>
+    <aw-command-panel-section id="processTargets" caption="i18n.targets" anchor="data.processTargetAnchor" context="data.dataProviders.attachTargets">
+        <aw-flex-row class="aw-workflow-targetSectionRow">
+            <aw-scrollpanel>
+                <aw-list dataprovider="data.dataProviders.attachTargets">
+                    <aw-default-cell vmo="item"></aw-default-cell>
+                </aw-list>
+            </aw-scrollpanel>
+        </aw-flex-row>
+    </aw-command-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="submit" visible-when="conditions.isValidToSubmit">
+        <aw-i18n>i18n.Submit</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

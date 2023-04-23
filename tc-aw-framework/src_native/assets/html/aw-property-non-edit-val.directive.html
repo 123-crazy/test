@@ -1,0 +1,45 @@
+<div ng-show="prop.isNull != null"
+    class="aw-widgets-propertyNonEditValue">
+	<div class="aw-propertyrenderjs-tooltipContainer"
+        ng-class="{'aw-widgets-propertyError': prop.error}"
+        ng-if="::(prop.isRichText )"
+        ng-mouseenter="toggleTooltip( true )" ng-mouseleave="toggleTooltip( false )">
+        <div ng-if="showTooltip && inTableCell && !prop.isEditing && !prop.isEditable"
+            class="aw-layout-popup aw-propertyrenderjs-tooltipPopup">
+            <p ng-bind-html="trustedRichtext"></p>
+        </div>
+
+        <span class="aw-jswidgets-text"
+            ng-class="{'aw-widgets-richText': prop.isRichText, 'aw-jswidgets-change': hasOldValue() }"
+            aw-parse-html
+            display-val="prop.isArray ? prop.displayValues[index] : prop.uiValue"
+            is-rich-text="prop.isRichText" rendering-hint="prop.renderingHint" ></span>
+        <span class="aw-jswidgets-oldText">{{prop.isArray ?
+            prop.oldValues[index] : prop.oldValue}}</span>
+    </div>
+
+    <div ng-class="{'aw-widgets-propertyError': prop.error}"
+        ng-if="::(prop.type === 'OBJECT' || prop.type === 'OBJECTARRAY')">
+        <a class="aw-widgets-propertyValueLink" href="{{associatedURL.url}}" target="{{associatedURL.target}}"
+            ng-click="openObjectLinkPage($event)"
+            ng-class="{'aw-jswidgets-change': hasOldValue()}"
+            aw-parse-html
+            display-val="prop.isArray ? prop.displayValues[index] : prop.uiValue"></a>
+            <span class="aw-jswidgets-oldText" aw-highlight-property-html display-val="prop.isArray ?
+            prop.oldValues[index] : prop.oldValue"></span>
+    </div>
+
+    <div class="aw-layout-flexRowContainer" ng-class="{'aw-widgets-propertyError': prop.error}"
+        ng-if="::( !prop.isRichText && prop.type !== 'OBJECT' && prop.type !== 'OBJECTARRAY')">
+        <span class="aw-jswidgets-text"
+            ng-class="{'aw-widgets-richText': prop.isRichText, 'aw-jswidgets-change': hasOldValue()}"
+            aw-parse-html
+            display-val="prop.isArray ? prop.displayValues[index] : prop.uiValue"
+            is-rich-text="prop.isRichText" rendering-hint="prop.renderingHint" ></span>
+        <span class="aw-jswidgets-oldText" aw-highlight-property-html display-val="prop.isArray ?
+        prop.oldValues[index] : prop.oldValue"></span>
+
+        <aw-command-bar class="aw-layout-propertyCommandsNoShadow" exist-when="prop.uwAnchor && !prop.isArray" anchor="{{prop.uwAnchor}}"
+            alignment="HORIZONTAL" context="prop"></aw-command-bar>
+    </div>
+</div>

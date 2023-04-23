@@ -1,0 +1,89 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-include.directive",
+        "js/wys-canvas-editor.directive",
+        "js/aw-splitter.directive"
+    ],
+    "data": {
+        "canvasData": {
+            "canvasModel": {},
+            "viewModel": {},
+            "currentSelectedElementId": null,
+            "currentSelectedElementType": null
+        }
+    },
+    "actions": {
+        "loadWysiwygJson": {
+            "actionType": "JSFunction",
+            "method": "processWysiwygJson",
+            "outputData": {
+                "wysiwygJson": "wysiwygJson"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "wysiwygJsonLoaded"
+                    }
+                ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "displayFilteredNodesAction": {
+            "actionType": "JSFunction",
+            "method": "displayFilteredNodes",
+            "inputData": {
+                "data": "{{data}}",
+                "inputNode": "{{data.eventData}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [
+                    {
+                        "name": "wysiwygJsonLoaded"
+                    }
+                ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "registerLeaveHandler": {
+            "actionType": "JSFunction",
+            "method": "registerLeaveHandler",
+            "deps": "js/wysiwygUtilService"
+        },
+        "wysiwygCanvasMountAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwygCanvasMountActionEvent"
+                } ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "wysiwygTree.refresh",
+            "action": "loadWysiwygJson"
+        },
+        {
+            "eventId": "wysiwygCanvasMountActionEvent",
+            "action": "loadWysiwygJson"
+        },
+        {
+            "eventId": "wysiwygCanvasMountActionEvent",
+            "action": "registerLeaveHandler",
+            "condition": "ctx.wysiwygCurrentPanel.isDirty === true"
+        },
+        {
+            "eventId": "wysiwygTree.filteredNodes",
+            "cacheEventData": true,
+            "action": "displayFilteredNodesAction"
+        }
+    ],
+    "lifecycleHooks": {
+        "onMount": "wysiwygCanvasMountAction"
+    }
+}

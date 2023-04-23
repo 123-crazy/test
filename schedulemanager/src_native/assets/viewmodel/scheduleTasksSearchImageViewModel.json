@@ -1,0 +1,225 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel.directive",
+        "js/aw-in-content-search-box.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list.directive",
+        "js/aw-image-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "data":{
+        "additionalContext":
+        {
+            "type": "STRING",
+            "hasLov": true,
+            "displayName": "",
+            "dbValue": ""
+        },
+        "searchBox": {
+            "displayName":"",
+            "type":"STRING",
+            "isRequired":"true",
+            "dbValue":"{{ctx.search.criteria.searchString}}",
+            "dispValue":"{{ctx.search.criteria.searchString}}"
+        }
+    },
+    "actions":
+    {
+        "doSearchKeepFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "simpleSearch",
+            "inputData":
+            {
+                "searchCriteria": "{{data.searchBox.dbValue}}"
+            },
+
+            "deps": "js/filterPanelService"
+        },
+        "setSelectedContext":
+        {
+            "actionType": "JSFunction",
+            "method": "setSelectedContext",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1SearchFilterService"
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "loadData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": "{{ctx.search.maxToLoad}}",
+                    "maxToReturn": "{{ctx.search.maxToReturn}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType" : "{{ctx.search.sortType}}",
+                    "startIndex": "{{data.dataProviders.imageDataProvider.startIndex}}",
+                    "searchFilterMap": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{ctx.search.sortCriteria}}"
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "schTaskSearchImageErrorMsg"
+                    }
+                ]
+            }
+        },
+        "loadSubscribedResourcePools":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput": {
+                    "maxToLoad": 1000,
+                    "maxToReturn": 1000,
+                    "providerName": "Saw1TaskSearchProvider",
+                    "searchCriteria":
+                    {
+                        "searchContentType": "SubscribedResourcePools"
+                    },
+                    "startIndex": 0
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "ResourcePool",
+                        "properties":
+                        [
+                            {
+                                "name": "object_string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "totalResourcePools": "totalFound",
+                "resourcePoolSearchResults": "searchResults",
+                "resourcePoolModelObjects": "ServiceData.modelObjects"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "scheduleTasksSearchImage.processSubscribedResourcePoolSearchResponse"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "schTaskSearchImageErrorMsg"
+                    }
+                ]
+            }
+        },
+        "prepareAdditionalContextList":
+        {
+            "actionType": "JSFunction",
+            "method": "prepareAdditionalContextList",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1SearchFilterService"
+        }
+    },
+    "dataProviders":
+    {
+        "imageDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commands":
+            {
+                "Awp0ShowObjectCell":
+                {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "scheduleTasksSearchImage.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "scheduleTasksSearchImage.contentLoaded",
+            "action": "loadSubscribedResourcePools"
+        },
+        {
+            "eventId": "scheduleTasksSearchImage.processSubscribedResourcePoolSearchResponse",
+            "action": "prepareAdditionalContextList"
+        }
+    ],
+    "messages": {
+        "schTaskSearchImageErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "allTeams": [ "ScheduleManagerMessages" ]
+    }
+}

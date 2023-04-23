@@ -1,0 +1,17 @@
+<div class="aw-layout-flexColumn aw-layout-include">
+    <aw-form name="epmTaskPanelForm">
+        <aw-panel-body>
+            <aw-widget  prop="data.taskName" hint="label"></aw-widget>
+            <aw-widget  prop="data.description" hint="label" visible-when="conditions.showInstructions"></aw-widget>
+            <aw-widget  prop="data.workflowDescription" hint="label" visible-when="conditions.showWorkflowDescription"></aw-widget>
+            <aw-xrt type="SAVEAS" vmo="data.formObject" exist-when = "data.formObject"></aw-xrt>
+            <aw-widget  prop="data.comments" hint="textarea"></aw-widget>
+            <aw-password prop="data.password" exist-when="conditions.isSecureTask"></aw-password>
+        </aw-panel-body>
+    </aw-form>
+
+    <aw-panel-footer visible-when="conditions.isValidToComplete && epmTaskPanelForm.$valid">
+        <aw-button action="verifyCompleteAction"><aw-i18n>i18n.complete</aw-i18n></aw-button>
+        <aw-button action="verifyUnableToCompleteAction" default="false" visible-when="conditions.showUnableToComplete"><aw-i18n>i18n.unableToComplete</aw-i18n></aw-button>
+    </aw-panel-footer>
+</div>

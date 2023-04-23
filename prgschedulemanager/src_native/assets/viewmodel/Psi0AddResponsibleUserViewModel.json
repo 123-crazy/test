@@ -1,0 +1,508 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-widget.directive",
+        "js/visible-when.directive",
+        "js/aw-listbox.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "checkVersionSupportForProject",
+            "inputData": {
+                "major": "11",
+                "minor": "2",
+                "qrm": "4"
+            },
+            "outputData":
+            {
+                "isVersionSupported": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.isVersionSupported === true",
+                        "name": "revealWithProject"
+                    },
+                    {
+                        "condition": "data.isVersionSupported === false",
+                        "name": "revealWithoutProject"
+                    }
+                ]
+            },
+            "deps": "js/Psi0AddResponsibleUserService"
+        },
+        "revealWithoutProjectPanel": {
+            "actionType": "dataProvider",
+            "methods": ["userPerformSearch"]
+        },
+        "revealWithProjectPanel": {
+            "actionType": "dataProvider",
+            "methods": [
+                 "getPropertiesProvider"
+            ]
+        },
+        "assign": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:addResponsibleUser}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData":
+                        {
+
+                            "relatedModified": [ "{{ctx.selected}}" ]
+                        },
+                        "condition":"ctx.xrtSummaryContextObject === undefined"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData":
+                        {
+
+                            "relatedModified": [ "{{ctx.xrtSummaryContextObject}}" ]
+                        },
+                        "condition":"ctx.xrtSummaryContextObject !== undefined"
+                    },
+                    {
+                      "name": "complete",
+                      "eventData": {
+                         "source": "toolAndInfoPanel"
+                      }
+                   }
+
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "errorCode.code===2010 || errorCode.code===515001 || errorCode.code===27026",
+                        "message": "noWriteAccessPermissionErrorMessage"
+                    },
+                    {
+                        "condition": "errorCode.code!==2010 && errorCode.code!==515001 && errorCode.code!==27026",
+                        "message": "SOAFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Psi0AddResponsibleUserService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Group",
+                        "properties": [
+                            {
+                                "name": "object_full_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_member",
+                        "properties": [
+                            {
+                                "name": "user",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [
+                            {
+                                "name": "group",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [
+                            {
+                                "name": "person",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties": [
+                            {
+                                "name": "user_name"
+                            },
+                            {
+                                "name": "PA9"
+                            },
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "deps": "js/Psi0AddResponsibleUserService"
+        },
+        "addSelection": {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+            },
+            "deps": "js/Psi0AddResponsibleUserService"
+        },
+        "getProjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2017-05-ProjectLevelSecurity",
+            "method": "getProjectsForAssignOrRemove",
+            "inputData":
+            {
+                "projectsInput":
+                [
+                    {
+                        "user":{
+                            "uid": "{{ctx.user.uid}}",
+                            "type": "{{ctx.user.type}}"
+                        },
+                        "selectedObjects": "{{function:processSelectedObjects}}",
+                        "assignedObjects": [],
+                        "filterText": "",
+                        "isAceContext": false,
+                        "paginationInfo":
+                        {
+                            "startIndexForAvailableProjects": 0,
+                            "maxToReturnForAvailableProjects": 50
+                        }
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "availableProjectsList"   : "ServiceData.modelObjects",
+                "commonProjectList" :  "projectOutput.assignedProjectsList"
+            },
+            "policy": {
+                "types": [
+                {
+
+                    "name": "TC_Project",
+                  "properties": [
+                     {
+                        "name": "object_string"
+                     },
+                     {
+                        "name": "project_id"
+                     }
+                  ]
+                 }
+              ]
+           },
+           "events": {
+             "success": [
+               {
+                  "name": "getProperties"
+               }
+             ]
+           },
+           "actionMessages": {
+               "failure": [ {
+                   "message": "SOAFailureMessage"
+               } ]
+           },
+           "deps": "js/Psi0AddResponsibleUserService"
+        },
+     "populateProjectData": {
+         "actionType": "JSFunction",
+         "method": "populateProjectData",
+         "inputData": {
+            "data": "{{data}}",
+            "selectedArray": "{{ctx.mselected}}"
+         },
+         "deps": "js/Psi0AddResponsibleUserService"
+      },
+    "getProperties": {
+        "actionType": "TcSoaService",
+        "serviceName": "Core-2006-03-DataManagement",
+        "method": "getProperties",
+        "inputData": {
+            "objects": "{{ctx.mselected}}",
+            "attributes": [
+                "project_list"
+            ]
+        },
+        "policy": {
+            "types": [
+                {
+                    "name": "Psi0AbsRIO",
+                    "properties": [
+                        {
+                            "name": "project_list"
+                        }
+                    ]
+                },
+                {
+                    "name": "Psi0PrgDelRevision",
+                    "properties": [
+                        {
+                            "name": "project_list"
+                        }
+                    ]
+                },
+                {
+                    "name": "Psi0AbsChecklist",
+                    "properties": [
+                        {
+                            "name": "project_list"
+                        }
+                    ]
+                }
+            ]
+        },
+        "outputData":
+        {
+            "objectsWithProjectList"   : "modelObjects"
+        },
+        "events": {
+            "success": [
+              {
+                 "name": "projectPropertiesLoaded"
+              }
+            ]
+          },
+          "actionMessages": {
+              "failure": [ {
+                  "message": "SOAFailureMessage"
+              } ]
+          }
+        },
+        "revealGroupRoleLOV":
+        {
+            "actionType": "JSFunction",
+            "method": "revealGroupRoleLOV",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selectedObj": "{{ctx.selected}}"
+            },
+            "deps": "js/Psi0AddResponsibleUserService"
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "userProjectObject": {
+            "displayName": "{{i18n.project}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true
+        },
+        "showProjectList": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "true"
+        },
+        "allGroups":
+        {
+            "displayName": "{{i18n.group}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allRoles":
+        {
+            "displayName": "{{i18n.role}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "dataProviders": {
+        "userPerformSearch": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "getPropertiesProvider": {
+            "action": "getProjects"
+        }
+    },
+    "functions": {
+        "processSelectedObjects": {
+            "functionName": "processSelectedObjects",
+            "parameters": [
+                "{{ctx}}"
+               ]
+        },
+        "addResponsibleUser": {
+            "functionName": "addResponsibleUser",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+               ]
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "noWriteAccessPermissionErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.noWriteAccessPermissionError}}",
+            "messageTextParams": [
+                "{{data.dataProviders.userPerformSearch.selectedObjects[0].props.user.displayValues[0]}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isProjectObjectListEmpty": {
+         "expression": "data.projectObjectList.length <= 0"
+      }
+    },
+    "preferences": [
+        "WRKFLW_allow_resourcepool_assignments",
+        "WRKFLW_show_user_assignment_options"
+    ],
+    "i18n": {
+        "project": [
+             "PrgScheduleManagerMessages"
+         ],
+         "noWriteAccessPermissionError": [
+            "PrgScheduleManagerMessages"
+        ],
+         "none": [
+             "PrgScheduleManagerMessages"
+         ],
+         "group": ["PrgScheduleManagerMessages"],
+        "role": ["PrgScheduleManagerMessages"],
+        "allGroups": ["PrgScheduleManagerMessages"],
+        "allRoles": ["PrgScheduleManagerMessages"]
+    },
+    "onEvent": [
+        {
+            "eventId": "userPerformSearch.selectionChangeEvent",
+            "action": "addSelection"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Psi0AddResponsibleUser"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "awPopupWidget.close",
+            "action": "userPerformSearch"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Psi0AddResponsibleUser"
+            },
+
+            "action": "revealGroupRoleLOV"
+        },
+        {
+           "eventId": "revealWithProject",
+           "action": "revealWithProjectPanel"
+        },
+        {
+           "eventId": "revealWithoutProject",
+           "action": "revealWithoutProjectPanel"
+        },
+        {
+           "eventId": "projectPropertiesLoaded",
+           "action": "populateProjectData"
+        },
+        {
+            "eventId": "getProperties",
+            "action": "getProperties"
+        },
+        {
+            "eventId": "Psi0AddResponsibleUser.assign",
+            "action": "assign"
+        }
+    ]
+}

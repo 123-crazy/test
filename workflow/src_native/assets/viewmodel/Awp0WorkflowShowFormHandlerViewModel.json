@@ -1,0 +1,259 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-i18n.directive",
+        "js/aw-listbox.directive",
+        "js/aw-widget.directive"
+    ],
+
+    "actions":
+    {
+        "loadFormTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0TypeSearchProvider",
+                    "searchCriteria":
+                    {
+                        "searchString": "{{data.formTypesList.dbValue}}",
+                        "listOfIncludeObjectTypes": "Form",
+                        "loadSubTypes": "true",
+                        "typeSelectorId": ""
+                    },
+                    "attributesToInflate": ["parent_types", "type_name", "object_string"],
+                    "startIndex": "{{data.dataProviders.formTypesDataProvider.startIndex}}"
+                }
+            },
+            "policy": {
+                "types": [ {
+                    "name": "ImanType",
+                    "properties": [
+                        { "name": "type_name" },
+                        { "name": "fnd0InternalName" },
+                        { "name": "object_string" }
+                    ]
+                } ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "formTypeList": "{{function:getFormTypeList}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateFormPanelService"
+
+        },
+        "closeCurrentOpenedPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "populatePanelData": {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "context": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateFormPanelService"
+        },
+        "saveHandler": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2019-06-Workflow",
+            "method": "createOrUpdateHandler",
+            "inputData": {
+                "input": "{{function:getCreateOrUpdateHandlerInput}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "EPMTaskTemplate",
+                        "properties": [
+                            {
+                                "name": "template_name"
+                            },
+                            {
+                                "name": "action_handlers",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                             }
+
+                        ]
+                    },
+                    {
+                        "name": "EPMHandler",
+                        "properties":
+                        [
+                           {
+                              "name": "arguments"
+                           },
+                           {
+                                "name": "parent_action_type"
+                           }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    },
+                    {
+                        "name": "workflowDesigner.tabReload"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowTemplateFormPanelService"
+        },
+        "unregisterCtx":
+        {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData":
+            {
+                "name": "workflowTabContext"
+            }
+        }
+    },
+    "data": {
+        "formTypesList": {
+            "type": "STRING",
+            "displayName": "{{i18n.selectFormTypeLabel}}",
+            "hasLov": true,
+            "dataProvider" : "formTypesDataProvider",
+            "isRequired": "true",
+            "emptyLOVEntry": false
+        },
+        "formTargetList": {
+            "type": "STRING",
+            "displayName": "{{i18n.attachAs}}",
+            "hasLov": true,
+            "isRequired": "true"
+        },
+        "formTargetValues": [
+            {
+                "propDisplayValue": "{{i18n.reference}}",
+                "propInternalValue": "$ROOT.$REFERENCE"
+            },
+            {
+                "propDisplayValue": "{{i18n.target}}",
+                "propInternalValue": "$ROOT.$TARGET"
+            }
+        ],
+        "formDescription": {
+            "type": "STRING",
+            "displayName": "{{i18n.Description}}"
+        },
+        "formName": {
+            "type": "STRING",
+            "displayName": "{{i18n.formName}}"
+        }
+    },
+    "functions": {
+        "getCreateOrUpdateHandlerInput" : {
+            "functionName": "getCreateOrUpdateHandlerInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.selected}}",
+                "{{ctx.workflowTabContext.handlerContextObject}}"
+            ]
+        },
+        "getFormTypeList": {
+            "functionName": "getFormTypeList",
+            "parameters": [
+                "{{data.formTypeListInput}}"
+            ]
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "populatePanelData"
+        },
+        {
+            "eventId": "awTab.selected",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "closePanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "workflow.closeOpenedPanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "Awp0WorkflowShowFormHandler.contentUnloaded",
+            "action": "unregisterCtx"
+        },
+        {
+           "eventId": "workflowGraph.selectionChanged",
+           "action": "closeCurrentOpenedPanel"
+        },
+        {
+           "eventId": "Awp0WorkflowDesignerGraph.contentUnloaded",
+           "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "condition": "scope.data._internal.panelId !=='Awp0WorkflowShowFormHandler'",
+            "action": "closeCurrentOpenedPanel"
+        }
+    ],
+    "messages": {
+    },
+
+    "conditions":
+    {
+    },
+    "dataProviders": {
+        "formTypesDataProvider": {
+            "action": "loadFormTypes",
+            "response": "{{data.formTypeList}}",
+            "totalFound": "{{data.totalFound}}"
+        }
+    },
+
+    "i18n": {
+        "selectFormTypeLabel": [ "WorkflowDesignerMessages" ],
+        "attachAs": [ "WorkflowDesignerMessages" ],
+        "target": [ "WorkflowDesignerMessages"],
+        "Description": [ "WorkflowCommandPanelsMessages" ],
+        "reference":[ "WorkflowDesignerMessages" ],
+        "formName":["WorkflowDesignerMessages"],
+        "save": [ "TCUICommandPanelsMessages" ],
+        "objectInformationLabel":[ "TCUICommandPanelsMessages" ]
+    }
+
+}

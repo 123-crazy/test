@@ -1,0 +1,271 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+            },
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "POM_member",
+                        "properties": [
+                            {
+                                "name": "user",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [
+                            {
+                                "name": "group",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Group",
+                        "properties": [
+                            {
+                                "name": "name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_user",
+                        "properties": [
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [
+                            {
+                                "name": "person",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties": [
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps": "js/qfm0UserPanelService"
+        },
+        "addTeamMember": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:createCrossFunctionUserInput}}"
+            },
+            "outputData": {
+                "serviceData": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "revealGroupRoleLOV": {
+            "actionType": "JSFunction",
+            "method": "revealGroupRoleLOV",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0UserPanelService"
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "{{i18n.qfm0Filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "allGroups": {
+            "displayName": "{{i18n.qfm0Group}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allRoles": {
+            "displayName": "{{i18n.qfm0Role}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "dataProviders": {
+        "userPerformSearch": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "multiple",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "createCrossFunctionUserInput": {
+            "functionName": "createCrossFunctionUserInput",
+            "parameters": [
+                "HasParticipant",
+                "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "qfm0AddCrossFuncTeamMemberSub"
+            },
+
+            "action": "revealGroupRoleLOV"
+        },
+        {
+            "eventId": "awPopupWidget.close",
+            "action": "userPerformSearch"
+        }
+    ],
+    "i18n": {
+        "qfm0Add": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Group": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Filter": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Role": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0AllGroups": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0AllRoles": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

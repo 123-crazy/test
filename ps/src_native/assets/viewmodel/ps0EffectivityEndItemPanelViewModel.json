@@ -1,0 +1,56 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive"
+    ],
+
+    "actions": {
+        "updateEndItemAndNavigateToMainPanel": {
+            "actionType": "JSFunction",
+            "method": "updateEndItemAndNavigateToMainPanel",
+            "inputData": {
+                "destPanelId": "{{data.previousView}}"
+            },
+            "deps": "js/expressionEffectivityEndItemPanelService"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "getClipboardProvider.selectionChangeEvent",
+            "action": "updateEndItemAndNavigateToMainPanel"
+        },
+        {
+            "eventId": "getFavoriteProvider.selectionChangeEvent",
+            "action": "updateEndItemAndNavigateToMainPanel"
+        },
+        {
+            "eventId": "getRecentObjsProvider.selectionChangeEvent",
+            "action": "updateEndItemAndNavigateToMainPanel"
+        }
+
+    ],
+
+    "data": {
+        "endItemTabsModel": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "panelId": "ps0EffectivityEndItemSearchTab",
+                    "name": "{{i18n.searchEndItemBtn}}",
+                    "recreatePanel": true,
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "paletteTabPageSub",
+                    "name": "{{i18n.paletteEndItemBtn}}",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+
+    "i18n": {
+        "paletteEndItemBtn": [ "PSConstants" ],
+        "searchEndItemBtn": [ "PSConstants" ],
+        "endItemMessage": [ "PSConstants" ]
+    }
+}

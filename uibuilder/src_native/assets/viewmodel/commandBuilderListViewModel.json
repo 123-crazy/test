@@ -1,0 +1,160 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "retrieveCommandsFromGeneratorGraphql": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($cursor:CursorInput,$criteria:String){commands(commandInput:{cursor:$cursor,criteria:$criteria}){cursor{endIndex endReached startIndex startReached}totalFound commands{id icon{id url}title{value}type}}}",
+                    "variables": {
+                        "cursor": {
+                            "endIndex": "{{data._cursorObject.endIndex}}",
+                            "endReached": "{{data._cursorObject.endReached}}",
+                            "startIndex": "{{data._cursorObject.startIndex}}",
+                            "startReached": "{{data._cursorObject.startReached}}",
+                            "pagingType": "GetCurrentPage",
+                            "focusId": "{{ctx.state.params.s_uid}}"
+                        },
+                        "criteria": "{{ctx.search.criteria.searchString}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "commandList": "{{function:convertCommandDefsToVMOs}}",
+                "dataProviders.listDataProvider.prevCursorObject": "data.commands.cursor",
+                "dataProviders.listDataProvider.nextCursorObject": "data.commands.cursor",
+                "dataProviders.listDataProvider.cursorObject": "data.commands.cursor",
+                "ctx.search.totalFound": "data.commands.totalFound"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "retrieveCommandsFromGeneratorGraphqlNextAction": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($cursor:CursorInput,$criteria:String){commands (commandInput:{cursor:$cursor,criteria:$criteria}){cursor{endIndex endReached startIndex startReached}totalFound commands{id icon{id url}title{value}}}}",
+                    "variables": {
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.listDataProvider.nextCursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.listDataProvider.nextCursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.listDataProvider.nextCursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.listDataProvider.nextCursorObject.startReached}}",
+                            "pagingType": "GetNextPage"
+                        },
+                        "criteria": "{{ctx.search.criteria.searchString}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "commandList": "{{function:convertCommandDefsToVMOs}}",
+                "dataProviders.listDataProvider.nextCursorObject": "data.commands.cursor",
+                "dataProviders.listDataProvider.cursorObject.endReached": "data.commands.cursor.endReached",
+                "ctx.search.totalFound": "data.commands.totalFound"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "retrieveCommandsFromGeneratorGraphqlPreviousAction": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($cursor:CursorInput,$criteria:String){commands(commandInput:{cursor:$cursor,criteria:$criteria}){cursor{endIndex endReached startIndex startReached}totalFound commands{id icon{id url}title{value}}}}",
+                    "variables": {
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.listDataProvider.prevCursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.listDataProvider.prevCursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.listDataProvider.prevCursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.listDataProvider.prevCursorObject.startReached}}",
+                            "pagingType": "GetPreviousPage"
+                        },
+                        "criteria": "{{ctx.search.criteria.searchString}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "commandList": "{{function:convertCommandDefsToVMOs}}",
+                "dataProviders.listDataProvider.prevCursorObject": "data.commands.cursor",
+                "dataProviders.listDataProvider.cursorObject.startReached": "data.commands.cursor.startReached",
+                "ctx.search.totalFound": "data.commands.totalFound"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "retrieveCommandsFromGeneratorGraphqlFocusAction": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($cursor:CursorInput,$criteria:String){commands(commandInput:{cursor:$cursor,criteria:$criteria}){cursor{endIndex endReached startIndex startReached}totalFound commands{id icon{id url}title{value}type}}}",
+                    "variables": {
+                        "cursor": {
+                            "endIndex": 0,
+                            "endReached": false,
+                            "startIndex": 0,
+                            "startReached": true,
+                            "pagingType": "GetCurrentPage",
+                            "focusId": "{{ctx.state.params.s_uid}}"
+                        },
+                        "criteria": "{{ctx.search.criteria.searchString}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "commandList": "{{function:convertCommandDefsToVMOs}}",
+                "dataProviders.listDataProvider.prevCursorObject": "data.commands.cursor",
+                "dataProviders.listDataProvider.nextCursorObject": "data.commands.cursor",
+                "dataProviders.listDataProvider.cursorObject": "data.commands.cursor",
+                "ctx.search.totalFound": "data.commands.totalFound"
+            },
+            "deps": "js/commandsSublocationService"
+        }
+    },
+    "data": {
+        "_cursorObject": {
+            "endIndex": 0,
+            "endReached": false,
+            "startIndex": 0,
+            "startReached": true,
+            "focusId": "{{ctx.state.params.s_uid}}"
+        }
+    },
+    "dataProviders": {
+        "listDataProvider": {
+            "action": "retrieveCommandsFromGeneratorGraphql",
+            "nextAction": "retrieveCommandsFromGeneratorGraphqlNextAction",
+            "previousAction": "retrieveCommandsFromGeneratorGraphqlPreviousAction",
+            "focusAction": "retrieveCommandsFromGeneratorGraphqlFocusAction",
+            "response": "{{data.commandList}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            }
+        }
+    },
+    "conditions": {},
+    "onEvent": [
+        {
+            "eventId": "commandBuilderList.retrievedCommandsVmJson",
+            "action": "reveal"
+        }
+    ],
+    "i18n": {},
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    }
+}

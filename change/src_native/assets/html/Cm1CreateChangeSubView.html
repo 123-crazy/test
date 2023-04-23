@@ -1,0 +1,57 @@
+<aw-form name="changeCommandPanelForm">
+<aw-panel-body visible-when="conditions.isTypeSelected">
+    <aw-panel-section caption="i18n.objectType">
+         <aw-type-selector prop="data.filterBox" override-id="CM" include="{{data.changeObjectTypes}}" load-sub-types="false" exist-when="data.gotTypes"></aw-type-selector>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-body exist-when="!conditions.isTypeSelected">
+    <aw-title-link prop="data.displayedType" action="clearSelectedType" exist-when="!conditions.isTypeSelected"></aw-title-link>
+    <aw-xrt type="CREATE" object-type="{{data.selectedType.dbValue}}"></aw-xrt>
+    <!-- including the "Audit Finding" (used in Qa0QualityAudit template) sub view if the Category value is selected as "Audit" -->
+    <aw-panel-section caption="i18n.implementsText" exist-when="conditions.isAuditFindingSelected" context="data">
+        <aw-include name="qa0SubFindingGuideline" sub-panel-context="item"></aw-include>
+    </aw-panel-section>
+    <aw-checkbox prop="data.openNewChange" exist-when="data.pinnedToForm.dbValue === true && !conditions.isHostedComponent"></aw-checkbox>
+    <aw-command-panel-section caption="i18n.attachmentsText" anchor="data.addObjectCommands" exist-when="(!ctx.CreateChangePanel.isDerive && !conditions.isHostedComponent) || (ctx.CreateChangePanel.isDerive && ctx.CreateChangePanel.clientId != '')" context="data">
+        <aw-list dataprovider="data.dataProviders.getAttachements">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <aw-command-panel-section caption="i18n.implementsText" exist-when="ctx.CreateChangePanel.isDerive " context="data">
+        <aw-list dataprovider="data.dataProviders.getImplements">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <!-- Symptom Defect Section gets added for CAPA Revision Object only-->
+    <aw-command-panel-section caption="i18n.symptomDefect" anchor="data.addSymptomDefectCommand" exist-when="conditions.isCapaDerivingFromIssue" context="data">
+        <aw-list dataprovider="data.dataProviders.getSymptomDefectProvider" exist-when="data.dataProviders.loadSymptomDefectsProvider.selectedObjects">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <!-- Responsible User Tab gets added for Plant Problem Report only-->
+    <aw-command-panel-section caption="i18n.responsibleUser" anchor="data.addResponsibleUserCommand" exist-when="conditions.isPlantPRTypeSelected" context="data">
+        <aw-list dataprovider="data.dataProviders.getAssignedResponsibleUser" exist-when="data.selectedResponsibleUser">
+            <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+        </aw-list>
+    </aw-command-panel-section>
+    <aw-panel-section caption="i18n.copyOptionsText" exist-when="data.showCopyOptions.dbValue == true" collapsed="true">
+         <aw-include aw-repeat="relation : data.relationNames" name="cmDeriveRelationDirective" sub-panel-context="relation"></aw-include>
+    </aw-panel-section>
+    <aw-panel-section caption="i18n.ownProjectSectionTitle" visible-when="!conditions.isSimpleChangeObjectCreation && conditions.isEnableAssignProjects">
+        <aw-list dataprovider="data.dataProviders.getCmOwningProjectsProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-panel-section>
+    <aw-command-panel-section caption="i18n.projectsSectionTitle" anchor="data.projectSectionCommands" visible-when="!conditions.isSimpleChangeObjectCreation && conditions.isEnableAssignProjects">
+        <aw-list dataprovider="data.dataProviders.getAssignedProjectsProvider" has-floating-cell-commands=false>
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>
+</aw-form>
+<aw-panel-footer>
+    <aw-button default="true" action="createChangeObject" visible-when="changeCommandPanelForm.$valid && !conditions.isTypeSelected && conditions.showCreateButton && !ctx.CreateChangePanel.isDerive && conditions.isContentLoaded && !conditions.isHostedComponent"><aw-i18n>i18n.CreateButtonTitle</aw-i18n></aw-button>
+    <aw-button default="true" action="createChangeObject" visible-when="changeCommandPanelForm.$valid && !conditions.isTypeSelected && conditions.showCreateButton && ctx.CreateChangePanel.isDerive && conditions.isContentLoaded && !conditions.isHostedComponent"><aw-i18n>i18n.DeriveButtonTitle</aw-i18n></aw-button>
+    <aw-button default="true" action="submitChangeObject" visible-when="changeCommandPanelForm.$valid && !conditions.isTypeSelected && conditions.showSubmitButton && !ctx.CreateChangePanel.isDerive && conditions.isContentLoaded"><aw-i18n>i18n.CreateSubmitButtonTitle</aw-i18n></aw-button>
+    <aw-button default="true" action="submitChangeObject" visible-when="changeCommandPanelForm.$valid && !conditions.isTypeSelected && conditions.showSubmitButton && ctx.CreateChangePanel.isDerive  && conditions.isContentLoaded"><aw-i18n>i18n.DeriveSubmitButtonTitle</aw-i18n></aw-button>
+</aw-panel-footer>

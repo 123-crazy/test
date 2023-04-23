@@ -1,0 +1,130 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-cls-fullview-image-ribbon.directive",
+        "js/aw-image.directive"
+    ],
+    "actions": {
+        "onPrevChevron": {
+            "actionType": "JSFunction",
+            "method": "onPrevChevron",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "classifySearch.chevronPrevious"
+                } ],
+                "failure": [ {
+                    "name": "classifySearch.chevronPrevious"
+                } ]
+            },
+            "deps": "js/classifySearchService"
+        },
+        "onNextChevron": {
+            "actionType": "JSFunction",
+            "method": "onNextChevron",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "classifySearch.chevronNext"
+                } ],
+                "failure": [ {
+                    "name": "classifySearch.chevronNext"
+                } ]
+            },
+            "deps": "js/classifySearchService"
+        },
+        "showImageViewer": {
+            "actionType": "JSFunction",
+            "method": "showImageViewer",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifySearchService"
+        },
+        "formatImageAttachments": {
+            "actionType": "JSFunction",
+            "method": "formatImageAttachments",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "classifySearch.formatImageAttachments"
+                } ]
+            },
+            "deps": "js/classifySearchService"
+        },
+        "resetImageViewer": {
+            "actionType": "JSFunction",
+            "method": "resetImageViewer",
+            "inputData": {},
+            "deps": "js/classifySearchService"
+        }
+    },
+
+    "data": {
+        "commands": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "action": "onPrevChevron",
+                    "iconName": "miscChevronLeft",
+                    "tooltip": "{{i18n.previousButtonTitle}}"
+                },
+                {
+                    "action": "onNextChevron",
+                    "iconName": "miscChevronRight",
+                    "tooltip": "{{i18n.nextButtonTitle}}"
+                }
+
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "classifySearch.chevronNext",
+            "action": "showImageViewer"
+        },
+        {
+            "eventId": "classifySearch.chevronPrevious",
+            "action": "showImageViewer"
+        },
+        {
+            "eventId": "classifyTab.imageSelected",
+            "action": "showImageViewer"
+        },
+        {
+            "eventId": "classifySearch.formatImageAttachments",
+            "condition": "ctx.clsLocation.imageURLs && ctx.clsLocation.imageURLs.length > 0",
+            "action": "showImageViewer"
+        },
+        {
+            "eventId": "aw-cls-image-chart.contentUnloaded",
+            "action": "resetImageViewer"
+        },
+        {
+            "eventId": "aw-cls-image-chart.contentLoaded",
+            "action": "formatImageAttachments"
+        }
+    ],
+    "functions": {},
+    "messages": {},
+    "conditions": {
+        "showImageAttachments": {
+            "expression": "ctx.clsLocation.imageURLs && ctx.clsLocation.imageURLs.length > 0"
+        },
+        "showDefaultImage": {
+            "expression": "!ctx.clsLocation.imageURLs || ctx.clsLocation.imageURLs.length === 0"
+        }
+    },
+    "i18n": {
+        "images": [ "ClassificationPanelMessages" ],
+        "previousButtonTitle": [ "ClassificationPanelMessages" ],
+        "nextButtonTitle": [ "ClassificationPanelMessages" ],
+        "imageAttachments": [ "ClassificationPanelMessages" ]
+    }
+}

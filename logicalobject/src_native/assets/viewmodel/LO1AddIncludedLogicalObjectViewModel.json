@@ -1,0 +1,378 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-repeat.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events": [ { "name": "awLogicalObject.createSegment" } ]
+            }
+        },
+        "createSegment":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-DataManagement",
+            "method": "getDeclarativeStyleSheets",
+            "inputData":
+            {
+                "input":
+                [
+                    {
+                        "businessObjectType": "Fnd0TraversalSegment",
+                        "businessObject":
+                        {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "Fnd0TraversalSegment"
+                        },
+
+                        "styleSheetLastModDate": "",
+                        "styleSheetType": "CREATE",
+                        "targetPage": "",
+                        "clientContext":
+                        {
+                            "ActiveWorkspace:Location": "com.siemens.splm.client.logicalobject.configurationLocation",
+                            "ActiveWorkspace:SubLocation": "com.siemens.splm.client.logicalobject:logicalObjectsSubLocation"
+                        }
+                    }
+                ],
+                "processEntireXRT": true
+            },
+            "outputData":
+            {
+                "segment": "{{dataParseDefinitions:convertNvObject}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "awLogicalObject.addSegment"
+                    }
+                ]
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "addSegment":
+        {
+            "actionType": "JSFunction",
+            "method": "addSegment",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "commandContext": "{{commandContext}}",
+                "panelName": "IncludedLogicalObjects"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "removeSegment":
+        {
+            "actionType": "JSFunction",
+            "method": "removeSegment",
+            "inputData":
+            {
+                "data": "{{commandContext}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "clearSegment":
+        {
+            "actionType": "JSFunction",
+            "method": "clearSegment",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "specialCharacterCheckIncludedLogicalObject":
+        {
+            "actionType": "JSFunction",
+            "method": "specialCharacterCheck",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "idName": "Add Included Logical Object",
+                "idValue": "{{data.logicalObjectID.dbValue}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "updateDestTypeAndCriteriaIncludedLO":
+        {
+            "actionType": "JSFunction",
+            "method": "updateDestTypeAndCriteria",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "updateRelOrRefAndDestCriteriaIncludedLO":
+        {
+            "actionType": "JSFunction",
+            "method": "updateRelOrRefAndDestCriteria",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "addIncludedLogicalObjectEvent":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events": [
+                    {
+                        "name": "awLogicalObject.addIncludedLogicalObject"
+                    }
+                ]
+            }
+        },
+
+        "addIncludedLogicalObject":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2018-11-LogicalObject",
+            "method": "addIncludedLogicalObjects",
+            "inputData":
+            {
+                "addIncludedLOInput": {
+                    "logicalObjectType": "{{data.logicalObject}}",
+                    "includedLODefinitions": [{
+                        "includedLogicalObjectID": "{{data.logicalObjectID.dbValue}}",
+                        "displayName": "{{data.displayName.dbValue}}",
+                        "traversalPath": "{{function:getTraversalPath}}",
+                        "applyConfigurationContext": "{{data.applyConfigurationContext.dbValue}}"
+                    }]
+                }
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": ["{{data.logicalObject}}"]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "success": [ { "message": "addIncludedLogicalObjectSuccess" } ]
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "data":
+    {
+        "caption": "{{i18n.add}}",
+        "logicalObjectID":
+        {
+            "displayName": "{{i18n.logicalObjectID}}",
+            "type": "STRING",
+            "dbValue": "",
+            "isRequired": "true",
+            "maxLength": 27
+        },
+        "displayName":
+        {
+            "displayName": "{{i18n.displayName}}",
+            "type": "STRING",
+            "dbValue": "",
+            "isRequired": "true",
+            "maxLength": 128
+        },
+        "applyConfigurationContext":
+        {
+            "displayName": "{{i18n.applyConfigurationContext}}",
+            "type": "BOOLEAN",
+            "dbValue": false,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "destinationObjectCriteria":
+        {
+            "displayName": "{{i18n.destinationObjectCriteria}}",
+            "type": "BOOLEAN",
+            "dbValue": false,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "addSegmentCommands": "awp0_addSegmentCommands",
+        "removeSegmentCommands": "awp0_removeSegmentCommands"
+    },
+
+    "dataParseDefinitions": {
+        "convertNvObject": {
+            "outputFormatType": "ViewModelObject",
+            "dataInput": "ServiceData.plain[0]",
+            "operationType": "CREATE"
+        }
+    },
+
+    "functions": {
+        "getTraversalPath": {
+            "functionName": "getTraversalPath",
+            "parameters": [ "{{data}}" ]
+        }
+    },
+
+    "conditions":
+    {
+        "requiredLOVsPopulated":
+        {
+            "expression": "data.segment.props.fnd0DestinationType.dbValue && data.segment.props.fnd0RelationOrReference.dbValue"
+        },
+        "isValidLOVSelections":
+        {
+            "expression": "!data.segment.props.fnd0DestinationType.hasServerValidationError && !data.segment.props.fnd0RelationOrReference.hasServerValidationError && !data.segment.props.fnd0DestinationCriteria.hasServerValidationError"
+        },
+        "isValidToAddSegment":
+        {
+           "expression": "conditions.requiredLOVsPopulated && conditions.isValidLOVSelections && data.segment.props.fnd0DestinationType.selectedLovEntries[0].lovRowValue.uid.lastIndexOf(':')!=5"
+        },
+        "isValidToAddButton":
+        {
+           "expression": "conditions.requiredLOVsPopulated && conditions.isValidLOVSelections && data.segment.props.fnd0DestinationType.selectedLovEntries[0].lovRowValue.uid.lastIndexOf(':')==5"
+        },
+        "isValidToAddOrSaveIncludedLogicalObject":
+        {
+            "expression": "data.logicalObjectID.dbValue && data.displayName.dbValue && conditions.isValidToAddButton"
+        },
+        "isValidToAddIncludedLogicalObject":
+        {
+            "expression": "ctx.selected.props.fnd0RootTypeName && conditions.isValidToAddOrSaveIncludedLogicalObject"
+        }
+    },
+
+    "i18n":
+    {
+        "add": [ "LogicalObjectMessages" ],
+        "includedLO": [ "LogicalObjectMessages" ],
+        "logicalObjectID": [ "LogicalObjectMessages" ],
+        "displayName": [ "LogicalObjectMessages" ],
+        "applyConfigurationContext": [ "LogicalObjectMessages" ],
+        "segment": [ "LogicalObjectMessages" ],
+        "addSegment": [ "LogicalObjectMessages" ],
+        "removeSegment": [ "LogicalObjectMessages" ],
+        "forward": [ "LogicalObjectMessages" ],
+        "backward": [ "LogicalObjectMessages" ],
+        "addEntryLOSuccess": [ "LogicalObjectMessages" ],
+        "addEntryAlreadyExistError": [ "LogicalObjectMessages" ],
+        "addEntryLogicalObjectSpecialCharacterError": [ "LogicalObjectMessages" ],
+        "destinationObjectCriteria": [ "LogicalObjectMessages" ]
+    },
+
+    "messages":
+    {
+        "addIncludedLogicalObjectSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addEntryLOSuccess}}",
+            "messageTextParams": [
+                "{{data.logicalObjectID.dbValue}}",
+                "{{data.logicalObjectName}}"
+            ]
+        },
+        "addIncludedLogicalObjectExistError":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.addEntryAlreadyExistError}}",
+            "messageTextParams": [
+                "{{data.logicalObjectID.dbValue}}",
+                "{{data.logicalObjectName}}"
+            ]
+        }
+    },
+
+    "onEvent":
+    [
+        {
+           "eventId": "awLogicalObject.addSegment",
+           "action": "addSegment"
+        },
+        {
+           "eventId": "awLogicalObject.createSegment",
+           "action": "createSegment"
+        },
+        {
+            "eventId": "awLogicalObject.addIncludedLogicalObjectEvent",
+            "action": "addIncludedLogicalObjectEvent"
+        },
+        {
+           "eventId": "awLogicalObject.addIncludedLogicalObject",
+           "action": "addIncludedLogicalObject"
+        },
+        {
+           "eventId": "Awp0CreateSegmentCmdActionEvent",
+           "action": "createSegment"
+        },
+        {
+           "eventId": "Awp0RemoveSegmentCmdActionEvent",
+           "action": "removeSegment"
+        },
+        {
+            "eventId": "fnd0RelationOrReference.lovValueChanged",
+            "action": "updateDestTypeAndCriteriaIncludedLO"
+        },
+        {
+            "eventId": "fnd0DestinationType.lovValueChanged",
+            "action": "updateRelOrRefAndDestCriteriaIncludedLO"
+        },
+        {
+           "eventId": "primaryWorkArea.selectionChangeEvent",
+           "action": "closePanel"
+        }
+    ]
+}

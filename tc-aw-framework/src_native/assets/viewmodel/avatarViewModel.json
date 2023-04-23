@@ -1,0 +1,97 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-avatar.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-header-context.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-link.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "data": {
+        "userName": {
+            "displayName": "{{ctx.userSession.props.user.uiValues[0]}}",
+            "type": "STRING"
+        },
+        "dockUnDockUserSettingsAnchor": {
+            "dockUserSettingsLabel": {
+                "displayName": "{{i18n.dockUserProperties}}",
+                "type": "STRING"
+            },
+            "undockUserSettingsWhileLHNUnPinnedIconButton": {
+                "action": "toggleUserSettingsBarAndCloseLHN",
+                "iconName": "uiUndock",
+                "tooltip": "{{i18n.undockUserProperties}}"
+            },
+            "undockUserSettingsWhileLHNPinnedIconButton": {
+                "action": "toggleShowUserSettingsBarValue",
+                "iconName": "uiUndock",
+                "tooltip": "{{i18n.undockUserProperties}}"
+            },
+            "dockUserSettingsIconButton": {
+                "action": "toggleShowUserSettingsBarValue",
+                "iconName": "uiDock",
+                "tooltip": "{{i18n.dockUserProperties}}"
+            }
+        }
+    },
+    "actions": {
+        "viewProfile": {
+            "actionType": "JSFunction",
+            "method": "go",
+            "inputData": {
+                "transitionTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{ctx.user.uid}}"
+                }
+            },
+            "deps": "js/locationNavigation.service",
+            "events": {
+                "success": [ {
+                    "name": "awPopupWidget.close"
+                } ]
+            }
+        },
+        "toggleUserSettingsBarAndCloseLHN": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "toggleShowUserSettingsBarValue"
+                },
+                {
+                    "action": "closeLHNGlobalNavigationSideNav"
+                }
+            ]
+        },
+        "toggleShowUserSettingsBarValue": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "showUserSettingsBar",
+                "value": "{{!(ctx.showUserSettingsBar=='true')}}"
+            }
+        },
+        "closeLHNGlobalNavigationSideNav": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awsidenav.openClose",
+                    "eventData": {
+                        "id": "globalNavigationSideNav",
+                        "commandId": "avatarCommandId",
+                        "keepOthersOpen": true
+                    }
+                } ]
+            }
+        }
+    },
+    "i18n": {
+        "undockUserProperties": [
+            "UIElementsMessages"
+        ],
+        "dockUserProperties": [
+            "UIElementsMessages"
+        ]
+    }
+}

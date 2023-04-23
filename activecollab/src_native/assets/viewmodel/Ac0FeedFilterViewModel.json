@@ -1,0 +1,186 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-property-lov-val.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox-multiselect.directive",
+        "js/aw-repeat.directive",
+        "js/aw-link.directive"
+    ],
+
+    "data": {
+
+        "box2":{ "uiValue": "" },
+        "ac0FeedFilterQueryUID": "",
+        "ac0Filters2":{},
+        "ac0Filters3":{},
+        "feedFilterPanelClearAll": {
+            "displayName": "{{i18n.advancedSearchClearAll}}",
+            "type": "STRING"
+        }
+
+    },
+    "actions":
+    {
+        "loadFilterQueryData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2010-04-SavedQuery",
+            "method": "findSavedQueries",
+            "inputData": {
+                "inputCriteria": [
+                    {
+                        "queryNames": [
+                            "__DiscussionFeedFilterQuer*"
+                        ]
+                    }
+                ]
+            },
+
+            "outputData": {
+                "ctx.ac0FeedFilter.QueryUID": "savedQueries[0].uid",
+                "ac0FeedFilterQueryUID": "savedQueries[0].uid",
+                "ctx.ac0FeedFilter.QueryUID2": "savedQueries[1].uid",
+                "ac0FeedFilterQueryUID2": "savedQueries[1].uid"
+            },
+            "events": {
+                "success": [ {
+                        "name": "Ac0Collab.getFeedQueryFilterProps"
+                    }
+                ]
+            }
+        },
+        "loadFilterPropData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-AdvancedSearch",
+            "method": "getSelectedQueryCriteria",
+            "inputData": {
+                "selectedQuery": {
+                    "type": "ImanQuery",
+                    "uid": "{{ctx.ac0FeedFilter.QueryUID}}"
+                }
+            },
+            "outputData": {
+                "ac0Filters3": "{{function:getFilterPropsFromSelectedQueryCriteria}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "Ac0Collab.getFeedQueryFilterUserProps"
+                    }
+                ]
+            },
+            "deps": "js/Ac0FeedFilterService"
+        },
+        "loadFilterUserPropData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-AdvancedSearch",
+            "method": "getSelectedQueryCriteria",
+            "inputData": {
+                "selectedQuery": {
+                    "type": "ImanQuery",
+                    "uid": "{{ctx.ac0FeedFilter.QueryUID2}}"
+                }
+            },
+            "outputData": {
+                "ac0Filters1": "{{function:getDateFilterProps}}",
+                "ac0Filters2": "{{function:getFilterPropsFromSelectedQueryCriteriaAddUsers}}"
+            },
+            "deps": "js/Ac0FeedFilterService"
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "filtersQueryDataProvider"
+        },
+        "getQueryFilterProps":
+        {
+            "actionType": "dataProvider",
+            "method": "filtersPropDataProvider"
+        },
+        "getQueryFilterUserProps":
+        {
+            "actionType": "dataProvider",
+            "method": "filtersUserPropDataProvider"
+        },
+        "doFeedFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "doFeedFiltering",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "deps": "js/Ac0FeedFilterService"
+        },
+        "clearAllAction":
+        {
+            "actionType": "JSFunction",
+            "method": "clearAllAction",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/Ac0FeedFilterService"
+        }
+    },
+    "dataProviders":
+    {
+        "filtersQueryDataProvider":
+        {
+            "action": "loadFilterQueryData",
+            "response": "{{data}}"
+        },
+        "filtersPropDataProvider":
+        {
+            "action": "loadFilterPropData",
+            "response": "{{data}}"
+        },
+        "filtersUserPropDataProvider":
+        {
+            "action": "loadFilterUserPropData",
+            "response": "{{data}}"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Ac0Collab.getFeedQueryFilterProps",
+            "action": "getQueryFilterProps"
+        },
+        {
+            "eventId": "Ac0Collab.getFeedQueryFilterUserProps",
+            "action": "getQueryFilterUserProps"
+        }
+    ],
+    "functions": {
+        "getFilterPropsFromSelectedQueryCriteria": {
+            "functionName": "getFilterPropsFromSelectedQueryCriteria",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+
+     "conditions":
+    {
+        "showClearAll":{
+            "expression": "data.awp0AdvancedQueryAttributes"
+        }
+    },
+
+    "i18n":
+    {
+        "filterString": ["SearchMessages"],
+        "quickText": ["SearchMessages"],
+        "advancedText": ["SearchMessages"],
+        "applyFeedFilters": ["ActiveCollabDeclarativeMessages"],
+        "searchString": ["SearchMessages"],
+        "advancedSearchClearAll": ["SearchMessages"]
+    }
+
+}

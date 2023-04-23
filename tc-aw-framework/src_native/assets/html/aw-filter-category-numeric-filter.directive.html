@@ -1,0 +1,18 @@
+<aw-filter-category-numeric-range-filter ng-if="category.showNumericRangeFilter" search-action="searchAction" category="category" id="{{category.displayName}}">
+</aw-filter-category-numeric-range-filter>
+
+<aw-filter-category-contents search-action="searchAction" filter="item" category="category" ng-repeat="item in category.results">
+</aw-filter-category-contents>
+<div ng-if="category.filterCount == 0 || ( category.filterCount > 0 && category.results.length == 0 )" class="aw-ui-filterNameLabel">
+    {{noFiltersText}}
+</div>
+<div tabindex="0" class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled aw-aria-border"
+ng-show="category.numberOfFiltersShown > category.defaultFilterValueDisplayCount " title="{{lessText}}"
+ng-click="toggleFiltersSoa(false)" ng-keydown="lessFilterKeyPress($event)" ng-if="category.numberOfFiltersShown > category.defaultFilterValueDisplayCount">
+    {{lessText}}
+</div>
+<div tabindex="0" class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled aw-aria-border"
+ng-show="category.hasMoreFacetValues || category.showMoreFilter" title="{{moreText}}" ng-keydown="moreFilterKeyPress($event)" ng-click="toggleFiltersSoa(true)" ng-if="category.showMoreFilter || category.hasMoreFacetValues">
+    {{moreText}}
+</div>
+

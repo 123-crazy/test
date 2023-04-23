@@ -1,0 +1,155 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-occmgmt-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "srcBreadCrumbDataProvider"
+        },
+        "buildCrumbs":
+        {
+            "actionType": "JSFunction",
+            "method": "buildNavigateBreadcrumb",
+            "inputData":
+            {
+               "selectedObjects": [ "{{data.eventData.lastSelectedObject}}" ]
+            },
+            "outputData":
+            {
+                "crumbs": "crumbs"
+            },
+            "deps": "js/aceBreadcrumbService"
+        },
+        "onSelect":
+        {
+            "actionType": "JSFunction",
+            "method": "onSelectBreadcrumb",
+            "inputData":
+            {
+               "crumb": "{{data.eventData}}",
+               "contextKey": "{{data.breadcrumbConfig.id}}"
+            },
+            "deps": "js/aceBreadcrumbService"
+        },
+        "onChevronClick":
+        {
+            "actionType": "dataProvider",
+            "method": "srcBreadCrumbChevronDataProvider"
+        },
+        "onObjSelected":
+        {
+            "actionType": "JSFunction",
+            "method": "updateUrlOnObjectSelection",
+             "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.srcBreadCrumbChevronDataProvider.selectedObjects}}",
+                "contextKey": "CompareSrc"
+            },
+            "deps": "js/occmgmtListBreadcrumbService"
+        },
+        "loadData":
+        {
+          "actionType": "JSFunctionAsync",
+            "method": "loadData",
+            "deps": "js/occmgmtListBreadcrumbService",
+            "inputData": {
+                "methodArgument": {
+                    "listLoadInput": {
+                        "parentUid": "{{ctx.CompareSrcChevron.scopedUid}}",
+                        "parentElement": "{{ctx.CompareSrcChevron.scopedUid}}",
+                        "skipFocusOccurrenceCheck": true,
+                        "startChildNdx": 0,
+                        "pageSize": 15,
+                        "addAfter": true
+                    },
+                    "openedObject": "{{data.dataProviders.srcBreadCrumbChevronDataProvider.openedObject}}",
+                    "cursorObject": "{{data.dataProviders.srcBreadCrumbChevronDataProvider.cursorObject}}",
+                    "contextKey": "CompareSrc"
+                }
+            },
+            "outputData":
+            {
+                "dataProviders.srcBreadCrumbChevronDataProvider.openedObject":  "result.listLoadResult.openedObject",
+                "dataProviders.srcBreadCrumbChevronDataProvider.cursorObject":  "result.listLoadResult.cursorObject",
+                "totalFound": "result.listLoadResult.totalChildCount",
+                "childOccurrences": "result.listLoadResult.childOccurrences"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "breadcrumb.popUpLoading"
+                    }
+                ]
+            }
+        },
+        "popUpLoading":
+        {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData":
+            {
+               "id":"CompareSrc",
+               "data": "{{data}}",
+               "key":"loading",
+               "value":false,
+               "unRegister": false
+            },
+            "deps": "js/breadcrumbUtils"
+        }
+    },
+    "dataProviders":
+    {
+        "srcBreadCrumbChevronDataProvider":
+        {
+            "action": "loadData",
+            "response": "action.result.listLoadResult.childNodes",
+            "totalFound": "action.result.listLoadResult.totalChildCount",
+            "selectionModelMode": "single",
+            "commandsAnchor": "occmgmt_breadcrumb_cell_commands"
+        },
+        "srcBreadCrumbDataProvider":
+        {
+            "action": "buildCrumbs",
+            "response": "{{data.crumbs}}",
+            "totalFound": "{{data.crumbs.length}}"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "CompareSrc.chevronClicked",
+            "action": "onChevronClick"
+        },
+        {
+            "eventId": "breadcrumb.popUpLoading",
+            "action": "popUpLoading"
+        },
+        {
+            "eventId": "srcBreadCrumbChevronDataProvider.selectionChangeEvent",
+            "action": "onObjSelected"
+        },
+        {
+            "eventId": "srcBreadcrumb.selectCrumb",
+            "action": "onSelect",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "srcBreadcrumb.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "srcBreadcrumb.refresh",
+            "action": "reveal",
+            "cacheEventData": true
+        }
+    ]
+}

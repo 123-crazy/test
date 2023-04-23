@@ -1,0 +1,23 @@
+<aw-command-panel caption="i18n.commandPanelTitle"  anchor="data.Acp0pinCommands" context="data">
+    <aw-panel-body>
+            <aw-panel-section caption="i18n.propertiesForAddExpr">
+            <div exist-when="conditions.ncVisibleOnPanel">
+                <aw-listbox prop="data.acp0NamingConvention" list="data.NamingConvention" action="ncSelectionChange"></aw-listbox>
+            </div>
+            <div exist-when="conditions.isWithOperatorPanelVisible">
+                <aw-listbox prop="data.operator" list="data.OperatorValues.dbValue" action="ncSelectionChange"></aw-listbox>
+           </div>
+           <aw-listbox prop="data.sourceAttribute" list="data.SourceAttribute"></aw-listbox>
+           <aw-listbox prop="data.relation" list="data.RelationValues.dbValue"></aw-listbox>
+           <aw-textbox prop="data.attributeValue"></aw-textbox>
+        </aw-panel-section>
+        </aw-panel-body>
+        <aw-panel-footer>
+            <aw-button action="createCondAndAddExpr" exist-when="ctx.selected.type === 'Acp0Rule' && (awPanelBody.$valid)">
+                <aw-i18n>i18n.commandPanelTitle</aw-i18n>
+            </aw-button>
+            <aw-button action="addExprInCond" exist-when="(awPanelBody.$valid) && (ctx.selected.type === 'Acp0RuleCondition')">
+                <aw-i18n>i18n.commandPanelTitle</aw-i18n>
+            </aw-button>
+        </aw-panel-footer>
+</aw-command-panel>

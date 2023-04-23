@@ -1,0 +1,18 @@
+<aw-row height="5.5f">
+    <aw-column width="4">
+        <aw-link class="aw-reports-reportTitle" prop="data.reportlink" action="goToReport"></aw-link>
+        <aw-link class="aw-reports-reportSourceName" prop="data.reportSource" action="goToSource" exist-when="conditions.showSourceLink"></aw-link>
+        <div class="aw-reports-reportTotalFound" exist-when="conditions.showtheChart || conditions.showtheTable">
+            {{data.totalObjectFound}}
+        </div>
+    </aw-column>
+    <aw-column>
+        <div class="aw-reports-tileCommand aw-widgets-cellCommandsContainer">
+            <aw-cell-command-bar anchor="reportTileViewerCommands" alignment="HORIZONTAL" context="subPanelContext"></aw-cell-command-bar>
+        </div>
+    </aw-column>
+</aw-row>
+<aw-row height="fill">
+    <aw-chart chart-provider="data.chartProviders.myChartProvider" exist-when="conditions.showtheChart"></aw-chart>
+    <aw-splm-table gridid="{{data.gridId}}" exist-when="conditions.showtheTable"></aw-splm-table>
+</aw-row>

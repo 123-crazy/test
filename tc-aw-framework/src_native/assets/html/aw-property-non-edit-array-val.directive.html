@@ -1,0 +1,24 @@
+<div class="aw-propertyrenderjs-tooltipContainer aw-layout-flexRowContainer" ng-mouseenter="toggleTooltip( true )" ng-mouseleave="toggleTooltip( false )">
+    <div ng-if="showTooltip && inTableCell && prop.isArray && !prop.isEditing"
+        class="aw-layout-popup aw-propertyrenderjs-tooltipPopup">
+        <p ng-if="!(prop.type == 'OBJECT' || prop.type == 'OBJECTARRAY')" ng-bind-html="trustedRichtext"></p>
+        <ul  ng-if="(prop.type == 'OBJECT' || prop.type == 'OBJECTARRAY')"
+            class="aw-jswidgets-arrayNonEditValueCellList" ng-style="{'maxHeight': arrayHeight}">
+            <li class="aw-jswidgets-arrayValueCellListItem" ng-repeat="displayValue in prop.displayValues track by $index">
+                <aw-property-non-edit-val prop="prop" index="{{$index}}" ></aw-property-non-edit-val>
+            </li>
+        </ul>
+    </div>
+    <ul class="aw-jswidgets-arrayNonEditValueCellList aw-layout-flex" ng-style="{'maxHeight': arrayHeight}">
+        <li class="aw-jswidgets-arrayValueCellListItem" ng-repeat="displayValue in prop.displayValues track by $index">
+            <aw-property-non-edit-val prop="prop" index="{{$index}}" ></aw-property-non-edit-val>
+        </li>
+        <li ng-if="prop.displayValues.length<prop.oldValues.length" class="aw-jswidgets-arrayValueCellListItem"
+            ng-repeat="oldValue in prop.oldValues | limitTo: (prop.displayValues.length - prop.oldValues.length)">
+            <span class="aw-jswidgets-oldText" aw-highlight-property-html display-val="oldValue"></span>
+        </li>
+    </ul>
+    <div class="aw-layout-flexRowContainer aw-layout-alignItemsEnd">
+        <aw-command-bar class="aw-layout-propertyCommandsNoShadow" exist-when="prop.uwAnchor" anchor="{{prop.uwAnchor}}" alignment="HORIZONTAL" context="prop"></aw-command-bar>
+    </div>
+</div>

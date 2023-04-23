@@ -1,0 +1,24 @@
+<div class="aw-layout-xrt-ctx-breadcrumb">
+    <div class="breadcrumbs">
+        <label><aw-i18n>{{i18n.scope}}</aw-i18n>:</label>
+        <select ng-options="item as item.label for item in prefLocationList track by item.id" ng-model="selectedPreferenceLocation" ng-change="setChangePending()"></select>
+
+        <label><aw-i18n>{{i18n.client}}</aw-i18n>:</label>
+        <select ng-options="item as item.label for item in clientList track by item.id" ng-model="selectedClient" ng-change="setChangePending()"></select>
+
+        <label><aw-i18n>{{i18n.objectType}}</aw-i18n>:</label>
+        <select ng-options="item as item.label for item in typeList track by item.id" ng-model="selectedType" ng-change="setChangePending()"></select>
+
+        <label><aw-i18n>{{i18n.xrtType}}</aw-i18n>:</label>
+        <select ng-options="item as item.label for item in stylesheetTypeList track by item.id" ng-model="selectedStylesheetType" ng-change="setChangePending()" ng-show="selectedClient.id === 'AWC'"></select>
+        <select ng-options="item as item.label for item in stylesheetTypeListTC track by item.id" ng-model="selectedStylesheetType" ng-change="setChangePending()" ng-show="selectedClient.id === 'TC'"></select>
+
+        <label ng-show="selectedStylesheetType.id === 'SUMMARY' && selectedClient.id === 'AWC'"><aw-i18n>{{i18n.location}}</aw-i18n>:</label>
+        <select ng-options="item as item.label for item in locationList track by item.id" ng-model="selectedLocation" ng-change="setChangePending()" ng-show="selectedStylesheetType.id === 'SUMMARY' && selectedClient.id === 'AWC'"></select>
+
+        <label ng-show="selectedLocation.id !== '' && selectedStylesheetType.id === 'SUMMARY' && selectedClient.id === 'AWC'"><aw-i18n>{{i18n.sublocation}}</aw-i18n>:</label>
+        <select ng-options="item as item.label for item in subLocationList track by item.id" ng-model="selectedSubLocation" ng-change="setChangePending()"  ng-show="selectedLocation.id !== '' && selectedStylesheetType.id === 'SUMMARY' && selectedClient.id === 'AWC'"></select>
+
+        <button ng-show="changePending" ng-click="updateStylesheet()"><aw-i18n>{{i18n.load}}</aw-i18n></button>
+    </div>
+</div>

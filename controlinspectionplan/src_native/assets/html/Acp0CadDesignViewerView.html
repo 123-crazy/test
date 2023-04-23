@@ -1,0 +1,75 @@
+<aw-flex-row>
+    <aw-flex-column width="22f" exist-when="ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_CAD_View'">
+        <aw-panel>
+            <aw-panel-body>
+                <aw-panel-section caption="i18n.partsToInspect" class="aw-controlinspectionplan-refPartsHeight" exist-when="!ctx.showComparePartRevisionsList">
+                    <div class="aw-xrt-objectSetToolbar" exist-when="ctx.showReferencePartList && ctx.isAW13X_OnwardsSupported">
+                        <aw-toolbar first-anchor="acp0_partRefViewModes" second-anchor="" orientation="HORIZONTAL"></aw-toolbar>
+                    </div>
+                    <aw-list dataprovider="data.dataProviders.refPartsProvider" visible-when="ctx.showReferencePartList && ctx.refPartListView && ctx.isAW13X_OnwardsSupported">
+                        <aw-default-cell vmo="item"></aw-default-cell>
+                    </aw-list>
+                    <aw-splm-table class="aw-controlinspectionplan-refPartsHeight" gridid="refPartsGrid" show-context-menu="true" visible-when="ctx.showReferencePartList && ctx.refPartTableView && ctx.isAW13X_OnwardsSupported"></aw-splm-table>
+
+                    <aw-list-filter prop="data.filterBox" dataprovider="data.dataProviders.partListProvider" class="aw-controlinspectionplan-partsToInspectHeight" visible-when="!ctx.showReferencePartList && !ctx.showComparePartRevisionsList || ctx.isAW13X_OnwardsSupported === false">
+                        <aw-default-cell vmo="item"></aw-default-cell>
+                    </aw-list-filter>
+                </aw-panel-section>
+                <aw-panel-section caption="i18n.CompareRevisions" class="aw-controlinspectionplan-refPartsHeight" exist-when="ctx.showComparePartRevisionsList">
+                   <aw-list-filter prop="data.filterBox" dataprovider="data.dataProviders.partRevisionListProvider" class="aw-controlinspectionplan-partsToInspectHeight">
+                        <aw-default-cell vmo="item"></aw-default-cell>
+                    </aw-list-filter>
+                </aw-panel-section>
+            </aw-panel-body>
+            <aw-panel-footer>
+                <aw-button action="showHidePartsListPanel" visible-when="conditions.acp0AddButtonCond && ctx.showReferencePartList && ctx.isAW13X_OnwardsSupported">
+                    <aw-i18n>i18n.Acp0Add</aw-i18n>
+                </aw-button>
+                <aw-button button-type="base" action="showHidePartsListPanel" visible-when="conditions.acp0AddButtonCond && !ctx.showReferencePartList && !ctx.showComparePartRevisionsList || ctx.isAW13X_OnwardsSupported === false">
+                    <aw-i18n>i18n.Acp0Cancel</aw-i18n>
+                </aw-button>
+                <aw-button button-type="base" action="showHidePartsListPanel" visible-when="conditions.acp0VersionAndTabCheckCond && ctx.showComparePartRevisionsList">
+                    <aw-i18n>i18n.Acp0Close</aw-i18n>
+                </aw-button>
+            </aw-panel-footer>
+        </aw-panel>
+    </aw-flex-column>
+    <aw-splitter direction="vertical" min-size-1="250" min-size-2="450" exist-when="ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_CAD_View'"></aw-splitter>
+    <aw-flex-column>
+        <aw-panel>
+            <div exist-when="ctx.projectToRenderBctComponent">
+                {{ctx.projectToRenderBctComponent.name}} {{i18n.Acp0Type}} {{ctx.fileTypeOfProject}}
+            </div>
+            <div>
+                <aw-advanced-bar type="TOOLBAR" negative>
+                    <aw-flex-row height="12">
+                        <aw-flex-column>
+                            <aw-command-bar anchor="acp0_bctInspViewer" alignment="HORIZONTAL"></aw-command-bar>
+                        </aw-flex-column>
+                        <aw-flex-column justify="right" align-content="end">
+                            <aw-listbox class="aw-controlinspectionplan-listWidget" prop="data.acp0DrawingSheetList" list="data.drawingSheetList" visible-when="ctx.selectedPart && !ctx.renderingErrorMessage" action="drawingSheetSelectionChange"></aw-listbox>
+                        </aw-flex-column>
+                        <aw-separator is-vertical="true"></aw-separator>
+                        <aw-flex-column width="1" justify="right" align-content="end">
+                            <aw-command-bar anchor="aw_viewerRightSide" alignment="HORIZONTAL"></aw-command-bar>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-advanced-bar>
+            </div>
+            <div align-content="center" exist-when="ctx.selectedPart === undefined || ctx.selectedPart === null || ctx.renderingErrorMessage">
+                <aw-break></aw-break>
+                <aw-break></aw-break>
+                <aw-break></aw-break>
+                <aw-break></aw-break>
+                <div exist-when="ctx.selectedPart === undefined || ctx.selectedPart === null">
+                    {{i18n.beforePartSelectMessage}}
+                </div>
+                <div exist-when="ctx.renderingErrorMessage">
+                    {{ctx.renderingErrorMessage}}
+                </div>
+            </div>
+            <div align-content="center" class="aw-controlinspectionplan-bctinspectordrawing" visible-when="conditions.acp0IsBctInspViewForDrawing && !ctx.renderingErrorMessage" id="bctInspViewIdForDrawing"></div>
+            <div align-content="center" class="aw-controlinspectionplan-bctinspectorchxtable" visible-when="conditions.acp0IsBctInspViewForTable && !ctx.renderingErrorMessage" id="bctInspViewIdForTable"></div>
+        </aw-panel>
+    </aw-flex-column>
+</aw-flex-row>

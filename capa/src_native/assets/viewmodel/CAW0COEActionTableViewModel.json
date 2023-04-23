@@ -1,0 +1,162 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "data": {
+        "commandContext": {
+            "tableDataProviderName": "Awp0ObjectSetRowProvider",
+            "clientScopeURI": "CAW0COEQAColumns",
+            "objectSetSource": "qam0DependentQualityActions.Qam0QualityAction",
+            "searchCriteria": {
+                "parentUid": "{{ctx.selectedCorrectiveAction.uid}}",
+                "objectSet": "qam0DependentQualityActions.Qam0QualityAction"
+            },
+            "modelTypeRelationListMap": {
+                "Qam0QualityAction": [ "qam0DependentQualityActions" ]
+            }
+        }
+    },
+    "actions": {
+        "doDataProvider": {
+            "actionType": "dataProvider",
+            "method": "COEActionProvider"
+        },
+        "loadViewModel": {
+            "actionType": "JSFunction",
+            "method": "loadViewModel",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "getCOEActions": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "deps": "js/CAW0splmTableService",
+            "outputData": {
+                "COEActions": "totalLoaded",
+                "ctx.search.totalFound": "totalLoaded.length",
+                "ctx.search.totalLoaded": "totalLoaded.length"
+            }
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.COEActionProvider}}"
+            },
+            "outputData": {
+                "dataProviders.COEActionProvider.columnConfig.columns": "{{function:setNonModifiablePropForCOEActions}}"
+            },
+            "deps": "js/CAW0splmTableService"
+        },
+        "updateSelection": {
+            "actionType": "JSFunction",
+            "method": "updateSelection",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "setProviderForEdit": {
+            "actionType": "JSFunction",
+            "method": "setProviderForEdit",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        }
+    },
+    "dataProviders": {
+        "COEActionProvider": {
+            "action": "getCOEActions",
+            "response": "{{data.COEActions}}",
+            "totalFound": "{{data.totalFound}}",
+            "cols": "{{data.columns}}",
+            "selectionModelMode": "multiple",
+            "editContext": "TABLE_CONTEXT",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands"
+        }
+    },
+    "columnProviders": {
+        "COEActionColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex": 1
+        }
+    },
+
+    "grids": {
+        "COEActionTable": {
+            "dataProvider": "COEActionProvider",
+            "columnProvider": "COEActionColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "maxRowsToShow": 5,
+                "enablePinning": true
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "loadViewModel"
+    },
+    "onEvent": [ {
+            "eventId": "CorrectiveActionSelectionChanged",
+            "action": "doDataProvider"
+        },
+        {
+            "eventId": "COEActionProvider.modelObjectsUpdated",
+            "action": "setProviderForEdit"
+        },
+        {
+            "eventId": "COEActionProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updateSelection"
+        }
+    ],
+    "i18n": {
+        "COEtitle": [
+            "CAW0CapaMessages"
+        ],
+        "name": [
+            "CAW0CapaMessages"
+        ],
+        "qualityActionSubtype": [
+            "CAW0CapaMessages"
+        ],
+        "comment": [
+            "CAW0CapaMessages"
+        ],
+        "caw0ResponsibleUser": [
+            "CAW0CapaMessages"
+        ],
+        "dueDate": [
+            "CAW0CapaMessages"
+        ],
+        "qualityActionStatus": [
+            "CAW0CapaMessages"
+        ],
+        "completionDate": [
+            "CAW0CapaMessages"
+        ],
+        "visibleInReport": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "functions": {
+        "setNonModifiablePropForCOEActions": {
+            "functionName": "setNonModifiablePropForCOEActions",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    }
+}

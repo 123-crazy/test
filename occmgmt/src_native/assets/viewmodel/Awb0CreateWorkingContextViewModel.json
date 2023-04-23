@@ -1,0 +1,408 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-form.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/aw-xrt.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive"
+    ],
+    
+    "actions":
+    {
+        "initializeCreateSWCPanel": {
+            "actionType": "JSFunctionAsync",
+            "method": "initializeCreateSWCPanel",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/saveWorkingContextService"
+        },
+        "loadSWCTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData": 
+            {
+
+                "searchInput": 
+                {
+                    "maxToLoad": 40,
+                    "maxToReturn": 40,
+                    "providerName": "Awp0TypeSearchProvider",
+                    "searchCriteria": 
+                    {
+                        "searchString": "*",
+                        "typeSelectorId": "SaveWorkingContext",
+                        "defaultType": "{{ctx.aceActiveContext.context.workingContextObj.type}}",
+                        "listOfIncludeObjectTypes": "Awb0SavedBookmark",
+                        "loadSubTypes": "true"
+                    },
+
+                    "startIndex": "{{data.dataProviders.performSearch.startIndex}}"
+                }
+            },
+
+            "outputData": 
+            {
+                "totalFound": "totalFound",
+                "swcTypeList": "{{function:processSwcTypes}}"
+            },
+          "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "loadSWCTypes.initializeCreateSWCPanel"
+                    }
+                ]
+            },
+            "deps": "js/saveWorkingContextService"
+        },
+        "findPropsToLoad": {
+            "actionType": "JSFunction",
+            "method": "findPropsToLoad",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/saveWorkingContextService"
+        },
+        "getReqdPropertiesAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": 
+            {
+                "objects": 
+                [
+                    "{{data.openedObject}}"
+                ],
+
+                "attributes": "{{data.propsToLoad}}"
+            },
+            
+            "outputData": 
+            {
+                "propertiesToEdit": "modelObjects"                             
+            },
+            
+            "events":
+            {
+                "success":[
+                    {
+                        "name": "openedObject.reqdPropsLoaded"                        
+                    }
+                ]
+             },
+
+            "deps": "js/saveWorkingContextService"
+        },
+        "populateCreateInputPanel": {
+            "actionType": "JSFunction",
+            "method": "populateCreateInputPanel",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/saveWorkingContextService"        
+        },
+        "onSaveAutoBookmarkStatusChange": {
+            "actionType": "JSFunction",
+            "method": "onSaveAutoBookmarkStatusChange",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/saveWorkingContextService"
+        },
+        "initiateCreateSWCAction": 
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": 
+            {
+                "events": 
+                [
+                    {
+                        "name": "saveBWC.success",
+                        "condition": "!data.targetTypeIsSavedBookmark" 
+                    },
+                    {
+                        "name": "ace.initiateCreateSWCActionInNative",
+                        "condition": "data.targetTypeIsSavedBookmark"
+                    }
+                ]
+            }
+        },
+        "initiateCreateSWCActionInNative": {
+            "actionType": "JSFunction",
+            "method": "saveUserWorkingContextState",
+            "inputData": {
+                "shouldFireEventOnSuccess": true
+            },
+            "deps": "js/backgroundWorkingContextService"        
+        },        
+        "genericAddObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdWorkingContext": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "saveWorkingContext.objectCreated"
+                    },
+                    {
+                        "name": "swc.objectCreated",
+                        "eventData": {  
+                            "createdObject": "{{data.createdObject}}" 
+                        }
+                    }                     
+                ]
+            },
+            "actionMessages": 
+            {
+                "success": 
+                [
+                    {                        
+                        "message": "setCreateSWCOperationSuccess"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "executePostActions":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events":
+                [
+                    {
+                        "name": "saveWorkingContext.postActionsCompleted",
+                        "condition": "conditions.canSkipPostActions"
+                    },
+                    {
+                        "name": "saveWorkingContext.processPostAction",
+                        "condition": "conditions.canProcessPostActions"
+                    }
+                ]
+            }  
+        },
+        "showSavedWorkingContext":
+        {
+            "actionType": "JSFunction",
+            "method": "go",
+            "inputData": {
+                "showObject": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{data.createdObject.uid}}"                            
+                },
+                "option": {
+                    "inherit": false
+                }                
+            },
+            "deps": "js/locationNavigation.service"
+        },
+        "callSaveRecipeSOA" :
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AW4GFoundation-2016-04-SubsetManagement",
+            "method": "saveRecipe",
+            "inputData": {
+                "input": [
+                        {
+                            "recipeContainer" :"{{data.createdWorkingContext}}",
+                            "productInfo": "{{ctx.aceActiveContext.context.productContextInfo}}",
+                            "recipe": "{{ctx.aceActiveContext.context.recipe}}"                                
+                        }
+                    ]
+            },
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "saveWorkingContext.postActionsCompleted"
+                    } 
+                    
+                ]
+            }
+        }        
+    },
+    
+    "functions": 
+    {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": 
+            [
+                "{{data}}"
+            ]
+        },
+        "processSwcTypes": {
+            "functionName": "processSwcTypes",
+            "parameters": 
+            [
+                "{{data}}"
+            ]
+        },
+        "getCreatedObject": {
+            "functionName": "getCreatedObject",
+            "parameters": []
+        }
+    },
+
+    "data":
+    {
+        "operationType": {
+            "type": "STRING",
+            "dbValue": ""        
+        },
+        "contextTitle": {
+            "type": "STRING",
+            "uiValue": ""        
+        },
+        "buttonText": {
+            "type": "STRING",
+            "uiValue": ""        
+        },
+        
+        "swcType": {
+            "type": "STRING",
+            "hasLov": true,
+            "dbValue": "",
+            "displayName": "{{i18n.type}}"
+        },
+        "swcTypeList": {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "contributedAppsHaveSavedBookmarkData": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    
+    "onEvent": 
+    [        
+        {
+            "eventId": "awPanel.reveal",
+            "cacheEventData":true,
+            "condition":"data._internal.modelId === scope.data._internal.modelId && data._internal.panelId === 'Awb0CreateWorkingContext' && ctx.occmgmtContext.supportedFeatures.Awb0SaveWorkingContextFeature",
+            "action": "initializeCreateSWCPanel"
+        },
+
+        {
+            "eventId": "awPanel.reveal",
+            "cacheEventData":true,    
+            "condition":"data._internal.modelId === scope.data._internal.modelId && data._internal.panelId === 'Awb0CreateWorkingContext' && (ctx.occmgmtContext.supportedFeatures.Awb0SaveWorkingContextFeature == undefined || !ctx.occmgmtContext.supportedFeatures.Awb0SaveWorkingContextFeature)",
+            "action": "loadSWCTypes"
+        },
+        {
+            "eventId": "loadSWCTypes.initializeCreateSWCPanel",
+            "action":"initializeCreateSWCPanel"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "findPropsToLoad"
+        },
+        {
+            "eventId": "findPropsToLoad.success",
+            "action": "getReqdPropertiesAction"
+        },
+        {            
+            "eventId": "openedObject.reqdPropsLoaded",
+            "action":  "populateCreateInputPanel"
+        },
+        {
+            "eventId": "gwt.SaveAutoBookmarkStatusChangeEvent",
+            "cacheEventData": true,
+            "action": "onSaveAutoBookmarkStatusChange"
+        },
+        {
+            "eventId": "ace.initiateCreateSWCActionInNative",
+            "action": "initiateCreateSWCActionInNative"
+        },
+        {
+            "eventId": "saveBWC.success",
+            "action": "genericAddObject"
+        },        
+        {
+            "eventId": "saveBWC.failure",
+            "cacheEventData": true,
+            "message": "createSWCValidationFailure"
+        },
+        {
+            "eventId" : "saveWorkingContext.objectCreated",
+            "action": "executePostActions"
+        },
+        {
+            "eventId" : "saveWorkingContext.postActionsCompleted",
+            "action": "showSavedWorkingContext"
+        },
+        {
+            "eventId" : "saveWorkingContext.processPostAction",
+            "action": "callSaveRecipeSOA"
+        }
+    ],
+    
+    "conditions": {
+        "canSkipPostActions": {
+            "expression": "data.createdObject.modelType.typeHierarchyArray.indexOf( 'Awb0SavedBookmark' ) > -1"
+        },
+        "canProcessPostActions" :
+        {
+           "expression": "ctx.aceActiveContext.context.supportedFeatures.Awb0SubsetFeature != undefined && ctx.aceActiveContext.context.supportedFeatures.Awb0SubsetFeature===true"
+        }
+    },
+       
+    "messages": 
+    {
+        "createSWCValidationFailure": 
+        {        
+            "messageType": "INFO",
+            "messageText": "{{i18n.autoSaveOfBookmarkNotYetComplete}}"           
+        },
+        "setCreateSWCOperationSuccess": 
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveOfWorkingContextSuccessful}}",
+            "messageTextParams": 
+            [
+                "{{data.createdObject.props.object_string.dbValues[0]}}"
+            ]
+        }
+    },
+       
+    "i18n":
+    {
+        "saveWorkingContextTitle": [ "OccurrenceManagementConstants" ],
+        "saveButtonText": [ "OccurrenceManagementConstants" ],
+        "type": [ "OccurrenceManagementConstants" ],
+        "autoSaveOfBookmarkNotYetComplete": [ "OccurrenceManagementMessages" ],
+        "saveOfWorkingContextSuccessful": [ "OccurrenceManagementMessages" ]
+    }
+    
+}

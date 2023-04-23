@@ -1,0 +1,147 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-init.directive",
+        "js/aw-label.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-togglebutton.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "title": {
+            "displayName": "{{i18n.textFilterTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.searchText}}"
+        },
+        "showFilters": {
+            "displayName": "{{i18n.toggleFacetTitle}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "noMatchesFound": {
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{i18n.noMatchesFound}}",
+            "displayValue": "{{i18n.noMatchesFound}}"
+        }
+    },
+    "i18n": {
+        "clearButtonTitle": [
+            "UIMessages"
+        ],
+        "textFilterTitle": [
+            "UIMessages"
+        ],
+        "toggleFacetTitle": [
+            "UIMessages"
+        ],
+        "noMatchesFound": [
+            "UIMessages"
+        ],
+        "FILTER_TEXT": [
+            "BaseMessages"
+        ],
+        "searchText": [
+            "UIMessages"
+        ]
+    },
+    "actions": {
+        "loadFacetValues": {
+            "actionType": "JSFunction",
+            "method": "loadFacetValues",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModel": "{{data}}",
+                "reloadValues": true
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "showFiltersToggleChanged": {
+            "actionType": "JSFunction",
+            "method": "showFiltersToggleChanged",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "toggleState": "{{data.showFilters.dbValue}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModel": "{{data}}"
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "setFacetToggleState": {
+            "actionType": "JSFunction",
+            "method": "setFacetToggleState",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "toggleProp": "{{data.showFilters}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModel": "{{data}}"
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "reloadStaleFacets": {
+            "actionType": "JSFunction",
+            "method": "reloadStaleFacets",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModel": "{{data}}"
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "filterFacetInputChanged": {
+            "actionType": "JSFunction",
+            "method": "filterFacetInputChanged",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "isBulkEditing": "{{data.context.isBulkEditing}}"
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "facetFilterMountAction": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "setFacetToggleState",
+                    "condition": "data.context.column.filter.showFilterFacets && data.context.column.filter.columnValues"
+                },
+                {
+                    "action": "reloadStaleFacets",
+                    "condition": "data.context.column.filter.showFilterFacets && data.context.column.filter.columnValues && data.context.column.filter.isStale"
+                }
+            ]
+        }
+    },
+    "conditions": {
+        "isShowFiltersSelected": {
+            "expression": "data.showFilters.dbValue === true"
+        },
+        "selectAllShown": {
+            "expression": "data.context.column.filter.columnValues.length"
+        },
+        "emptyFacetsContainerShown": {
+            "expression": "!data.context.column.filter.columnValues || data.context.column.filter.columnValues.length === 0"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "facetFilterMountAction"
+    }
+}

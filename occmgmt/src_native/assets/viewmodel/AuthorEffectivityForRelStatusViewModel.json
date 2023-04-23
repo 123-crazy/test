@@ -1,0 +1,129 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[
+        "js/aw-include.directive"
+    ],
+    "i18n":
+    {
+        "addElementBtn":[ "OccurrenceManagementConstants" ],
+        "dateEffectivity":[ "OccurrenceManagementConstants" ],
+        "dateEffectivityPlaceholder":[ "OccurrenceManagementConstants" ],
+        "duplicateEffectivityCreationErrorMessage":["OccurrenceManagementMessages"],
+        "effectivityType":[ "OccurrenceManagementConstants"],
+        "endDate":[ "OccurrenceManagementConstants"],
+        "endItemMessage":[ "OccurrenceManagementConstants" ],
+        "endItemRequired":[ "OccurrenceManagementConstants"],
+        "failedToApplyEffectivity":[ "OccurrenceManagementConstants" ],
+        "name":[ "OccurrenceManagementConstants" ],
+        "protect":[ "OccurrenceManagementConstants" ],
+        "sharedEffectivities":[ "OccurrenceManagementConstants" ],
+        "shareEffectivity":[ "OccurrenceManagementConstants"],
+        "soText":[ "OccurrenceManagementConstants"],
+        "startDate":[ "OccurrenceManagementConstants"],
+        "unitEffectivity":[ "OccurrenceManagementConstants" ],
+        "upText":[ "OccurrenceManagementConstants"],
+        "aceRemove":[ "OccurrenceManagementConstants"]
+    },
+    "data" :
+    {
+        "flag": {
+            "type": "STRING",
+            "dbValue": "AUTHORREVISION"
+        },
+        "nameBox":{
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "dbValue": "",
+            "isRequired": "true",
+            "maxLength":32
+        },
+        "unitRangeText":{
+            "displayName": "{{i18n.unitEffectivity}}",
+            "type": "STRING",
+            "dbValue": "",
+            "isRequired": "true"
+        },
+        "isShared":{
+            "displayName": "{{i18n.shareEffectivity}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": false,
+            "labelPosition":"PROPERTY_LABEL_AT_RIGHT"
+        },
+        "dateOrUnitEffectivityTypeRadioButton":
+        {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.dateEffectivity}}",
+            "propertyRadioFalseText":"{{i18n.unitEffectivity}}",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "startDate":
+        {
+            "dbValue": "",
+            "type": "DATETIME",
+            "isRequired": "false",
+            "displayName": "{{i18n.startDate}}"
+        },
+        "endDate":
+        {
+            "dbValue": "",
+            "type": "DATETIME",
+            "isRequired": "false"
+        },
+        "endDateOptions":
+        {
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov":true,
+            "displayName": "{{i18n.endDate}}",
+            "dbValue": "{{i18n.dateEffectivity}}",
+            "isEditable": "true"
+        },
+        "endItemVal":{
+            "type": "STRING",
+            "uiValue":"{{ctx.elementEffectivity.author.endItem.dbValue}}",
+            "displayName": "{{i18n.endItemMessage}}"
+        },
+        "isProtected":{
+            "displayName": "{{i18n.protect}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": false,
+            "labelPosition":"PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "actions":
+    {
+        "handleTabSelectionChange":
+        {
+            "actionType": "JSFunction",
+            "method": "handleTabSelectionChange",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        }
+    },
+
+     "conditions":
+    {
+    },
+
+    "functions":
+    {
+    },
+    "onEvent": [
+        {
+            "eventId": "awTab.selected",
+            "action":  "handleTabSelectionChange"
+        }
+    ],
+    "messages":
+     {
+     }
+}

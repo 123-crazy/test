@@ -1,0 +1,133 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-search-box.directive",
+        "js/aw-panel-body.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "searchPageRevealed",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/configureReportService"
+        },
+        "callSearchResultsAction": {
+            "actionType": "JSFunction",
+            "method": "resultsPageRevealed",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/configureReportService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "callPerformSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/configureReportService"
+        },
+        "updateTotalFoundCtxValue": {
+            "actionType": "JSFunction",
+            "method": "updateTotalFoundCtxValue",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/configureReportService"
+        },
+        "setResultsSelectedTab": {
+            "actionType": "JSFunction",
+            "method": "setResultsSelectedTab",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/configureReportService"
+        }
+    },
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        },
+        "showAddObjectTabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "tabKey": "results",
+                    "panelId": "reportsSearchDataResults",
+                    "name": "{{i18n.results}}",
+                    "selectedTab": true
+                },
+                {
+                    "tabKey": "filters",
+                    "panelId": "reportsSearchDataFilters",
+                    "name": "{{i18n.filterTabTitle}}"
+                }
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "SearchDataTabPage"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "awTab.selected",
+            "condition": "scope.selectedTab.panelId === 'SearchDataTabPage'",
+            "action": "setResultsSelectedTab"
+        },
+        {
+            "eventId": "showReportService.updateTotalFoundOnCtx",
+            "action": "updateTotalFoundCtxValue"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "reportsSearchDataResults"
+            },
+            "action": "callSearchResultsAction"
+        },
+        {
+            "eventId": "searchResultItems.doConfigureReportSearch",
+            "action": "search"
+        }
+    ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showSearchFilterPanel": {
+            "expression": "data.showSearchFilter != undefined && data.showSearchFilter == true"
+        }
+    },
+    "i18n": {
+        "results": [
+            "UIMessages"
+        ],
+        "filterTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ]
+    }
+}

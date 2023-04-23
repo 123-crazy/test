@@ -1,0 +1,53 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-row.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "revealProductSnapshotPanel": {
+            "actionType": "JSFunction",
+            "method": "productSnapshotPanelRevealed",
+            "inputData": {},
+            "outputData": {
+                "viewerCtxNamespace": ""
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "revealSessionSnapshotPanel": {
+            "actionType": "JSFunction",
+            "method": "snapshotPanelRevealed",
+            "inputData": {},
+            "outputData": {
+                "viewerCtxNamespace": ""
+            },
+            "deps": "js/viewerSnapshotService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awTab.selected",
+            "condition": "conditions.revealSessionSnapshotPanelCond",
+            "action": "revealSessionSnapshotPanel"
+        },
+        {
+            "eventId": "awTab.selected",
+            "condition": "conditions.revealProductSnapshotPanelCond",
+            "action": "revealProductSnapshotPanel"
+        }
+    ],
+    "conditions": {
+        "isProductSnapshotVisibleCond": {
+            "expression": "((ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 3 ) || ( ctx.tcSessionData.tcMajorVersion > 13 )) && ctx.aceActiveContext.context.topElement.modelType.typeHierarchyArray.indexOf('Fnd0AppSession') === -1"
+        },
+        "isSessionSnapshotVisibleCond": {
+            "expression": "ctx.tcSessionData.tcMajorVersion >= 13 && ctx.aceActiveContext.context.topElement.modelType.typeHierarchyArray.indexOf('Fnd0AppSession') !== -1"
+        },
+        "revealSessionSnapshotPanelCond": {
+            "expression": "conditions.isSessionSnapshotVisibleCond && data.selectedTab.tabKey === 'InputSnapshot'"
+        },
+        "revealProductSnapshotPanelCond": {
+            "expression": "conditions.isProductSnapshotVisibleCond && data.selectedTab.tabKey === 'InputSnapshot'"
+        }
+    }
+}

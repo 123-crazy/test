@@ -1,0 +1,161 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-repeat.directive",
+        "js/aw-source-editor.directive",
+        "js/aw-property-label.directive",
+        "js/aw-label.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive"
+    ],
+    "data": {
+        "registrationData": "{{ctx.graph.selected.model.modelObject.actionDef}}",
+        "configJson": {
+            "language": "json",
+            "automaticLayout": true,
+            "minimap": {
+                "enabled": false
+            },
+            "formatOnType": true,
+            "lineNumbers": "off",
+            "folding": false,
+            "lineDecorationsWidth": 0
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'graph' && target === 'selected' && ctx.graph.selected && !ctx.graph.selected.model.edgeObject && !ctx.graph.selected.model.nodeObject.messageDef && ctx.graph.selected.model.nodeObject.category !== 'onEvent'",
+            "action": "retrieveActionProperties",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'graph' && target === 'selected' && ctx.graph.selected && ( ctx.graph.selected.model.edgeObject || ctx.graph.selected.model.nodeObject.messageDef || ctx.graph.selected.model.nodeObject.category === 'onEvent' )",
+            "action": "updateActionProperties",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'graph' && target === 'selected' && !ctx.graph.selected",
+            "action": "resetSelection",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "actionBuilder.refreshActivityProperty",
+            "cacheEventData": true,
+            "action": "changeActivityOperation"
+        },
+        {
+            "eventId": "changeActionType.closeChangeTypePanel",
+            "action": "applyActionPropertiesFromChangeActivity"
+        }
+    ],
+    "actions": {
+        "retrieveActionProperties": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($id:ID!){actionType(id:$id){id props{ id type }}}",
+                    "variables": {
+                        "id": "{{ctx.graph.selected.model.category}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "actionProps": "{{function:convertActionProps}}"
+            },
+            "deps": "js/actionPropertiesService"
+        },
+        "resetSelection": {
+            "actionType": "JSFunction",
+            "method": "resetActionProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "updateActionProperties": {
+            "actionType": "JSFunction",
+            "method": "updateActionProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "changeActivityOperation": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "closeChangeActivityPanel"
+                },
+                {
+                    "action": "applyActionPropertiesFromChangeActivity"
+                },
+                {
+                    "action": "retrieveActionProperties"
+                }
+            ]
+        },
+        "closeChangeActivityPanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                         "name": "changeActionType.closeChangeTypePanel"
+                     }
+                 ]
+            }
+        },
+        "applyActionProperties": {
+            "actionType": "JSFunction",
+            "method": "applyActionProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "applyActionPropertiesFromChangeActivity": {
+            "actionType": "JSFunction",
+            "method": "applyActionProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "changeActivity": true
+            },
+            "deps": "js/actionBuilderService"
+        }
+    },
+    "functions": {
+        "convertActionProps": {
+            "functionName": "convertActionProps",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}",
+                "{{ctx.graph.selected.model.modelObject.actionDef}}",
+                "{{ctx.graph.selected.model.modelObject.messageDef}}",
+                "{{ctx.graph.selected.model.modelObject.eventDef}}"
+            ]
+        }
+    },
+    "i18n": {
+        "actionProperties": [ "ActionBuilderMessages" ],
+        "updateParams": [ "ActionBuilderMessages" ]
+    }
+}

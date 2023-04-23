@@ -1,0 +1,13 @@
+<aw-panel-body scrollable="false">
+    <aw-widget id="profileNumberOfReviewerValue" exist-when="ctx.workflow.isAssignmentQuestionNeeded" prop="data.numberOfReviewers"></aw-widget>
+    <aw-radiobutton prop="data.teamAssignmentOption" exist-when="ctx.workflow.isAssignmentQuestionNeeded"></aw-radiobutton>
+    <aw-checkbox prop="data.reassignOutsideGroupRoleOption" exist-when="ctx.workflow.isAssignmentQuestionNeeded" visible-when="data.teamAssignmentOption.dbValue === false"></aw-checkbox>
+    <aw-listbox prop="data.projectObject" list="data.projectObjectList" visible-when="!conditions.isProjectObjectListEmpty" action="resourcePoolPerformSearch"></aw-listbox>
+    <aw-list-filter id="resourcePoolListFilter" prop="data.resourceFilterBox" dataprovider="data.dataProviders.resourcePoolPerformSearch">
+        <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+    </aw-list-filter>
+</aw-panel-body>
+
+<aw-panel-footer>
+    <aw-button action="addUsers" visible-when="conditions.isValidObjectToAdd"><aw-i18n>i18n.Add_Title</aw-i18n></aw-button>
+</aw-panel-footer>

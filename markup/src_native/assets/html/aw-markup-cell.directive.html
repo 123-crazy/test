@@ -1,0 +1,23 @@
+<div ng-if="vmo && vmo.groupName">
+    <div role="button" class="aw-layout-panelSectionTitle aw-layout-flexRow aw-layout-collapsiblePanelSectionTitle collapsible">
+        <aw-property-image name="miscDownArrow_uxRefresh" class="aw-layout-panelSectionTitleChevron" ng-class="{ 'aw-layout-panelSectionTitleChevronDown' : vmo.expanded === false }" ng-click="toggleGroup(vmo)"></aw-property-image>
+        <div class="aw-ui-filterCategoryLabel aw-ui-filterCategoryLabelEnabled" ng-click="toggleGroup(vmo)">
+        {{vmo.groupName | toI18n}}
+        </div>
+    </div>
+</div>
+<div ng-if="vmo && !vmo.groupName" class="aw-layout-flexRow">
+    <div class="aw-widgets-cellListCellImage" ng-class="{'aw-markup-cellIndentation': isIndented()}">
+        <aw-avatar size="small" source="vmo.userImage" title="{{vmo | toShareInfo}}"></aw-avatar>
+    </div>
+    <div class="aw-markup-cellContent">
+        <div class="aw-widgets-cellListCellTitleBlock">
+            <h3 class="aw-widgets-cellListCellTitle">{{vmo.displayname}}</h3>
+            <label class="aw-widgets-cellListCellItemType aw-base-small">{{vmo | toStatus}}</label>
+        </div>
+        <div class="aw-widgets-cellListCellProperties">
+            <label class="aw-widgets-propertyValue aw-base-small">{{vmo.date.toLocaleString()}}</label>
+        </div>
+        <div class="aw-markup-cellRichContent" ng-bind-html="vmo.comment | toTrusted" ></div>
+    </div>
+</div>

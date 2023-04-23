@@ -1,0 +1,61 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+
+    ],
+    "data":
+    {
+        "searchBox": {
+            "displayName":"",
+            "type":"STRING",
+            "isRequired":"true",
+            "dbValue":"{{ctx.searchSearch.searchStringSecondary}}",
+            "dispValue":"{{ctx.searchSearch.searchStringSecondary}}"
+        }
+    },
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "clsBreadCrumbProvider"
+        },
+        "buildCrumbs":
+        {
+            "actionType": "JSFunction",
+            "method": "buildClsBreadcrumb",
+            "inputData":
+            {
+               "label": "{{ctx.sublocation.label}}",
+               "totalFound": "{{ctx.search.totalFound}}",
+               "selectedClass":"{{ctx.clsLocation.prevSelectedClass}}"
+            },
+            "outputData":
+            {
+                "crumbs": "crumbs"
+            },
+            "deps": "js/classifyTreeService"
+        }
+    },
+    "dataProviders":
+    {
+        "clsBreadCrumbProvider":
+        {
+            "action": "buildCrumbs",
+            "response": "{{data.crumbs}}",
+            "totalFound": "{{data.crumbs.length}}"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "clsBreadCrumb.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "clsBreadCrumb.refresh",
+            "action": "reveal"
+        }
+    ]
+}

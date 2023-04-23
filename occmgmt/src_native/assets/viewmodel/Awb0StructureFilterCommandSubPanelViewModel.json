@@ -1,0 +1,183 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                 "js/aw-filter-category.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-panel-section.directive",
+                 "js/aw-repeat.directive",
+                 "js/exist-when.directive",
+                 "js/aw-scrollpanel.directive",
+                 "js/aw-layout-slot.directive",
+                 "js/aw-textbox.directive",
+                 "js/aw-filter-in-filters-searchbox.directive"
+
+    ],
+    "actions":
+    {
+        "updateCategoryResults":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategoryResults",
+            "inputData":
+            {
+                "category":"{{ctx.search.valueCategory}}"
+            },
+            "deps":"js/filterPanelService"
+        },
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "getFilterData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/structureFilterService"
+        },
+        "selectStructureFilterAction":
+        {
+            "actionType": "JSFunction",
+            "method": "selectACEFilter",
+            "inputData":
+            {
+                "category"     : "{{category}}",
+                "filter"       : "{{filter}}"
+            },
+            "deps": "js/structureFilterService"
+        },
+        "selectGivenCategory":
+        {
+            "actionType": "JSFunction",
+            "method": "selectCategory",
+            "inputData":
+            {
+                "category"     : "{{category}}"
+            },
+            "deps": "js/structureFilterService"
+        },
+        "initialize":
+        {
+            "actionType": "JSFunction",
+            "method": "initialize",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/structureFilterService"
+        },
+        "persistCategoryFilterToUpdateState": {
+            "actionType": "JSFunction",
+            "method": "persistCategoryFilterToUpdateState",
+            "inputData": {
+                "context": "{{data.eventData}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "performFacetSearch"
+                } ]
+            },
+            "deps": "js/structureFilterService"
+        },
+        "performFacetSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-Finder",
+            "method": "performFacetSearch",
+            "inputData": {
+                "facetSearchInput": {
+                    "maxToReturn": 100,
+                    "providerName": "{{function:getFacetSearchDataProvider}}",
+                    "searchCriteria": "{{function:getSearchCriteriaForFacetSearch}}",
+                    "searchFilterMap": {},
+                    "startIndex": "{{function:getStartIndexForFacetSearch}}"
+                }
+            },
+            "outputData": {
+                "ctx.search.filterMap": "{{function:updateFilterMapForFacet}}",
+                "ctx.search.valueCategory.endIndex": "endIndex",
+                "ctx.search.valueCategory.hasMoreFacetValues": "hasMoreFacetValues",
+                "ctx.search.valueCategory.soaCallDone": true
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateFilterPanel"
+                }]
+            },
+            "deps": "js/structureFilterService"
+        }
+    },
+    "functions": {
+        "getFacetSearchDataProvider": {
+            "functionName": "getFacetSearchDataProvider"
+        },
+        "getSearchCriteriaForFacetSearch": {
+            "functionName": "getSearchCriteriaForFacetSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "getStartIndexForFacetSearch": {
+            "functionName": "getStartIndexForFacetSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId" : "Awb0StructureFilterCommandSubPanel"
+            },
+            "action": "initialize"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId" : "Awb0StructureFilterCommandSubPanel"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action":"updateCategoryResults",
+            "condition": "conditions.isStructureIndexed"
+        },
+        {
+            "eventId": "toggleExpansionUnpopulated",
+            "action": "persistCategoryFilterToUpdateState",
+            "cacheEventData": true,
+            "condition": "conditions.isStructureIndexed"
+        },
+        {
+            "eventId": "filterInFilter.serverFilter",
+            "action": "performFacetSearch",
+            "cacheEventData": true,
+            "condition": "conditions.isStructureIndexed"
+        },
+        {
+            "eventId": "performFacetSearch",
+            "action": "performFacetSearch",
+            "cacheEventData": true,
+            "condition": "conditions.isStructureIndexed"
+        }
+    ],
+    "conditions": {
+        "isStructureIndexed": {
+            "expression": "!(ctx.aceActiveContext.context.productContextInfo.props.awb0AlternateConfiguration !== undefined && ctx.aceActiveContext.context.productContextInfo.props.awb0AlternateConfiguration.dbValues[0] === '') || (ctx.aceActiveContext.context.supportedFeatures.Awb0EnableSmartDiscoveryFeature === undefined)"
+        }
+    },
+    "data":
+    {
+        "searchBox1": {
+            "displayName": "",
+            "type": "STRING"
+        }
+    },
+    "i18n":
+    {
+          "subset" :        ["OccurrenceManagementConstants"],
+          "MORE_LINK_TEXT": [ "BaseMessages" ],
+          "LESS_LINK_TEXT": [ "BaseMessages" ]
+    }
+}

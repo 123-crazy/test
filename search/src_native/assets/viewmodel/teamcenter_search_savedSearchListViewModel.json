@@ -1,0 +1,169 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions":
+    {
+        "reset":
+        {
+            "actionType": "JSFunction",
+            "method": "resetForSavedSearchSublocation",
+            "inputData":
+            {
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "executeSavedSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "executeSavedSearch",
+            "inputData":
+            {
+                "vmo": "{{vmo}}"
+            },
+            "deps": "js/Awp0SaveSearchService"
+        },
+        "loadSavedSearchData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Awp0SavedSearchProvider",
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}",
+                    "searchFilterMap6": "{{function:updateFilterMap}}"
+                },
+                "inflateProperties": false
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Awp0FullTextSavedSearch",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0is_global_shared",
+                                "name": "awp0ChartOn"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "ctx.search.savedSearchObjects": "{{json:searchResultsJSON}}",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.searchResponseInfo.searchFilterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.searchResponseInfo.unpopulatedSearchFilterCategories": "searchFilterCategoriesUnpopulated",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound"
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "updateSavedSearchContext":
+        {
+            "actionType": "JSFunction",
+            "method": "updateSavedSearchContext",
+            "inputData":
+            {
+                "savedSearchObject": "{{ctx.selected}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0SaveSearchService"
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize":
+        {
+            "functionName": "getDefaultPageSize",
+            "parameters":
+            [
+                 "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "getActualSearchFilterCategories": {
+            "functionName": "getActualSearchFilterCategories",
+            "parameters": ["{{data}}"]
+        },
+
+        "updateFilterMap":
+        {
+            "functionName": "updateFilterMap",
+            "parameters":
+            [
+                "{{ctx.search.activeFilterMap}}",
+                "{{ctx.search.provider}}"
+            ]
+        }
+    },
+
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadSavedSearchData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commands":
+            {
+                "Awp0ShowObjectCell":
+                {
+                    "id": "cmdOpen",
+                    "title": "{{i18n.showObjectCommandTitle}}",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT",
+                    "action":"executeSavedSearch"
+                }
+            }
+        }
+    },
+    "conditions":
+    {
+    },
+    "onEvent": [
+        {
+            "eventId": "teamcenter_search_savedSearchList.contentLoaded",
+            "action": "reset"
+        },
+        {
+            "eventId": "teamcenter_search_savedSearchList.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "soa.getVisibleCommands",
+            "action":  "updateSavedSearchContext"
+        }
+    ],
+    "i18n":
+    {
+        "showObjectCommandTitle": [
+            "XRTMessages"
+        ]
+    }
+}

@@ -1,0 +1,18 @@
+<aw-form name="createInputs">
+    <aw-add include-types="{{data.allowedTypeInfo.objectTypeName !=='' ? data.allowedTypeInfo.objectTypeName : 'Item' }}" 
+        type-filter="{{data.allowedTypeInfo.searchTypeName !=='' ? data.allowedTypeInfo.searchTypeName : 'ItemRevision' }}"
+        preferred-type="{{data.allowedTypeInfo.preferredType !=='' ? data.allowedTypeInfo.preferredType : 'Item' }}"
+        is-include-sub-types="data.allowedTypeInfo.searchTypeName===''"
+        load-sub-types="data.allowedTypeInfo.searchTypeName===''"
+        auto-select-on-unique-type="true" visible-tabs="new,palette,search" max-recent-count="5"
+        exist-when="data.allowedTypeInfo">
+    </aw-add>
+</aw-form>
+<aw-panel-footer>
+    <aw-button action="createAndAddObject" visible-when="createInputs.$valid && conditions.shouldShowAddButtonInNewTab">
+        <aw-i18n>i18n.add</aw-i18n>
+    </aw-button>
+    <aw-button action="addSelectedObjects" visible-when="conditions.shouldShowAddButtonInPaletteTab || conditions.shouldShowAddButtonInSearchTab">
+        <aw-i18n>i18n.add</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

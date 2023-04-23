@@ -1,0 +1,123 @@
+<aw-panel-body>
+    <aw-list dataprovider="data.dataProviders.conversationDataProvider" class="aw-activecollab-shadow">
+        <aw-flex-column class="aw-layout-flexRow" aw-class="[{'aw-activecollab-openStatus aw-widgets-showCellDecorator': item.props.convStatus.dbValue==='Open' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'},{'aw-activecollab-closedStatus aw-widgets-showCellDecorator': item.props.convStatus.dbValue==='Closed' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'},{'aw-activecollab-inProgressStatus aw-widgets-showCellDecorator': item.props.convStatus.dbValue==='In Progress' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'}]">
+            <aw-flex-column justify="top" exist-when="item.showMoreCellCmds && !item.isParticipantObjVisible && !item.isSourceObjVisible">
+                <aw-flex-row justify="left" align-content="center">
+                    <aw-flex-column justify="center" align-content="end">
+                        <aw-pic id="{{item.moreCellCmdsIdRef}}" class="aw-widget-thumbnail aw-commands-commandToolbarIconButton" icon-id="data.cmdMore" aw-click="item.doShowMoreCmds(item)" extended-tooltip="{{item.moreDesc}}"></aw-pic>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <div visible-when="item.showMoreCellCmds && !item.isParticipantObjVisible && !item.isSourceObjVisible" class="aw-activecollab-convSeparator aw-theme-separator"></div>
+            <aw-flex-column justify="top" visible-when="item.isParticipantObjVisible">
+                <aw-flex-row justify="left" align-content="center">
+                    <aw-flex-column width="9">
+                        <aw-flex-row align-content="center">
+                            <aw-flex-column justify="center" width="2f" visible-when="item.props.isConvPrivate.dbValue">
+                                <aw-icon class="aw-commands-svg" icon-id="indicatorPrivate"></aw-icon>
+                            </aw-flex-column>
+                            <aw-flex-column width="3f" aw-repeat=" userObj : item.props.inflatedParticipantObjList">
+                                <aw-avatar size="xsmall" source="userObj.props.thumbnailUrl" extended-tooltip="{{userObj.props.participantNameTooltip}}"></aw-avatar>
+                            </aw-flex-column>
+                            <aw-flex-column justify="center" width="5f">
+                                <div id="{{item.participantIdRef}}" class="aw-activecollab-link">
+                                    <strong><aw-link prop="item.moreParticipantPopupLink" visible-when="item.moreParticipantPopupLink" link-id="{{item.participantIdRef}}" action="noop" aw-click="item.clickParticipantLink(item)"></aw-link></strong>
+                                </div>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <aw-flex-column justify="top" visible-when="item.isSourceObjVisible">
+                <aw-flex-row justify="left" align-content="center">
+                    <aw-flex-column width="9">
+                        <aw-flex-row class="aw-activecollab-srcObjChip" justify="left" align-content="center">
+                            <aw-chip chip="item.chipData" button-type="base" extended-tooltip="{{item.chipData.extendedTooltip}}" action="clickObjChipAction"></aw-chip>
+                            <div id="{{item.srcObjIdRef}}">
+                                <strong><aw-link prop="item.moreSourceObjPopupLink" visible-when="item.moreSourceObjPopupLink" link-id="{{item.srcObjIdRef}}" action="noop" aw-click="item.clickSrcObjLink(item)"></aw-link></strong>
+                            </div>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <div visible-when="item.isSourceObjVisible || item.isParticipantObjVisible" class="aw-activecollab-convSeparator aw-theme-separator"></div>
+            <aw-flex-column justify="center" visible-when="item.isConvActionable  && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'">
+                <aw-flex-row justify="left" align-content="start" class="aw-activecollab-userBold">
+                    <aw-flex-column width="10f">
+                        <div visible-when="!item.convStatusModifiable" class="aw-activecollab-statusLabel">
+                            {{item.props.convStatus.displayValues[0]}}
+                        </div>
+                        <aw-link-with-popup-menu prop="item.props.convStatus" dataprovider="data.dataProviders.convStatusLOVDataProvider" visible-when="item.convStatusModifiable"></aw-link-with-popup-menu>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <aw-flex-column justify="center">
+                <aw-flex-row justify="left" align-content="start">
+                    <aw-flex-column width="5f">
+                        <aw-avatar size="small" source="item.thumbnailUrl" exist-when="item.hasThumbnail"></aw-avatar>
+                        <aw-avatar size="small" source="item.typeIconURL" exist-when="!item.hasThumbnail"></aw-avatar>
+                    </aw-flex-column>
+                    <aw-flex-column>
+                        <aw-flex-row class="aw-widgets-propertyNonEditValue" justify="space-between" height="1.5f" class="aw-activecollab-convCreds">
+                            <aw-flex-column width="6" class="aw-activecollab-userBold">
+                                {{item.props.userName.displayValues[0]}}
+                            </aw-flex-column>
+                            <aw-flex-column width="4" align-content="end">
+                                {{item.props.modifiedDateTime.displayValues[0]}}
+                            </aw-flex-column>
+                        </aw-flex-row>
+                        <aw-flex-row visible-when="!item.beingEdited" class="aw-activecollab-viewRichText">
+                            <div aw-parse-html="" display-val="item.props.richTextObject.curtailRichText" is-rich-text="true" visible-when="item.props.richTextObject && item.props.richTextObject.curtailRichText.length > 0 && item.showMore"></div>
+                            <div aw-parse-html="" display-val="item.props.richText.displayValues[0]" is-rich-text="true" visible-when="item.props.richText.displayValues[0] && item.props.richText.displayValues[0].length > 0 && !item.showMore"></div>
+                            <div visible-when="!item.props.richText.displayValues[0] && item.showMore">
+                                {{item.props.plainTextObject.curtailPlainText}}
+                            </div>
+                            <div visible-when="!item.props.richText.displayValues[0] && !item.showMore">
+                                {{item.props.plainText.displayValues[0]}}
+                            </div>
+                        </aw-flex-row>
+                        <aw-flex-row class="aw-activecollab-quickReply" exist-when="item.beingEdited">
+                            <aw-flex-column width="12">
+                                <div class="aw-activecollab-editor">
+                                    <div id="{{item.commentCKEId}}" name="{{item.commentCKEId}}"></div>
+                                </div>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                        <aw-flex-row>
+                            <aw-flex-column align-content="center" justify="center" width="100%" aw-repeat=" relatedObj : item.props.inflatedRelatedObjList" visible-when="item.discussionHasSnapshot && item.convViewSnapshotPerm">
+                                <aw-include name="Ac0SnapshotCard" sub-panel-context="{snapshot:relatedObj, showCMDBar:true}"></aw-include>
+                            </aw-flex-column>
+                            <aw-flex-column visible-when="item.discussionHasSnapshot && !item.convViewSnapshotPerm">
+                                <aw-guidance-message message="participantSnapshotWarningMsg" banner-style="true" show-icon="false" show-type="false"></aw-guidance-message>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                        <aw-include name="Ac0DiscardSaveComment" sub-panel-context="item" exist-when="item.beingEdited"></aw-include>
+                        <aw-flex-row height="1.5f" visible-when="!item.beingEdited">
+                            <aw-link prop="item.moreLink" action="noop" aw-click="item.doShowMore(item)" visible-when="item.showMoreLink"></aw-link>
+                            <aw-link prop="item.lessLink" action="noop" aw-click="item.doShowLess(item)" visible-when="item.showLessLink"></aw-link>
+                        </aw-flex-row>
+
+                        <aw-flex-row justify="left" align-content="center" visible-when="!item.beingEdited">
+                            <aw-flex-column justify="center" align-content="end">
+                                <aw-pic id="{{item.moreCmtCellCmdsIdRef}}" class="aw-widget-thumbnail aw-commands-commandToolbarIconButton" icon-id="data.cmdMore" aw-click="item.doShowMoreCmtCellCmds(item)" extended-tooltip="{{item.moreDesc}}" visible-when="item.showMoreCmtCellCmds"></aw-pic>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <div class="aw-activecollab-convSeparator aw-theme-separator"></div>
+            <aw-include name="Ac0CommentList" exist-when="item.expandComments" sub-panel-context="item"></aw-include>
+            <aw-flex-row height="2f">
+                <aw-flex-column width="4" justify="center">
+                    <strong><aw-link prop="item.expandCommentsLink" action="noop" aw-click="item.doExpandComments(item)" visible-when="!item.expandComments"></aw-link></strong>
+                    <strong><aw-link prop="item.collapseCommentsLink" action="noop" aw-click="item.doExpandComments(item)" visible-when="item.expandComments"></aw-link></strong>
+                </aw-flex-column>
+                <aw-flex-column width="4"></aw-flex-column>
+                <aw-flex-column width="4" justify="center" align-content="end">
+                    <strong><aw-link prop="item.followConvLink" action="noop" aw-click="item.doFollowConv(item)" visible-when="item.showFollowConv" extended-tooltip="{{item.followConvDesc}}"></aw-link></strong>
+                    <strong><aw-link prop="item.unfollowConvLink" action="noop" aw-click="item.doFollowConv(item)" visible-when="!item.showFollowConv" extended-tooltip="{{item.unFollowConvDesc}}"></aw-link></strong>
+                </aw-flex-column>
+            </aw-flex-row>
+        </aw-flex-column>
+    </aw-list>
+</aw-panel-body>

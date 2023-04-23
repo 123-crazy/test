@@ -1,0 +1,540 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-graph.directive",
+        "js/aw-column.directive",
+        "js/aw-toolbar.directive"
+    ],
+
+    "actions": {
+        "queryLegendData": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2014-11-NetworkEngine",
+            "method": "getViews3",
+            "inputData": {
+                "key": "Relations"
+            },
+
+            "outputData": {
+                "legendData": "views"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "Caw0Methodology.initLegendData"
+                } ]
+            }
+        },
+
+        "initLegendData": {
+            "actionType": "JSFunction",
+            "method": "initLegendData",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/CAW0AnalysisDataService"
+        },
+        "graphSelectionChanged": {
+            "actionType": "JSFunction",
+            "method": "graphSelectionChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.selectionChanged']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserSelectionService"
+        },
+        "initGraphStyle": {
+            "actionType": "JSFunction",
+            "method": "initGraphStyle",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserGraphStyles"
+        },
+        "queryNetwork": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2012-10-NetworkEngine",
+            "method": "queryNetwork2",
+            "inputData": {
+                "input": "{{function:getQueryNetworkInput}}"
+            },
+            "policy": {
+                "types": "{{function:getQueryNetworkPolicy}}"
+            },
+            "outputData": {
+                "ctx.graph.graphModel.graphData": "graph",
+                "oauthData": "ServiceData.partialErrors"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Caw0Methodology.startDrawGraph"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==142009",
+                    "message": "oauthError"
+                } ]
+            },
+            "deps": "js/Caw0AnalysisService"
+        },
+
+        "getGraphStyleDef": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2012-10-NetworkEngine",
+            "method": "getGraphStyleDef",
+            "inputData": {},
+            "outputData": {
+                "graphStyleResponse": "{{function:parseGraphStyleXML}}"
+            },
+            "deps": "js/Rv1RelationBrowserGraphStyles"
+        },
+        "setAddedNode": {
+            "actionType": "JSFunction",
+            "method": "setAddedNode",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "addElementResponse": "{{data.eventMap['Caw0IshikawaMethodology.activeViewUpdated'].addElementResponse}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateIshikawaGraph"
+                } ]
+            },
+            "deps": "js/CAW0IshikawaDrawService"
+        },
+        "drawGraph": {
+            "actionType": "JSFunction",
+            "method": "drawGraph",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "GraphRefreshed"
+                } ]
+            },
+            "deps": "js/CAW0IshikawaDrawService"
+        },
+        "updateGraphChangeAction": {
+            "actionType": "JSFunction",
+            "method": "markGraphAsDirty",
+            "inputData": {
+                "hasPendingChanges": true
+            },
+            "deps": "js/Caw0MethodologyGraphSaveService"
+        },
+        "resetEditHandler": {
+            "actionType": "JSFunction",
+            "method": "resetEditHandler",
+            "inputData": {
+                "hasPendingChanges": false,
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0MethodologyGraphSaveService"
+        },
+        "onNodeEditCommitted": {
+            "actionType": "JSFunction",
+            "method": "onNodeEditCommitted",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "eventData": "{{data.eventMap['awGraph.nodeEditCommitted']}}",
+                "legendState": "{{ctx.graph.legendState}}"
+            },
+            "deps": "js/Caw0AnalysisService"
+        },
+        "setProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:getGraphPropertyInput}}"
+            },
+            "outputData": {
+                "serviceData": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateTreeTable",
+                    "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_RootCauseAnalysis'"
+                } ]
+            },
+            "deps": "js/Caw0AnalysisService"
+        },
+        "updateTreeTable": {
+            "actionType": "JSFunction",
+            "method": "updateTreeTable",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0EditTreeStructure"
+        },
+        "handleItemsAddedToGraph": {
+            "actionType": "JSFunction",
+            "method": "handleItemsAddedToGraph",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}"
+            },
+
+            "deps": "js/CAW0IshikawaDrawService"
+        },
+        "graphHoverChanged": {
+            "actionType": "JSFunction",
+            "method": "graphHoverChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.hoverChanged']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserSelectionService"
+        },
+        "updateGraphThroughInfo": {
+            "actionType": "JSFunction",
+            "method": "updateGraphThroughInfo",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0AnalysisDrawService"
+        }
+    },
+
+    "data": {
+
+        "legend": {
+            "tabModels": [ {
+                "panelId": "Rv1LegendFilterSub",
+                "name": "{{i18n.filter}}"
+            } ]
+        },
+
+        "graphModel": {
+            "config": {
+                "enableEdit": true,
+                "minZoom": 0.1,
+                "maxZoom": 1,
+                "autoEdgeRoutingType": "HV_SEGMENT3",
+                "fitViewPosition": "LEFT",
+                "hoverDelayTime": 500,
+                "nodeHeightUpdateStrategy": "NONE",
+                "movableItems": [],
+                "selectableItems": [ "Node" ],
+                "layout": {
+                    "layoutMode": "IncUpdateLayout",
+                    "defaultOption": "TopToBottom",
+                    "config": {
+                        "nodeToNodeDistance": {
+                            "x": 45,
+                            "y": 45
+                        },
+                        "edgeToEdgeDistance": {
+                            "x": 15,
+                            "y": 15
+                        },
+                        "portSize": {
+                            "width": 0,
+                            "height": 0
+                        },
+                        "minSegmentLength": 15
+                    }
+                },
+                "showNodeOverlay": true,
+                "nodeOverlay": {
+                    "zoomThreshold": 0.7,
+                    "graphOverlayHandler": "js/CAW0MethodologyOverlayHandler"
+                },
+                "inputMode": "viewInputMode",
+                "graphEditHandler": "js/Gc1GraphEditHandler",
+                "tooltipHandler": "js/Rv1RelationBrowserTooltipHandler",
+                "moveWithoutSelection": false,
+                "enableAutoPan": true,
+                "enableMarqueeSelection": true,
+                "marqueeSelectionModifierKey": [ "shift" ],
+                "enableMultipleSelection": false,
+                "multipleSelectionModifierKey": [
+                    [ "ctrl" ],
+                    [ "shift" ]
+                ],
+                "showOverview": true,
+                "showFilter": true,
+                "syncGroupDescendantsVisibilityOnFilter": false,
+                "enableObjectArrangement": false,
+                "enableAutoAlignment​": true,
+                "snapToGridByAnchorPoint": false,
+                "showGrid": false,
+                "grid": {},
+                "enableAlignment": false,
+                "alignment": {
+                    "strokeColor": "rgb(0,255,0)",
+                    "strokeWidth": 2,
+                    "strokeDashStyle": "SOLID",
+                    "tolerance": 10,
+                    "separateGridSnapAndAlignment": true
+                },
+                "defaults": {
+                    "nodePaddings": {
+                        "top": 50,
+                        "bottom": 50,
+                        "left": 50,
+                        "right": 50
+                    },
+                    "nodeSize": {
+                        "width": 250,
+                        "height": 50
+                    },
+                    "nodeStyle": {
+                        "templateId": "Caw0TileNodeTemplate",
+                        "borderColor": "rgb(138,66,8)"
+                    },
+                    "edgeStyle": {
+                        "dashStyle": "SOLID",
+                        "thickness": 0,
+                        "color": "(0,0,0)",
+                        "isHotSpotEdge": false,
+                        "targetArrow": {
+                            "arrowShape": "SIMPLE",
+                            "arrowScale": 1.0,
+                            "fillInterior": true
+                        }
+                    },
+                    "portStyle": {
+                        "fillColor": "(0,0,0)",
+                        "size": 0
+                    },
+                    "label": {
+                        "hasBackground": true,
+                        "backgroundFillColor": "argb(1,244,244,244)",
+                        "backgroundStyleClass": "aw-graph-labelBackground",
+                        "backgroundAnchor": [ 0.5, 0.5 ],
+                        "textAnchor": [ 0.5, 0.5 ],
+                        "contentStyleClass": "aw-widgets-label aw-base-normal aw-graph-label",
+                        "allowWrapping": false,
+                        "textOverflowMode": "ELLIPSIS",
+                        "maxPortLabelWidth": 96,
+                        "maxEdgeLabelWidth": 128,
+                        "maxMoveDistance": 500
+                    }
+                }
+            },
+
+            "nodeTemplates": {
+                "Caw0TileNodeTemplate": {
+                    "templateUrl": "/html/Caw0TileNodeTemplate.html",
+                    "textOverflow": "ELLIPSIS",
+                    "textPadding": 60,
+                    "padding": 50,
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    },
+                    "initialBindData": {
+                        "Description_editable": true,
+                        "Name_editable": true
+                    },
+                    "roundCorner": {
+                        "rx": 10,
+                        "ry": 10,
+                        "strokeColorProperty": "node_fill_color",
+                        "borderStyleClass": ""
+                    }
+                },
+                "Caw0IshikawaCauseNodeTemplate": {
+                    "templateUrl": "/html/Caw0IshikawaCauseNodeTemplate.html",
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 10,
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    },
+                    "initialBindData": {
+                        "Name_editable": true
+                    },
+                    "roundCorner": {
+                        "rx": 10,
+                        "ry": 10,
+                        "strokeColorProperty": "node_fill_color",
+                        "borderStyleClass": ""
+                    }
+                }
+            },
+
+            "inputModes": {
+                "viewInputMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": false,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+                "editInputMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                }
+            },
+            "isShowLabel": false,
+
+            "hoverStyle": {
+                "node": "aw-widgets-cellListItemNodeHovered",
+                "edge": { "thicknessScale": 1.75 }
+            },
+
+            "shadowEffects": [ {
+                "effectId": "drop-shadow",
+                "xOffset": 4,
+                "yOffset": 4,
+                "blurDeviation": 3
+            } ]
+        }
+    },
+
+    "functions": {
+        "getQueryNetworkInput": {
+            "functionName": "getQueryNetworkInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}",
+                "{{data.eventData}}"
+            ]
+        },
+        "getQueryNetworkPolicy": {
+            "functionName": "getQueryNetworkPolicy",
+            "parameters": [
+                "{{ctx}}",
+                "{{data.preferences.RV1_DARB_Filter_Properties}}"
+            ]
+        },
+        "getGraphPropertyInput": {
+            "functionName": "getGraphPropertyInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "updateTreeTable",
+            "action": "updateTreeTable"
+        },
+        {
+            "eventId": "awGraph.initialized",
+            "action": "queryLegendData"
+        },
+
+        {
+            "eventId": "awGraph.initialized",
+            "action": "initGraphStyle"
+        },
+
+        {
+            "eventId": "Caw0Methodology.initLegendData",
+            "action": "initLegendData"
+        },
+
+        {
+            "eventId": "Caw0Methodology.legendInitialized",
+            "action": "queryNetwork"
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "graphSelectionChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Caw0Methodology.startDrawGraph",
+            "action": "drawGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Caw0Methodology.activeViewUpdated",
+            "action": "queryNetwork",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Caw0IshikawaMethodology.activeViewUpdated",
+            "action": "setAddedNode",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Caw0IshikawaMethodology.CategoryUpdated",
+            "action": "queryNetwork",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "updateIshikawaGraph",
+            "action": "queryNetwork",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.itemsAdded",
+            "action": "handleItemsAddedToGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.nodeEditCommitted",
+            "action": "onNodeEditCommitted",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "setGraphProperties",
+            "cacheEventData": true,
+            "action": "setProperties"
+        },
+        {
+            "eventId": "caw0MethodologyGraph.Modified",
+            "action": "updateGraphChangeAction"
+        },
+        {
+            "eventId": "resetEditHandler",
+            "action": "resetEditHandler"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved' && state !== 'canceling' && (ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Methodology' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Methodology')",
+            "action": "updateGraphThroughInfo",
+            "cacheEventData": true
+        }
+    ],
+
+    "conditions": {
+        "isShiftKeyDown": {
+            "expression": "data.eventMap['awGraph.selectionChanged'].isShiftKeyDown"
+        },
+        "isCtrlKeyDown": {
+            "expression": "data.eventMap['awGraph.selectionChanged'].isCtrlKeyDown"
+        },
+        "isShiftOrCtrlKeyDown": {
+            "expression": "data.eventMap['awGraph.selectionChanged'].isShiftKeyDown || data.eventMap['awGraph.selectionChanged'].isCtrlKeyDown"
+        }
+    },
+
+    "preferences": [
+        "RV1_DARB_Filter_Properties"
+    ],
+
+    "i18n": {
+        "filter": [ "RelationBrowserMessages" ],
+        "objects": [ "RelationBrowserMessages" ],
+        "relations": [ "RelationBrowserMessages" ]
+    },
+
+    "messages": {
+        "oauthError": {
+            "messageType": "NONE",
+            "messageText": ""
+        }
+    }
+}

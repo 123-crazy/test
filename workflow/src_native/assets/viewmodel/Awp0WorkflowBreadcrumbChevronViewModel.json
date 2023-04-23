@@ -1,0 +1,124 @@
+{
+    "schemaVersion" : "1.0.0",
+    "actions":
+    {
+        "populateWorkflowBreadCrumb":
+        {
+            "actionType": "JSFunction",
+            "method": "populateWorkflowBreadCrumb",
+            "inputData":
+            {
+                "data":"{{data}}",
+                "target": "{{ctx.xrtSummaryContextObject}}"
+            },
+            "deps": "js/Awp0WorkflowBreadcrumbPanel"
+        },
+        "onChevronClickAW":
+        {
+            "actionType": "dataProvider",
+            "method": "workflowChevronDataProvider"
+        },
+        "getChildren":
+        {
+            "actionType": "JSFunction",
+            "method": "loadChevronPopup",
+            "inputData":
+            {
+               "templateObject": "{{ctx.workflowDesignerNativeBreadCrumbChevron.scopedUid}}"
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowNativeBreadCrumb.popUpLoading"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowBreadcrumbPanel"
+        },
+        "onWorkflowChevronDataSelection":
+        {
+
+            "actionType": "JSFunction",
+            "method": "onWorkflowChevronDataSelection",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "id": "workflowNativeBreadCrumb",
+               "selectedObject": "{{data.dataProviders.workflowChevronDataProvider.selectedObjects[0]}}",
+               "currentCrumb": "{{ctx.workflowNativeBreadCrumbChevron}}"
+            },
+            "deps": "js/Awp0WorkflowBreadcrumbPanel"
+        },
+        "workflowBreadCrumbPopUpLoading":
+        {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData":
+            {
+               "id":"workflowNativeBreadCrumb",
+               "data": "{{data}}",
+               "key":"loading",
+               "value":false,
+               "unRegister": false
+            },
+            "deps": "js/breadcrumbUtils"
+        },
+        "closePopUp":
+        {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData":
+            {
+               "id": "workflowNativeBreadCrumb",
+               "data": "{{data}}",
+               "key":"showPopup",
+               "value":false,
+               "unRegister": true
+            },
+            "deps": "js/breadcrumbUtils"
+        }
+    },
+
+    "dataProviders":
+    {
+        "workflowChevronDataProvider":
+        {
+            "action": "getChildren",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "workflowNativeBreadCrumb.chevronClicked",
+            "action": "onChevronClickAW"
+        },
+        {
+            "eventId": "workflowNativeBreadCrumb.popUpLoading",
+            "action": "workflowBreadCrumbPopUpLoading"
+        },
+        {
+            "eventId": "workflowChevronDataProvider.selectionChangeEvent",
+            "action": "onWorkflowChevronDataSelection"
+        },
+        {
+            "eventId": "workflowBreadCrumb.PropertiesLoaded",
+            "action": "populateWorkflowBreadCrumb"
+        },
+        {
+            "eventId": "workflowNativeBreadCrumb.update",
+            "action": "closePopUp"
+        }
+
+    ]
+}

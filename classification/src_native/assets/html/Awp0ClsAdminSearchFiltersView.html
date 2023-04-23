@@ -1,0 +1,20 @@
+<aw-command-panel caption="i18n.Filters" class="aw-clsadmin-filters" aw-init="data.activeView='Awp0ClsAdminSearchFilters'">
+        <!-- Releases-->
+        <aw-checkbox-with-reset  class="aw-search-settings" prop="data.Releases" reset-action='resetReleases'
+            visible-when="ctx.clsAdmin.releases.eReleases.length > 0"></aw-checkbox-with-reset>
+        <!-- Properties -->
+        <aw-command-panel-section caption="i18n.propertiesTitle" class="aw-clsadmin-propsSection">
+        </aw-command-panel-section>
+        <aw-panel-body class="aw-clsadmin-addlProps aw-base-scrollPanel">
+            <aw-list dataprovider="data.dataProviders.addFilterListProvider">
+                <aw-include name="Awp0ClsAddFilterCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+            <aw-icon-button button-type="button" class="aw-layout-right" command="data.addFilter.dbValue[0]"
+                visible-when="awPanelBody.$valid"></aw-icon-button>
+        </aw-panel-body>
+        <aw-panel-footer>
+            <aw-button action="performFilter" visible-when="awPanelBody.$valid || data.Releases.dbValue && data.Releases.dbValue.length > 0">
+                <aw-i18n>{{i18n.applyFilters}}</aw-i18n>
+            </aw-button>
+        </aw-panel-footer>
+</aw-command-panel>

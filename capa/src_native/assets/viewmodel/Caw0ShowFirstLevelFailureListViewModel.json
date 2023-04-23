@@ -1,0 +1,170 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-panel-footer.directive"
+    ],
+    "actions": {
+        "doDataProvider": {
+            "actionType": "dataProvider",
+            "method": "loadFirstChildfailureProvider"
+        },
+        "updateTextMessage": {
+            "actionType": "JSFunction",
+            "method": "updateTextMessage",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "clearTextMessage": {
+            "actionType": "JSFunction",
+            "method": "clearTextMessage",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0capaUtilsService",
+            "events": {
+                "success": [ {
+                    "name": "doDataProvider"
+                } ]
+            }
+        },
+        "loadChildFailures": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "searchInput": {
+                    "maxToLoad": 100,
+                    "maxToReturn": 100,
+                    "providerName": "Aqc0QualityBaseProvider",
+                    "searchCriteria": {
+                        "parentGUID": "{{ctx.selectedParentFailure.uid}}"
+                    }
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResponseFirstChild": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateTextMessage"
+                } ]
+            }
+        },
+        "addFailureToDefect": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "caw0addFailureToDefect",
+                    "eventData": {
+                        "selectedFailureObjects": "{{data.eventMap['loadFirstChildfailureProvider.selectionChangeEvent'].selectedObjects}}"
+                    }
+                } ]
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "deriveType": {
+            "displayName": "{{i18n.caw0SymptomDefect}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": "CarryOver",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "deriveTypeValues": {
+            "type": "STRING",
+            "dbValue": [ {
+                    "propDisplayValue": "{{i18n.caw0CarryOver}}",
+                    "propInternalValue": "CarryOver"
+                },
+                {
+                    "propDisplayValue": "{{i18n.caw0Duplicate}}",
+                    "propInternalValue": "Duplicate"
+                }
+            ]
+        }
+    },
+    "dataProviders": {
+        "loadFirstChildfailureProvider": {
+            "action": "loadChildFailures",
+            "response": "{{data.searchResponseFirstChild}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{ctx.search.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0NavigateObject": {
+                    "id": "cmdShowChildren",
+                    "title": "Navigate Object",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities": [
+                        300
+                    ],
+
+                    "dependencies": [
+                        "js/Caw0FailuerFiltercommandHandler"
+                    ],
+
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getLoadedSymtomDefects": {
+            "functionName": "getLoadedSymtomDefects",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "i18n": {
+        "caw0add": [
+            "CAW0CapaMessages"
+        ],
+        "caw0NoFailureFound": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "onEvent": [ {
+        "eventId": "awPanel.reveal",
+        "action": "clearTextMessage"
+    },
+    {
+        "eventId": "awPanel.reveal",
+        "action": "doDataProvider"
+    },
+    {
+        "eventId": "loadFirstChildfailureProvider.selectionChangeEvent",
+        "cacheEventData": true
+    },
+    {
+        "eventId": "updateTextMessage",
+        "action": "updateTextMessage"
+    } ]
+}

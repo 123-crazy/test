@@ -1,0 +1,20 @@
+<div class="aw-layout-flexColumn aw-layout-include aw-workflow-performTaskPanel">
+    <aw-panel-body>
+        <aw-widget  prop="data.taskName" hint="label"></aw-widget>
+        <aw-widget  prop="data.description" hint="label" visible-when="conditions.showInstructions"></aw-widget>
+        <aw-widget  prop="data.decision" hint="label" visible-when="conditions.showDecision"></aw-widget>
+        <aw-widget  prop="data.workflowDescription" hint="label" visible-when="conditions.showWorkflowDescription"></aw-widget>
+        <aw-widget  prop="data.comments" hint="textarea"></aw-widget>
+        <aw-password prop="data.password" visible-when="conditions.isSecureTask"></aw-password>
+    </aw-panel-body>
+    <aw-panel-footer visible-when="conditions.isValidToComplete">
+        <aw-button action="verifyUndoDecision" visible-when="conditions.showUndoDecision && !conditions.isDSConfigured">{{data.undoDecision}}</aw-button>
+        <aw-button action="verifyApprove" visible-when="!conditions.isAcknowledgeTask && !conditions.isDSConfigured && !conditions.showUndoDecision">{{data.approveText}}</aw-button>
+        <aw-button action="verifyReject" default="false" visible-when="!conditions.isAcknowledgeTask && !conditions.isDSConfigured && !conditions.showUndoDecision">{{data.rejectText}}</aw-button>
+        <aw-button action="verifyApprove" visible-when="conditions.isAcknowledgeTask && !conditions.isDSConfigured && !conditions.showUndoDecision">{{data.approveText}}</aw-button>
+        <aw-button action="verifyUndoDecisionDS" visible-when="conditions.showUndoDecision && conditions.isDSConfigured">{{data.undoDecision}}</aw-button>
+        <aw-button action="verifyApproveDS" visible-when="!conditions.isAcknowledgeTask && conditions.isDSConfigured && !conditions.showUndoDecision">{{data.approveText}}</aw-button>
+        <aw-button action="verifyRejectDS" default="false" visible-when="!conditions.isAcknowledgeTask && conditions.isDSConfigured && !conditions.showUndoDecision">{{data.rejectText}}</aw-button>
+        <aw-button action="verifyApproveDS" visible-when="conditions.isAcknowledgeTask && conditions.isDSConfigured && !conditions.showUndoDecision">{{data.approveText}}</aw-button>
+    </aw-panel-footer>
+</div>

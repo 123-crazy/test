@@ -1,0 +1,24 @@
+<div ng-class="{'aw-jswidgets-dirtyGridCell': prop.dirty}">
+    <div ng-if="prop.hasLov">
+        <aw-property-lov-val prop="prop" ></aw-property-lov-val>
+    </div>
+    <div ng-if="!prop.hasLov">
+        <aw-property-error>
+            <div ng-if="prop.uiValue" class="aw-jswidgets-objectLinkContainer">
+                <span class="aw-jswidgets-objectLink"  ng-model="prop.dbValue" aw-validator="REQUIRED" title="{{prop.uiValue}}" ng-class="{'aw-widgets-propertyPendingChangeValue': prop.dirty}">{{prop.uiValue}}</span>
+                <button type="button" class="aw-commands-commandIconButton aw-jswidgets-rmButton" title="{{removeButtonTitle}}"  ng-class="{'ng-dirty': prop.dirty}" ng-click="removeObject($event)" aw-autofocus auto-focus="prop.autofocus" ng-disabled="!prop.isEnabled" ng-attr-tabindex="{{prop.tabIndex}}">
+                    <aw-property-image name="cmdDelete" ></aw-property-image>
+                </button>
+            </div>
+            <div ng-if="!prop.uiValue">
+                <button type="button" class="aw-commands-commandIconButton aw-jswidgets-addButton" title="{{addButtonTitle}}" ng-class="{'ng-dirty': prop.dirty}" ng-click="addObject()" aw-autofocus auto-focus="prop.autofocus" ng-disabled="!prop.isEnabled" ng-attr-tabindex="{{prop.tabIndex}}">
+                    <aw-property-image name="cmdAdd" ></aw-property-image>
+                </button>
+                <div class="aw-jswidgets-objectLinkContainer">
+                    <span ng-show="prop.isRequired"  ng-model="prop.dbValue" aw-validator="REQUIRED" class="aw-jswidgets-standaloneRequired" ng-class="{ 'aw-widgets-propertyError': errorApi.errorMsg}">{{prop.propertyRequiredText}}</span>
+                    <span ng-class="{ 'aw-widgets-propertyPendingChangeValue': prop.dirty}"></span>
+                </div>
+            </div>
+        </aw-property-error>
+    </div>
+</div>

@@ -1,0 +1,123 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": 
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-clipboard.directive",
+        "js/aw-favorite.directive",
+        "js/aw-history.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive"
+         
+    ],
+    "actions": {
+        "processEventSelectionPalette": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "getRecentObjsProvider.selected",
+                        "condition": "ctx.getRecentObjsProvider.selectedObjects.length > 0"
+                    },
+                    {
+                        "name": "getClipboardProvider.selected",
+                        "condition": "ctx.getClipboardProvider.selectedObjects.length > 0"
+                    },
+                    {
+                        "name": "getFavoriteProvider.selected",
+                        "condition": "ctx.getFavoriteProvider.selectedObjects.length > 0"
+                    }
+                ]
+            }
+        },
+        "setSelectedEventFromRecentAction": {
+            "actionType": "JSFunction",
+            "method": "getSelectedEventFromPalette",
+            "inputData": {
+                "attributes": "{{ctx.getRecentObjsProvider.selectedObjects}}"
+            },
+            "outputData": {
+                "selectedEvent": ""
+            }, 
+            "events": {
+                "success": [ {
+                    "name": "launchShowCreateTypesEvent"
+                }]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "setSelectedEventFromClipboardAction": {
+            "actionType": "JSFunction",
+            "method": "getSelectedEventFromPalette",
+            "inputData": {
+                "attributes": "{{ctx.getClipboardProvider.selectedObjects}}"
+            },
+            "outputData": {
+                "selectedEvent": ""
+            }, 
+            "events": {
+                "success": [ {
+                    "name": "launchShowCreateTypesEvent"
+                }]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "setSelectedEventFromFavouriteAction": {
+            "actionType": "JSFunction",
+            "method": "getSelectedEventFromPalette",
+            "inputData": {
+                "attributes": "{{ctx.getFavoriteProvider.selectedObjects}}"
+            },
+            "outputData": {
+                "selectedEvent": ""
+            }, 
+            "events": {
+                "success": [ {
+                    "name": "launchShowCreateTypesEvent"
+                }]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "launchShowCreateTypesEventAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "ShowCreateTypesEvent",
+                        "recreatePanel": false
+                    }
+                } ]
+            }
+        }
+    },
+    "conditions":{
+        "showAddPalette": {
+            "expression": "ctx.getRecentObjsProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0 || ctx.getClipboardProvider.selectedObjects.length > 0"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "getRecentObjsProvider.selected",
+            "action": "setSelectedEventFromRecentAction"
+        },
+        {
+            "eventId": "getClipboardProvider.selected",
+            "action": "setSelectedEventFromClipboardAction"
+        },
+        {
+            "eventId": "getFavoriteProvider.selected",
+            "action": "setSelectedEventFromFavouriteAction"
+        },
+        {
+            "eventId": "launchShowCreateTypesEvent",
+            "action": "launchShowCreateTypesEventAction"
+        }
+    ],
+    "i18n": {
+        "addButtonCommandTitle": [ "ProgramPlanningCommandPanelsMessages" ]
+    }
+}

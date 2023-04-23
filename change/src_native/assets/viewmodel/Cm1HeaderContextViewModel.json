@@ -1,0 +1,174 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-link-with-popup-menu.directive",
+        "js/aw-property-label.directive",
+        "js/visible-when.directive"
+    ],
+
+
+    "dataProviders":
+    {
+        "changeContextLinkLOV":
+        {
+            "dataProviderType": "TcLOV",
+            "action": "updateLOVEntries",
+            "response": "{{data.listofEcns}}",
+            "totalFound": "{{data.listofEcns.length}}"
+        }
+    },
+    "actions":
+    {
+        "updateLOVEntries":
+        {
+            "actionType": "JSFunctionAsync",
+            "method": "generateChangeContextList",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/changeMgmtUtils"
+        },
+        "setChangeContext":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData":
+            {
+                "info":
+                [
+                    {
+                        "object": "{{ctx.userSession}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "cm0GlobalChangeContext",
+                                "values":
+                                [
+                                    "{{data.eventData.property.dbValue.propInternalValue}}"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+
+                    {
+                        "name": "cm.changeContextChangedInUserSession"
+                    },
+                    {
+                        "name": "reconfigureProductAfterActiveEcnChanged"
+                    }
+                ]
+            }
+        },
+
+        "updateSessionProperties":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData":
+            {
+                "attributes":
+                [
+                    "awp0RevRule",
+                    "user",
+                    "project",
+                    "group",
+                    "role",
+                    "fnd0LocationCode",
+                    "cm0GlobalChangeContext"
+                ],
+                "objects":
+                [{
+                 "uid": "{{ctx.userSession.uid}}",
+                 "type": "UserSession"
+                }]
+            },
+            "events":
+            {
+                "success":
+                [
+
+                    {
+                        "name": "awsidenav.openClose"
+                    }
+                ]
+            }
+
+        },
+        "setRequestPrefAndResetStructure":{
+            "actionType": "JSFunction",
+            "method":"setRequestPrefAndResetStructure",
+            "inputData": {},
+            "deps": "js/changeMgmtUtils"
+        }
+    },
+
+
+    "onEvent":
+    [
+        {
+            "eventId": "awlinkPopup.selected",
+            "condition": "conditions.isChangeContextSelected",
+            "cacheEventData": true,
+            "action": "setChangeContext"
+        },
+        {
+            "eventId": "cm.changeContextChangedInUserSession",
+            "action": "updateSessionProperties"
+        },
+        {
+            "eventId": "reconfigureProductAfterActiveEcnChanged",
+            "action": "setRequestPrefAndResetStructure"
+        }
+    ],
+
+    "data":
+    {
+        "cm0GlobalChangeContext": {
+            "displayName": "{{i18n.noChangeContext}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "uiValue": "{{ctx.userSession.props.cm0GlobalChangeContext.uiValue}}"
+        },
+        "cm0GlobalChangeContextLabel": {
+            "displayName": "{{i18n.globalChangeContextLabel}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "conditions":
+    {
+        "isChangeContextSelected":
+        {
+            "expression": "property.propertyName === 'cm0GlobalChangeContext'"
+        },
+        "isChangeContextEnabled":
+        {
+            "expression": "ctx.userSession.props.cm0GlobalChangeContext && ctx.preferences.CM_enable_global_change_context && ctx.preferences.CM_enable_global_change_context[0] === 'true'"
+        }
+    },
+
+    "i18n":
+    {
+        "noChangeContext":
+        [
+            "ChangeMessages"
+        ],
+        "globalChangeContextLabel":
+        [
+            "ChangeMessages"
+        ]
+    }
+}

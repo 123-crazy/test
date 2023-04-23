@@ -1,0 +1,151 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-link-with-popup.directive",
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "initializeVariantInfo"
+                }
+            ]
+        },
+        "initializeVariantInfo": {
+            "actionType": "JSFunction",
+            "method": "getInitialVariantConfigurationData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "addNewVariantRule": {
+            "actionType": "JSFunction",
+            "method": "addNewVariantRule",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "clearVariantInfo": {
+            "actionType": "JSFunction",
+            "method": "clearVariantConfigurationData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "updateCurrentVariantRule": {
+            "actionType": "JSFunction",
+            "method": "updateCurrentVariantRule",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "unsetVariantRuleChangeFlag": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "variantRule.changeRule",
+                "value": false
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "conditions": {
+        "isUpdateApplicable": {
+            "expression": "data.viewKey === viewKey"
+        }
+
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeVariantInfo"
+        },
+        {
+            "eventId": "awConfigPanel.variantInfoChanged",
+            "cacheEventData": true,
+            "condition": "conditions.isUpdateApplicable",
+            "action": "updateCurrentVariantRule"
+        },
+        {
+            "eventId": "awConfigPanel.newVariantRuleCreated",
+            "action": "clearVariantInfo"
+        },
+        {
+            "eventId": "occDataLoadedEvent",
+            "action": "unsetVariantRuleChangeFlag"
+        },
+        {
+            "eventId": "awb0AddNewVariantRuleCmdEvent",
+            "action": "addNewVariantRule"
+        }
+    ],
+    "data": {
+        "defaultVariantRule": {
+            "displayName": "{{i18n.useNoVariantRuleLabel}}",
+            "uiValue": "{{i18n.useNoVariantRuleLabel}}",
+            "type": "STRING"
+        },
+        "currentVariantRule": {
+            "uiValue": "{{data.currentVariantRule}}",
+            "type": "STRING"
+        },
+        "customVariantRule": {
+            "displayName": "{{i18n.customVariantRule}}",
+            "type": "STRING"
+        },
+        "newVariantRule": {
+            "displayName": "{{i18n.new}}",
+            "type": "STRING"
+        },
+        "openProduct": {
+            "uiValue": "{{data.openProduct}}",
+            "type": "STRING"
+        },
+        "customVariantPanelTitle": {
+            "uiValue": "{{i18n.customVariantRule}}",
+            "type": "STRING"
+        },
+        "isCustomVariantRuleApplied": {
+            "dbValue": false,
+            "type": "BOOLEAN"
+        },
+        "variantRuleFilterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "functions": {
+
+    },
+
+    "i18n": {
+        "customVariantRule": [ "OccurrenceManagementConstants" ],
+        "useNoVariantRuleLabel": [ "OccurrenceManagementConstants" ],
+        "errorInGettingPreferredConfigInfo": [ "OccurrenceManagementMessages" ],
+        "new": [ "OccurrenceManagementConstants" ],
+        "filter": [ "OccurrenceManagementConstants" ]
+    }
+}

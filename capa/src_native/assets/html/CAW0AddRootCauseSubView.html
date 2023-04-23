@@ -1,0 +1,34 @@
+<aw-panel-header>
+    <aw-panel-section caption="i18n.toTitle">
+        <aw-default-cell vmo="ctx.parentContextObject"></aw-default-cell>
+    </aw-panel-section>
+</aw-panel-header>
+<aw-panel-body exist-when="!data.isObjectTypeSelected" context="data">
+<aw-panel-section caption="i18n.objectType">
+        <aw-type-selector prop="data.filterBox" include="CAW0Defect" load-sub-types="true" override-id="IssueAndCapa">
+        </aw-type-selector>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-body exist-when="data.isObjectTypeSelected">
+    <aw-title-link prop="ctx.type_name" action="clearSelectedType"></aw-title-link>
+    <aw-panel-section caption="i18n.objectType">
+        <aw-widget prop="data.object_name"></aw-widget>
+        <aw-widget prop="data.object_desc"></aw-widget>
+        <aw-widget exist-when="ctx.selected.caw0Context!=='Capa' && ctx.tcSessionData.tcMajorVersion >= 13" prop="data.caw0AnalysisDimensionStatic"></aw-widget>
+        <aw-listbox exist-when="ctx.selected.caw0Context==='Capa' && ctx.tcSessionData.tcMajorVersion >= 13" prop="data.caw0AnalysisDimension" list="data.dimension"></aw-listbox>
+        <aw-listbox exist-when="ctx.tcSessionData.tcMajorVersion >= 13" prop="data.caw0AnalysisType" list="data.analysisType"></aw-listbox>
+        <aw-widget prop="data.caw0reoccuring"></aw-widget>
+        <aw-listbox prop="data.caw0category" list="data.category"></aw-listbox>
+    </aw-panel-section>
+    <aw-command-panel-section exist-when="ctx.tcSessionData.tcMajorVersion >= 13" caption="i18n.failure" anchor="data.addFailureCommand" context="data">
+        <aw-list dataprovider="data.dataProviders.getFailureProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <!-- panel-footer button for New tab -->
+    <aw-button default="true" action="createObject" visible-when="data.object_name.dbValue !=='' && data.object_name.dbValue !==null && data.object_name.dbValue !== undefined">
+        <aw-i18n>i18n.addButtonTitle</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

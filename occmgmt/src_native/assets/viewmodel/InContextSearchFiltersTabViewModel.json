@@ -1,0 +1,150 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-filter-category.directive",
+        "js/aw-repeat.directive",
+        "js/aw-expandable-search-result-filter.directive",
+        "js/aw-label.directive",
+        "js/visible-when.directive"
+    ],
+
+    "data": {
+        "filterKeywordLabel": {
+            "displayName": "{{i18n.keywords}}",
+            "type": "STRING",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        }
+    },
+
+    "i18n": {
+        "keywords": [ "OccurrenceManagementConstants" ]
+    },
+
+    "actions": {
+        "updateCategoryResults":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategoryResults",
+            "inputData":
+            {
+                "category":"{{ctx.search.valueCategory}}"
+            },
+            "deps":"js/filterPanelService"
+        },
+        "initializeFilterPanel": {
+            "actionType": "JSFunction",
+            "method": "initializeFilterPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "updateFiltersKeywordLabel": {
+            "actionType": "JSFunction",
+            "method": "updateFiltersKeywordLabel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/navigateSearchService"
+        },
+        "selectGivenCategory": {
+            "actionType": "JSFunction",
+            "method": "selectGivenCategory",
+            "inputData": {
+                "category": "{{category}}",
+                "appCtxPathForCategoriesToUpdate": "aceActiveContext.context.categoriesToRender",
+                "rawCategories": {
+                    "rawCategories": "{{data.searchFilterCategories}}",
+                    "rawCategoryValues": "{{data.sourceSearchFilterMap}}"
+                }
+            },
+            "deps": "js/aceFilterService"
+        },
+        "selectFilter": {
+            "actionType": "JSFunction",
+            "method": "updateSearchFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "category": "{{category}}",
+                "filter": "{{filter}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "navigate.doSearch",
+                    "eventData": {
+                        "populateDataProvider": true,
+                        "showKeywordLabel": true,
+                        "showLiveSearchResultCommand": true
+                    }
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updatePanelForColorToggle": {
+            "actionType": "JSFunction",
+            "method": "selectApplicableCategory",
+            "inputData": {
+                "categories": "{{ctx.aceActiveContext.context.categoriesToRender}}",
+                "searchFilterCategories": "{{data.searchFilterCategories}}",
+                "sourceSearchFilterMap": "{{data.sourceSearchFilterMap}}"
+            },
+            "deps": "js/aceFilterService"
+        },
+        "selectApplicableCategory": {
+            "actionType": "JSFunction",
+            "method": "selectApplicableCategory",
+            "inputData": {
+                "categories": "{{data.categories}}",
+                "searchFilterCategories": "{{data.searchFilterCategories}}",
+                "sourceSearchFilterMap": "{{data.sourceSearchFilterMap}}"
+            },
+            "deps": "js/aceFilterService"
+        },
+        "redirectColorFilteringToggleEventt": {
+            "actionType": "JSFunction",
+            "method": "redirectCommandEvent",
+            "inputData": {
+                "eventName": "navigate.colorFilteringToggleEvent"
+            },
+            "deps": "js/navigateSearchService"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "navigate.searchActionCompleted",
+            "action": "selectApplicableCategory"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "InContextSearchFiltersTab"
+            },
+            "action": "initializeFilterPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "InContextSearchFiltersTab"
+            },
+            "action": "selectApplicableCategory"
+        },
+        {
+            "eventId": "icsPerformSearch.modelObjectsUpdated",
+            "action": "updateFiltersKeywordLabel"
+        },
+        {
+            "eventId": "navigate.colorFilteringToggleEvent",
+            "action": "updatePanelForColorToggle"
+        },
+        {
+            "eventId": "aw.colorFilteringToggleEvent",
+            "action": "redirectColorFilteringToggleEventt",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action":"updateCategoryResults"
+        }
+    ]
+}

@@ -1,0 +1,260 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-search-global.directive",
+        "js/aw-command-panel.directive"
+    ],
+
+    "actions": {
+
+        "doGlobalSearch": {
+            "actionType": "JSFunction",
+            "method": "performGlobalSearch2",
+            "inputData": {
+                "criteria": "{{data.searchBox.dbValue}}",
+                "ownerPrefilter": "{{data.selectPrefilter1.dbValue}}",
+                "categoryPrefilter": "{{data.selectPrefilter2.dbValue}}"
+            },
+            "outputData": {
+                "owners": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "navigationPanel"
+                    }
+                } ]
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "getSuggestions": {
+            "actionType": "JSFunction",
+            "method": "getSuggestions",
+            "inputData": {
+                "searchString": "{{data.searchBox.dbValue}}",
+                "maxCount": 5,
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "showPopup": "showPopup",
+                "suggestions": "suggestions"
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "getPrefilters": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2012-10-FullTextSearch",
+            "method": "getPreFilters",
+            "inputData": {
+
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "awPrefilter.populateDataProviders",
+                    "eventData": {
+                        "data": "{{data}}"
+                    }
+                } ]
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "populateDataProviders": {
+            "actionType": "JSFunction",
+            "method": "populateDataProviders2",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "updatePrefilter1": {
+            "actionType": "JSFunction",
+            "method": "updateNarrowModePrefilter1",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "updatePrefilter2": {
+            "actionType": "JSFunction",
+            "method": "updateNarrowModePrefilter2",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "initialize": {
+            "actionType": "JSFunction",
+            "method": "initialize2",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/globalSearchService"
+        },
+
+        "advancedSearchLink": {
+            "actionType": "JSFunction",
+            "method": "advancedSearchLink",
+            "deps": "js/globalSearchService"
+        },
+
+        "updateSearchCriteria": {
+            "actionType": "JSFunction",
+            "method": "updateSearchCriteria",
+            "inputData": {
+                "criteria": "{{data}}"
+            },
+            "deps": "js/searchCommonUtils"
+        }
+    },
+
+    "dataProviders": {
+        "ownerPrefilterProvider": {
+            "dataProviderType": "Static"
+        },
+
+        "categoryPrefilterProvider": {
+            "dataProviderType": "Static"
+        },
+        "revisionLink": {
+            "dataProviderType": "TcLOV",
+            "lovConfiguration": {
+                "filterStr": "",
+                "lovPageSize": 10000,
+                "viewModelObj": "{{ctx.userSession}}",
+                "viewProp": "{{ctx.userSession.props.awp0RevRule}}",
+                "operationName": "Edit"
+            },
+            "totalFound": ""
+        }
+    },
+    "onEvent": [ {
+            "eventId": "updateFilterPanel",
+            "action": "updateSearchCriteria"
+        },
+        {
+            "eventId": "Awp0Search.contentLoaded",
+            "action": "initialize"
+        },
+        {
+            "eventId": "awPrefilter.getPrefilters",
+            "action": "getPrefilters"
+        },
+        {
+            "eventId": "awPrefilter.populateDataProviders",
+            "cacheEventData": true,
+            "action": "populateDataProviders"
+        }
+    ],
+
+    "functions": {
+
+    },
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "selectPrefilter1": {
+            "displayName": "{{ctx.searchPreFilters.ownPrefilters.propDisplayName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isNonEditable": "false",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "hasLov": true
+        },
+        "selectPrefilter2": {
+            "displayName": "{{ctx.searchPreFilters.catPrefilters.propDisplayName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "labelPosition": "NO_PROPERTY_LABEL",
+            "isNonEditable": "false",
+            "hasLov": true
+        },
+        "advancedSearch": {
+            "displayName": "{{i18n.advancedSearch}}",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "clearAll": {
+            "displayName": "{{i18n.clearAll}}",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "undoClearAll": {
+            "displayName": "{{i18n.undo}}",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "showMore": {
+            "displayName": "{{i18n.searchFilterCategoryExpandMore}}",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "showLess": {
+            "displayName": "{{i18n.searchFilterCategoryExpandLess}}",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.Awp0SearchTitle}}"
+        },
+        "advancedText": {
+            "displayName": "{{i18n.advancedText}}",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "defaultPrefilter1Value": {
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "defaultPrefilter2Value": {
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        }
+    },
+
+    "messages": {
+
+    },
+    "conditions": {
+        "noSuggestions": {
+            "expression": "data.suggestions==undefined"
+        },
+        "isSearchBoxCollapsed": {
+            "expression": "false"
+        }
+    },
+
+    "i18n": {
+        "advancedSearch": [ "SearchMessages" ],
+        "noSuggestions": [ "SearchMessages" ],
+        "Awp0SearchTitle": [ "SearchMessages" ],
+        "suggestions": [ "SearchMessages" ],
+        "clearAll": [ "SearchMessages" ],
+        "undo": [ "SearchMessages" ],
+        "searchFilterCategoryExpandMore": [ "SearchMessages" ],
+        "searchFilterCategoryExpandLess": [ "SearchMessages" ],
+        "clearedRecentSearches": [ "SearchMessages" ],
+        "recentSearches": [ "SearchMessages" ],
+        "advancedText": [ "SearchMessages" ],
+        "expandSearchPanel": [ "SearchMessages" ]
+    }
+
+}

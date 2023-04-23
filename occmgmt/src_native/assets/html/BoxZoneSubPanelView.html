@@ -1,0 +1,15 @@
+<aw-panel-body scrollable="false">
+    <aw-listbox prop="data.searchOption" list="data.searchOptionTrueShapeOn" isSelectOnly="true" exist-when="data.preferences.RDV_QSEARCH_REFINE[0]!=='undefine' && data.preferences.RDV_QSEARCH_REFINE[0] === 'true' "></aw-listbox>
+    <aw-listbox prop="data.searchOption" list="data.searchOptionTrueShapeOff" isSelectOnly="true" exist-when="!(data.preferences.RDV_QSEARCH_REFINE[0]) || data.preferences.RDV_QSEARCH_REFINE[0] === 'false' "></aw-listbox>
+    <aw-list-filter prop="data.boxZoneFilter" dataprovider="data.dataProviders.loadBoxZonesUsingAction"  exist-when="data.initialCount > 5">
+        <aw-checkbox prop="item" action="updateSelectedBoxZoneList" class="aw-filter-boxZoneCheckBox"></aw-checkbox>
+    </aw-list-filter>
+    <aw-list dataprovider="data.dataProviders.loadBoxZonesUsingAction" exist-when="data.initialCount <= 5">
+        <aw-checkbox prop="item" action="updateSelectedBoxZoneList" class="aw-filter-boxZoneCheckBox"></aw-checkbox>
+    </aw-list>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="addButtonAction" visible-when="data.selectedBoxZoneCount>0">
+        <aw-i18n>i18n.Add</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

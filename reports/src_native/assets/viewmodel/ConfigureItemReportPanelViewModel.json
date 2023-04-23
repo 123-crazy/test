@@ -1,0 +1,147 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-tree.directive",
+        "js/aw-label.directive"
+    ],
+
+    "data": {
+        "rootClassCommands": "rb0_rootClassCommands",
+        "rootClassSampleCommands": "rb0_rootClassSampleCommands",
+        "segmentCommands": "rb0_segmentCommands",
+        "layoutCommands": "rb0_layoutCommands",
+        "rootClass": [],
+        "rootClassSample": [],
+        "dataforSegmentTree": [ {}],
+        "recreateSegementsPanel": false,
+        "chart1LabelTxt":{
+            "displayName": "{{i18n.chart1Label}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValues": ["{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart1.ChartPropName}}"],
+            "displayValues": ["{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart1.ChartPropName}}"],
+            "dispValue": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart1.ChartPropName}}"
+        },
+        "chart2LabelTxt":{
+            "displayName": "{{i18n.chart2Label}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValues": ["{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart2.ChartPropName}}"],
+            "displayValues": ["{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart2.ChartPropName}}"],
+            "dispValue": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart2.ChartPropName}}"
+        },
+        "chart3LabelTxt":{
+            "displayName": "{{i18n.chart3Label}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValues": ["{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart3.ChartPropName}}"],
+            "displayValues": ["{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart3.ChartPropName}}"],
+            "dispValue": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart3.ChartPropName}}"
+        }
+    },
+
+    "dataProviders": {
+        "rootClassProvider":
+        {
+            "response": "{{data.rootClass}}",
+            "totalFound": "{{data.rootClass.length}}",
+            "selectionModelMode": "single",
+            "noResultsFound": "",
+            "commandsAnchor": "reportclass_cell_commands"
+        },
+        "rootClassSampleProvider":{
+            "response": "{{data.rootClassSample}}",
+            "totalFound": "{{data.rootClassSample.length}}",
+            "selectionModelMode": "single",
+            "noResultsFound": "",
+            "commandsAnchor": "reportsample_cell_commands"
+        }
+    },
+
+    "actions": {
+        "initiateItemReportPanelDisplay":{
+            "actionType": "JSFunction",
+            "method": "setupConfigureItemRepPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/configureItemReportService"
+        },
+        "saveItemReport":{
+            "actionType": "JSFunction",
+            "method": "saveItemReport",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/configureItemReportService"
+        },
+        "updateConfigItemProps":{
+            "actionType": "JSFunction",
+            "method": "updateConfigItemProps",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/configureItemReportService"
+        }
+    },
+    "lifecycleHooks": {
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "initiateItemReportPanelDisplay",
+            "criteria": { "panelId": "ConfigureItemReportPanel" }
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "action": "updateConfigItemProps",
+            "criteria": {"destPanelId": "ConfigureItemReportPanel"}
+        }
+    ],
+
+    "conditions":
+    {
+
+    },
+
+    "messages": {
+        "showSampleObjectMissingMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.showSampleObjectMissingMessageTxt}}",
+            "messageTextParams": [
+                "{{ctx.state.params.title}}"
+            ]
+        }
+    },
+
+    "i18n": {
+        "showSampleObjectMissingMessageTxt":["ReportChartMessages"],
+        "selectSample":["ReportChartMessages"],
+        "parentSource":["ReportChartMessages"],
+        "chart1Label": ["ReportChartMessages"],
+        "chart2Label": ["ReportChartMessages"],
+        "chart3Label": ["ReportChartMessages"],
+        "layout": ["ReportChartMessages"],
+        "segments":["ReportChartMessages"],
+        "forClass":["ReportChartMessages"],
+        "sampleSource":["ReportChartMessages"],
+        "removeClassConfirm":["ReportChartMessages"],
+        "CancelButtonLabel":["FileVersionsMessages"],
+        "ConfirmButtonLabel":["FileVersionsMessages"],
+        "Save":["SearchMessages"],
+        "segment":["ReportChartMessages"],
+        "structure": [ "ReportChartMessages" ]
+    }
+}
+

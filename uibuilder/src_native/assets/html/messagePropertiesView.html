@@ -1,0 +1,41 @@
+<aw-column width="fill">
+    <aw-panel-body>
+        <div exist-when="ctx.graph.selected.model.modelObject.actionDef.message">
+            <aw-widget prop="data.condition"></aw-widget>
+            <aw-widget prop="data.messageType"></aw-widget>
+            <aw-widget prop="data.messageName"></aw-widget>
+            <aw-row>
+                <aw-widget prop="data.messageText" class="aw-layout-flexRow"></aw-widget>
+                <aw-command-bar anchor="{{data.messageText.anchor}}" class="aw-commandbuilder-openButton" context="data.messageText" alignment="HORIZONTAL"></aw-command-bar>
+            </aw-row>
+            <aw-widget prop="data.messageKey"></aw-widget>
+            <aw-widget prop="data.messageTextParams"></aw-widget>
+            <aw-label prop="data.messageDataLabel"></aw-label>
+            <div class="aw-layout-flexColumnContainer aw-actionbuilder-srcEditor">
+                <aw-source-editor name="messageData" content="data.messageData.dbValue" config="data.configJson"></aw-source-editor>
+            </div>
+            <aw-label prop="data.messageExpression"></aw-label>
+            <div class="aw-layout-flexColumnContainer aw-actionbuilder-srcEditor">
+                <aw-source-editor name="messageExpression" content="data.messageExpression.dbValue" config="data.configJson"></aw-source-editor>
+            </div>
+        </div>
+
+        <div exist-when="!ctx.graph.selected.model.modelObject.actionDef.message">
+            <div class="aw-layout-flexRowContainer aw-layout-alignItemsCenter">
+                <div class="aw-layout-flexColumn">
+                    <aw-widget prop="data.actionType"></aw-widget>
+                </div>
+                <div class="aw-layout-flexColumnContainer">
+                    <aw-command-bar anchor="aw_actionTypeDetails" alignment="HORIZONTAL"></aw-command-bar>
+                </div>
+            </div>
+            <aw-widget prop="data.actionName" exist-when="data.actionName.dbValue !== ctx.state.params.s_uid"></aw-widget>
+            <aw-widget prop="data.actionTypeMessageText"></aw-widget>
+        </div>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-button action="applyActionProperties">
+            <aw-i18n>i18n.updateParams</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-column>

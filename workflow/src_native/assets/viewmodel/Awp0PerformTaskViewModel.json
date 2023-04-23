@@ -1,0 +1,66 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-panel.directive"
+    ],
+    "actions":
+    {
+        "populateSecondaryPanel": {
+            "actionType": "JSFunction",
+            "method": "populateSecondaryPanel",
+            "deps": "js/Awp0PerformTask",
+            "inputData":
+             {
+                "data": "{{data}}",
+               "name": "{{ctx.selected}}"
+             }
+        },
+        "isPerformPanelUpdateNeeded": {
+            "actionType": "JSFunction",
+            "method": "isPerformPanelUpdateNeeded",
+            "inputData": {
+                "data": "{{data}}",
+                "selection": "{{ctx.selected}}",
+                "updatedObjects": "{{data.eventMap['cdm.updated'].updatedObjects}}"
+            },
+
+            "deps": "js/Awp0PerformTask"
+        }
+    },
+    "functions":
+    {
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Awp0PerformTask.contentLoaded",
+            "action": "populateSecondaryPanel"
+        },
+        {
+            "eventId": "cdm.updated",
+            "cacheEventData": true,
+            "action": "isPerformPanelUpdateNeeded"
+        }
+    ],
+
+    "conditions":
+    {
+        "isTaskPerformable":
+        {
+            "expression": "data.selectedObject.props.awp0PerformableByMeBehavior.dbValues[0] === '1'"
+        },
+        "isGenericEPMTaskObject":
+        {
+            "expression": "( (ctx.task_to_perform.task[0].type != 'EPMConditionTask' && ctx.task_to_perform.task[0].type != 'EPMSelectSignoffTask' && ctx.task_to_perform.task[0].type != 'EPMRouteTask' && ctx.task_to_perform.task[0].type != 'EPMDoTask' && ctx.task_to_perform.task[0].type != 'Signoff' &&  ctx.task_to_perform.task[0].type != 'EPMPerformSignoffTask') && ctx.task_to_perform.task[0].modelType.typeHierarchyArray.indexOf('EPMTask') >= 0)"
+        }
+    },
+    "i18n":
+    {
+
+    }
+
+}

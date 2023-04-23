@@ -1,0 +1,37 @@
+{
+"schemaVersion" : "1.0.0",
+"imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-panel-body.directive"
+    ],
+    "actions":{
+        "updateGraphFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "applyFilter",
+            "inputData":
+            {
+                "graphModel" : "{{ctx.graph.graphModel}}",
+                "filters":"{{ctx.graph.legendState.filters}}"
+            },
+            "deps": "js/graphFilterService"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awGraphLegend.filterStatusChanged",
+            "action": "updateGraphFilter",
+            "cacheEventData": true
+        }
+    ],
+    "data":
+    {
+    },
+    "i18n":
+    {
+        "Legend": ["GraphMessages"]
+    }
+}

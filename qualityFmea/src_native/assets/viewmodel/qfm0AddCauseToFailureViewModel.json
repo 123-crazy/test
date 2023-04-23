@@ -1,0 +1,525 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "tabs": [
+            {
+                "panelId": "qfm0AddCauseOrEffectWithoutSpec",
+                "name": "{{i18n.qfm0New}}",
+                "tabKey": "qfm0NewFailureTab",
+                "recreatePanel": true
+            },
+            {
+                "panelId": "qfm0SearchFailureElement",
+                "name": "{{i18n.qfm0SearchString}}",
+                "tabKey": "qfm0SearchFailureTab",
+                "selectedTab": true,
+                "recreatePanel": true
+            }
+        ]
+    },
+    "actions": {
+        "reveal": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "condition": "data.selectedTab.panelId === 'qfm0SearchFailureSpec'",
+                        "name": "qfm0SearchFailureSpec.reset"
+                    },
+                    {
+                        "condition": "data.selectedTab.panelId === 'qfm0SearchFailureElement'",
+                        "name": "qfm0SearchFailureElement.reset"
+                    }
+                ]
+            }
+        },
+        "createCauseRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2019-12-FailureModeManagement",
+            "method": "addCausesAndEffects",
+            "inputData": {
+                "inputs": "{{function:createCauseInputs}}"
+            },
+            "outputData": {
+                "createdObject": "{{function:getCreatedRelationObject}}",
+                "errorMessage": "{{function:processPartialErrors}}",
+                "partialSuccessObjectCount": "{{function:getSuccessAttachObjectCount}}",
+                "newObjCreated": "{{function:getObjectIDsToUpdateOrAddInNetViewForRelations}}",
+                "createdFailureElements": "{{function:getCreatedFMEAElements}}",
+                "modelObjects": "modelObjects",
+                "createdCauseEffectRelationObjects": "{{function:getCreatedCauseEffectRelationObjects}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis')  && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FailureElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && ctx.tcSessionData.tcMajorVersion < 13",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "failureCauseTable.plTable.reload",
+                        "condition":"!ctx.showFailureNetView && ctx.tcSessionData.tcMajorVersion >= 13"
+                    },
+                    {
+                        "name": "qfm0.addToFormsheet",
+                        "eventData":{
+                            "addElementInput": "{{data.createdObject}}",
+                            "formsheetColIdx" : 4
+                        },
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet'"
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandOutgoing",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}",
+                            "updatedFailureElements":"{{data.newObjCreated}}",
+                            "isCauseEffectAdded": "true",
+                            "modelObjects": "{{data.modelObjects}}",
+                            "createdCauseEffectRelationObjects": "{{data.createdCauseEffectRelationObjects}}"
+                        },
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{data.createdFailureElements}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis')  && (ctx.tcSessionData.tcMajorVersion < 13)",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FailureElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && (ctx.tcSessionData.tcMajorVersion < 13)",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "failureCauseTable.plTable.reload",
+                        "condition":"!ctx.showFailureNetView && (ctx.tcSessionData.tcMajorVersion >= 13)"
+                    },
+                    {
+                        "name": "qfm0.addToFormsheet",
+                        "eventData":{
+                            "addElementInput": "{{data.createdObject}}",
+                            "formsheetColIdx" : 4
+                        },
+                        "condition": "(ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet') && data.dataProviders.loadFilteredList.selectedObjects.length  > 1 && data.partialSuccessObjectCount > 0"
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandOutgoing",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],                      
+                            "fmeaElementToAdd":"{{data.newObjCreated}}",
+                            "updatedFailureElements":"{{data.newObjCreated}}",
+                            "isCauseEffectAdded": "true",
+                            "modelObjects": "{{data.modelObjects}}",
+                            "createdCauseEffectRelationObjects": "{{data.createdCauseEffectRelationObjects}}"
+                        },
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{data.createdFailureElements}}"
+                        },
+                        "condition": "data.dataProviders.loadFilteredList.selectedObjects.length > 0 && data.partialSuccessObjectCount > 0"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.dataProviders.loadFilteredList.selectedObjects.length  > 0 && data.partialSuccessObjectCount > 0",
+                        "message": "partialSuccessCauseAddMessage"
+                    },
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "getNextId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "generateNextValuesForProperties",
+            "inputData": {
+                "propertyNamingRuleInfo":"{{function:getCreateObjectsInputforgenerateID}}"
+            },
+            "outputData": {
+                "nextId": "generatedValues",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "events": {
+                "success": [ {
+                    "name" : "callCreateFailureElement"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "createFailureElement": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                 "input": "{{function:getCreateObjectsInputforFailureElement}}"
+            },
+            "outputData": {
+                "createdObject": "output",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "callAddNewlyCreatedFailureAsCause"
+                    },
+                    {
+                        "name": "qfm0.addElement",
+                        "eventData": {
+                            "addElementResponse": "",
+                            "addElementInput": "{{data.createdObject}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "addNewlyCreatedFailureAsCause": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2019-12-FailureModeManagement",
+            "method": "addCausesAndEffects",
+            "inputData": {
+                "inputs": "{{function:createCauseInputsForNewFailure}}"
+            },
+            "outputData": {
+                "createdObject": "{{function:getCreatedRelationObject}}",
+                "errorMessage": "{{function:processPartialErrors}}",
+                "partialSuccessObjectCount": "{{function:getSuccessAttachObjectCount}}",
+                "newObjCreated": "{{function:getObjectIDsToUpdateOrAddInNetViewForRelations}}",
+                "modelObjects": "modelObjects",
+                "createdCauseEffectRelationObjects": "{{function:getCreatedCauseEffectRelationObjects}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis')  && (ctx.tcSessionData.tcMajorVersion < 13)",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FailureElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && (ctx.tcSessionData.tcMajorVersion < 13)",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "failureCauseTable.plTable.reload",
+                        "condition":"!ctx.showFailureNetView && ctx.tcSessionData.tcMajorVersion >= 13"
+                    },
+                    {
+                        "name": "qfm0.addToFormsheet",
+                        "eventData":{
+                            "addElementInput": "{{data.createdObject}}",
+                            "formsheetColIdx" : 4
+                        },
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet'"
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandOutgoing",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}",
+                            "updatedFailureElements":"{{data.newObjCreated}}",
+                            "isCauseEffectAdded": "true",
+                            "modelObjects": "{{data.modelObjects}}",
+                            "createdCauseEffectRelationObjects": "{{data.createdCauseEffectRelationObjects}}"
+                        },
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected === undefined || ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FMEANode' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis')  && (ctx.tcSessionData.tcMajorVersion < 13 )",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "(ctx.pselected !== undefined && ctx.pselected.modelType.typeHierarchyArray.indexOf( 'Qfm0FailureElement' ) >-1) && (ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && (ctx.tcSessionData.tcMajorVersion < 13)",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    },
+                    {
+                        "name": "failureCauseTable.plTable.reload",
+                        "condition":"!ctx.showFailureNetView && (ctx.tcSessionData.tcMajorVersion >= 13)"
+                    },
+                    {
+                        "name": "qfm0.addToFormsheet",
+                        "eventData":{
+                            "addElementInput": "{{data.createdObject}}",
+                            "formsheetColIdx" : 4
+                        },
+                        "condition": "(ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet') && data.dataProviders.loadFilteredList.selectedObjects.length  > 1 && data.partialSuccessObjectCount > 0"
+                    },
+                    {
+                        "name": "Gc1TestHarness.expandOutgoing",
+                        "eventData": {
+                            "expandDirection": "forward",
+                            "rootIDs": [
+                                "{{ctx.selected.uid}}"
+                            ],
+                            "fmeaElementToAdd":"{{data.newObjCreated}}",
+                            "updatedFailureElements":"{{data.newObjCreated}}",
+                            "isCauseEffectAdded": "true",
+                            "modelObjects": "{{data.modelObjects}}",
+                            "createdCauseEffectRelationObjects": "{{data.createdCauseEffectRelationObjects}}"
+                        },
+                        "condition": "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView') || ((ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Failure_Analysis' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Failure_Analysis') && ctx.tcSessionData.tcMajorVersion >= 13)"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.errorMessage && data.errorMessage.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "functions": {
+        "getSuccessAttachObjectCount": {
+            "functionName": "getSuccessAttachObjectCount",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "createCauseInputs": {
+            "functionName": "getSoaInputsForEffectAndCauseObj",
+            "parameters": [
+                "Qfm0Cause",
+                "{{data.dataProviders.loadFilteredList.selectedObjects}}",
+                "{{ctx.selected}}"
+            ]
+        },
+        "createCauseInputsForNewFailure": {
+            "functionName": "getSoaInputsForEffectAndCauseObj",
+            "parameters": [
+                "Qfm0Cause",
+                "{{data.createdObject[0].objects}}",
+                "{{ctx.selected}}"
+            ]
+        },
+        "getCreatedRelationObject" :{
+            "functionName" : "getCreatedRelationObject",
+            "parameters" :[]
+        },
+        "getCreateObjectsInputforgenerateID": {
+            "functionName": "getCreateObjectsInputforgenerateID",
+               "parameters": [
+                   "{{data}}"
+               ]
+         },
+         "getCreateObjectsInputforFailureElement": {
+             "functionName": "getCreateObjectsInputforFMEAObjects",
+             "parameters": [
+                 "{{data}}",
+                 "{{ctx}}"
+             ]
+        },
+        "getObjectIDsToUpdateOrAddInNetViewForRelations": {
+            "functionName": "getObjectIDsToUpdateOrAddInNetViewForRelations",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreatedFMEAElements":{
+            "functionName": "getCreatedFMEAElements",
+            "parameters": [
+                "{{data}}"
+            ],
+            "deps":"js/qfm0FmeaManagerUtils2"
+        },
+        "getCreatedCauseEffectRelationObjects": {
+            "functionName": "getCreatedCauseEffectRelationObjects",
+            "parameters": [
+                "{{data}}"
+            ],
+            "deps":"js/qfm0FmeaManagerUtils2"
+        }
+    },
+    "i18n": {
+        "qfm0New": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Existing": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Add": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0SearchString": [
+            "qualityFmeaMessages"
+        ],
+        "PartialError": [
+            "qualityFmeaMessages"
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "callCreateFailureElement",
+            "action": "createFailureElement"
+        },
+        {
+            "eventId": "callAddNewlyCreatedFailureAsCause",
+            "action": "addNewlyCreatedFailureAsCause"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "qfm0.addElement",
+            "cacheEventData": true
+        }
+
+    ]
+}

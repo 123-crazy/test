@@ -1,0 +1,198 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-guidance-message.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-break.directive",        
+        "js/visible-when.directive",
+        "js/aw-row.directive" 
+    ],
+    "actions": {        
+        "selectionChangeOfPropertyContext": {
+            "actionType": "JSFunction",
+            "method": "selectionChangeOfPropertyContext",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"            
+        },               
+        "getPropertyAction": {
+            "actionType": "JSFunction",
+            "method": "getPropertyAction",
+            "inputData": {
+                "typeInternalName" : "Qc0ChecklistSpecification",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "checkForEditConditionEvent"
+                } ]
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        },
+        "checkForEditCondition": {
+            "actionType": "JSFunction",
+            "method": "editChecklistEvalRuleConditon",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"            
+        },          
+        "addConditionToFilter": {
+            "actionType": "JSFunction",
+            "method": "addConditionToCtx",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "isDuplicate": "result.isDuplicate",
+                "isFieldEmpty": "result.isFieldEmpty",
+                "errorParam": "result.param"
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        },             
+        "cleanAll": {
+            "actionType": "JSFunction",
+            "method": "cleanAll",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Aqc0ChecklistSpecRatingEvalRuleService"
+        }        
+    },
+    "functions": {
+        "getFilterBOType" : {
+            "functionName": "getFilterBOType",
+            "parameters":
+            [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "data": {       
+        "propertyContext": {
+            "displayName": "{{i18n.Aqc0PropertySection}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "propertyContextValues": {
+            "type": "STRING",
+            "dbValue": [ {} ]
+        },       
+        "currentFieldValueType": {
+            "type": "STRING",
+            "dbValue": ""
+        },               
+        "genericWidget": {
+            "displayName": "",
+            "type": "DATE",
+            "isRequired": "true",
+            "dbValue": ""
+        },        
+        "genericValueContext": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "genericValueContextValues": {
+            "type": "STRING",
+            "dbValue": [ {} ]
+        }       
+    },
+    "messages": {
+        "fieldsEmptyErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.Aqc0FieldsEmptyErrorMsg}}"
+        },
+        "duplicatePropertyErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.Aqc0PropertyAleadyExistErrorMsg}}",
+            "messageTextParams": [
+                "{{data.errorParam}}"
+            ]
+        }     
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "cacheEventData": true,
+            "action": "getPropertyAction"
+        },
+        {
+            "eventId": "checkForEditConditionEvent",
+            "action": "checkForEditCondition"
+        },
+        {
+            "eventId": "selectionChangeOfPropertyContext",
+            "cacheEventData": true,
+            "action": "selectionChangeOfPropertyContext"
+        },       
+        {
+            "eventId": "Aqc0AddEvaluationCondition.contentUnloaded",
+            "action": "cleanAll"
+        }
+    ],
+    "conditions": {
+        "showValueWidget": {
+            "expression": " data.genericWidget.dbValue || data.genericWidget.dbValue === 0 || data.genericWidget.dbValue === false"
+        },
+        "showWidget": {
+            "expression": "data.propertyContext.dbValue"
+        },
+        "showAddWidget": {
+            "expression": "!ctx.ChecklistEvaluationRuleEditContext && conditions.showWidget && conditions.showValueWidget"
+        },
+        "showSaveWidget": {
+            "expression": "ctx.ChecklistEvaluationRuleEditContext && conditions.showWidget && conditions.showValueWidget"
+        },               
+        "showGenericWidget": {
+            "expression": "conditions.showWidget && data.currentFieldValueType.dbValue !== 'LISTBOX'"
+        },               
+        "checkForStringType": {
+            "expression": "data.currentFieldValueType.dbValue === 'STRING'"
+        },
+        "showGuidanceMessageForDuplicateError": {
+            "expression": "data.isDuplicate === true && data.isFieldEmpty === false"
+        },
+        "showGuidanceMessageForEmptyField": {
+            "expression": "data.isDuplicate === false && data.isFieldEmpty === true"
+        }
+    },
+    "i18n": {       
+        "Aqc0PropertySection": [
+            "qualitycentermanagerMessages"
+        ],        
+        "Aqc0Add": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0Save":[
+            "qualitycentermanagerMessages"
+        ],       
+        "Aqc0FieldsEmptyErrorMsg": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0ConditionCellValueSection": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0ConditionCellNameSection":[
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0PropertyAleadyExistErrorMsg":[
+            "qualitycentermanagerMessages"
+        ]
+    }
+}

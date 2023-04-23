@@ -1,0 +1,147 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-popup2.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-textbox.directive",
+        "js/aw-i18n.directive",
+        "js/aw-click.directive",
+        "js/aw-list.directive",
+        "js/aw-pic.directive"
+    ],
+    "actions": {
+        "afterReveal": {
+            "actionType": "JSFunction",
+            "method": "initPopup",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/Arm0PasteCrossReferenceLinkPopup"
+        },
+        "closePopupWindow": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "inputData": {
+                "popupId": "{{data.popupId}}"
+            },
+            "deps": "js/popupService"
+        },
+        "pasteCrossRefLink":
+        {
+            "actionType": "JSFunction",
+            "method": "pasteCrossRefLink",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "aw.closePopup"
+                } ]
+            },
+            "deps": "js/Arm0PasteCrossReferenceLinkPopup"
+        },
+        "refreshPasteOptionsItems":
+        {
+            "actionType": "dataProvider",
+            "method": "actionsList"
+        }
+    },
+    "data": {
+        "pasteOptions":
+        {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "dbValue":"paraNumAndName",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "vertical":true
+        },
+        "customTextBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{i18n.DefaultName}}",
+            "dispValue": "{{i18n.DefaultName}}"
+        },
+        "pasteOptionsItems": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "displayName": "",
+                    "iconURL": "",
+                    "checked":"checked"
+                },
+                {
+                    "displayName": "",
+                    "iconURL": ""
+                },
+                {
+                    "displayName": "",
+                    "iconURL": ""
+                },
+                {
+                    "displayName": "",
+                    "iconURL": ""
+                },
+                {
+                    "displayName": "{{i18n.customLabel}}",
+                    "iconURL": ""
+                }
+            ]
+        },
+        "pasteOptionsList": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "1",
+                    "propInternalValue": "paraNumAndName"
+                },
+                {
+                    "propDisplayValue": "1",
+                    "propInternalValue": "paraIdAndName"
+                },
+                {
+                    "propDisplayValue": "custom",
+                    "propInternalValue": "custom"
+                }
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "pasteCrossReferenceLinkPopup.afterReveal",
+            "action": "afterReveal"
+        },
+        {
+            "eventId": "aw.closePopup",
+            "action": "closePopupWindow"
+        },
+        {
+            "eventId": "pasteCrossReferenceLinkPopup.refreshPasteOptionsItems",
+            "action": "refreshPasteOptionsItems"
+        }
+    ],
+    "i18n": {
+        "ShowCrossReferenceAs": [
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "Paste": [
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "DefaultName": [
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "customLabel": [
+            "RichTextEditorCommandPanelsMessages"
+        ]
+    },
+    "dataProviders": {
+        "actionsList": {
+            "response": "{{data.pasteOptionsItems.dbValue}}",
+            "selectionModelMode": "single"
+        }
+    }
+}

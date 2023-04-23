@@ -1,0 +1,329 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-avatar.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-parse-html.directive",
+        "js/visible-when.directive",
+        "js/aw-link.directive",
+        "js/aw-click.directive",
+        "js/aw-include.directive",
+        "js/aw-chip.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-icon.directive",
+        "js/aw-widget.directive",
+        "js/aw-link-with-popup-menu.directive",
+        "js/aw-list.directive",
+        "js/aw-pic.directive"
+    ],
+
+    "actions": {
+
+        "initActionableFeedSummary": {
+            "actionType": "dataProvider",
+            "method": "convSourceObjectsDataProvider"
+        },
+
+        "initActionableFeedSummary2": {
+            "actionType": "dataProvider",
+            "method": "convParticipantsDataProvider"
+        },
+
+        "initActionableFeedSummary3": {
+            "actionType": "dataProvider",
+            "method": "convRelatedObjDataProvider"
+        },
+
+        "expandDiscussionTile":{
+            "actionType": "JSFunction",
+            "method": "doExpandDiscussionTile",
+            "events": {
+                "success": [
+                    {
+                        "name": "ac0ActionableFeedSummary.expandDiscussionTileComplete"
+                    }
+                ]
+            },
+            "deps": "js/Ac0ConversationService2"
+        },
+
+        "collapseDiscussionTile": {
+            "actionType": "JSFunction",
+            "method": "doCollapseDiscussionTile",
+            "events": {
+                "success": [
+                    {
+                        "name": "ac0ActionableFeedSummary.collapseDiscussionTileComplete"
+                    }
+                ]
+            },
+            "deps": "js/Ac0ConversationService2"
+        },
+
+        "selectionChange": {
+            "actionType": "JSFunction",
+            "method": "feedPrimaryWorkspaceSelection",
+            "inputData": {
+                "vmData": "{{data}}",
+                "eventData": "{{data.eventData}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "ac0ActionableFeedSummary.selectionChangeComplete"
+                    }
+                ]
+            },
+            "deps": "js/Ac0ConversationService"
+        },
+
+        "clickObjChipAction": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{chip.objUid}}"
+            }
+        },
+
+        "noop": {
+            "actionType": "JSFunction",
+            "method": "getRandObjId",
+            "deps": "js/Ac0ConversationService"
+        },
+
+        "loadConvStatusLOV": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "ac0Status",
+                    "lovInput": {
+                        "operationName": "Search",
+                        "boName": "Ac0Conversation"
+                    }
+                }
+            },
+            "outputData": {
+                "statusLOV": "{{function:processStatusLOV}}"
+            },
+            "deps": "js/Ac0CreateCollabObjectService"
+        },
+
+        "updateConvStatusAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "updateConvStatusAction",
+            "deps": "js/Ac0ConversationService",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+
+        "loadConvSourceObjects": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadConvSrcObjs",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "sourceObjectList": "sourceObjectList",
+                "numberOfSourceObjects": "numberOfSourceObjects"
+            },
+            "deps": "js/Ac0ConversationUtils"
+        },
+        "loadConvParticipants": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadParticipants",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "participantsList": "participantsList",
+                "numberOfParticipants": "numberOfParticipants"
+            },
+            "deps": "js/Ac0ConversationUtils"
+        },
+        "loadConvRelatedObjs": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadRelatedObjs",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "relatedObjectList": "relatedObjectList",
+                "numberOfRelatedObjects": "numberOfRelatedObjects"
+            },
+            "deps": "js/Ac0ConversationUtils"
+        }
+    },
+
+    "data": {
+        "commandPanelSectionData": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "staticChip": {
+
+            "chipType": "STATIC",
+            "labelDisplayName": "Conv 1",
+            "labelInternalName": "conv1"
+        },
+        "placeHolderTextBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true"
+        },
+        "oneStringMsg": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "1"
+        },
+        "replyPlaceHolder": {
+            "displayName": "{{i18n.addReply}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true"
+        },
+        "cmdMore": "cmdMore",
+        "updateFrom": "ConvLocation"
+    },
+
+    "dataParseDefinitions": {},
+
+    "dataProviders": {
+        "convStatusLOVDataProvider": {
+            "dataProviderType": "TcLOV",
+            "action": "loadConvStatusLOV",
+            "response": "{{data.statusLOV}}",
+            "totalFound": "{{data.statusLOV.length}}"
+        },
+        "convSourceObjectsDataProvider": {
+            "action": "loadConvSourceObjects",
+            "response": "{{data.sourceObjectList}}",
+            "totalFound": "{{data.numberOfSourceObjects}}",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "convParticipantsDataProvider": {
+            "action": "loadConvParticipants",
+            "response": "{{data.participantsList}}",
+            "totalFound": "{{data.numberOfParticipants}}",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "convRelatedObjDataProvider": {
+            "action": "loadConvRelatedObjs",
+            "response": "{{data.relatedObjectList}}",
+            "totalFound": "{{data.numberOfRelatedObjects}}",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+
+    },
+
+    "functions": {
+        "processStatusLOV": {
+            "functionName": "processStatusLOV",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "collapseDiscussionTile"
+        },
+        {
+            "eventId": "ac0ActionableFeedSummary.selectionChangeComplete",
+            "cacheEventData": true,
+            "action": "expandDiscussionTile"
+        },
+        {
+            "eventId": "ac0ActionableFeedSummary.collapseDiscussionTileComplete",
+            "cacheEventData": true,
+            "action": "selectionChange"
+        },
+        {
+            "eventId": "awlinkPopup.selected",
+            "cacheEventData": true,
+            "action": "updateConvStatusAction"
+        },
+        {
+            "eventId": "ac0ActionableFeedSummary.expandDiscussionTileComplete",
+            "action": "initActionableFeedSummary"
+        },
+        {
+            "eventId": "ac0ActionableFeedSummary.expandDiscussionTileComplete",
+            "action": "initActionableFeedSummary2"
+        },
+        {
+            "eventId": "ac0ActionableFeedSummary.expandDiscussionTileComplete",
+            "action": "initActionableFeedSummary3"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        }
+    ],
+
+    "lifecycleHooks": {
+        "onMount": "selectionChange"
+    },
+
+    "conditions": {
+        "lovStatusValueUpdated": {
+            "expression": "data.eventData.property.dbValues !== data.eventData.previousSelect"
+        }
+    },
+
+    "i18n": {
+        "overview": [ "ActiveCollabDeclarativeMessages" ],
+        "more": [ "ActiveCollabDeclarativeMessages" ],
+        "less": [ "ActiveCollabDeclarativeMessages" ],
+        "discussion": [ "ActiveCollabDeclarativeMessages" ],
+        "sourceObjects": [ "ActiveCollabDeclarativeMessages" ],
+        "participants": [ "ActiveCollabDeclarativeMessages" ],
+        "status": [ "ActiveCollabDeclarativeMessages" ],
+        "convUpdateErrorMsg": [ "ActiveCollabDeclarativeMessages" ],
+        "save": [ "ActiveCollabDeclarativeMessages" ],
+        "discard": ["ZeroCompileCommandMessages"],
+        "snapshot": [ "ActiveCollabDeclarativeMessages" ],
+        "addReply": [ "ActiveCollabDeclarativeMessages" ],
+        "description": [ "ActiveCollabDeclarativeMessages" ]
+    }
+}

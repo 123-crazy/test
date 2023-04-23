@@ -1,0 +1,160 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-xrt.directive",
+        "js/aw-checkbox.directive"
+    ],
+
+    "actions": {
+        "loadListOfFMEATypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "lov": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    },
+                    "lovInput": {
+                        "owningObject": {
+                            "uid": "Qfm0FMEANode",
+                            "type": "unknownType"
+                        },
+                        "boName": "Qfm0FMEANode",
+                        "operationName": "SaveAs"
+                    },
+                    "propertyName": "qfm0FMEAGuideline",
+                    "filterData": {
+                        "filterString": "",
+                        "maxResults": 0,
+                        "numberToReturn": 10000,
+                        "sortPropertyName": "",
+                        "order": 1
+                    }
+                }
+            },
+            "outputData": {
+                "listOfFMEATypes": "{{function:getLOVList}}"
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+         "saveAsSubmit": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "fmeaRootSaveAs"
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "message": "qfm0FmeaRootSaveAsSubmitMessage"
+                    }
+                ]
+            },
+            "deps": "js/qfm0VersionSavAsService"
+        },
+        "saveas": {
+            "actionType": "JSFunctionAsync",
+            "method": "saveAsforFMEANode",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.selected}}"
+            },
+            "deps": "js/qfm0VersionSavAsService"
+        }
+    },
+
+
+    "functions": {
+        "getLOVList": {
+            "functionName": "getLOVList",
+            "parameters": []
+        }
+    },
+
+    "data": {
+        "qfm0FMEAGuideline": {
+            "displayName": "{{ctx.selected.props.qfm0FMEAGuideline.propertyDescriptor.displayName}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": "{{ctx.selected.props.qfm0FMEAGuideline.dbValues[0]}}"
+        },
+        "copyCrossFunctionalTeam": {
+            "displayName": "{{i18n.qfm0copyCrossFunctionalTeam}}",
+            "dbValue": true,
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadListOfFMEATypes"
+
+        },
+        {
+            "eventId": "fmeaRootSaveAs",
+            "action": "saveas"
+        }
+    ],
+    "messages": {
+        "qfm0FmeaRootSaveAsSubmitMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qfm0FmeaRootSaveAsSubmitMessage}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValues[0]}}"
+            ]
+        }
+    },
+
+    "conditions": {
+    },
+    "i18n": {
+        "qfm0copyCrossFunctionalTeam": [
+            "qualityFmeaMessages"
+        ],
+        "save": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0SaveAs": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FmeaRootSaveAsSubmitMessage": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

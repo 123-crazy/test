@@ -1,0 +1,269 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-textbox.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/exist-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-label.directive",
+        "js/aw-radiobutton.directive"
+    ],
+    "actions": {
+        "populateArgumentValueslist" : {
+            "actionType": "JSFunction",
+            "method": "populateArgumentValueslist",
+            "inputData": {
+                "data": "{{ctx.argumentsPanelData}}"
+
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "populateArgumentNameslist" : {
+            "actionType": "JSFunction",
+            "method": "populateArgumentNameslist",
+            "inputData": {
+                "data": "{{ctx.argumentsPanelData}}"
+
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "addHandlerArgumentValuesToArgumentsTable" : {
+            "actionType": "JSFunction",
+            "method": "addHandlerArgumentValuesToArgumentsTable",
+            "inputData": {
+                "ctx": "{{ctx}}"
+
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers",
+            "events": {
+                "success": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "{{ctx.argumentsPanelData.previousView}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "updateHandlerArgumentValuesToArgumentsTable" : {
+            "actionType": "JSFunction",
+            "method": "updateHandlerArgumentValuesToArgumentsTable",
+            "inputData": {
+                "ctx": "{{ctx}}"
+
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers",
+            "events": {
+                "success": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "{{ctx.argumentsPanelData.previousView}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "closeCurrentOpenedPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "populateArgumentValues" : {
+            "actionType": "JSFunction",
+            "method": "populateArgumentValues",
+            "inputData": {
+                "data": "{{ctx.argumentsPanelData}}"
+
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "getIncrementalList": {
+            "actionType": "JSFunction",
+            "method": "generateListValues",
+            "inputData": {
+                "startChildNdx": "request.listLoadInput.startChildNdx",
+                "filter": "request.listLoadInput.filter",
+                "data": "{{data}}"
+
+            },
+            "outputData": {
+                "listVals": "vals",
+                "moreValuesExist": "moreValuesExist"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        }
+
+    },
+    "functions": {
+    },
+    "dataProviders": {
+        "argumentValuelistProvider": {
+            "initializeAction": "getIncrementalList",
+            "nextAction": "getIncrementalList",
+            "response": "{{data.listVals}}",
+            "totalFound": "{{data.argumentValueslist.length}}",
+            "moreValuesExist": "{{data.moreValuesExist}}"
+        }
+    },
+    "columnProviders": {
+    },
+    "data": {
+        "argumentValues":
+        {
+            "displayName": "{{i18n.argumentValue}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "argumentNames":
+        {
+            "displayName": "{{i18n.arguments}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "argumentValueTextBox":
+        {
+            "displayName": "{{i18n.argumentValue}}",
+            "type": "STRING",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "argumentNameTextBox":
+        {
+            "displayName": "{{i18n.arguments}}",
+            "type": "STRING",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "argumentValuesMultiselect": {
+            "displayName": "{{i18n.argumentValue}}",
+            "type": "STRINGARRAY",
+            "isArray": true,
+            "dataProvider": "argumentValuelistProvider"
+        },
+        "readOnlyArgumentName":
+        {
+            "displayName": "{{i18n.arguments}}",
+            "type": "STRING",
+            "labelPosition": "PROPERTY_LABEL_AT_LEFT"
+        },
+        "undefinedArgValueRadioButton": {
+            "displayName": "{{i18n.entryType}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue":"false",
+            "uiValue": "false"
+        },
+        "undefinedArgValueRadioValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.predefined}}",
+                    "propInternalValue": "false"
+                },
+                {
+                    "propDisplayValue": "{{i18n.undefined}}",
+                    "propInternalValue": "true"
+                }
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0ArgumentsValue"
+            },
+            "action": "populateArgumentValueslist",
+            "condition": "ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length > 1"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0ArgumentsValue"
+            },
+            "action": "populateArgumentNameslist",
+            "condition": "ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length === 0"
+        },
+        {
+            "eventId": "ruleHandlerDataProvider.selectionChangeEvent",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "actionHandlerDataProvider.selectionChangeEvent",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "closeCurrentOpenedPanel"
+        }
+    ],
+    "conditions": {
+        "showArgumentTextBox":
+        {
+            "expression": "ctx.argumentsPanelData.handlerData==='' && ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length === 0"
+        },
+        "showArgumentValueTextBox":
+        {
+            "expression": "ctx.argumentsPanelData.handlerData=='' || ctx.argumentsPanelData.argumentValueslist.length === 0 || data.undefinedArgValueRadioButton.dbValue === 'true' || ctx.argumentsPanelData.argHasFreeFormText === true"
+        },
+        "isFreeFromCheckBoxEnable":
+        {
+            "expression": "data.undefinedArgValueRadioButton.dbValue === 'true' && ctx.argumentsPanelData.dataProviders.argumentsDataProvider.selectedObjects.length === 0"
+        },
+        "isArgHasNullValue":
+        {
+            "expression": "ctx.argumentsPanelData.argHasNullValue === true"
+        }
+    },
+    "preferences":
+    [
+        "EPM_ARG_target_user_group_list_separator"
+    ],
+    "i18n": {
+        "taskName": [ "InboxMessages" ],
+        "arguments": [ "WorkflowDesignerMessages" ],
+        "handler" : [ "WorkflowDesignerMessages" ],
+        "action_type" : [ "WorkflowDesignerMessages" ],
+        "actionHandler" : [ "WorkflowDesignerMessages" ],
+        "ruleHandler" : [ "WorkflowDesignerMessages" ],
+        "argumentName" : [ "WorkflowDesignerMessages" ],
+        "argumentValue" : [ "WorkflowDesignerMessages" ],
+        "addArguments" : [ "WorkflowDesignerMessages" ],
+        "addTitle" : [ "WorkflowDesignerMessages" ],
+        "save" : [ "InboxMessages" ],
+        "entryType" : [ "WorkflowDesignerMessages" ],
+        "predefined" : [ "WorkflowDesignerMessages" ],
+        "undefined" : [ "WorkflowDesignerMessages" ],
+        "predefinedValues" : [ "WorkflowDesignerMessages" ],
+        "undefinedValues" : [ "WorkflowDesignerMessages" ]
+    }
+}

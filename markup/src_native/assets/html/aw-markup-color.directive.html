@@ -1,0 +1,31 @@
+<div class="aw-widgets-propertyContainer">
+    <aw-property-label prop="prop" ></aw-property-label>
+    <div class="aw-jswidgets-lovParentContainer aw-jswidgets-lovParent" ng-class="{'aw-jswidgets-popUpVisible': expanded}">
+        <div class="aw-layout-flexRowContainer aw-widget-iconParent" ng-click="toggle()">
+            <div class="aw-jswidgets-choice gwt-ListBox" ng-class="{'aw-jswidgets-expanded': expanded}" >
+                <div visible-when="prop.dbValue.startsWith('#')" class="aw-markup-colorPatch"
+                     ng-style="{ 'background': prop.dbValue }">&emsp;</div>
+                <span>{{prop.uiValue}}</span>
+            </div>
+            <aw-property-image name="miscDownArrow_uxRefresh" class="aw-widget-icon" ></aw-property-image>
+        </div>
+        <div class="aw-jswidgets-drop aw-layout-popup aw-base-scrollPanel" ng-show="expanded"
+             ng-style="{'marginTop': dropDownVerticalAdj, 'top': lovDDTop, 'left': lovDDLeft, 'width': lovDDWidth}">
+            <div class="aw-widgets-cellListWidget">
+                <div class="aw-jswidgets-nestingListItemDisplay" ng-repeat="v in list" ng-click="selected(v)"
+                     ng-class="{'aw-state-selected': v.sel, 'aw-state-attention': v.attn}" >
+                    <div class="aw-jswidgets-lovValuesContainer">       
+                        <div class="aw-widgets-cellListCellText aw-base-small">
+                            <div visible-when="v.propInternalValue.startsWith('#')" class="aw-markup-colorPatch"
+                                    ng-style="{ 'background': v.propInternalValue }">&emsp;</div>
+                            <input type="color" visible-when="v.propInternalValue==='picker'"
+                                    class="aw-markup-colorPicker" ng-model="prop.color" ng-change="picked()"/>
+                            {{v.propDisplayValue}}
+                        </div>
+                        <div class="aw-widgets-cellListCellItemType aw-base-small">{{v.propDisplayDescription}}</div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

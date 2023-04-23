@@ -1,0 +1,113 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-init.directive",
+        "js/aw-label.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-numeric.directive",
+        "js/aw-enter-key.directive",
+        "js/aw-link-with-popup-menu.directive"
+    ],
+    "data": {
+        "fromTitle": {
+            "displayName": "{{i18n.fromTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "toTitle": {
+            "displayName": "{{i18n.toTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        }
+    },
+    "i18n": {
+        "numericFilterTitle": [ "UIMessages" ],
+        "fromTitle": [ "UIMessages" ],
+        "toTitle": [ "UIMessages" ],
+        "equalsOperation": [ "UIMessages" ],
+        "lessThanOperation": [ "UIMessages" ],
+        "greaterThanOperation": [ "UIMessages" ],
+        "rangeOperation": [ "UIMessages" ]
+    },
+    "actions": {
+        "filterAction": {
+            "actionType": "JSFunction",
+            "method": "doNumericFiltering",
+            "inputData": {
+                "column": "{{data.context.column}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "eventData": {
+                    "columnName": "{{data.context.column.field}}",
+                    "operation": "{{data.context.column.filter.operation.dbValue}}",
+                    "numberValue": "{{data.context.column.filter.numberValue.dbValue}}",
+                    "startNumber": "{{data.context.column.filter.startNumber.dbValue}}",
+                    "endNumber": "{{data.context.column.filter.endNumber.dbValue}}"
+                },
+                "viewModelData": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "pltable.columnFilterApplied",
+                    "condition": "data.context.filterError !== true && data.context.filterNoAction !== true",
+                    "eventData": {
+                        "gridId": "{{data.context.gridId}}",
+                        "columnName": "{{data.context.column.field}}"
+                    }
+                }, {
+                    "name": "pltable.columnFilterApplied",
+                    "condition": "data.context.filterError !== true && data.context.filterNoAction === true",
+                    "eventData": {}
+                } ]
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "numericFilterInputChanged": {
+            "actionType": "JSFunction",
+            "method": "numericFilterInputChanged",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModelData": "{{data}}"
+            },
+            "deps": "js/awColumnFilterService"
+        }
+    },
+    "dataProviders": {
+        "operationsDataProvider": {
+            "dataProviderType": "Static",
+            "response": [
+                {
+                    "staticDisplayValue": "{{i18n.equalsOperation}}",
+                    "staticElementObject": "equals",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.lessThanOperation}}",
+                    "staticElementObject": "lt",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.greaterThanOperation}}",
+                    "staticElementObject": "gt",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.rangeOperation}}",
+                    "staticElementObject": "range",
+                    "selected": false
+                }
+            ],
+            "totalFound": 4
+        }
+    },
+    "onEvent": [ {
+        "eventId": "awlinkPopup.selected",
+        "action": "numericFilterInputChanged"
+    } ]
+}

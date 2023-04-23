@@ -1,0 +1,20 @@
+<aw-panel-header>
+    <aw-panel-section caption="i18n.toTitle">
+        <aw-default-cell vmo="ctx.aceActiveContext.context.addElementInput.parentElement"></aw-default-cell>
+    </aw-panel-section>
+</aw-panel-header>
+<aw-form name="createInputs">
+    <aw-add include-types="{{data.allowedTypeInfo.objectTypeName}}" type-filter="{{data.allowedTypeInfo.searchTypeName}}" load-sub-types="false" max-recent-count="5" exist-when="data.allowedTypeInfo" visible-tabs="{{data.allowedTypeInfo.allowedTabs}}" selection-mode="{{data.selectionMode.value}}" preferred-type="{{data.allowedTypeInfo.preferredType}}"></aw-add>
+</aw-form>
+<aw-panel-footer>    
+     <aw-button action="createAndReplaceElement" visible-when="createInputs.$valid && conditions.isNewTabReplaceButtonVisible">
+        <aw-i18n>i18n.replaceElementBtn</aw-i18n>
+    </aw-button>
+    <aw-button action="replaceWithExistingElement" visible-when="!ctx.aceActiveContext.context.isDuplicateEnabled && (conditions.isPaletteTabReplaceButtonVisible || conditions.isSearchTabReplaceButtonVisible)">
+        <aw-i18n>i18n.replaceElementBtn</aw-i18n>
+    </aw-button>
+    <aw-button action="replaceElementForDuplicate" visible-when="ctx.aceActiveContext.context.isDuplicateEnabled && (conditions.isPaletteTabReplaceButtonVisible || conditions.isSearchTabReplaceButtonVisible)">
+        <aw-i18n>i18n.replaceElementBtn</aw-i18n>
+    </aw-button>
+
+</aw-panel-footer>

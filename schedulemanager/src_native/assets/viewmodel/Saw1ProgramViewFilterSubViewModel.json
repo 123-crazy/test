@@ -1,0 +1,269 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getProgramViewConditions"
+            ]
+        },
+        "removeCondition": {
+            "actionType": "JSFunction",
+            "method": "removeCondition",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "deletedVMO": "{{data.eventMap['Saw1ProgramViewFilterSub.removeCondition'].vmo.uid}}"
+            },
+            "deps": "js/Saw1ProgramViewFilterService"
+        },
+        "searchProgramViewConditions": {
+            "actionType": "JSFunction",
+            "method": "getProgramViewConditions",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.getProgramViewConditions}}",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1ProgramViewFilterService"
+        },
+        "applyFilters":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ProjectManagementAw-2019-12-ScheduleManagementAw",
+            "method": "manageProgramView",
+            "inputData": {
+                "programViewInfo": {
+                    "programView": "{{function:getProgramViewObject}}",
+                    "operationType": "saveAndLoadUsingInputConfig",
+                    "contextNodeId" : "{{function:getParentTaskUid}}",
+                    "referenceNodeId": "{{function:getReferenceTaskUid}}",
+                    "inputOptions" : [ {
+                            "name" : "returnProgramViewConfig",
+                            "stringValue" : "true"
+                        }
+                    ],
+                    "programViewConfiguration": "{{function:getProgramViewConfiguration}}"
+                }
+            },
+            "outputData": {
+                "searchResults": "{{function:parseProgramViewSOAResponse}}"
+            },
+            "events": {
+                "success":[
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Saw1ProgramViewFilterService"
+        },
+        "cleanUp": {
+            "actionType": "JSFunction",
+            "method": "cleanUpEdit",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1ProgramViewFilterService"
+        }
+    },
+    "data": {
+        "programViewAddFiltersCommand": "saw1_programViewAddFiltersCommand",
+
+        "conditionSection": {
+            "type": "STRING",
+            "dbValue": "Condition"
+        },
+        "typeSection": {
+            "type": "STRING",
+            "dbValue": "Type",
+            "uiValue": "{{i18n.typeSection}}"
+        },
+        "propertySection": {
+            "type": "STRING",
+            "dbValue": "Property",
+            "uiValue": "{{i18n.propertySection}}"
+        },
+        "operatorSection": {
+            "type": "STRING",
+            "dbValue": "Operator",
+            "uiValue": "{{i18n.operatorSection}}"
+        },
+        "ValueSection": {
+            "type": "STRING",
+            "dbValue": "Value",
+            "uiValue": "{{i18n.ValueSection}}"
+        }
+    },
+    "dataProviders": {
+        "getProgramViewConditions": {
+            "action": "searchProgramViewConditions",
+            "commandsAnchor": "aw_ProgramViewCellCommand",
+            "selectionModelMode": "single",
+            "response": "{{data.dataProviders.getProgramViewConditions.viewModelCollection.loadedVMObjects}}"
+        }
+    },
+    "conditions": {
+        "showApplyButton": {
+            "expression": "data.dataProviders.getProgramViewConditions.viewModelCollection.loadedVMObjects.length >= 0"
+        }
+    },
+
+    "functions": {
+        "getProgramViewConfiguration": {
+            "functionName": "getProgramViewConfiguration",
+            "parameters":
+            [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "parseProgramViewSOAResponse" : {
+            "functionName": "parseProgramViewSOAResponse",
+            "parameters":
+            [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "getReferenceTaskUid": {
+            "functionName": "getReferenceTaskUid",
+            "parameters": [
+                "{{data.eventData}}"
+            ]
+        },
+        "getParentTaskUid": {
+            "functionName": "getParentTaskUid",
+            "parameters": [
+                "{{data.eventData}}",
+                "{{ctx}}"
+            ]
+        },
+        "getProgramViewObject": {
+            "functionName": "getProgramViewObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },
+        {
+            "eventId": "searchProgramViewConditionsEvent",
+            "action": "searchProgramViewConditions"
+        },
+        {
+            "eventId": "Saw1ProgramViewFilterSub.removeCondition",
+            "cacheEventData": true,
+            "action": "removeCondition"
+        },
+        {
+            "eventId": "Saw1ProgramViewFilterSub.contentLoaded",
+            "action": "cleanUp"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "criteria": {
+                "destPanelId": "Saw1ProgramViewFilterSub"
+            },
+            "action": "cleanUp"
+        }
+    ],
+    "messages": {
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "filters": [
+            "ScheduleManagerMessages"
+        ],
+        "addFilter": [
+            "ScheduleManagerMessages"
+        ],
+        "assigned": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1Unassigned": [
+            "ScheduleManagerMessages"
+        ],
+        "addButtonText": [
+            "ScheduleManagerMessages"
+        ],
+        "applyButtonTxt": [
+            "ScheduleManagerMessages"
+        ],
+        "conditionSection": [
+            "ScheduleManagerMessages"
+        ],
+        "typeSection": [
+            "ScheduleManagerMessages"
+        ],
+        "propertySection": [
+            "ScheduleManagerMessages"
+        ],
+        "operatorSection": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1EqualTo": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1NotEqualTo": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1LessThan": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1GreaterThan": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1LessThanOrEqTo": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1GreaterThanOrEqTo": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1Between": [
+            "ScheduleManagerMessages"
+        ],
+        "ValueSection": [
+            "ScheduleManagerMessages"
+        ],
+        "and": [
+            "ScheduleManagerMessages"
+        ],
+        "or": [
+            "ScheduleManagerMessages"
+        ],
+        "from": [
+            "ScheduleManagerMessages"
+        ],
+        "to": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

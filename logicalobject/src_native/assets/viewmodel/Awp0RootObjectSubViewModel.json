@@ -1,0 +1,123 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": 
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",  
+        "js/aw-search-box.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-i18n.directive"
+    ],
+    
+    "actions": 
+    { 
+        "rootUpdate":
+        {
+            "actionType": "dataProvider",
+            "method": "rootListProvider"
+        },
+            
+        "rootSearch":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "columnConfigInput":
+                {
+                    "clientName": "AWClient",
+                    "clientScopeURI":"Awp0SearchResults",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": "intersection"
+                },
+                "saveColumnConfigData":
+                {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput":
+                {
+                    "attributesToInflate": [ "object_name", "object_desc", "parent_types", "type_name" ],
+                    "internalPropertyName": "",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Fnd0TypeSearchProvider",
+                    "searchCriteria":
+                    {
+                        "searchString": "{{data.rootBox.dbValue}}",
+                        "category": "Persistent", 
+                        "root": "",
+                        "parentLO": "{{data.parentSet[0].props.type_name.dbValue}}"
+                    },
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.rootListProvider.startIndex}}"
+                }
+            },
+            "outputData":
+            {
+                "rootFound": "totalFound",
+                "rootResults": "searchResults"
+            }
+        },
+                    
+        "rootAdd": 
+        {
+            "actionType": "JSFunction",
+            "method": "setRootObject",
+            "inputData": 
+            {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.rootListProvider.selectedObjects}}"
+            },
+
+            "deps": "js/Awp0LogicalObjectService"
+        }
+    },
+
+    "data": 
+    {
+        "rootBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": ""
+        }
+    },
+          
+    "dataProviders":
+    {
+        "rootListProvider":
+        {
+            "action": "rootSearch",
+            "response": "{{data.rootResults}}",
+            "totalFound": "{{data.rootFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    
+    "conditions": 
+    {
+        "rootValid": 
+        {
+            "expression": "data.dataProviders.rootListProvider.selectedObjects.length > 0"
+        }
+    },
+    
+    "onEvent": 
+    [
+        {
+           "eventId": "awPanel.reveal",
+           "action": "rootUpdate",
+           "criteria": { "panelId": "Awp0RootObjectSub" }
+        }
+    ]   
+}

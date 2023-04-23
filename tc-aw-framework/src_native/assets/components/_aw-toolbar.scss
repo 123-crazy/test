@@ -1,0 +1,73 @@
+// Copyright (c) 2020 Siemens
+@import 'mixins/mixins';
+// aw-toolbar
+.aw-toolbar-layout {
+    @include display_flex;
+    @include flex_justify_content;
+
+    &.aw-toolbar-vertical {
+        flex-direction: column;
+        @include flex(1 1 auto);
+    }
+    &.aw-toolbar-horizontal {
+        width: 100%;
+        z-index: 4;
+        margin-bottom: $horizontal_tool_bar_margin_bottom;
+    }
+}
+
+//This is required to support both versions with and w/o overflow
+.aw-commandBars {
+    @include display_flex;
+    @include flex_justify_content;
+
+    &.aw-commandBar-horizontal {
+        width: 100%;
+    }
+
+    &.aw-commandBar-vertical {
+        @include flex(1 1 auto);
+        height: 100%;
+        flex-direction: column;
+        &.aw-commandBar-verticalOverflow {
+            height: calc(100% - 40px);
+        }
+    }
+
+    .aw-bottom-bar {
+        flex: 0 1 auto;
+    }
+}
+
+.aw-toolbarIcon {
+    height: 40px;
+    .aw-commands-commandToolbarIconButton {
+        height: 40px;
+        width: 100%;
+        padding: 6px;
+        margin: 0;
+        text-align: left;
+        max-width: 100px;
+        position: relative;
+        border: $default_focus_border;
+
+        aw-icon {
+            width: 16px;
+            height: 16px;
+            padding: 0;
+        }
+    }
+}
+
+//Set vertical height of More button to be equal to vertical bar command height
+.aw-toolbar-layout.aw-toolbar-vertical,
+.aw-commandBars.aw-commandBar-vertical  {
+    .aw-toolbarIcon {
+        height: $vertical_command_bar_button_height;
+        .aw-commands-commandToolbarIconButton {
+            height: $vertical_command_bar_button_height;
+        }
+    }
+}
+
+

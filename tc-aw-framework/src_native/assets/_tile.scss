@@ -1,0 +1,634 @@
+// Copyright (c) 2020 Siemens
+
+.aw-tile-tileCanvasPanel {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* iPad */
+    -webkit-overflow-scrolling: touch;
+}
+
+.aw-tile-mainContainer {
+    margin: 40px 0 0 5px;
+}
+
+/* these browser-specific styles prevent popup menus for copy, saveas, etc. */
+
+.aw-tile-tileCanvasPanel img,
+.aw-tile-tileCanvasPanel a {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -ms-touch-select: none;
+    -ms-touch-action: none;
+}
+
+.aw-tile-tileCanvasPanel *,
+.aw-tile-tileCanvasPanel *:after,
+.aw-tile-tileCanvasPanel *:before,
+aw-tile-group *,
+aw-tile-group *:after,
+aw-tile-group *:before,
+aw-tile *,
+aw-tile *:after,
+aw-tile *:before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+@media screen and (-ms-high-contrast: none) {
+    /* Windows 8+ IE only */
+    .aw-tile-tileCanvasPanel {
+        -ms-overflow-style: auto;
+    }
+}
+
+aw-tile {
+    @include flexbox();
+    @include flex-direction(column);
+    @include flex(0 0 auto);
+}
+
+aw-tile-canvas,
+aw-tile-icon {
+    @include flexbox();
+    @include flex-direction(column);
+    @include flex(1 1 auto);
+    overflow: hidden;
+}
+
+aw-tile-icon {
+    width: 100%;
+}
+
+/************ Start TileGroup CSS Styling ******/
+
+.aw-tile-tileGroups {
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+    margin: -80px 0 0 -80px;
+}
+
+.aw-tile-tileGroup {
+    padding: 80px 0 0 80px;
+    min-height: 1px;
+    min-width: 160px;
+    max-width: 560px;
+
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+}
+
+aw-tile-group {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+    -webkit-align-content: flex-start;
+    -ms-flex-line-pack: start;
+    align-content: flex-start;
+}
+
+.aw-tile-emptyTileGroup {
+    min-width: 0;
+    max-width: 0;
+    height: 0;
+    padding: 0;
+}
+
+.aw-tile-tileGroup.aw-tile-placeHolderGroupSep {
+    max-width: 480px;
+    margin: 80px 0 0 80px;
+}
+
+@media (max-width: 767px) {
+    .aw-tile-tileGroup {
+        min-width: 85px;
+        max-width: 365px;
+        margin-right: 0;
+    }
+    .aw-tile-tileGroup.aw-tile-placeHolderGroupSep {
+        max-width: 285px;
+    }
+}
+
+@media all and (max-width: 28.75em) {
+    .aw-tile-tileGroup {
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+    }
+    .aw-tile-placeHolderGroupSep {
+        height: 85px;
+        min-width: 285px;
+    }
+
+    .aw-tile-tileGroups {
+        margin: -120px 0 0 -80px;
+    }
+}
+
+/**** End TileGroup Styling *****/
+
+/************ Start Tile CSS Styling ***********/
+.aw-tile-tileContainer {
+    width: 150px;
+    height: 150px;
+    font-weight: 300;
+    font-size: $fontsize_large;
+    letter-spacing: 0.02em;
+    line-height: 19px;
+    box-shadow: none;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    outline: 0;
+    border: transparent solid 2px;
+
+    .keyboard &:focus {
+        margin: 4px;
+        transition: height .25s, width .25s, margin .25s;
+        width: 142px;
+        height: 142px;
+    }
+
+    &.aw-tile-doubleSize {
+        width: 310px;
+
+        .keyboard &:focus {
+            width: 302px;
+        }
+    }
+
+    &.aw-tile-doubleVerticalSize {
+        height: 310px;
+
+        .keyboard &:focus {
+            height: 302px;
+        }
+    }
+}
+
+.aw-tile-tileMain {
+    cursor: pointer;
+
+    margin: 0 10px 10px 0;
+    overflow: hidden;
+    position: relative;
+
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+
+.aw-tile-placeHolderTile {
+    background: none;
+    border-style: solid;
+    border-width: thin;
+
+    width: 150px;
+    height: 150px;
+}
+
+@media (max-width: 767px) {
+    .aw-tile-tileContainer {
+        width: 85px;
+        height: 85px;
+
+        .keyboard &:focus {
+            height: 77px;
+            width: 77px;
+        }
+    }
+    .aw-tile-doubleSize {
+        width: 180px;
+
+        .keyboard &:focus {
+            width: 172px;
+        }
+    }
+    .aw-tile-doubleVerticalSize {
+        height: 180px;
+
+        .keyboard &:focus {
+            height: 172px;
+        }
+    }
+}
+/**** End Tile Styling *****/
+
+/************ Start TileContent CSS Styling ****/
+.aw-tile-tileContainer .aw-tile-tileContent ul.aw-tile-tileContentData {
+    padding-top: 0;
+    white-space: nowrap;
+    margin-left: 0;
+    text-align: center;
+}
+
+.aw-tile-doubleSize .aw-tile-tileContent ul.aw-tile-tileContentData li {
+    display: inline-block;
+    text-align: center;
+    font-size: $fontsize_large;
+    line-height: 20px;
+}
+
+.aw-tile-tileContent ul.aw-tile-tileContentData li.aw-tile-contentSep {
+    padding: 0 5px;
+    font-size: $fontsize_5x_large;
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+}
+
+/* hide tile notification content on small tiles */
+
+.aw-tile-smallSize .aw-tile-tileContent ul.aw-tile-tileContentData {
+    display: none;
+}
+
+.aw-tile-tileMain.aw-tile-fullsizeIcon .aw-tile-tileContent {
+    padding: 0;
+}
+
+.aw-tile-tileContainer .aw-tile-tileContent {
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 16px;
+}
+
+.aw-tile-counter {
+    font-size: $fontsize_5x_large;
+}
+
+.aw-tile-countDesc {
+    font-size: $fontsize_small;
+    display: block;
+}
+
+/* hide regular hover border */
+.aw-tile-tileContainer:hover {
+    outline: none;
+}
+
+.aw-tile-tileContent > .aw-layout-flexColumn {
+    -webkit-justify-content: center;
+    -ms-flex-pack: justify;
+    justify-content: center;
+}
+
+@media (max-width: 767px) {
+    .aw-tile-tileContainer .aw-tile-tileContent {
+        line-height: 14px;
+    }
+    .aw-tile-counter,
+    .aw-tile-tileContent ul.aw-tile-tileContentData li.aw-tile-contentSep {
+        font-size: $fontsize_2x_large;
+    }
+    .aw-tile-countDesc {
+        font-size: $fontsize_small;
+    }
+    .aw-tile-tileContainer .aw-tile-tileContent ul.aw-tile-tileContentData {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+
+        -webkit-justify-content: center;
+        -ms-flex-pack: justify;
+        -moz-box-pack: justify;
+        justify-content: center;
+
+        overflow: hidden;
+        margin: 0;
+    }
+    .aw-tile-tileContainer .aw-tile-tileContent ul.aw-tile-tileContentData li {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .aw-tile-counter {
+        line-height: 16px;
+    }
+}
+/**** End Tile Content Styling *****/
+
+/************ Start TileIcon CSS Styling *******/
+.aw-tile-tileContainer .aw-tile-unpin {
+    top: -9px;
+    right: -9px;
+    display: none;
+}
+
+/* small to large */
+
+.aw-tile-tileContainer .aw-tile-resize {
+    background-position: -3352px -33px;
+    bottom: -9px;
+    right: -9px;
+    display: none;
+}
+
+/* large to wide */
+
+.aw-tile-doubleSize.aw-tile-doubleVerticalSize .aw-tile-resize {
+    background-position: -3352px 0;
+}
+
+/* wide to small */
+
+.aw-tile-doubleSize .aw-tile-resize {
+    background-position: -3385px 0;
+}
+
+/* secondary icon */
+
+.aw-tile-tileContainer .aw-tile-brand .aw-tile-tileIcon {
+    height: 28px;
+    width: 28px;
+    z-index: 99;
+    background-size: inherit;
+}
+
+.aw-tile-tileContainer .aw-tile-tileIcon.aw-tile-dynamicIcon {
+    background-size: cover;
+}
+
+.aw-tile-tileContainer .aw-tile-brand .aw-tile-tileIcon {
+    margin: 0 5px;
+    vertical-align: bottom;
+}
+
+.aw-tile-iconContainer {
+    overflow: hidden;
+
+    -ms-flex-pack: justify;
+    @include justify-content(flex-end);
+}
+
+.aw-tile-doubleSize.aw-tile-doubleVerticalSize .aw-tile-iconContainer {
+    @include justify-content(center);
+}
+
+/**** End Tile Icon Styling *****/
+
+/************ Start TileImage CSS Styling ******/
+
+.aw-tile-tileImage {
+    width: 100%;
+    height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    align-items: center;
+
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.aw-tile-tileImage.aw-tile-dynamicIcon.aw-tile-fullsizeIcon {
+    -webkit-box-pack: justify;
+    -webkit-justify-content: center;
+    -ms-flex-pack: justify;
+    -moz-box-pack: justify;
+    justify-content: center;
+}
+
+.aw-tile-tileImage svg {
+    height: 64px;
+    width: 64px;
+}
+
+.aw-tile-fullsizeIcon img.aw-base-icon.aw-tile-thumbnailIcon {
+    object-fit: cover;
+}
+
+.aw-tile-fullsizeIcon .aw-tile-tileImage svg {
+    width: 100%;
+}
+
+.aw-tile-tileImage .aw-base-icon {
+    min-width: 100%;
+    max-height: 100%;
+}
+
+.aw-tile-tileImage img.aw-base-icon {
+    min-height: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.aw-tile-tileImage.aw-tile-fullsizeIcon.aw-tile-dynamicIcon .aw-tile-thumbnailIcon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    min-width: 0;
+    -ms-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    height: 100%;
+}
+
+.aw-tile-tileImage.aw-tile-fullsizeIcon.aw-tile-dynamicIcon img.aw-base-icon {
+    width: 100%;
+}
+
+@media (max-width: 767px) {
+    .aw-tile-tileContainer .aw-tile-tileImage svg {
+        height: 32px;
+        width: 32px;
+    }
+}
+/**** End Tile Image Styling *****/
+
+/************ Start TileBrand CSS Styling ******/
+.aw-tile-tileContainer .aw-tile-brand>.aw-tile-tileName {
+    text-transform: uppercase;
+    z-index: 99;
+    margin-left: 10px;
+    margin-right: 4px;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+    font-weight: 400;
+    font-size: $fontsize_normal;
+    line-height: 15px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    max-height: 30px;
+}
+
+// less margin when focussed so text doesn't wrap
+.keyboard .aw-tile-tileContainer:focus .aw-tile-brand>.aw-tile-tileName {
+    margin-right: 0;
+    margin-left: 6px;
+}
+
+@media screen and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .aw-tile-tileContainer .aw-tile-brand>.aw-tile-tileName {
+        word-wrap: break-word;
+        margin-right: 10px;
+    }
+}
+
+.aw-tile-tileContainer .aw-tile-brand.aw-tile-displayTitle {
+    padding-top: 10px;
+    opacity: .8;
+    z-index: 98;
+}
+
+/* hide count on medium and large tiles */
+
+.aw-tile-doubleSize .aw-tile-tileBadge {
+    display: none;
+}
+
+.aw-tile-tileContainer .aw-tile-brand {
+    min-height: 30px;
+
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+
+.aw-tile-tileContainer .aw-tile-brand .aw-tile-tileBadge {
+    font-weight: 600;
+    font-size: $fontsize_large;
+    letter-spacing: 0.01em;
+    line-height: 17px;
+    font-size: $fontsize_4x_large;
+    margin: 0 10px 10px 10px;
+    -webkit-align-self: flex-end;
+    -ms-flex-item-align: flex-end;
+    align-self: flex-end;
+}
+
+.aw-tile-tileContainer .aw-tile-brand .aw-tile-tileImage svg {
+    height: 28px;
+    width: 28px;
+}
+
+@media (max-width: 767px) {
+    .aw-tile-tileContainer .aw-tile-brand .aw-tile-tileBadge {
+        font-size: $fontsize_normal;
+        margin: 5px;
+    }
+    .aw-tile-tileContainer .aw-tile-brand>.aw-tile-tileName {
+        font-size: $fontsize_x_small;
+        margin: 0 0 5px 5px;
+    }
+    .aw-tile-tileContainer .aw-tile-brand {
+        min-height: 15px;
+    }
+    .aw-tile-tileContainer .aw-tile-brand .aw-tile-tileImage svg,
+    .aw-tile-tileContainer .aw-tile-brand .aw-tile-tileIcon {
+        height: 15px;
+        width: 15px;
+    }
+    .aw-tile-tileContainer .aw-tile-brand .aw-tile-tileIcon {
+        margin: 0 5px;
+    }
+    .aw-tile-tileContainer .aw-tile-brand.aw-tile-displayTitle {
+        padding-top: 2px;
+    }
+}
+
+/**** End TileBrand Styling *****/
+
+/************ Start TileEdit CSS Styling ******/
+
+.aw-tile-tileEdit .aw-tile-tileEditButton {
+    height: 32px;
+    width: 32px;
+    position: absolute;
+    background-repeat: no-repeat;
+    z-index: 101;
+    cursor: pointer;
+    display: block;
+}
+
+.aw-tile-tileEdit {
+    overflow: visible;
+    cursor: move;
+    -ms-touch-action: none;
+    touch-action: none;
+    z-index: 101;
+}
+
+.aw-tile-dragTile {
+    margin-right: 0;
+    transform: translateX( -9999px);
+}
+
+.aw-tile-dragTileCont {
+    position: absolute;
+}
+
+.aw-tile-dragTile .aw-tile-tileEdit .aw-tile-tileEditButton,
+.aw-tile-dragTileCont .aw-tile-tileEdit .aw-tile-tileEditButton {
+    display: none;
+}
+
+.aw-tile-editMode .aw-tile-tileMain {
+    transition: all 0.1s linear, order 0.1s linear, width 0.5s ease, height 0.5s ease, outline 0s linear;
+}
+
+.aw-tile-editMode .aw-tile-tileContainer {
+    opacity: 0.5;
+}
+
+.aw-tile-tileContainer.aw-tile-tileEdit {
+    opacity: 1;
+}
+
+.aw-tile-tileMain.aw-tile-tileEdit:hover aw-tile {
+    outline: 3px solid transparent;
+}
+
+/**** End TileEdit Styling *****/

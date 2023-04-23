@@ -1,0 +1,216 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-chart.directive",
+        "js/aw-row.directive"
+    ],
+    "actions": {
+        "createPieChartForType": {
+            "actionType": "JSFunction",
+            "method": "createPieChart",
+            "inputData": {
+                "data": "{{data}}",
+                "pieChartCategory": "pieChartProviderType"
+            },
+            "outputData": {
+                "chartProviders.pieChartProviderType.chartPoints": ""
+            },
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "createPieChartForCreationDate": {
+            "actionType": "JSFunction",
+            "method": "createPieChart",
+            "inputData": {
+                "data": "{{data}}",
+                "pieChartCategory": "pieChartProviderCreationDate"
+            },
+            "outputData": {
+                "chartProviders.pieChartProviderCreationDate.chartPoints": ""
+            },
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "createPieChartForMaturity": {
+            "actionType": "JSFunction",
+            "method": "createPieChart",
+            "inputData": {
+                "data": "{{data}}",
+                "pieChartCategory": "pieChartProviderMaturity"
+            },
+            "outputData": {
+                "chartProviders.pieChartProviderMaturity.chartPoints": ""
+            },
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "updateFiltersForTypePieChart":{
+            "actionType": "JSFunction",
+            "method": "updateFilters",
+            "inputData": {
+                "data": "{{data}}",
+                "currentChart": "pieChartProviderType"
+            },
+            "outputData": {},
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "updateFiltersForCreationDatePieChart":{
+            "actionType": "JSFunction",
+            "method": "updateFilters",
+            "inputData": {
+                "data": "{{data}}",
+                "currentChart": "pieChartProviderCreationDate"
+            },
+            "outputData": {},
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "updateFiltersForMaturityPieChart":{
+            "actionType": "JSFunction",
+            "method": "updateFilters",
+            "inputData": {
+                "data": "{{data}}",
+                "currentChart": "pieChartProviderMaturity"
+            },
+            "outputData": {},
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "updatePieChart":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePieChart",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Cm1ChangeDashboardService"
+        },
+        "clearAndInitializePieCharts":
+        {
+            "actionType": "JSFunction",
+            "method": "clearAndInitializePieCharts",
+            "inputData": {
+                "eventData": "{{parameters.eventData}}"
+            },
+            "outputData": {},
+            "deps": "js/Cm1ChangeDashboardService"
+        }
+    },
+    "data": {
+        "chartListboxPropData":
+        {
+           "displayName": "{{i18n.SearchResultsChartSelectorTitle}}",
+           "type": "STRING",
+           "isRequired": "false",
+           "hasLov": "true",
+           "dbValue": "{{ctx.chartProvider.chartListboxPropData.dbValue}}",
+           "dispValue": "{{ctx.chartProvider.chartListboxPropData.dispValue}}"
+       },
+       "chartTitleValue":
+       {
+           "titleValue" : "{{i18n.SearchResultsChartTitle}} {{ctx.chartProvider.chartListboxPropData.dispValue}}"
+       },
+       "pieChartProviderType":{
+            "chartBy":"ChangeItemRevision.object_type",
+            "defaultChartCategory":"ChangeItemRevision.object_type",
+            "categoryDisplayName":"Type"
+       },
+       "pieChartProviderCreationDate":{
+            "chartBy":"ChangeItemRevision.creation_date",
+            "defaultChartCategory":"ChangeItemRevision.creation_date",
+            "categoryDisplayName":"Creation Date"
+        },
+        "pieChartProviderMaturity":{
+            "chartBy":"ChangeItemRevision.CMMaturity",
+            "defaultChartCategory":"ChangeItemRevision.CMMaturity",
+            "categoryDisplayName":"Maturity"
+        }
+   },
+   "onEvent": [
+        {
+            "eventId": "pieChartProviderType.selected",
+            "cacheEventData": true,
+            "action": "updateFiltersForTypePieChart"
+        },
+        {
+            "eventId": "pieChartProviderCreationDate.selected",
+            "cacheEventData": true,
+            "action": "updateFiltersForCreationDatePieChart"
+        },
+        {
+            "eventId": "pieChartProviderMaturity.selected",
+            "cacheEventData": true,
+            "action": "updateFiltersForMaturityPieChart"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria":
+            {
+                "name": "searchResponseInfo",
+                "target": "searchFilterMap"
+            },
+            "action": "updatePieChart"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'search'",
+            "cacheEventData": true,
+            "inputArgs": { "eventData": "{{eventData}}" },
+            "action": "clearAndInitializePieCharts"
+        },
+        {
+            "eventId": "pieChartProviderType.create",
+            "cacheEventData": true,
+            "action": "createPieChartForType"
+        },
+        {
+            "eventId": "pieChartProviderCreationDate.create",
+            "cacheEventData": true,
+            "action": "createPieChartForCreationDate"
+        },
+        {
+            "eventId": "pieChartProviderMaturity.create",
+            "cacheEventData": true,
+            "action": "createPieChartForMaturity"
+        },
+        {
+            "eventId": "Cm1ChangeDasshboardPieChart.contentLoaded",
+            "cacheEventData": true,
+            "action": "clearAndInitializePieCharts"
+        }
+    ],
+   "chartProviders": {
+        "pieChartProviderType": {
+            "title": "Changes",
+            "chartType": "pie",
+            "loadDataAction": "createPieChartForType",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "logarithmic",
+                "xAxisLabel": "",
+                "yAxisLabel": "",
+                "isDataLabelOnChartEnabled": true
+            }
+        },
+        "pieChartProviderCreationDate": {
+            "title": "Changes",
+            "chartType": "pie",
+            "loadDataAction": "createPieChartForCreationDate",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "logarithmic",
+                "xAxisLabel": "",
+                "yAxisLabel": "",
+                "isDataLabelOnChartEnabled": true
+            }
+        },
+        "pieChartProviderMaturity": {
+            "title": "Changes",
+            "chartType": "pie",
+            "loadDataAction": "createPieChartForMaturity",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "logarithmic",
+                "xAxisLabel": "",
+                "yAxisLabel": "",
+                "isDataLabelOnChartEnabled": true
+            }
+        }
+    }
+}

@@ -1,0 +1,50 @@
+<aw-form name="commandPanelForm">
+    <aw-panel-body>
+        <aw-title-link prop="ctx.type_name" visible-when="ctx.sidenavCommandId !== 'Qam0addQAFromTemplate'" action="clearSelectedType"></aw-title-link>
+        <aw-command-panel-section caption="TEMPLATE" context="data" visible-when="ctx.sidenavCommandId === 'Qam0addQAFromTemplate'" >
+            <aw-list dataprovider="data.dataProviders.qualityActionTemplatesProvider" has-floating-cell-commands="false">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-panel-section caption="i18n.propertiesTitle">
+            <aw-widget prop="data.fnd0ActionItemId" visible-when="ctx.sidenavCommandId !== 'Qam0addQAFromTemplate'"></aw-widget>
+            <aw-widget prop="data.object_name"></aw-widget>
+            <aw-widget prop="data.object_desc"></aw-widget>
+            <aw-datetime prop="data.qam0DueDate"></aw-datetime>
+            <aw-listbox prop="data.qam0QualityActionStatus" list="data.listOfQualityactstatus"></aw-listbox>
+        </aw-panel-section>
+        <aw-command-panel-section caption="i18n.qam0ResponsibleUser" anchor="data.qam0ResponsibleUserSectionCommands" context="data">
+            <aw-list dataprovider="data.dataProviders.getAssignedResponsibleUserProvider" has-floating-cell-commands="false">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+        </aw-command-panel-section>
+
+        <aw-panel-section caption="i18n.targetTitle">
+            <aw-widget prop="data.qam0Targets"></aw-widget>
+        </aw-panel-section>
+
+        <aw-panel-section caption="i18n.actionsetting">
+            <aw-widget prop="data.qam0ConfirmationRequired"></aw-widget>
+            <aw-widget prop="data.qam0FeedbackAtCompletion"></aw-widget>
+            <aw-widget prop="data.qam0AutocompleteByDependent"></aw-widget>
+        </aw-panel-section>
+
+        <aw-panel-section caption="i18n.ownProjectSectionTitle">
+            <aw-list dataprovider="data.dataProviders.getOwningProjectsProvider">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+        </aw-panel-section>
+        <aw-command-panel-section caption="i18n.projectsSectionTitle" anchor="data.widgetProjectSectionCommands">
+            <aw-list dataprovider="data.dataProviders.getAssignedProjectsProvider" has-floating-cell-commands="false">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+        </aw-command-panel-section>
+    </aw-panel-body>
+</aw-form>
+<aw-command-sub-panel panel-id="addObjectPrimarySub" visible-when="data.activeView === 'assignProjectSub' && data.activeView === 'addReferenceSub'"></aw-command-sub-panel>
+<aw-panel-footer>
+    <!-- panel-footer button for New tab -->
+    <aw-button default="true" action="createObject" visible-when="data.activeView !== 'addReferenceSub' && data.activeView !== 'assignProjectSub' && data.object_name.dbValue !=='' && data.object_name.dbValue !==null && data.object_name.dbValue !== undefined && data.fnd0ActionItemId.dbValue !=='' && data.fnd0ActionItemId.dbValue !==null && data.fnd0ActionItemId.dbValue !== undefined">
+        <aw-i18n>i18n.qam0Add</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

@@ -1,0 +1,60 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-tab-set.directive"
+    ],
+    "actions": {
+        "revealAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "initializeCaptureGalleryListSubView",
+            "inputData": {},
+            "outputData": {
+                "showSnapshotTab": "showSnapshotTab",
+                "activeView": "activeView"
+            },
+            "events": {
+                "success": [ {
+                    "condition": "data.showSnapshotTab",
+                    "name": "awTab.setSelected",
+                    "eventData": {
+                        "tabKey": "InputSnapshot"
+                    }
+                } ]
+            },
+            "deps": "js/Awv0ImageCaptureService"
+        }
+    },
+    "data": {
+        "showSnapshotTab": null,
+        "tabsModel": [ {
+                "panelId": "SnapshotBaseListSub",
+                "name": "{{i18n.snapshotTab}}",
+                "tabKey": "InputSnapshot",
+                "visibleWhen": "(ctx.sublocation.nameToken === 'com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation' && data.showSnapshotTab && !ctx.splitView.mode && ((((ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >= 3 ) || ( ctx.tcSessionData.tcMajorVersion > 13 )) && ctx.aceActiveContext.context.topElement.modelType.typeHierarchyArray.indexOf('Fnd0AppSession') === -1) || ctx.tcSessionData.tcMajorVersion >= 13 && ctx.aceActiveContext.context.topElement.modelType.typeHierarchyArray.indexOf('Fnd0AppSession') !== -1)) && !(ctx.aceActiveContext.context.worksetTopNode !== undefined && ctx.aceActiveContext.context.worksetTopNode.modelType.typeHierarchyArray.indexOf( 'Fnd0WorksetRevision' ) > -1) && !(ctx.aceActiveContext.context.topElement.modelType.typeHierarchyArray.indexOf('Cae1ModelDesignElement') > -1) && !(ctx.aceActiveContext.context.workingContextObj && (ctx.aceActiveContext.context.workingContextObj.modelType.typeHierarchyArray.indexOf( 'Awb0SavedBookmark' ) > -1))"
+            },
+            {
+                "panelId": "Awv0ImageCaptureListSub",
+                "name": "{{i18n.imagesTab}}",
+                "tabKey": "InputImageCapture"
+            }
+        ]
+    },
+    "onEvent": [ {
+        "eventId": "awTab.selected",
+        "action": "revealAction"
+    } ],
+    "conditions": {
+    },
+    "preferences": [],
+    "dataProviders": {},
+    "i18n": {
+        "snapshotTab": [
+            "ImageCaptureToolMessages"
+        ],
+
+        "imagesTab": [
+            "ImageCaptureToolMessages"
+        ]
+    }
+}

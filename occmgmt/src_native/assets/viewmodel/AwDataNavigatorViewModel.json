@@ -1,0 +1,113 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-primary-workarea.directive",
+        "js/aw-splitter.directive",
+        "js/aw-occmgmt-secondary-workarea.directive",
+        "js/aw-class.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "initializeDataNavigator": {
+            "actionType": "JSFunction",
+            "method": "initializeDataNavigator",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "outputData":{
+                "handleUnlockForCommandVisibility":"handleToUnlockCommandVisibility",
+                "locked":"locked"
+            },
+            "deps": "js/awDataNavigatorService"
+        },
+        "destroyDataNavigator": {
+            "actionType": "JSFunction",
+            "method": "destroyDataNavigator",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/awDataNavigatorService"
+        },
+        "populateVisibleServerCommands": {
+            "actionType": "JSFunction",
+            "method": "populateVisibleServerCommands",
+            "inputData": {
+                "data": "{{data.eventData}}",
+                "contextKey": "{{subPanelContext.contextKey}}"
+            },
+            "deps": "js/awDataNavigatorService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeDataNavigator",
+        "onUnmount": "destroyDataNavigator"
+    },
+    "onEvent": [ {
+        "eventId": "soa.getVisibleCommands",
+        "action": "populateVisibleServerCommands",
+        "cacheEventData": true
+    } ],
+    "i18n": {},
+    "data": {
+
+        "aceSearchPolicyOverride" : {
+            "types": [ {
+                "name": "Awb0Element",
+                "properties": [ {
+                        "name": "awp0ThumbnailImageTicket"
+                    }, {
+                        "name": "object_string"
+                    }, {
+                        "name": "awp0CellProperties"
+                    },
+                    {
+                        "name": "awb0BreadcrumbAncestor",
+                        "modifiers": [ {
+                            "name": "withProperties",
+                            "Value": "true"
+                        } ]
+                    },
+                    {
+                        "name": "awb0UnderlyingObject"
+                    },
+                    {
+                        "name": "awb0TraceLinkFlag"
+                    }
+                ]
+            }, {
+                "name": "Fgd0DesignElement",
+                "properties": [ {
+                    "name": "awb0UnderlyingObject",
+                    "modifiers": [ {
+                        "name": "withProperties",
+                        "Value": "true"
+                    } ]
+                } ]
+            }, {
+                "name": "Cpd0DesignElement",
+                "properties": [ {
+                    "name": "cpd0category"
+                } ]
+            }, {
+                "name": "Wbs0ElementCondElement",
+                "properties": [ {
+                        "name": "wbs0IsWorkElement"
+                    },
+                    {
+                        "name": "wbs0RevObjectType"
+                    } ]
+            }, {
+                "name": "Awb0PartElement",
+                "properties": [ {
+                        "name": "ebm1Category"
+                    },
+                    {
+                        "name": "awb0AssemblyIndicator"
+                    }]
+            } ]
+        }
+    }
+
+}

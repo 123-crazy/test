@@ -1,0 +1,187 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-popup2.directive",
+        "js/aw-textbox.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive"
+    ],
+    "actions": {
+        "saveViewAndViewModel": {
+            "actionType": "JSFunctionAsync",
+            "method": "saveViewAndViewModel",
+            "inputData": {
+                "viewName": "{{data.viewAndViewModelName.dbValue}}"
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "viewAndViewModelSaved"
+                } ],
+                "failure": [ {
+                    "condition": "errorCode.status === 403",
+                    "message": "viewAndViewModelSaveNotAuthorized"
+                }, {
+                    "condition": "errorCode.status !== 403",
+                    "message": "viewAndViewModelSaveFailed"
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "wysiwyg.refreshWysiWyg"
+                } ],
+                "failure": [ {
+                    "name": "wysiwyg.closePopup"
+                } ]
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "refreshWysiWyg": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateLocationUrl"
+                },
+                {
+                    "action": "cloneLoadedViewViewModel"
+                },
+                {
+                    "action": "setCurrentPanelId"
+                },
+                {
+                    "action": "updateConfigService"
+                },
+                {
+                    "action": "refreshNestedView"
+                },
+                {
+                    "action": "closePopupWindow"
+                }
+            ]
+        },
+        "setCurrentPanelId": {
+            "actionType": "JSFunction",
+            "method": "setCurrentPanelId",
+            "inputData": {
+                "panelId": "{{data.viewAndViewModelName.dbValue}}",
+                "panelIdStatus": "Save"
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "cloneLoadedViewViewModel": {
+            "actionType": "JSFunction",
+            "method": "cloneLoadedViewViewModel",
+            "inputData": {
+                "panelId": "{{data.viewAndViewModelName.dbValue}}"
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "updateLocationUrl": {
+            "actionType": "JSFunction",
+            "method": "updateLocationURL",
+            "inputData": {
+                "panelId": "{{data.viewAndViewModelName.dbValue}}"
+            },
+            "deps": "js/wysiwygUtilService"
+        },
+        "refreshNestedView": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.refreshNestedView",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "closePopupWindow": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "inputData": {
+                "popupId": "{{data.eventData.popupId}}",
+                "targetEvent": "{{$event}}"
+            },
+            "deps": "js/popupService"
+        },
+        "updateConfigService": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "deps": "js/configurationService",
+            "inputData": {
+                "path": "viewmodel.{{data.viewAndViewModelName.dbValue}}"
+            }
+        },
+        "updatePanelDirtyState": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "updatePartial",
+                "name": null,
+                "value": false,
+                "path": "wysiwygCurrentPanel.isDirty"
+            }
+        }
+    },
+    "messages": {
+        "viewAndViewModelSaved": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.fileSaveMsg}}"
+        },
+        "viewAndViewModelSaveNotAuthorized": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.userNotAuthorizedError}}",
+            "messageTextParams": [
+                "{{data.viewAndViewModelName.dbValue}}"
+            ]
+        },
+        "viewAndViewModelSaveFailed": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.unableToSaveError}}",
+            "messageTextParams": [
+                "{{data.viewAndViewModelName.dbValue}}"
+            ]
+        }
+    },
+    "data": {
+        "viewAndViewModelName": {
+            "displayName": "{{i18n.panelTextBoxName}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": "{{ctx.wysiwygCurrentPanel.id}}",
+            "dispValue": "{{ctx.wysiwygCurrentPanel.id}}"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "wysiwyg.refreshWysiWyg",
+            "action": "updatePanelDirtyState"
+        },
+        {
+            "eventId": "wysiwyg.refreshWysiWyg",
+            "action": "refreshWysiWyg"
+        },
+        {
+            "eventId": "wysiwyg.closePopup",
+            "action": "closePopupWindow"
+        }
+    ],
+    "i18n": {
+        "panelTextBoxName": [
+            "locationMessages"
+        ],
+        "fileSaveMsg": [
+            "locationMessages"
+        ],
+        "close": [
+            "locationMessages"
+        ],
+        "save": [
+            "locationMessages"
+        ],
+        "userNotAuthorizedError": [
+            "BuilderMessages"
+        ],
+        "unableToSaveError": [
+            "BuilderMessages"
+        ]
+    }
+}

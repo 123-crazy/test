@@ -1,0 +1,150 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-break.directive",
+        "js/aw-button.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-command-panel.directive",
+        "js/enable-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "getInitialValuesForPanel": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "checkForSecondaryEvents"
+                },
+                {
+                    "action": "callToGetTypeConstantValue"
+                }
+            ]
+        },
+        "unregisterContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isSecondaryEventPresent"
+            }
+        },
+        "callToGetTypeConstantValue": {
+            "actionType": "JSFunction",
+            "method": "checkAndSetBOConstantValue",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "shiftSecondary": "{{data.Pgp0ShiftSecondary}}"
+            },
+            "outputData": {
+                "Pgp0ShiftSecondary": ""
+            },
+            "deps": "js/TimelineEventDependencyService"
+        },
+        "checkForSecondaryEvents": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": [ "{{ctx.selected}}" ],
+                "attributes": [
+                    "Prg0EventDependencyRel"
+                ]
+            }
+        },
+        "shiftEvent": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProgramInfra-2021-12-ProgramManagement",
+            "method": "moveEvents",
+            "inputData": {
+                "events": [ {
+                    "type": "{{ctx.mselected[0].type}}",
+                    "uid": "{{ctx.mselected[0].uid}}"
+                } ],
+                "newEventDate": "{{function:formatNewEventDate}}",
+                "updateSecondaryEvents": "{{function:setUpdateSecondaryEvents}}",
+                "runInBackground": false
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ],
+                "failure": [ {
+                    "name": "cdm.updated",
+                    "eventData": {
+                        "updatedObjects": [ "{{data.eventData.event}}" ]
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/TimelineEventDependencyService"
+        }
+    },
+    "data": {
+        "Pgp0NewPlannedDate": {
+            "displayName": "{{i18n.Pgp0PlannedDate}}",
+            "dbValue": "",
+            "type": "DATE",
+            "isRequired": "true"
+        },
+        "Pgp0ShiftSecondary": {
+            "type": "BOOLEAN",
+            "displayName": "{{i18n.Pgp0ShiftSecondary}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"            
+        }
+    },
+    "functions": {
+        "setUpdateSecondaryEvents": {
+            "functionName": "setUpdateSecondaryEvents",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "formatNewEventDate": {
+            "functionName": "formatNewEventDate",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.mselected[0]}}"
+            ]
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "getInitialValuesForPanel",
+        "onUnmount": "unregisterContext"
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "Pgp0PlannedDate": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0ShiftEvent": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0ShiftText": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0ShiftSecondary": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0ShiftSecondaryDesc": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "isRunAsync": [
+            "ProgramPlanningCommandPanelsMessages"
+        ]
+    }
+}

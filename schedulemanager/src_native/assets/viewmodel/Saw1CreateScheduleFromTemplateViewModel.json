@@ -1,0 +1,453 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "templateSectionCommands": "saw1_templateSectionCommands",
+
+        "object_name":
+        {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": ""
+        },
+        "startShiftDate":
+        {
+            "displayName": "{{i18n.Saw1StartDate}}",
+            "type": "DATETIME",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "finishShiftDate":
+        {
+            "displayName": "{{i18n.Saw1FinishDate}}",
+            "type": "DATETIME",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "isTemplate":
+        {
+            "displayName": "{{i18n.isTemplate}}",
+            "dbValue" : false,
+            "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "isRunAsync":
+        {
+            "displayName": "{{i18n.isRunAsync}}",
+             "dbValue" : false,
+             "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "openOnCreate":
+        {
+            "displayName": "{{i18n.openOnCreate}}",
+            "dbValue" : false,
+            "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+       "filterText": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING"
+        },
+        "createRelationForSchedInChanges": "{{ctx.PaletteAndSearchData.currentLocationChangeRelated}}"
+    },
+    "actions": {
+        "revealAction": {
+            "actionType": "dataProvider",
+            "methods": [
+                "selectedSchedules"
+            ]
+        },
+        "createScheduleFromTemplate": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2011-06-ScheduleManagement",
+            "method": "copySchedules",
+            "inputData": {
+                "containers": [
+                    {
+                        "name": "{{data.object_name.dbValue}}",
+                        "description": "{{data.object_desc.dbValue}}",
+                        "scheduleToCopy": "{{data.dataProviders.selectedSchedules.viewModelCollection.loadedVMObjects[0]}}",
+                        "options": {
+                            "logicalOptions": [
+                                {
+                                    "name": "showAlert",
+                                    "value": true
+                                },
+                                {
+                                    "name": "relateToNewStuff",
+                                    "value": true
+                                },
+                                {
+                                    "name": "resetWork",
+                                    "value": true
+                                }
+                            ],
+                            "integerOptions": [],
+                            "stringOptions": []
+                        },
+                        "stringValueContainer": [
+                            {
+                                "key": "is_template",
+                                "value": "{{function:getTemplateString}}",
+                                "type": 5
+                            },
+                            {
+                                "key": "fnd0ShiftDate",
+                                "value": "{{function:getShiftDate}}",
+                                "type": 1
+                            }
+                        ],
+                        "typedAttributesContainer": [
+                            {
+                                "type": "ScheduleType",
+                                "attributes": [
+                                    {
+                                        "key":"saw1UnitOfTimeMeasure",
+                                        "value":"{{data.currentSchedule.props.saw1UnitOfTimeMeasure.dbValue}}",
+                                        "type": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps":"js/Saw1CreateScheduleFromTemplateService",
+            "outputData":
+            {
+                "createdSchedule": "scheduleResponse[0].schedule"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "openOnCreate",
+                        "condition": "data.openOnCreate.dbValue === true"
+                    },
+                    {
+                        "name": "createScheduleCompleteInChanges",
+                        "condition":"data.createRelationForSchedInChanges == true"
+
+                    },
+                    {
+                         "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        },
+                        "condition":"data.createRelationForSchedInChanges == false"
+
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.openOnCreate.dbValue === false"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                            "message": "createObjectSuccessInChanges",
+                            "condition": "data.createRelationForSchedInChanges == true"
+                        },
+                        {
+                            "message": "createObjectSuccess",
+                            "condition": "data.isRunAsync.dbValue === false && data.createRelationForSchedInChanges == false"
+                     } ],
+                "failure": [ {
+                    "condition": "errorCode=='invalidStartDateOrFinishDate'",
+                    "message": "invalidStartDateOrFinishDate"
+                } ]
+            }
+        },
+        "createScheduleFromTemplateAsync": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2011-06-ScheduleManagement",
+            "method": "copySchedulesAsyncClient",
+            "inputData": {
+                "schToCopy": [
+                    {
+                        "name": "{{data.object_name.dbValue}}",
+                        "description": "{{data.object_desc.dbValue}}",
+                        "scheduleToCopy": "{{data.dataProviders.selectedSchedules.viewModelCollection.loadedVMObjects[0]}}",
+                        "options": {
+                            "logicalOptions": [
+                                {
+                                    "name": "showAlert",
+                                    "value": true
+                                },
+                                {
+                                    "name": "relateToNewStuff",
+                                    "value": true
+                                },
+                                {
+                                    "name": "resetWork",
+                                    "value": true
+                                }
+                            ],
+                            "integerOptions": [],
+                            "stringOptions": []
+                        },
+                        "stringValueContainer": [
+                            {
+                                "key": "is_template",
+                                "value": "{{function:getTemplateString}}",
+                                "type": 5
+                            },
+                            {
+                                "key": "fnd0ShiftDate",
+                                "value": "{{function:getShiftDate}}",
+                                "type": 1
+                            }
+                        ],
+                        "typedAttributesContainer": [
+                            {
+                                "type": "ScheduleType",
+                                "attributes": [
+                                    {
+                                        "key":"saw1UnitOfTimeMeasure",
+                                        "value":"{{data.currentSchedule.props.saw1UnitOfTimeMeasure.dbValue}}",
+                                        "type": 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps": "js/Saw1CreateScheduleFromTemplateService",
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            }
+        },
+        "openCreatedSchedule": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+            "uid": "{{data.createdSchedule.uid}}"
+        }
+      },
+
+      "createRelationForSchedActionInChanges": {
+          "actionType": "JSFunctionAsync",
+          "method": "execute",
+          "inputData": {
+              "targetObject": "{{ctx.PaletteAndSearchData.createRelationTargetObj}}",
+              "sourceObjects":["{{data.createdSchedule}}"],
+              "relationName": "{{ctx.PaletteAndSearchData.relationName}}"
+          },
+          "events": {
+            "success": [ {
+                "name": "cdm.relatedModified",
+                "eventData": {
+                    "relatedModified": [
+                        "{{ctx.PaletteAndSearchData.createRelationTargetObj}}"
+                    ]
+                }
+        } ]
+        },
+          "deps": "js/pasteService"
+      },
+      "closePanel": {
+          "actionType": "Event",
+          "method": "Event",
+          "inputData": {
+              "events": [ {
+                      "name": "complete",
+                      "eventData": {
+                          "source": "toolAndInfoPanel"
+                      }
+                  }
+
+              ]
+          }
+      },
+
+      "getSelectedSchedules": {
+        "actionType": "JSFunction",
+        "method": "getSelectedSchedules",
+        "inputData": {
+            "data": "{{data}}"
+        },
+        "deps": "js/Saw1CreateScheduleFromTemplateService"
+    }
+
+    },
+    "functions": {
+        "getShiftDate": {
+                "functionName": "getShiftDate",
+                "parameters": [
+                    "{{data}}"
+                ]
+        },
+        "getTemplateString": {
+            "functionName": "getTemplateString",
+            "parameters": [
+                "{{data.isTemplate.dbValue}}"
+            ]
+        }
+    },
+    "messages": {
+        "createObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.scheduleObjectAdded}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValue}}"
+            ]
+        },
+        "createObjectSuccessInChanges": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.scheduleObjectAddedInChanges}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValue}}"
+            ]
+        },
+        "invalidStartDateOrFinishDate": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.invalidStartDateOrFinishDate}}"
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "dataProviders": {
+        "getAssignedProjectsProvider": {
+            "response": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+            "totalFound": "{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0RemoveProjectsCell": {
+                    "id": "cmdRemove",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/removeObjectCellCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "selectedSchedules": {
+            "initializeAction": "getSelectedSchedules",
+            "selectionModelMode": "single",
+            "response": "{{data.dataProviders.selectedSchedules.viewModelCollection.loadedVMObjects}}",
+            "commandsAnchor": "aw_schTemplateCellCommand"
+        }
+    },
+    "preferences": [
+        "SM_TEMPLATE_DATE"
+    ],
+    "conditions": {
+        "isValidToShowCreateButton": {
+            "expression": "data.object_name.dbValue && data.object_name.dbValue!='' &&  data.dataProviders.selectedSchedules.viewModelCollection.loadedVMObjects.length === 1"
+        },
+        "isValidToShowRequired": {
+            "expression": "data.dataProviders.selectedSchedules.viewModelCollection.loadedVMObjects.length === 0"
+        },
+        "isFinishDateSchedule": {
+            "expression": "data.currentSchedule.props.end_date_scheduling.dbValue === true"
+        },
+        "isValidToShowDate": {
+            "expression": "data.dataProviders.selectedSchedules.viewModelCollection.loadedVMObjects.length === 1"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "cdm.relatedModified",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "revealAction"
+        },
+        {
+            "eventId": "openOnCreate",
+            "action": "openCreatedSchedule"
+        },
+        {
+            "eventId": "createScheduleCompleteInChanges",
+            "action": "createRelationForSchedActionInChanges"
+        }
+    ],
+    "i18n": {
+        "saw1Template": [
+            "ScheduleManagerMessages"
+        ],
+        "saw1ScheduleProperties": [
+            "ScheduleManagerMessages"
+        ],
+        "required": [
+            "ScheduleManagerMessages"
+        ],
+        "properties": [
+            "ScheduleManagerMessages"
+        ],
+        "name": [
+            "ScheduleManagerMessages"
+        ],
+        "createScheduleFromTemplateTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "createScheduleGroupTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "isRunAsync": [
+            "ScheduleManagerMessages"
+        ],
+        "isTemplate": [
+            "ScheduleManagerMessages"
+        ],
+        "openOnCreate": [
+            "ScheduleManagerMessages"
+        ],
+        "create": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleObjectAddedInChanges": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleObjectAdded": [
+            "ScheduleManagerMessages"
+        ],
+        "invalidStartDateOrFinishDate": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1StartDate": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1FinishDate": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

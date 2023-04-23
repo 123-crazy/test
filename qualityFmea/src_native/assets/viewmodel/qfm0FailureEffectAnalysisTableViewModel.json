@@ -1,0 +1,263 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "getFailureEffectData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "Qfm0FailureEffectURI",
+                    "operationType": "configured"
+                },
+                "saveColumnConfigData": {
+                    "clientScopeURI": "Qfm0FailureEffectURI",
+                    "columnConfigId": "{{data.dataProviders.failureEffectTableProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.failureEffectTableProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "objectSet": "Qfm0Effect.WorkspaceObject,Qfm0Effect",
+                        "parentUid": "{{function:getSelectedFailureMode}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "startIndex": "{{data.dataProviders.failureEffectTableProvider.startIndex}}",
+                    "searchSortCriteria": "{{data.columnProviders.failureEffectTableColumnProvider.sortCriteria}}",
+                    "columnFilters": "{{data.columnProviders.failureEffectTableColumnProvider.columnFilters}}"
+                },
+                "inflateProperties": true,
+                "noServiceData": false
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Awp0XRTObjectSetRow",
+                    "properties": [ 
+                        {
+                            "name": "is_modifiable"
+                        },
+                        {
+                            "name": "awp0Target"                            
+                        },
+                        {
+                            "name": "awp0IsCutAllowed"                            
+                        },
+                        {
+                            "name": "awp0Primary"                            
+                        },
+                        {
+                            "name": "awp0Relation"                            
+                        },
+                        {
+                            "name": "awp0Secondary"                            
+                        },
+                        {
+                            "name": "awp0RelationTypeName"                            
+                        },
+                        {
+                            "name": "awp0RelationTypeDisplayName"                            
+                        },
+                        {
+                            "name": "awp0RefPropertyName"                            
+                        }
+                    ]
+                } ]
+            },
+            "outputData": {
+                "failureEffectTotalFound": "totalFound",
+                "failureEffectTotalLoaded": "totalLoaded",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "failureEffectSearchResults": "{{function:processFailureAnalysisResponse}}",
+                "dataProviders.failureEffectTableProvider.columnConfig": "{{function:setNonModifiablePropForAbsFailureAnalysis}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "SOAFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FailureAnalysisTableServices"
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [
+                    {
+                        "clientScopeURI": "Qfm0FailureEffectURI",
+                        "columnConfigId": "{{data.dataProviders.failureEffectTableProvider.columnConfig.columnConfigId}}",
+                        "columns": "{{data.dataProviders.failureEffectTableProvider.newColumns}}",
+                        "scope": "LoginUser",
+                        "scopeName": ""
+                    }
+                ]
+            },
+            "outputData": {},
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "SOAFailureMessage"
+                    }
+                ]
+            }
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [
+                    {
+                        "scope": "LoginUser",
+                        "scopeName": "",
+                        "clientName": "AWClient",
+                        "resetColumnConfig": true,
+                        "columnConfigQueryInfos": [
+                            {
+                                "clientScopeURI": "Qfm0FailureEffectURI",
+                                "operationType": "configured",
+                                "columnsToExclude": []
+                            }
+                        ],
+                        "businessObjects": [
+                            {}
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "dataProviders.failureEffectTableProvider.resetColumnConfigs": "columnConfigurations"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "SOAFailureMessage"
+                    }
+                ]
+            }
+        },
+        "setProviderForEdit": {
+            "actionType": "JSFunction",
+            "method": "setEffectProviderForEdit",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/qfm0FailureAnalysisTableServices"
+        },
+        "getAdaptedObjects": {
+            "actionType": "JSFunction",
+            "method": "getAdaptedObjects",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx" :"{{ctx}}",
+                "relationType" : "Qfm0Effect"
+            },
+            "deps": "js/qfm0FailureAnalysisTableServices"
+        },
+        "getFilterFacets": {
+            "actionType": "JSFunction",
+            "method": "getFilterFacetValues",
+            "inputData": {
+                "columnName": "{{filterFacetInput.column.field}}",
+                "objects": "{{data.dataProviders.failureEffectTableProvider.viewModelCollection.loadedVMObjects}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "filterFacetResults": "{{data.filterFacetResults}}"
+            },
+            "deps": "js/qfm0SortFilterUtilService"
+        }
+    },
+    "data": {},
+    "dataProviders": {
+        "failureEffectTableProvider": {
+            "action": "getFailureEffectData",
+            "response": "{{data.failureEffectSearchResults}}",
+            "totalFound": "{{data.failureEffectTotalFound}}",
+            "totalLoaded": "{{data.failureEffectTotalLoaded}}",
+            "selectionModelMode": "multiple",
+            "editContext": "TABLE_CONTEXT_EFFECT",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands",
+            "filterFacetAction": "getFilterFacets",
+            "filterFacetResults": "{{data.filterFacetResults}}"
+        }
+    },
+    "columnProviders": {
+        "failureEffectTableColumnProvider": {
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "columnFilters": "{{filterFacetInput.columnFilters}}",
+            "sortCriteria": []
+        }
+    },
+    "conditions": {},
+    "functions": {
+        "getSelectedFailureMode": {
+            "functionName": "getSelectedFailureMode",
+            "parameters": []
+        },
+        "processFailureAnalysisResponse": {
+            "functionName": "processFailureAnalysisObjects",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "setNonModifiablePropForAbsFailureAnalysis": {
+            "functionName": "setNonModifiablePropForAbsFailureAnalysis",
+            "parameters": []
+        }
+    },
+    "grids": {
+        "failureEffectTable": {
+            "dataProvider": "failureEffectTableProvider",
+            "columnProvider": "failureEffectTableColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true,
+                "isFilteringEnabled": true
+            }
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "failureEffectTableProvider.modelObjectsUpdated",
+            "action": "setProviderForEdit"
+        },
+        {
+            "eventId": "failureEffectTableProvider.selectionChangeEvent",
+            "action": "getAdaptedObjects",
+            "condition": "selectedObjects.length !== 0"
+        }
+    ],
+    "i18n": {
+        "qfm0Name": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Severity": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FailureEffect": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

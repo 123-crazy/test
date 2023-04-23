@@ -1,0 +1,423 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-break.directive",
+        "js/aw-checkbox.directive"
+    ],
+    "data": {
+        "actionDef": {
+            "displayName": "{{i18n.initialAction}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "CommandPanel",
+            "dispValue": "{{i18n.openCommandPanel}}",
+            "dataProvider": "getDefaultActionTypes",
+            "hasLov": true,
+            "renderingHint": "textbox",
+            "isSelectOnly": true
+        },
+        "commandId": {
+            "displayName": "{{i18n.commandId}}",
+            "type": "STRING",
+            "isEditable": true,
+            "dispValue": "",
+            "dbValue": "",
+            "autofocus": "true"
+        },
+        "createWithPlacement": {
+            "displayName": "{{i18n.createWithPlacement}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "createWithHandler": {
+            "displayName": "{{i18n.createWithHandler}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "actions": {
+        "create": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "createCommand.createCommand",
+                        "condition": "!conditions.isCreateWithPlacement && !conditions.isCreateWithHandler"
+                    },
+                    {
+                        "name": "createCommand.createCommandWithPlacement",
+                        "condition": "conditions.isCreateWithPlacement && !conditions.isCreateWithHandler"
+                    },
+                    {
+                        "name": "createCommand.createCommandWithHandler",
+                        "condition": "!conditions.isCreateWithPlacement && conditions.isCreateWithHandler && !conditions.isEmptyAction"
+                    },
+                    {
+                        "name": "createCommand.createCommandWithEmptyActionHandler",
+                        "condition": "!conditions.isCreateWithPlacement && conditions.isCreateWithHandler && conditions.isEmptyAction"
+                    },
+                    {
+                        "name": "createCommand.createCommandWithPlacementAndHandler",
+                        "condition": "conditions.isCreateWithPlacement && conditions.isCreateWithHandler && !conditions.isEmptyAction"
+                    },
+                    {
+                        "name": "createCommand.createCommandWithPlacementAndEmptyActionHandler",
+                        "condition": "conditions.isCreateWithPlacement && conditions.isCreateWithHandler && conditions.isEmptyAction"
+                    }
+                ]
+            }
+        },
+        "createCommand": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($id:ID!){ addCommand(input:{id:$id}){id} updateCommandExtendedTooltip(input:{id:$id,viewName:\"extendedTooltipDefault\"}){id}}",
+                    "variables": {
+                        "id": "{{data.commandId.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "createdCommand": "data.addCommand"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createCommand.focusCommand"
+                    },
+                    {
+                        "name": "createCommand.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "createCommandWithPlacement": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$anchor:String,$priority:Int!){ addCommand(input:{id:$commandID}){id} addPlacement(input:{command:$commandID,anchor:$anchor,priority:$priority}){id} updateCommandExtendedTooltip(input:{id:$commandID,viewName:\"extendedTooltipDefault\"}){id}}",
+                    "variables": {
+                        "commandID": "{{data.commandId.dbValue}}",
+                        "anchor": "aw_rightWall",
+                        "priority": -1
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "createdCommand": "data.addCommand"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createCommand.focusCommand"
+                    },
+                    {
+                        "name": "createCommand.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "createCommandWithHandler": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$requiredID:ID!,$conditionID:ID,$actionName:ID,$actionDefType:ActionDefType){ addCommand(input:{id:$commandID}){id} addHandler(input:{command:$commandID,action:$actionName,actionDefType:$actionDefType,visibleWhen:$conditionID,enableWhen:$conditionID,activeWhen:$requiredID}){id} updateCommandExtendedTooltip(input:{id:$commandID,viewName:\"extendedTooltipDefault\"}){id} }",
+                    "variables": {
+                        "commandID": "{{data.commandId.dbValue}}",
+                        "requiredID": "true",
+                        "conditionID": "true",
+                        "actionName": "{{data.commandId.dbValue}}NewAction",
+                        "actionDefType": "{{data.actionDef.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "createdCommand": "data.addCommand"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createCommand.createDefaultPanelAndClose"
+                    },
+                    {
+                        "name": "createCommand.focusCommand"
+                    },
+                    {
+                        "name": "createCommand.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "createCommandWithEmptyActionHandler": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$requiredID:ID!,$conditionID:ID,$actionDefType:ActionDefType){ addCommand(input:{id:$commandID}){id} addHandler(input:{command:$commandID,actionDefType:$actionDefType,visibleWhen:$conditionID,enableWhen:$conditionID,activeWhen:$requiredID}){id} updateCommandExtendedTooltip(input:{id:$commandID,viewName:\"extendedTooltipDefault\"}){id} }",
+                    "variables": {
+                        "commandID": "{{data.commandId.dbValue}}",
+                        "requiredID": "true",
+                        "conditionID": "true",
+                        "actionDefType": "{{data.actionDef.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "createdCommand": "data.addCommand"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createCommand.createDefaultPanelAndClose"
+                    },
+                    {
+                        "name": "createCommand.focusCommand"
+                    },
+                    {
+                        "name": "createCommand.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "createCommandWithPlacementAndHandler": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$requiredID:ID!,$conditionID:ID,$actionName:ID,$actionDefType:ActionDefType){addCommand(input:{id:$commandID}){id} addPlacement(input:{command:$commandID,anchor:\"aw_rightWall\",priority:-1}){id} addHandler(input:{command:$commandID,action:$actionName,actionDefType:$actionDefType,visibleWhen:$conditionID,enableWhen:$conditionID,activeWhen:$requiredID}){id} updateCommandExtendedTooltip(input:{id:$commandID,viewName:\"extendedTooltipDefault\"}){id} }",
+                    "variables": {
+                        "commandID": "{{data.commandId.dbValue}}",
+                        "requiredID": "true",
+                        "conditionID": "true",
+                        "actionName": "{{data.commandId.dbValue}}NewAction",
+                        "actionDefType": "{{data.actionDef.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "createdCommand": "data.addCommand"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createCommand.createDefaultPanelAndClose"
+                    },
+                    {
+                        "name": "createCommand.focusCommand"
+                    },
+                    {
+                        "name": "createCommand.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "createCommandWithPlacementAndEmptyActionHandler": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$requiredID:ID!,$conditionID:ID,$actionDefType:ActionDefType){addCommand(input:{id:$commandID}){id} addPlacement(input:{command:$commandID,anchor:\"aw_rightWall\",priority:-1}){id} addHandler(input:{command:$commandID,actionDefType:$actionDefType,visibleWhen:$conditionID,enableWhen:$conditionID,activeWhen:$requiredID}){id} updateCommandExtendedTooltip(input:{id:$commandID,viewName:\"extendedTooltipDefault\"}){id} }",
+                    "variables": {
+                        "commandID": "{{data.commandId.dbValue}}",
+                        "requiredID": "true",
+                        "conditionID": "true",
+                        "actionDefType": "{{data.actionDef.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "createdCommand": "data.addCommand"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createCommand.createDefaultPanelAndClose"
+                    },
+                    {
+                        "name": "createCommand.focusCommand"
+                    },
+                    {
+                        "name": "createCommand.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "createDefaultPanelAndCloseBatchJob": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "condition": "conditions.isCommandPanel",
+                    "action": "createDefaultPanel"
+                },
+                {
+                    "action": "closePanel"
+                }
+            ]
+        },
+        "createDefaultPanel": {
+            "actionType": "RESTService",
+            "method": "PUT",
+            "inputData": {
+                "request": "{{function:createDefaultPanel}}"
+            },
+            "deps": "js/createCommandService"
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "focusCommand": {
+            "actionType": "Navigate",
+            "navigateTo": "commandBuilder",
+            "navigationParams": {
+                "s_uid": "{{data.commandId.dbValue}}"
+            }
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "getDefaultActions": {
+            "actionType": "JSFunction",
+            "method": "getDefaultActions",
+            "outputData": {
+                "actionDefOptions": ""
+            },
+            "deps": "js/createCommandService"
+        }
+    },
+    "dataProviders": {
+        "getDefaultActionTypes": {
+            "dataProviderType": "TcLOV",
+            "action": "getDefaultActions",
+            "response": "{{data.actionDefOptions}}",
+            "totalFound": "{{data.actionDefOptions.length}}"
+        }
+    },
+    "functions": {
+        "createDefaultPanel": {
+            "functionName": "createDefaultPanel",
+            "parameters": [
+                "{{data.commandId.dbValue}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "createCommand.notifyConfigChange",
+            "action": "notifyConfigChange"
+        },
+        {
+            "eventId": "createCommand.focusCommand",
+            "action": "focusCommand"
+        },
+        {
+            "eventId": "createCommand.createCommand",
+            "action": "createCommand"
+        },
+        {
+            "eventId": "createCommand.createCommandWithPlacement",
+            "action": "createCommandWithPlacement"
+        },
+        {
+            "eventId": "createCommand.createCommandWithHandler",
+            "action": "createCommandWithHandler"
+        },
+        {
+            "eventId": "createCommand.createCommandWithEmptyActionHandler",
+            "action": "createCommandWithEmptyActionHandler"
+        },
+        {
+            "eventId": "createCommand.createCommandWithPlacementAndHandler",
+            "action": "createCommandWithPlacementAndHandler"
+        },
+        {
+            "eventId": "createCommand.createCommandWithPlacementAndEmptyActionHandler",
+            "action": "createCommandWithPlacementAndEmptyActionHandler"
+        },
+        {
+            "eventId": "createCommand.createDefaultPanelAndClose",
+            "action": "createDefaultPanelAndCloseBatchJob"
+        }
+     ],
+    "conditions": {
+        "isValidToCreate": {
+            "expression": "data.commandId.dbValue && data.commandId.dbValue !=''"
+        },
+        "isCreateWithPlacement": {
+            "expression": "data.createWithPlacement.dbValue===true"
+        },
+        "isCreateWithHandler": {
+            "expression": "data.createWithHandler.dbValue===true"
+        },
+        "isCommandPanel": {
+            "expression": "data.actionDef.dbValue === 'CommandPanel'"
+        },
+        "isEmptyAction": {
+            "expression": "data.actionDef.dbValue === 'Empty'"
+        }
+    },
+    "i18n": {
+        "Create": [ "CommandBuilderMessages" ],
+        "createCommand": [ "CommandBuilderMessages" ],
+        "commandId": [ "CommandBuilderMessages" ],
+        "createWithPlacement": [ "CommandBuilderMessages" ],
+        "createWithHandler": [ "CommandBuilderMessages" ],
+        "initialAction": [ "CommandBuilderMessages" ],
+        "openCommandPanel": [ "CommandBuilderMessages" ]
+    }
+}

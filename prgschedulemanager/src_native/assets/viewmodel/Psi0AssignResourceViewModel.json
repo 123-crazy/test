@@ -1,0 +1,177 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel.directive"
+    ],
+    "actions": {
+        "assignResource": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "condition": "data.selectedTab.panelId === 'Psi0AddResponsibleUser'",
+                        "name": "Psi0AddResponsibleUser.assign"
+                    },
+                    {
+                        "condition": "data.selectedTab.panelId === 'Saw1AddResourcePoolToSchedule'",
+                        "name": "Saw1AddResourcePoolToSchedule.assign"
+                    }
+                ]
+            }
+        },
+        "checkForExistingResourcePoolAndDeleteAction": {
+            "actionType": "JSFunction",
+            "method": "checkForExistingResourcePoolAndDelete",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "assignResourcePoolToPDREvent"
+                    }
+                ]
+            },
+            "deps": "js/Psi0AssignResourceService"
+        },
+        "assignResourcePoolToPDRAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:getObjectsWithRelation}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "getResourceAssignment",
+                        "condition": "ctx.activeSplit === true"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        },
+                        "condition": "!ctx.activeSplit"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/Psi0AssignResourceService"
+        },
+        "getResourceAssignment": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": "{{ctx.mselected}}",
+                "attributes": [
+                    "psi0ResourceAssignment"
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Psi0PrgDelRevision",
+                        "properties": [
+                            {
+                                "name": "psi0ResourceAssignment"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        }
+    },
+    "data": {
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "panelId": "Psi0AddResponsibleUser",
+                    "name": "{{i18n.psi0Users}}",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Saw1AddResourcePoolToSchedule",
+                    "name": "{{i18n.resourcePool}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx.mselected[0].modelType.typeHierarchyArray.indexOf( 'Psi0PrgDelRevision' ) > -1"
+                }
+            ]
+        }
+    },
+    "functions": {
+        "getObjectsWithRelation": {
+            "functionName": "getObjectsWithRelation",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isSelectedObjectListEmpty": {
+            "expression": "(data.dataProviders.getResourcePool.selectedObjects.length > 0 && data.selectedTab.panelId === 'Saw1AddResourcePoolToSchedule') || (data.dataProviders.userPerformSearch.selectedObjects.length > 0 && data.selectedTab.panelId === 'Psi0AddResponsibleUser')"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Saw1AddResourcePoolToSchedule.assign",
+            "action": "checkForExistingResourcePoolAndDeleteAction"
+        },
+        {
+            "eventId": "assignResourcePoolToPDREvent",
+            "action": "assignResourcePoolToPDRAction"
+        },
+        {
+            "eventId": "getResourceAssignment",
+            "action": "getResourceAssignment"
+        }
+    ],
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "resourcePool": [
+            "ScheduleManagerMessages"
+        ],
+        "psi0Users": [
+            "PrgScheduleManagerMessages"
+        ],
+        "psi0AssignResource": [
+            "PrgScheduleManagerMessages"
+        ],
+        "assign": [
+            "PrgScheduleManagerMessages"
+        ]
+    }
+}

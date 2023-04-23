@@ -1,0 +1,162 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-scrollpanel.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "loadData":
+        {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($searchString:String,$searchInput:SearchInput,$inboxContentType:InboxContentType!){inbox(searchString:searchString,searchInput:$searchInput,content:$inboxContentType){totalFound totalLoaded searchFilterMap searchFilterCategories objectsGroupedByProperty results{cell_properties thumbnailURL hasThumbnail uid typeHierarchy cellHeader1 cellHeader2 indicators props}}}",
+                    "variables": {
+                        "searchInput": {
+                            "maxToLoad": 50,
+                            "maxToReturn": 50,
+                            "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                            "cursor": {
+                                "startIndex": "{{data.dataProviders.imageDataProvider.startIndex}}",
+                                "endIndex": 50,
+                                "startReached": true,
+                                "endReached": false
+                            },
+                            "searchFilterMap": "{{function:convertSearchFilterMap}}",
+                            "searchSortCriteria": "{{ctx.sublocation.sortCriteria}}",
+                            "inflateProperties": false
+                        },
+                        "searchString": "{{ctx.search.criteria.searchString}}",
+                        "inboxContentType": "{{ctx.search.criteria.searchInboxContentType}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [{
+                "id": "search",
+                "responseObjs": "data.inbox.results"
+            }],
+            "outputData":
+            {
+                "totalFound": "data.inbox.totalFound",
+                "searchResults": "{{function:getSearchResults}}",
+                "ctx.search.totalFound": "data.inbox.totalFound",
+                "ctx.search.totalLoaded": "data.inbox.totalLoaded",
+                "ctx.search.filterMap": "data.inbox.searchFilterMap",
+                "ctx.search.filterCategories": "data.inbox.searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "data.inbox.objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "data.inbox.searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "data.inbox.searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "data.inbox.objectsGroupedByProperty"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "selectFirstItemEvent",
+                        "condition": "ctx.search.totalFound > 0 && data.preferences.WRKFLW_preselect_first_task && data.preferences.WRKFLW_preselect_first_task[0] === 'true'"
+                    }
+                ]
+            },
+            "deps": "js/GraphQLConversionService"
+        },
+        "selectFirstItem": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.imageDataProvider.selectionModel}}",
+                "newSelection": "{{data.searchResults.objects[0].uid}}"
+            },
+            "deps": "js/selectionModelFactory"
+        },
+        "unsubscribeCdmModified": {
+            "actionType": "JSFunction",
+            "method": "unsubscribeCdmModified",
+            "deps": "js/aw.inbox.service"
+        },
+        "updateUnreadFlag": {
+            "actionType": "JSFunction",
+            "method": "updateUnreadFlag",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aw.inbox.service"
+        }
+    },
+    "functions": {
+        "convertSearchFilterMap": {
+            "functionName": "convertSearchFilterMap",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "convertSearchCriteria": {
+            "functionName": "convertSearchCriteria",
+            "parameters": [
+                "{{ctx.search.criteria}}"
+            ]
+        },
+        "getSearchResults": {
+            "functionName": "getSearchResults",
+            "parameters": [  "{{data}}"  ]
+        }
+    },
+    "dataParseDefinitions": {
+        "search": {
+            "cellHeader1": "{{response.cellHeader1}}",
+            "cellHeader2": "{{response.cellHeader2}}",
+            "cellProperties": "{{response.cell_properties}}",
+            "thumbnailURL": "{{response.thumbnailURL}}",
+            "typeHierarchy": "{{response.typeHierarchy}}",
+            "typeIconURL": "assets/image/typeItemRevision48.svg",
+            "hasThumbnail": "{{response.hasThumbnail}}",
+            "identifier": "{{response.uid}}",
+            "indicators": "{{response.indicators}}",
+            "props": "{{response.props}}"
+        }
+    },
+    "dataProviders":
+    {
+        "imageDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "onEvent": [{
+        "eventId": "inboxGQLImage.contentLoaded",
+        "action": "reveal"
+    },
+    {
+        "eventId": "selectFirstItemEvent",
+        "action": "selectFirstItem"
+    },
+    {
+        "eventId": "cdm.modified",
+        "action": "updateUnreadFlag",
+        "cacheEventData": true
+    }],
+    "preferences":
+    [
+        "WRKFLW_preselect_first_task"
+    ],
+    "lifecycleHooks": {
+        "onUnmount": "unsubscribeCdmModified"
+    }
+}

@@ -1,0 +1,26 @@
+<div class="aw-layout-flexColumn">
+    <header aria-label="i18n.applicationHeader" class="aw-layout-header clearfix">
+        <div class="aw-layout-flexColumn">
+            <div class="aw-layout-flexRow aw-layout-headerTitleContainer">
+                <aw-header-title headerVMO="headerViewModel" headerTitle="headerTitle" headerProperties="headerProperties"></aw-header-title>
+                <div ng-show="subLocationTabs.length > 1 && !ctx.fullscreen" class="aw-layout-subLocationTitles">
+                    <aw-tab-container tab-container-model="subLocationTabs" callback="api" tab-set-id="primary">
+                        <aw-tab tab-model="tab" ng-repeat="tab in subLocationTabs | filter:{displayTab:true}"></aw-tab>
+                    </aw-tab-container>
+                </div>
+            </div>
+            <div class="aw-layout-flexRow">
+                <aw-sublocation-title>
+                    <div class="aw-layout-validationErrorMessage" ng-if="ctx.sublocationTitleErrorMessage">
+                        {{ctx.sublocationTitleErrorMessage}}
+                    </div>
+                    <aw-workarea-title provider="breadCrumbProvider" breadcrumb-config="breadcrumbConfig" ng-if="!ctx.sublocationTitleErrorMessage"></aw-workarea-title>
+                </aw-sublocation-title>
+            </div>
+        </div>
+        <div class="aw-layout-flexRowContainer aw-layout-alignItemsCenter">
+            <aw-global-search visible-when="!ctx.embeddedLocationView" ></aw-global-search>
+            <aw-logo></aw-logo>
+        </div>
+    </header>
+</div>

@@ -1,0 +1,157 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "data": {
+        "displayLimit": {
+            "displayName": "{{i18n.Saw1KanbanDisplayLimitPropertyText}}",
+            "type": "INTEGER",
+            "dbValue": "",
+            "isRequired": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "SM_TASKS_KANBAN_BOARD_DEFAULT_DISPLAY_LIMIT" : "20"
+    },
+    "actions": {
+        "callSetPreferenceSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Administration-2012-09-PreferenceManagement",
+            "method": "setPreferences2",
+            "inputData": {
+                "preferenceInput": [
+                    {
+                        "preferenceName": "AWC_SM_Tasks_Board_Display_Limit",
+                        "values": [
+                            "{{data.SMKanbanDisplayLimit}}"
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "navigate"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            }
+        },
+        "navigateAction": {
+            "actionType": "JSFunction",
+            "method": "updatesubLocation",
+            "deps": "js/SMKanbanBoardHelper"
+        },
+        "populateDisplayLimit": {
+            "actionType": "JSFunction",
+            "method": "populateDisplayLimit",
+            "inputData":{
+                "data": "{{data}}"
+            },
+            "deps": "js/SMKanbanBoardHelper"
+        },
+        "updateDisplayLimitPreference": {
+            "actionType": "JSFunction",
+            "method": "updateDisplayLimitPreference",
+            "inputData":{
+                "data": "{{data}}",
+                "value": "{{data.displayLimit.dbValues[0]}}"
+            },
+            "outputData": {
+                "SMKanbanDisplayLimit": ""
+            },
+            "deps": "js/SMKanbanBoardHelper",
+            "events": {
+                "success": [
+                    {
+                        "name": "callSetPreferenceSOA"
+                    }
+                ]
+            }
+        },
+        "resetDisplayLimitPreference": {
+            "actionType": "JSFunction",
+            "method": "updateDisplayLimitPreference",
+            "inputData":{
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "SMKanbanDisplayLimit": ""
+            },
+            "deps": "js/SMKanbanBoardHelper",
+            "events": {
+                "success": [
+                    {
+                        "name": "callSetPreferenceSOA"
+                    }
+                ]
+            }
+        }
+
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "populateDisplayLimit"
+        },
+        {
+            "eventId": "callSetPreferenceSOA",
+            "action": "callSetPreferenceSOA"
+        },
+        {
+            "eventId": "updateDisplayLimitPreference",
+            "action": "updateDisplayLimitPreference"
+        },
+        {
+            "eventId": "navigate",
+            "action": "navigateAction"
+        }
+    ],
+    "conditions":{
+        "isValidToShowSetButton": {
+            "expression": "data.displayLimit.dbValue > 0"
+        }
+    },
+    "preferences": [
+        "AWC_SM_Tasks_Board_Display_Limit"
+    ],
+    "messages": {
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "Saw1KanbanDisplayLimit": [
+            "ScheduleManagerMessages"
+        ],
+        "setButtonText": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1KanbanDisplayLimitPropertyText": [
+            "ScheduleManagerMessages"
+        ],
+        "Saw1ResetButtonText": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

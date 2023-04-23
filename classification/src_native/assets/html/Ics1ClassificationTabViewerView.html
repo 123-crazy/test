@@ -1,0 +1,75 @@
+<div class="aw-clspanel-fullViewClassify">
+    <aw-flex-row>
+        <aw-flex-column class="aw-clspanel-fullviewViewMode" width="25f" visible-when="!conditions.isStandAloneCmdSelected && !conditions.isSelectedObjectStandAlone">
+            <div class="aw-clspanel-fullViewVerticalFlexBox">
+                <div class="aw-clspanel-fullViewClassifications" visible-when="data.panelMode === -1 || (data.panelMode === 1 && data.editPropInProgress) || ( data.panelMode === 1 && ctx.pasteInProgress === true)">
+                    <aw-command-panel-section caption="i18n.Classifications" anchor="data.classificationCommands" collapsed="false">
+                        <div class="aw-clspanel-viewClassification aw-xrt-columnContentPanel aw-layout-primaryWorkareaFill">
+                            <aw-command-sub-panel panel-id="Awp0ViewClassificationFull" visible-when="data.panelMode === -1 ||( data.icoCells && data.icoCells.length >= 1 )|| ( data.panelMode === 1 && ctx.pasteInProgress === true)"></aw-command-sub-panel>
+                        </div>
+                    </aw-command-panel-section>
+                </div>
+                <div class="aw-clspanel-fullViewClassFlexBox">
+                    <aw-command-sub-panel class="aw-clspanel-createClassificationPanel" panel-id="Awp0CreateClassificationFull" visible-when="conditions.createMode || conditions.editMode && ctx.classifyEdit.vmo"></aw-command-sub-panel>
+                </div>
+            </div>
+        </aw-flex-column>
+        <aw-splitter min-size-1="200" min-size-2="320" isprimarysplitter="false" direction="vertical" visible-when="!conditions.isStandAloneCmdSelected && !conditions.isSelectedObjectStandAlone"></aw-splitter>
+        <aw-flex-column>
+            <div class="aw-clspanel-fullViewVerticalFlexBox">
+                <div class="aw-clspanel-fullViewColumnFlexContainer" exist-when="data.panelMode!== -1 && !data.editPropInProgress && data.suggestedClasses && !data.selectedClass && data.suggestedClasses.length >= 1 " visible-when="conditions.createMode || conditions.editMode">
+                    <div class="aw-clspanel-suggestedCommandPanel">
+                        <aw-command-sub-panel panel-id="Awp0SuggestedClassificationVNCs" class="aw-clspanel-suggestion"></aw-command-sub-panel>
+                    </div>
+                </div>
+                <div class="aw-clspanel-fullViewFlexContainer aw-clspanel-fullViewColumnFlexContainer"
+                    aw-class="{'aw-clspanel-locationTab': ctx.clsLocation}">
+                    <aw-column visible-when="data && ((ctx.clsTab.classifyImageMaximize === true || ctx.clsTabGlobal.classifyShowImages==true && data.clsImgAvailable===true) || (ctx.clsTabGlobal.classifyShowPropGroups ===true && data.hasBlocks === true))"
+                        class="aw-clspanel-fullViewImage" id="aw-clspanel-fullViewImage">
+                        <div aw-class="{'aw-clspanel-fullViewFlexBox aw-clspanel-fullViewImageSection': data.attr_anno && data.imageURLs.length>= 1, 'hidden': data.attr_anno == null && data.imageURLs == null}"
+                                exist-when="ctx.clsTab.classifyImageMaximize===true || (ctx.clsTabGlobal.classifyShowImages==true && data.clsImgAvailable===true)">
+                            <aw-command-sub-panel class="aw-clspanel-images" panel-id="Awp0ClassificationImagesFull" ></aw-command-sub-panel>
+                        </div>
+                        <div class="aw-clspanel-fullViewFlexBox aw-clspanel-fullViewPropGrpSection" visible-when="data && (ctx.clsTabGlobal.classifyShowPropGroups === true && data.hasBlocks === true) && (!ctx.clsTab.classifyImageMaximize || ctx.clsTab.classifyImageMaximize === false)">
+                            <aw-command-sub-panel class="aw-clspanel-fullview-container-propertyGroups" panel-id="Awp0ClassificationPropertyGroupTreeFull" ></aw-command-sub-panel>
+                        </div>
+                    </aw-column>
+                    <aw-column class="aw-clspanel-fullViewPropSection" id="aw-clspanel-fullViewPropSection"
+                        visible-when="(data.attr_anno === null && ctx.clsTab.classifyImageMaximize === true) || !ctx.clsTab.classifyImageMaximize || ctx.clsTab.classifyImageMaximize === false">
+                        <aw-panel-body>
+                            <div class="aw-xrt-columnContentPanel" width="fill"
+                                    visible-when="(data.editClass || (data.editClassInProgress && data.attr_anno === null) ||
+                                           (data.attr_anno && (!data.editClass || data.isPanel)) || (data.panelMode !== -1 && data.attr_anno === null))">
+                                <div class="aw-clspanel-fullViewFlexBox aw-clspanel-fullViewPropertySection" exist-when="data.attr_anno || data.isPanel">
+                                    <aw-command-sub-panel class="aw-clspanel-fullview-container-propertiesFullPanel" panel-id="Awp0ClassificationPropertiesFull"></aw-command-sub-panel>
+                                </div>
+                                <div class="aw-clspanel-fullViewVncFlexBox" visible-when="data.panelMode !== -1 && data.attr_anno === null">
+                                    <aw-command-sub-panel panel-id="Awp0ClassificationVncsFull" visible-when="conditions.createMode || conditions.editMode"></aw-command-sub-panel>
+                                </div>
+                            </div>
+                        </aw-panel-body>
+                        <div class="aw-clspanel-classifyCreateFooter" visible-when="conditions.isStandAloneCmdSelected || data.panelMode===0 || data.editClassInProgress===true || ( data.panelMode === 1 && ctx.pasteInProgress === true)">
+                            <aw-panel-footer visible-when="conditions.createMode || conditions.editMode && ctx.classifyEdit.vmo || conditions.editMode &&  ctx.pasteInProgress === true">
+                                <aw-button class="aw-clspanel-classifyButton" button-type="negative" action="cancelEditOperation" default="false"
+                                    visible-when="!conditions.isStandAloneCmdSelected && data.panelMode !== -1">
+                                    <aw-i18n>i18n.cancel</aw-i18n>
+                                </aw-button>
+                                <aw-button class="aw-clspanel-standAloneClassifyButton" button-type="negative" action="cancelEditOperation" default="false"  visible-when="conditions.isStandAloneCmdSelected && data.panelMode===0">
+                                    <aw-i18n>i18n.cancel</aw-i18n>
+                                </aw-button>
+                                <aw-button class="aw-clspanel-classifyButton aw-clspanel-classifyButtonLast" action="saveExit"
+                                    visible-when="(conditions.showClassifyButtonCreate || conditions.showClassifyButtonEdit) && !conditions.isStandAloneCmdSelected">
+                                    <aw-i18n>i18n.Classify</aw-i18n>
+                                </aw-button>
+                                <aw-button class="aw-clspanel-standAloneClassifyButton aw-clspanel-classifyButtonLast" action="saveExit"
+                                    visible-when="conditions.isStandAloneCmdSelected && conditions.standAloneCreateButton">
+                                    <aw-i18n>i18n.create</aw-i18n>
+                                </aw-button>
+                            </aw-panel-footer>
+                        </div>
+                    </aw-column>
+                </div>
+            </div>
+        </aw-flex-column>
+    </aw-flex-row>
+</div>

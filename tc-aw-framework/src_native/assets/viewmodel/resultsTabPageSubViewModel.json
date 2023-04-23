@@ -1,0 +1,286 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/visible-when.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-expandable-search-result-filter.directive",
+        "js/aw-label.directive",
+        "js/exist-when.directive"
+    ],
+
+    "conditions": {
+        "isResultsTabPage": {
+            "expression": "data.selectedTab.panelId==='resultsTabPageSub'"
+        }
+    },
+
+    "data": {
+        "keyWordLabel": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "condition": "conditions.isResultsTabPage",
+            "action": "revealAction"
+        },
+
+        {
+            "eventId": "performSearch.modelObjectsUpdated",
+            "action": "updateResultKeyWords"
+        },
+
+        {
+            "eventId": "addPanel.filterChanged",
+            "action": "performSearch"
+        },
+
+        {
+            "eventId": "searchResultItems.doSearch",
+            "action": "performSearch"
+        },
+        {
+            "eventId": "awSearchTab.filtersRemoved",
+            "cacheEventData": true,
+            "action": "filterRemovedAction"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "condition": "conditions.isResultsTabPage",
+            "action": "updateSelectionModeForDataProvider"
+        }
+    ],
+
+    "dataProviders": {
+        "performSearch": {
+            "action": "getSearch",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities": [
+                        300
+                    ],
+
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                },
+
+                "Awp0ShowObjectCellDataset": {
+                    "id": "cmdOpen",
+                    "title": "Download",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities": [
+                        300
+                    ],
+
+                    "dependencies": [
+                        "js/showObjectDatasetCommandHandler"
+                    ],
+
+                    "displayOption": "ON_SELECTION",
+                    "position": "TOP_RIGHT"
+                },
+
+                "Awp0NavigateObject": {
+                    "id": "cmdShowChildren",
+                    "title": "Navigate Object",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities": [
+                        300
+                    ],
+
+                    "dependencies": [
+                        "js/navigateObjectCommandHandler"
+                    ],
+
+                    "displayOption": "ALWAYS",
+                    "position": "TOP_RIGHT"
+                }
+            },
+
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+
+    "actions": {
+        "revealAction": {
+            "actionType": "JSFunction",
+            "method": "initSearchResultKeyFunction",
+            "inputData": {
+                "declViewModel": "{{data}}"
+            },
+
+            "deps": "js/addObjectUtils"
+        },
+
+        "updateSelectionModeForDataProvider": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionModeForDataProvider",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.performSearch}}",
+                "selectionMode": "{{data.selectionMode}}"
+            },
+
+            "deps": "js/addObjectUtils"
+        },
+
+        "updateResultKeyWords": {
+            "actionType": "JSFunction",
+            "method": "updateResultKeyWords",
+            "inputData": {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/addObjectUtils"
+        },
+
+        "getSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "searchInput": {
+                    "attributesToInflate": [],
+                    "internalPropertyName": "",
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "{{function:setFullTextSearchProviderCtxAndGetProviderName}}",
+                    "searchCriteria": {
+                        "searchString": "{{function:processDateSearchCriteria}}",
+                        "forceThreshold": "{{function:setThresholdValue}}",
+                        "listOfExpandedCategories": "{{function:setListOfExpandedCategories}}",
+                        "limitedFilterCategoriesEnabled": "{{function:getLimitedFilterCategoriesEnabled}}"
+                    },
+
+                    "searchFilterFieldSortType": "Priority",
+                    "searchFilterMap6": "{{data.searchFilterMap}}",
+                    "searchSortCriteria": [
+
+                    ],
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.performSearch.startIndex}}"
+                    }
+
+                },
+                "inflateProperties": false
+            },
+
+            "policy": {
+                "types": [ {
+                    "name": "BusinessObject",
+                    "properties": [ {
+                        "name": "awp0CellProperties"
+                    } ]
+                } ]
+            },
+
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "sourceSearchFilterMap": "searchFilterMap6",
+                "ctx.searchIncontextInfo.hasMoreFacetValues": "additionalSearchInfoMap.categoryHasMoreFacetValuesList",
+                "categories": "{{function:callGetCategories}}",
+                "unpopulatedSearchFilterCategories": "searchFilterCategoriesUnpopulated",
+                "ctx.searchIncontextInfo.searchFilterCategories": "{{function:callGetCategories}}",
+                "ctx.searchIncontextInfo.unpopulatedSearchFilterCategories": "searchFilterCategoriesUnpopulated",
+                "ctx.searchIncontextInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchIncontextInfo.thresholdExceeded": "{{function:getThresholdState}}"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "performSearch.modelObjectsUpdated"
+                } ]
+            },
+
+            "deps": "js/searchCommonUtils"
+        },
+
+        "filterRemovedAction": {
+            "actionType": "JSFunction",
+            "method": "updateKeywordFilters",
+            "inputData": {
+                "data": "{{data}}",
+                "categoryName": "{{data.eventData.prop}}",
+                "filterValue": "{{data.eventData.filterValue}}"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "addPanel.filterChanged"
+                } ]
+            },
+
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize": {
+            "functionName": "getDefaultPageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "callGetCategories": {
+            "functionName": "callGetCategories",
+            "parameters": []
+        },
+        "getThresholdState": {
+            "functionName": "getThresholdState",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "setThresholdValue": {
+            "functionName": "setThresholdValue",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "setListOfExpandedCategories": {
+            "functionName": "setListOfExpandedCategories",
+            "parameters": []
+        },
+        "setFullTextSearchProviderCtxAndGetProviderName": {
+            "functionName": "setFullTextSearchProviderCtxAndGetProviderName",
+            "parameters": []
+        },
+        "getLimitedFilterCategoriesEnabled": {
+            "functionName": "getLimitedFilterCategoriesEnabled",
+            "parameters": []
+        },
+        "processDateSearchCriteria": {
+            "functionName": "processDateSearchCriteria",
+            "parameters": [ "{{ctx.searchCriteria}}" ]
+        }
+    },
+    "i18n": {
+
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-row.directive",
+        "js/aw-include.directive"
+    ],
+    "actions":
+    {
+        "showRelationViewer":{
+            "actionType": "JSFunction",
+            "method": "populateViewDependencies",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Psi0ViewDependenciesService"
+    },
+    "refreshRelationViewer": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+        },
+        "events": {
+            "success": [ 
+                {
+                    "name": "showRelationViewerEvent",
+                    "condition": "ctx.selected.modelType.typeHierarchyArray.indexOf('ItemRevision') >-1 || ctx.selected.modelType.typeHierarchyArray.indexOf('Prg0AbsEvent') >-1"
+                }
+            ]
+        }
+    }    
+    },
+    "onEvent": [
+        {
+            "eventId": "objectSet.selectionChangeEvent",
+            "action": "refreshRelationViewer"
+        },
+        {
+            "eventId":"showRelationViewerEvent",
+            "action": "showRelationViewer"
+        },
+        {
+            "eventId": "Psi0ViewDependencies.updateRelationViewer",
+            "action": "showRelationViewer"
+        }       
+    ]
+}

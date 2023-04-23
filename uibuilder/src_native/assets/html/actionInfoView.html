@@ -1,0 +1,29 @@
+<aw-command-panel hide-title="true" caption="i18n.actionProperties" exist-when="ctx.graph.selected">
+    <aw-include exist-when="data.propertyViewData" name="{{data.propertyViewData}}" sub-panel-context="data.registrationData"></aw-include>
+
+    <aw-panel-body exist-when="!data.propertyViewData">
+        <div aw-repeat="prop : data.actionProps">
+            <div exist-when="prop.propertyName === 'actionType'" class="aw-layout-flexRowContainer aw-layout-alignItemsCenter">
+                <div class="aw-layout-flexColumn">
+                    <aw-label prop="prop"></aw-label>
+                </div>
+                <div class="aw-layout-flexColumnContainer aw-actionbuilder-changeActionCmd">
+                    <aw-command-bar anchor="aw_actionTypeDetails" alignment="HORIZONTAL"></aw-command-bar>
+                </div>
+            </div>
+
+            <aw-widget exist-when="prop.propertyName !== 'actionType' && prop.type !== 'OBJECT' && prop.type !== 'STRINGARRAY'" prop="prop"></aw-widget>
+
+            <aw-property-label exist-when="prop.type === 'OBJECT' || prop.type === 'STRINGARRAY'" prop="prop"></aw-property-label>
+            <div exist-when="prop.type === 'OBJECT' || prop.type === 'STRINGARRAY'" class="aw-layout-flexColumnContainer aw-actionbuilder-srcEditor">
+                <aw-source-editor name="prop.propertyName" content="prop.dbValue" config="data.configJson"></aw-source-editor>
+            </div>
+        </div>
+    </aw-panel-body>
+
+    <aw-panel-footer exist-when="!data.propertyViewData">
+        <aw-button action="applyActionProperties" >
+            <aw-i18n>i18n.updateParams</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

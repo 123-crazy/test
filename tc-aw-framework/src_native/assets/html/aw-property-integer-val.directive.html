@@ -1,0 +1,16 @@
+<div ng-if="prop.renderingHint == 'label'">
+    <aw-property-non-edit-val prop="prop" ></aw-property-non-edit-val>
+</div>
+<div ng-if="!prop.renderingHint && prop.hasLov">
+    <aw-property-lov-val prop="prop" ></aw-property-lov-val>
+</div>
+<div ng-if="!prop.renderingHint && !prop.hasLov">
+    <aw-property-error>
+        <input aria-label="{{prop.propertyDisplayName}}" type="text" aw-widget-initialize aw-autofocus auto-focus="prop.autofocus" aw-integer-validator aw-validator="REQUIRED"
+            ng-change="changeFunction()" ng-blur="blurNumericFunction($event)" maxlength="{{prop.maxLength}}" ng-model="prop.dbValue"
+            placeholder="{{prop.propertyRequiredText}}" ng-class="{'aw-widgets-propertyError': errorApi.errorMsg, 'changed': prop.dirty}"
+            class="aw-widgets-propertyEditValue" ng-disabled="!prop.isEnabled" ng-keydown="evalKey($event)" ng-required="prop.isRequired" aria-required="{{prop.isRequired}}"
+            ng-model-options="{ allowInvalid: true }" ng-attr-tabindex="{{prop.tabIndex}}" >
+        </input>
+    </aw-property-error>
+</div>

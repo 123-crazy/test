@@ -1,0 +1,412 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "dataProvider": "{{data.dataProviders.fmeaDataProvider}}",
+                "sortCriteria": "{{data.columnProviders.fmeaColumnProvider.sortCriteria}}"
+            },
+            "outputData": {
+                "ctx.search.totalFound": "result.treeLoadResult.totalChildCount",
+                "ctx.search.totalLoaded": "result.treeLoadResult.childNodes.length",
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "searchResults": "result.treeLoadResult.childNodes"
+            },
+            "events": {
+                "success": [ {
+                    "name": "processPWASelection"
+                } ]
+            },
+            "deps": "js/fmeaTreeTableService"
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "methodArgument": {
+                    "propertyLoadInput": "request.propertyLoadInput",
+                    "propertyLoadContext": {
+                        "clientName": "AWClient",
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "typesForArrange": "{{data.dataProviders.fmeaDataProvider.columnConfig.typesForArrange}}"
+                    },
+                    "contextKey": "search",
+                    "declViewModel": "{{data}}",
+                    "uwDataProvider": "{{data.dataProviders.fmeaDataProvider}}"
+                }
+            },
+            "outputData": {
+                "dataProviders.fmeaDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            },
+            "deps": "js/fmeaTreeTableService"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.fmeaDataProvider.selectionModel}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/fmeaTreeTableService"
+        },
+        "addNewlyAddedElement": {
+            "actionType": "JSFunction",
+            "method": "addNewElement",
+            "inputData": {
+                "addElementResponse": "{{data.eventMap['qfm0.addElement'].addElementInput}}"
+            },
+            "outputData": {},
+            "deps": "js/qfm0FmeaEditStructureServices"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "updateDisplayNames": {
+            "actionType": "JSFunction",
+            "method": "updateDisplayNames",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/fmeaTreeTableService"
+        },
+        "updateFmeaTreeOnDelete": {
+            "actionType": "JSFunction",
+            "method": "updateFmeaTreeOnDelete",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/qfm0FmeaEditStructureServices"
+        },
+        "updateParentStateOnDelete": {
+            "actionType": "JSFunction",
+            "method": "updateParentStateOnDelete",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/fmeaTreeTableService"
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "operationType": "configured",
+                        "typeNames":"{{data.dataProviders.fmeaDataProvider.columnConfig.typesForArrange}}"
+                    } ],
+                    "businessObjects": [
+                        {}
+                    ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.fmeaDataProvider.resetColumnConfigs": "columnConfigurations"
+            },
+            "events": {
+                "success": [ {
+                    "name": "fmeaTree.plTable.reload"
+                } ]
+            }
+        },
+        "loadDataForSavedColumnConfig": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTableViewModelProperties",
+            "deps": "js/tcViewModelObjectService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.fmeaDataProvider.viewModelCollection.loadedVMObjects}}",
+                "context": {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "clientName": "AWClient"
+                }
+            },
+            "outputData": {
+                "newColumnConfig": "result.output.columnConfig"
+            },
+            "events": {
+                "success": [ {
+                    "name": "fmeaTree.updateTreeTableColumns"
+                } ]
+            }
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.fmeaDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.fmeaDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "fmeaTree.ColumnConfigSaved"
+                } ]
+            }
+        },
+        "saveColumnConfigData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId":  "{{data.dataProviders.fmeaDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.fmeaDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {}
+        },
+        "loadTreeTablePropertiesOnInitialLoad": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTablePropertiesOnInitialLoad",
+            "deps": "js/fmeaTreeTableService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.fmeaDataProvider.viewModelCollection.loadedVMObjects}}",
+                "declViewModel": "{{data}}",
+                "uwDataProvider": "{{data.dataProviders.fmeaDataProvider}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "typesForArrange": "{{data.dataProviders.fmeaDataProvider.columnConfig.typesForArrange}}"
+                },
+                "contextKey": "search"
+            },
+            "outputData": {
+                "dataProviders.fmeaDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            }
+        },
+        "updateFmeaTreeTableColumns": {
+            "actionType": "JSFunction",
+            "method": "updateFmeaTreeTableColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.fmeaDataProvider}}"
+            },
+            "outputData": {
+                "newColumnConfig": "result.newColumnConfig",
+                "dataProviders.fmeaDataProvider.columnConfig": "result.columnConfig"
+            },
+            "deps": "js/fmeaTreeTableService"
+        },
+        "loadTreeColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {},
+            "outputData": {
+                    "dataProviders.fmeaDataProvider.columnConfig": ""
+            },
+            "deps": "js/fmeaTreeTableService"
+        },
+        "updateSWAForSystemElement":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    }
+                ]
+            }            
+        }
+    },
+    "data": {
+        "delayTimeTree": {
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "20",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "fmeaDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "focusAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}",
+                "topNodeUid": "{{ctx.state.params.uid}}"
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands"
+        },
+        "fmeaPropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "fmeaColumnProvider": {
+            "loadColumnAction": "loadTreeColumns",
+            "columns": "{{fmeaDataProvider.columnConfig.columns}}",
+            "saveColumnAction": "saveColumnConfigData",
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "soaEnabled": false,
+            "sortCriteria": []
+        }
+    },
+    "conditions": {
+        "qfm0IsFmeaSubLocation": {
+            "expression": "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation'|| ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualitySystemElementManagerSublocation'"
+        },
+        "qfm0IsFmeaInfoPanelOpen": {
+            "expression": "data.eventData && data.eventData.dataSource && data.eventData.dataSource.xrtType && data.eventData.dataSource.xrtType === 'INFO'"
+        },
+        "qfm0IsFmeaSubLocationAndIsFmeaInfoPanelOpen":{
+            "expression": "conditions.qfm0IsFmeaSubLocation && conditions.qfm0IsFmeaInfoPanelOpen"
+        }
+    },
+    "grids": {
+        "fmeaTree": {
+            "dataProvider": "fmeaDataProvider",
+            "propertyProvider": "fmeaPropertyProvider",
+            "columnProvider": "fmeaColumnProvider",
+            "addIconColumn": false,
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true,
+                "useStaticFirstCol": true
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "processPWASelection",
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "qfm0.addElement",
+            "cacheEventData": true,
+            "action": "addNewlyAddedElement"
+        },
+        {
+            "eventId": "qfm0ElementSelectionUpdateEvent",
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "fmeaDataProvider.modelObjectsUpdated",
+            "cacheEventData": true,
+            "action": "updateDisplayNames"
+        },
+        {
+            "eventId": "vmc.modified.fmeaDataProvider",
+            "cacheEventData": true,
+            "action": "updateDisplayNames"
+        },
+        {
+            "eventId": "updateFmeaTreeOnDelete",
+            "cacheEventData": true,
+            "action": "updateFmeaTreeOnDelete"
+        },
+        {
+            "eventId": "updateParentStateOnDelete",
+            "cacheEventData": true,
+            "action": "updateParentStateOnDelete"
+        },
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "fmeaTree.updateTreeTableColumns",
+            "action": "updateFmeaTreeTableColumns"
+        },
+        {
+            "eventId": "fmeaTree.ColumnConfigSaved",
+            "cacheEventData": true,
+            "action": "loadDataForSavedColumnConfig",
+            "condition": "!ctx.editInProgress"
+        },
+        {
+            "eventId": "fmeaDataProvider.treeNodesLoaded",
+            "cacheEventData": true,
+            "condition": "!data.dataProviders.fmeaDataProvider.columnConfigLoadingInProgress",
+            "action": "loadTreeTablePropertiesOnInitialLoad"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved' && state !== 'canceling' && ctx['INFO_PANEL_CONTEXT'] && ctx.selected.modelType.typeHierarchyArray.indexOf('Qfm0SystemElement') > -1",
+            "action": "updateSWAForSystemElement",
+            "cacheEventData": true
+        }
+    ],
+    "i18n": {
+        "qfm0Name": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Id": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0ReleaseStatus": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

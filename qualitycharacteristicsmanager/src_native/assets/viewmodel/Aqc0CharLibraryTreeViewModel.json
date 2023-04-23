@@ -1,0 +1,227 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "getCurrentType",
+            "inputData": {
+            },
+            "deps": "js/Aqc0CharManagerUtils",
+            "events" : {
+                "success": [
+                    {
+                        "name": "aqc0NullMapEvent",
+                        "condition" : "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset"
+                    }
+                ]
+            }
+        },
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.charLibraryDataProvider}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "sortCriteria": "{{data.columnProviders.charLibraryColumnProvider.sortCriteria}}"
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "searchResults": "result.treeLoadResult.childNodes"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "aqc0CharLibrarySelectionUpdateEvent",
+                        "condition" : "ctx.pinnedToForm"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.charLibraryDataProvider}}",
+                "data" : "{{data}}"
+            },
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "propertyLoadInput": "request.propertyLoadInput",
+                "delayTimeProperty": "{{data.delayTimeProperty}}"
+            },
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.charLibraryDataProvider.selectionModel}}"
+            },
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "selectionChanged": {
+            "actionType": "JSFunction",
+            "method": "selectionChanged",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.charLibraryDataProvider.selectionModel}}"
+            },
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "charLibraryExpandTreeNodeAction": {
+            "actionType": "JSFunction",
+            "method": "charLibraryExpandTreeNode",
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "plTableClientRefresh": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "charLibraryTree.plTable.clientRefresh"
+                } ]
+            }
+        },
+        "clearMapOfCharGroupAndSpecificationAction" : {
+            "actionType" : "JSFunction",
+            "method": "clearMapOfCharGroupAndSpecification",
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        }
+    },
+    "data": {
+        "delayTimeTree": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "20",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "charLibraryDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}"
+        },
+        "charLibraryPropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "charLibraryColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": [
+                {
+                    "fieldName":"creation_date",
+                    "sortDirection":"DESC"
+                }
+            ]
+        }
+    },
+    "grids": {
+        "charLibraryTree": {
+            "dataProvider": "charLibraryDataProvider",
+            "propertyProvider": "charLibraryPropertyProvider",
+            "columnProvider": "charLibraryColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true
+            }
+        }
+    },
+    "i18n": {
+        "Aqc0CharGroup" :[
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Aqc0RuleTitle" :[
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Aqc0NamingConventionTitle" :[
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Description": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Type": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Name": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "ReleaseStatus": [
+            "qualitycharacteristicsmanagerMessages"
+        ]
+
+    },
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    },
+    "onEvent": [
+        {
+            "eventId": "charLibraryDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "selectionChanged"
+        },
+        {
+            "eventId": "aqc0CharLibrarySelectionUpdateEvent",
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "charLibraryExpandTreeNodeEvent",
+            "action": "charLibraryExpandTreeNodeAction"
+        },
+        {
+            "eventId" : "Aqc0CharLibraryTree.contentLoaded",
+            "action" : "loadColumns"
+        },
+        {
+            "eventId": "primaryWorkarea.multiSelectAction",
+            "action": "plTableClientRefresh"
+        },
+        {
+            "eventId" : "aqc0NullMapEvent",
+            "action" : "clearMapOfCharGroupAndSpecificationAction"
+        }
+    ]
+}

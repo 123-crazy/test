@@ -1,0 +1,52 @@
+<aw-panel>
+    <aw-panel-body>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-panel-section caption="i18n.Workflow" collapsed="false">
+                <aw-radiobutton prop="data.allowAlternateProcedures" enable-when="conditions.isAllowAlternateProcedureEnable" visible-when="conditions.isAllowAlternateProcedures" action="getValidTemplates"></aw-radiobutton>
+                <aw-listbox prop="data.workflowTemplates" list="data.templates" action="getProcessParticipantAssignments"></aw-listbox>
+                <aw-widget prop="data.workFlowName"></aw-widget>
+                <aw-widget prop="data.description" hint="textarea"></aw-widget>
+            </aw-panel-section>
+        </div>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-panel-section id="assignmentSectionDynamic" caption="i18n.assignments" collapsed="true" exist-when="ctx.isDynamicParticipantAssignmentPresent">
+                <aw-include name="Awp0NewWorkflowProcessParticipantAssignmentsSection" sub-panel-context="data" exist-when="ctx.isTemplateListboxValueChanged || (ctx.mselected.length === 0 && ctx.forceDelay)"></aw-include>
+            </aw-panel-section>
+        </div>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-panel-section id="assignmentSectionNonDynamic" caption="i18n.assignments" collapsed="true" exist-when="!ctx.isDynamicParticipantAssignmentPresent">
+                <aw-include name="Awp0TaskTemplateAssignment" sub-panel-context="data" exist-when="ctx.isTemplateListboxValueChanged || (ctx.mselected.length === 0 && ctx.forceDelay)"></aw-include>
+            </aw-panel-section>
+        </div>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-command-panel-section id="processTargets" name="Targets" caption="i18n.targets" collapsed="false" anchor="data.processTargetAnchor" context="data.dataProviders.attachTargets">
+                <aw-flex-row class="aw-workflow-targetSectionRow">
+                    <aw-scrollpanel>
+                        <aw-list dataprovider="data.dataProviders.attachTargets">
+                            <aw-default-cell vmo="item"></aw-default-cell>
+                        </aw-list>
+                    </aw-scrollpanel>
+                </aw-flex-row>
+            </aw-command-panel-section>
+        </div>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-command-panel-section id="processReferences" name="References" caption="i18n.references" collapsed="true" anchor="data.processReferenceAnchor" context="data.dataProviders.attachReferences">
+                <aw-flex-row class="aw-workflow-targetSectionRow">
+                    <aw-scrollpanel>
+                        <aw-list dataprovider="data.dataProviders.attachReferences">
+                            <aw-default-cell vmo="item"></aw-default-cell>
+                        </aw-list>
+                    </aw-scrollpanel>
+                </aw-flex-row>
+            </aw-command-panel-section>
+        </div>
+    </aw-panel-body>
+</aw-panel>
+<aw-panel-footer>
+    <aw-button action="submit" visible-when="conditions.isValidToSubmit && !conditions.inInboxLocation">
+        <aw-i18n>i18n.Submit</aw-i18n>
+    </aw-button>
+    <aw-button action="submit" visible-when="conditions.isValidToSubmit && conditions.inInboxLocation">
+        <aw-i18n>i18n.create</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

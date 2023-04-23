@@ -1,0 +1,141 @@
+{
+  "name": "massupdate",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commandHandlers": {
+      "MUCutCmdHandler": {
+        "id": "Awp0Cut",
+        "activeWhen": {
+          "condition": "conditions.impactedParentSelected"
+        },
+        "enableWhen": false
+      },
+      "MUCutCtxMenuCmdHandler": {
+        "id": "Awp0CutContextMenu",
+        "activeWhen": {
+          "condition": "conditions.impactedParentSelected"
+        },
+        "visibleWhen": false
+      },
+      "MUCopyCmdHandler": {
+        "id": "Awp0Copy",
+        "activeWhen": {
+          "condition": "conditions.impactedParentSelected"
+        },
+        "enableWhen": false
+      },
+      "MUCopyContextMenuCmdHandler": {
+        "id": "Awp0CopyContextMenu",
+        "activeWhen": {
+          "condition": "conditions.impactedParentSelected"
+        },
+        "visibleWhen": false
+      },
+      "MUOpenGroupCmdHandler": {
+        "id": "Awp0OpenGroup",
+        "activeWhen": {
+          "condition": "conditions.impactedParentSelected"
+        },
+        "visibleWhen": false
+      },
+      "MUShowObjectCellCommandHandler": {
+        "id": "Awp0ShowObjectCell",
+        "action": "MUShowDelegatedObject",
+        "activeWhen": {
+          "condition": "conditions.openImpactedCellCommand"
+        },
+        "visibleWhen": {
+          "condition": "conditions.openImpactedCellCommand"
+        }
+      },
+      "MUShareURLCmdHandler": {
+        "id": "Awp0ShareURL",
+        "activeWhen": {
+          "condition": "conditions.impactedParentSelected"
+        },
+        "visibleWhen": false
+      }
+    },
+    "actions": {
+      "MUShowDelegatedObject": {
+        "actionType": "Navigate",
+        "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+        "navigationParams": {
+          "uid": "{{commandContext.vmo.props[\"REF(fnd0ImpactedItemRev,ItemRevision).item_id\"].intermediateObjectUids[0]}}"
+        }
+      }
+    },
+    "onEvent": [],
+    "conditions": {
+      "impactedParentSelected": {
+        "expression": "ctx.selected.type === 'Fnd0MUImpactedParents'"
+      },
+      "openImpactedCellCommand": {
+        "expression": {
+          "$and": [
+            {
+              "$source": "ctx.xrtPageContext",
+              "$query": {
+                "$or": [
+                  {
+                    "$source": "secondaryXrtPageID",
+                    "$query": {
+                      "$eq": "tc_xrt_Massupdate"
+                    }
+                  },
+                  {
+                    "$source": "primaryXrtPageID",
+                    "$query": {
+                      "$eq": "tc_xrt_Massupdate"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "$source": "commandContext.vmo.props.fnd0OccurrenceCount.dbValues.length",
+              "$query": {
+                "$gt": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    "i18n": {},
+    "data": {},
+    "commands": {},
+    "commandPlacements": {}
+  },
+  "saveHandlers": [
+    {
+      "conditions": {
+        "$or": [
+          {
+            "xrtPageContext.primaryXrtPageID": {
+              "$eq": "tc_xrt_Massupdate"
+            }
+          },
+          {
+            "xrtPageContext.secondaryXrtPageID": {
+              "$eq": "tc_xrt_Massupdate"
+            }
+          }
+        ]
+      },
+      "target": {
+        "method": "getSaveHandler",
+        "deps": "js/massUpdateSaveHandler"
+      }
+    }
+  ]
+}

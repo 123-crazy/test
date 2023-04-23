@@ -1,0 +1,56 @@
+<!-- Cell list content -->
+<div class="aw-requirements-cellListCellContent">
+    <div class="aw-widgets-cellListCellTitleBlock">
+        <h3 class="aw-widgets-cellListCellTitle" cell-title-id="CellTitle"><aw-i18n>i18n.createTraceLink</aw-i18n>
+            <span>{{subPanelContext.targetChildDisplayType}}<span></h3>
+    </div>
+    <div cell-prop-id="cellProperties" aw-repeat="cellProp : subPanelContext.keywordImportConditions">
+        <div class="aw-widgets-cellListCellProperties">
+            <aw-flex-row height="fill" align-content="start">
+                <aw-flex-column width="2.5f" align-content="start" exist-when="($index > 0)">
+                    <span class="aw-widgets-propertyLabel aw-base-small" exist-when="subPanelContext.conditionProcessingType === 'ANY'"><aw-i18n>i18n.orLabel</aw-i18n></span>
+                    <span class="aw-widgets-propertyLabel aw-base-small" exist-when="subPanelContext.conditionProcessingType === 'ALL'"><aw-i18n>i18n.andLabel</aw-i18n></span>
+                </aw-flex-column>
+                <aw-flex-column width="fill">
+                    <div class="aw-widgets-cellListCellProperties">
+                        <label class="aw-widgets-propertyLabel aw-base-small" exist-when="($index == 0)">
+                            <aw-i18n>i18n.If</aw-i18n>
+                        </label>
+                        <label class="aw-widgets-propertyLabel aw-base-small">'{{cellProp.opDisplayType}}'</label>
+                        <label class="aw-widgets-propertyValue aw-base-small" exist-when="cellProp.opType !== 'SENTENCE_BEGIN_ON_NEW_LINE'">:'{{cellProp.keyword}}'</label>
+                        <label class="aw-widgets-propertyLabel aw-base-small" exist-when="cellProp.opType === 'SENTENCE_BEGIN_ON_NEW_LINE' && cellProp.operationCheckboxValues">{{i18n.andLabel}} '{{i18n.importHeader}}'</label>
+                    </div>
+                </aw-flex-column>
+            </aw-flex-row>
+        </div>
+    </div>
+    <div cell-prop-id="cellProperties" aw-repeat="cellProp : subPanelContext.advancedRules track by $index">
+        <div class="aw-widgets-cellListCellProperties">
+            <label class="aw-widgets-propertyLabel aw-base-small"><aw-i18n>i18n.alsoLabel</aw-i18n> <aw-i18n>i18n.setFieldTypelabel</aw-i18n>
+                <span>'{{cellProp.propertyNameValue.dispKey}}'</span>
+            </label>
+            <label class="aw-widgets-propertyValue aw-base-small"><aw-i18n>i18n.toLabel</aw-i18n></label>
+            <label> '{{cellProp.propertyNameValue.Value}}'</label>
+        </div>
+        <div cell-prop-id="cellProperties" aw-repeat="cellPropIn : cellProp.keywordImportConditions">
+            <div class="aw-widgets-cellListCellProperties">
+                <aw-flex-row height="fill" align-content="start">
+                    <aw-flex-column width="2.5f" align-content="start" exist-when="($index > 0)">
+                        <span class="aw-widgets-propertyLabel aw-base-small" exist-when="cellProp.conditionProcessingType === 'ANY'"><aw-i18n>i18n.orLabel</aw-i18n></span>
+                        <span class="aw-widgets-propertyLabel aw-base-small" exist-when="cellProp.conditionProcessingType === 'ALL'"><aw-i18n>i18n.andLabel</aw-i18n></span>
+                    </aw-flex-column>
+                    <aw-flex-column width="fill">
+                        <div class="aw-widgets-cellListCellProperties">
+                            <label class="aw-widgets-propertyLabel aw-base-small" exist-when="($index == 0)">
+                                <aw-i18n>i18n.If</aw-i18n>
+                            </label>
+                            <label class="aw-widgets-propertyLabel aw-base-small">'{{cellPropIn.opDisplayType}}'</label>
+                            <label class="aw-widgets-propertyValue aw-base-small" exist-when="cellProp.opType !== 'SENTENCE_BEGIN_ON_NEW_LINE'">:'{{cellPropIn.keyword}}'</label>
+                            <label class="aw-widgets-propertyLabel aw-base-small" exist-when="cellProp.opType === 'SENTENCE_BEGIN_ON_NEW_LINE' && cellProp.operationCheckboxValues">{{i18n.andLabel}} '{{i18n.importHeader}}'</label>
+                        </div>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </div>
+        </div>
+    </div>
+</div>

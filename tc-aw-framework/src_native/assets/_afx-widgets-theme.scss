@@ -1,0 +1,2274 @@
+// Copyright (c) 2020 Siemens
+// mixins
+@import 'mixins/mixins';
+
+/**** section 1: define background classes and contrasting foregrounds ****/
+// As long as we get more specific rules out of the way, this simple definition can be sufficient for many cases
+// see wiki for details https://gitlab.industrysoftware.automation.siemens.com/Apollo/afx/wikis/stylingOverview#background-color-and-contrasting-text
+
+body,
+.afx-default-background {
+    // note: this is a dark blue gradient background for light/horizon theme
+    @include gradient_bg();
+    color: $brand_primary_inverse_text;
+    fill: $brand_primary_inverse_text;
+}
+
+.afx-accent-background {
+    // default is darker accent
+    background-color: $brand_quaternary_content_background;
+    color: $brand_quaternary_content_text;
+    fill: $brand_quaternary_content_text;
+}
+
+// aw-layout-subLocation and popup backgrounds are here for backward compatibility, we'd like to remove...
+.aw-layout-subLocation,
+.aw-layout-popup,
+.afx-content-background {
+    background-color: $brand_primary_content_background;
+    color: $main_text_color;
+    fill: $main_text_color;
+}
+
+.afx-alt-content-background {
+    background-color: $brand_secondary_content_background;
+    color: $brand_secondary_content_text;
+    fill: $brand_secondary_content_text;
+
+    //Setting aw-list container color to white
+    .aw-widgets-cellListWidget {
+        .aw-widgets-cellListItem:not(.aw-widgets-dropframe) {
+            border-color: $cell_item_border_color_alt_content;
+            border-bottom-color: $cell_item_main_border_bottom_color;
+        }
+    }
+}
+
+.afx-medium-background,
+.afx-medium-background .aw-layout-panel {
+    background-color: $medium_background_color;
+    color: $medium_text_color;
+    fill: $medium_text_color;
+}
+
+aw-showobject-page {
+    .aw-layout-subLocationTitles {
+        border-bottom-color: $brand_secondary_border;
+    }
+}
+
+// replace with background class
+.aw-layout-panelTitle {
+    background-color: $panel_title_background_color;
+    color: $panel_title_text_color;
+    fill: $panel_title_text_color;
+}
+
+.noty_msg:focus {
+    .keyboard & {
+        outline-style: solid;
+        outline-width: 2px;
+        outline-color: $brand_main_focus_color;
+    }
+}
+
+/**** section 2: create foreground color overrides based on background group ****/
+// Backgrounds are grouped in 2 sets: base and main.
+// Base is applied on the body and is the default background (e.g. dark blue gradient in the horizon/light theme).
+// Other backgrounds that have a similar level of pigment are grouped in the base set.
+// Main contains the contrasting backgrounds (e.g., light in the light/horizon theme).
+
+// styling widgets for main content backgrounds
+@mixin main-foreground-styles {
+    a {
+        color: $link_main;
+
+        &:visited {
+            color: $link_main_visited;
+        }
+
+        &:hover {
+            color: $link_main_hover;
+        }
+
+        &:active {
+            color: $link_main_active;
+        }
+
+        &.disabled {
+            color: $link_disabled;
+        }
+    }
+
+    .aw-aria-border:focus {
+        .keyboard & {
+            border-color: $brand_main_focus_color !important;
+        }
+    }
+
+    // link with popup
+    .aw-widgets-linkWithPopupMenu {
+        .aw-theme-iconOutline {
+            fill: $link_main;
+        }
+
+        &:hover {
+            .aw-theme-iconOutline {
+                fill: $link_main_hover;
+            }
+        }
+    }
+
+    // command bar
+    .aw-commands-commandIconButton,
+    .aw-commands-commandToolbarIconButton {
+        color: $command_text_color;
+
+        &.aw-state-selected,
+        &:hover,
+        &:active {
+            background-color: $command_bar_icon_button_background_color_hover;
+            color: $command_text_color;
+        }
+
+        &:hover {
+            &.aw-state-selected {
+                color: $command_text_color;
+            }
+        }
+
+        .aw-widgets-groupCommandStack {
+            .aw-base-icon {
+                .aw-theme-iconOutline {
+                    fill: rgba(0, 0, 0, 0.15);
+                }
+            }
+        }
+
+        .keyboard &:focus {
+            border-color: $brand_main_focus_color;
+        }
+    }
+
+    .aw-commands-svg svg,
+    .aw-theme-iconHomeOutline,
+    .aw-theme-iconOutline {
+        fill: $main_text_color;
+    }
+
+    .aw-layout-panelSectionTitle {
+        color: $panel_section_title_color;
+        background-color: $panel_section_title_background;
+
+        //links on panel section title to be wcag compliant
+        a {
+            color: $aw_link_and_clickable;
+        }
+
+        .keyboard &:focus {
+            border-color: $brand_main_focus_color;
+        }
+    }
+
+    // widget required asterisk
+    .afx-property-required:after {
+        color: $Siemens_Blue_7;
+    }
+
+    // aw-list: title uses emphasis
+    .aw-widgets-cellListCellTitle {
+        color: $default_cell_list_item_cell_content_cell_title_header1_color;
+        fill: $default_cell_list_item_cell_content_cell_title_header1_color;
+    }
+
+    // jqueryUI slider styling
+    .aw-jswidgets-slider .ui-slider {
+        // contrast with parent background
+        background-color: $slider_main_background_color;
+
+        .ui-slider-range,
+        .ui-slider-handle {
+            background-color: $slider_handle_main_background_color;
+        }
+    }
+
+    .aw-jswidget-tabContainer {
+        .aw-jswidget-controlArrow {
+            outline-color: $brand_main_focus_color;
+        }
+
+        .aw-jswidget-tab {
+            a.aw-base-tabTitle {
+                color: $tab_title;
+                border-color: $tab_title_border_color;
+
+                &:hover {
+                    color: $tab_title_hover;
+                }
+
+                &:active {
+                    color: $tab_title_active;
+                }
+            }
+
+            a.aw-base-tabTitleSelected {
+                color: $tab_title_selected;
+                border-bottom-color: $tab_title_selected_border_color;
+                -webkit-transition: $hover_border_color_transition;
+                transition: $hover_border_color_transition;
+
+                &:hover {
+                    color: $tab_title_hover;
+                    border-bottom-color: $tab_title_selected_border_color_hover;
+                }
+            }
+        }
+    }
+
+    // Buttons & Chips, the two have the same color variants
+    button.aw-base-blk-button,
+    .noty_buttons .btn,
+    .aw-widgets-chip {
+        &:not(.disabled) {
+            &.aw-accent-highContrast {
+                color: $default_main_button_text;
+                fill: $default_main_button_text;
+                background-color: $default_main_button_background;
+                border-color: $default_main_button_border;
+
+                &:not(.aw-widgets-staticChip) {
+                    &:hover {
+                        background-color: $default_main_button_background_hover;
+                        box-shadow: $default_main_button_hover_shadow;
+                    }
+
+                    &:active {
+                        background-color: $default_main_button_background_active;
+                    }
+                }
+
+            }
+
+            &.aw-not-default-button {
+                background-color: transparent;
+                border-color: $aw_button_color;
+                color: $negative_button_text;
+                fill: $negative_button_text;
+            }
+
+            &.aw-base-button {
+                background-color: $base_main_button_background;
+                border-color: $base_main_button_border;
+                color: $base_main_button_text;
+                fill: $base_main_button_text;
+
+                &.aw-widgets-staticChip {
+                    cursor: auto;
+                }
+
+                &:not(.aw-widgets-staticChip) {
+                    &:hover {
+                        background-color: $base_main_button_background_hover;
+                    }
+
+                    &:active {
+                        background-color: $base_main_button_background_active;
+                    }
+                }
+            }
+
+            // chromeless is not applicable for chip
+            &.aw-chromeless-button {
+                background-color: $chromeless_main_button_background;
+                border-color: $chromeless_main_button_border;
+                color: $chromeless_main_button_text;
+                box-shadow: none;
+
+                &:hover {
+                    background-color: $chromeless_main_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $chromeless_main_button_background_active;
+                }
+            }
+        }
+
+        &.disabled {
+            background-color: $disabled_main_button_background;
+            border-color: $disabled_main_button_border;
+            color: $disabled_main_button_text;
+            fill: $disabled_main_button_text;
+        }
+    }
+
+    // command icon button in global navigation panel
+    .global-navigation &.aw-sidenav-layoutContainer aw-command-bar aw-command .aw-commands-commandIconButton {
+        color: $command_text_color;
+
+        &:hover,
+        &:active {
+            background-color: $command_bar_icon_button_background_color_hover;
+            color: $command_text_color;
+        }
+    }
+
+    .global-navigation &.aw-sidenav-layoutContainer aw-command-bar aw-command .aw-commands-commandIconButton .aw-commands-svg svg,
+    .global-navigation &.aw-sidenav-layoutContainer aw-command-bar aw-command .aw-commands-commandIconButton .aw-theme-iconOutline {
+        fill: $main_text_color;
+    }
+
+    // aw-radiobutton
+    @keyframes radio-ripple {
+        0% {
+            box-shadow: 0px 0px 0px 1px rgba($radio_main_ripple_color, 0);
+        }
+
+        50% {
+            box-shadow: 0px 0px 0px 13px rgba($radio_main_ripple_color, 0.2);
+        }
+
+        100% {
+            box-shadow: 0px 0px 0px 13px rgba($radio_main_ripple_color, 0);
+        }
+    }
+
+    .aw-jswidgets-radioButtonItem {
+        input[type="radio"] {
+            &:checked+.aw-jswidgets-radioLabel:before {
+                animation: radio-ripple 0.7s forwards ease-out;
+                border-color: $radiobutton_main_checked_border_color;
+            }
+
+            &:not(:checked):hover+.aw-jswidgets-radioLabel:before {
+                border: solid 4px $radiobutton_main_hover_border_color;
+            }
+        }
+
+        .aw-jswidgets-radioLabel {
+
+            &:before,
+            &:after {
+                transition-property: transform, border-color;
+            }
+
+            &:before {
+                border-color: $radio_button_main_border_color;
+            }
+
+            &:after {
+                background-color: $radiobutton_main_checked_dot_color;
+            }
+        }
+    }
+
+    .disabled .aw-jswidgets-radioText {
+        color: $radiobutton_main_disabled_color;
+    }
+
+    // WCAG accessibility compliance style for disabled class
+    aw-widget,
+    aw-listbox,
+    aw-radiobutton,
+    aw-checkbox,
+    aw-textarea,
+    aw-togglebutton,
+    aw-date,
+    .aw-widgets-propertyContainer {
+
+        .disabled,
+        &.disabled {
+            opacity: 1;
+
+            aw-property-label,
+            span.aw-jswidgets-radioText,
+            label.aw-jswidgets-checkboxLabel {
+                color: $aw_widget_property_label_disabled_text;
+            }
+
+            input[type=password],
+            input[type=text],
+            textarea {
+                border-color: $aw_widget_property_input_disabled_border;
+                background: $aw_widget_property_input_disabled_background;
+                color: $aw_widget_property_input_disabled_text_selected;
+            }
+
+            label.aw-jswidgets-toggleLabel {
+                opacity: 0.5;
+            }
+        }
+    }
+
+    aw-check-list {
+
+        .disabled,
+        &.disabled {
+            opacity: 1;
+
+            span:first-of-type {
+                opacity: 0.5;
+            }
+
+            span.aw-widgets-checklistText {
+                color: $aw_widget_property_label_disabled_text;
+            }
+        }
+    }
+
+
+    .disabled .aw-jswidgets-radioButtonItem .aw-jswidgets-radioLabel:before,
+    .disabled .aw-jswidgets-radioButtonItem input[type="radio"]:checked+.aw-jswidgets-radioLabel:before,
+    .aw-jswidgets-radioButtonItem.disabled .aw-jswidgets-radioLabel:before {
+        border-color: $radiobutton_main_disabled_color;
+    }
+
+    .disabled .aw-jswidgets-radioButtonItem .aw-jswidgets-radioLabel:after {
+        background-color: $radiobutton_main_disabled_color;
+    }
+
+    //aw-list: border-color
+    .aw-widgets-cellListItem {
+        border-color: $default_cell_list_main_item_border_color;
+    }
+
+    // SPLITTER
+    .aw-layout-splitter {
+        background-color: $splitter_background_color;
+
+        &:hover {
+            .aw-layout-splitterLine {
+                border-color: $splitter_main_border_color_hover;
+            }
+
+            .aw-layout-splitterLineHorizontal {
+                border-color: $splitter_main_border_color_hover;
+            }
+        }
+
+        &:active {
+            .aw-layout-splitterLine {
+                border-color: $splitter_main_border_color_active;
+            }
+
+            .aw-layout-splitterLineHorizontal {
+                border-color: $splitter_main_border_color_active;
+            }
+        }
+    }
+
+    .aw-layout-splitterLine {
+        border-color: $splitter_main_border_color;
+    }
+
+    .aw-layout-splitterLineHorizontal {
+        border-color: $splitter_main_border_color;
+    }
+
+    .aw-generic-avatar:focus,
+    .aw-avatar-layout:focus,
+    .aw-tile-tileContainer:focus,
+    .noty_buttons .btn.btn-notify:focus,
+    .noty_close:focus,
+    a.aw-progress-bar-text:focus,
+    button.aw-base-blk-button:focus,
+    button.aw-base-button:focus,
+    input.aw-jswidgets-checkboxButton:focus+.afx-checkbox-md-style .check,
+    input.aw-jswidgets-radioButton:focus+.aw-jswidgets-radioLabel:before,
+    input.aw-jswidgets-checkboxButton:focus+.aw-jswidgets-toggleLabel,
+    .aw-widgets-checkSelect input:focus ~ .aw-widgets-checklistText,
+    .aw-widgets-propertyValueLink:focus {
+        .keyboard & {
+            outline-color: $brand_main_focus_color;
+        }
+    }
+
+    .aw-file-uploadFocus {
+        border-color: $brand_main_focus_color;
+    }
+}
+
+// style foregrounds on base backgrounds
+// (dark background with light foreground in light/horizon theme)
+@mixin base-foreground-styles {
+    a {
+        color: $link_base;
+
+        &:visited {
+            color: $link_base_visited;
+        }
+
+        &:hover {
+            color: $link_base_hover;
+        }
+
+        &:active {
+            color: $link_base_active;
+        }
+
+        &.disabled {
+            color: $link_disabled;
+        }
+    }
+
+    .aw-aria-border:focus {
+        .keyboard & {
+            border-color: $brand_base_focus_color !important;
+        }
+    }
+
+    // link with popup
+    .aw-widgets-linkWithPopupMenu {
+        .aw-theme-iconOutline {
+            fill: $link_base;
+        }
+
+        &:hover {
+            .aw-theme-iconOutline {
+                fill: $link_base_hover;
+            }
+        }
+    }
+
+    // command bar
+    .aw-commands-commandIconButton,
+    .aw-commands-commandToolbarIconButton {
+        color: $command_base_text_color;
+
+        &.aw-state-selected {
+            background-color: $global_toolbar_command_selected_background_color;
+            color: $command_base_text_color;
+
+            &:hover {
+                background-color: $global_toolbar_command_hover_background_color;
+                color: $command_base_text_color;
+            }
+        }
+
+        &:hover {
+            background-color: $global_toolbar_command_hover_background_color;
+            color: $command_base_text_color;
+        }
+
+        &:active {
+            background-color: $global_toolbar_command_active_background_color;
+            color: $command_base_text_color;
+        }
+
+        .keyboard &:focus {
+            border-color: $brand_base_focus_color;
+        }
+    }
+
+    .aw-commands-svg svg,
+    .aw-theme-iconHomeOutline,
+    .aw-theme-iconOutline {
+        fill: $base_text_color;
+    }
+
+    .aw-layout-panelSectionTitle {
+        color: $panel_section_title_base_color;
+        background-color: $panel_section_title_base_background;
+
+        .aw-theme-iconOutline {
+            fill: $main_text_color
+        }
+
+        .keyboard &:focus {
+            border-color: $brand_base_focus_color;
+        }
+    }
+
+    .aw-jswidget-tabContainer {
+        .aw-jswidget-controlArrow {
+            outline-color: $brand_base_focus_color;
+        }
+
+        .aw-jswidget-tab {
+            a.aw-base-tabTitle {
+                color: $brand_primary_content_background;
+                border-color: transparent;
+            }
+
+            a.aw-base-tabTitleSelected,
+            a.aw-base-tabTitleSelected:hover,
+            a.aw-base-tabTitle:hover {
+                color: $parent_tab_title;
+                border-bottom-color: $parent_tab_title_border_color;
+            }
+        }
+    }
+
+    @media (max-width: 28.75em) {
+        .aw-footer-container {
+            //Keeping the background color of footer as is for now
+            background-color: $aw_toolbar_narrow_mode;
+            box-shadow: $footer_toolbar_box_shadow;
+
+            .aw-avatar-normal-icon {
+                .aw-theme-iconOutline {
+                    fill: $avatar_icon_fill;
+                }
+            }
+        }
+    }
+
+    // Buttons
+    button.aw-base-blk-button,
+    .aw-widgets-chip {
+        &:not(.disabled) {
+            &.aw-accent-highContrast {
+                color: $default_base_button_text;
+                fill: $default_base_button_text;
+                background-color: $default_base_button_background;
+                border-color: $default_base_button_border;
+
+                &:not(.aw-widgets-staticChip) {
+                    &:hover {
+                        background-color: $default_base_button_background_hover;
+                    }
+
+                    &:active {
+                        background-color: $default_base_button_background_active;
+                    }
+                }
+            }
+
+            &.aw-not-default-button {
+                background-color: transparent;
+                border-color: $aw_button_color;
+                color: $negative_button_text;
+            }
+
+            &.aw-base-button {
+                background-color: $base_dark_button_background;
+                border-color: $base_dark_button_border;
+                color: $base_dark_button_text;
+                fill: $base_dark_button_text;
+
+                &:not(.aw-widgets-staticChip) {
+                    &:hover {
+                        background-color: $base_dark_button_background_hover;
+                    }
+
+                    &:active {
+                        background-color: $base_dark_button_background_active;
+                    }
+                }
+            }
+
+            // chromeless is not applicable for chip
+            &.aw-chromeless-button {
+                background-color: $chromeless_base_button_background;
+                border-color: $chromeless_base_button_border;
+                color: $chromeless_base_button_text;
+                box-shadow: none;
+
+                &:hover {
+                    background-color: $chromeless_base_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $chromeless_base_button_background_active;
+                }
+            }
+
+            &.aw-chromeless-disabled {
+                pointer-events: none;
+                background-color: $chromeless_disabled_base_button_background;
+                border-color: $chromeless_disabled_base_button_border;
+                color: $chromeless_disabled_base_button_text;
+                box-shadow: none;
+            }
+        }
+
+        &.disabled {
+            background-color: $disabled_base_button_background;
+            border-color: $disabled_base_button_border;
+            color: $disabled_base_button_text;
+            fill: $disabled_base_button_text;
+        }
+    }
+
+    // command icon button: light-blue in global navigation panel
+    .global-navigation .aw-sidenav-layoutContainer aw-command-bar aw-command .aw-commands-commandIconButton {
+        background-color: $chromeless_base_button_background;
+        color: $chromeless_base_button_text;
+
+        &:hover {
+            background-color: $chromeless_base_button_background_hover;
+            color: $chromeless_base_button_text;
+        }
+
+        &:active {
+            background-color: $chromeless_base_button_background_active;
+            color: $chromeless_base_button_text;
+        }
+    }
+
+    .global-navigation .aw-sidenav-layoutContainer aw-command-bar aw-command .aw-commands-commandIconButton .aw-commands-svg svg,
+    .global-navigation .aw-sidenav-layoutContainer aw-command-bar aw-command .aw-commands-commandIconButton .aw-theme-iconOutline {
+        fill: $chromeless_base_button_text;
+    }
+
+    // aw-radiobutton
+    @keyframes radio-ripple {
+        0% {
+            box-shadow: 0px 0px 0px 1px rgba($radio_base_ripple_color, 0);
+        }
+
+        50% {
+            box-shadow: 0px 0px 0px 13px rgba($radio_base_ripple_color, 0.15);
+        }
+
+        100% {
+            box-shadow: 0px 0px 0px 13px rgba($radio_base_ripple_color, 0);
+        }
+    }
+
+    .aw-jswidgets-radioButtonItem {
+        input[type="radio"] {
+            &:checked+.aw-jswidgets-radioLabel:before {
+                animation: radio-ripple 0.7s forwards ease-out;
+                border-color: $radiobutton_base_checked_border_color;
+            }
+
+            &:not(:checked):hover+.aw-jswidgets-radioLabel:before {
+                border: solid 4px $radiobutton_base_hover_border_color;
+            }
+        }
+
+        .aw-jswidgets-radioLabel {
+
+            &:before,
+            &:after {
+                transition-property: transform, border-color;
+            }
+
+            &:before {
+                border-color: $radio_button_base_border_color;
+            }
+
+            &:after {
+                background-color: $radiobutton_base_checked_dot_color;
+            }
+        }
+    }
+
+    .disabled .aw-jswidgets-radioText {
+        color: $radiobutton_base_disabled_color;
+    }
+
+    aw-radiobutton {
+
+        .disabled,
+        &.disabled {
+            .aw-widgets-propertyLabelTop {
+                color: $radiobutton_base_disabled_color;
+            }
+        }
+    }
+
+    .disabled .aw-jswidgets-radioButtonItem .aw-jswidgets-radioLabel:before,
+    .disabled .aw-jswidgets-radioButtonItem input[type="radio"]:checked+.aw-jswidgets-radioLabel:before,
+    .aw-jswidgets-radioButtonItem.disabled .aw-jswidgets-radioLabel:before {
+        border-color: $radiobutton_base_disabled_color;
+    }
+
+    .disabled .aw-jswidgets-radioButtonItem .aw-jswidgets-radioLabel:after {
+        background-color: $radiobutton_base_disabled_color;
+    }
+
+    //aw-list: border color
+    .aw-widgets-cellListItem {
+        border-color: $default_cell_list_base_item_border_color;
+        border-bottom-color: $cell_item_base_border_bottom_color;
+    }
+
+    //SPLITTER
+    .aw-layout-splitter {
+        background-color: $splitter_background_color;
+
+        &:hover {
+            .aw-layout-splitterLine {
+                border-color: $splitter_base_border_color_hover;
+            }
+
+            .aw-layout-splitterLineHorizontal {
+                border-color: $splitter_base_border_color_hover;
+            }
+        }
+
+        &:active {
+            .aw-layout-splitterLine {
+                border-color: $splitter_base_border_color_active;
+            }
+
+            .aw-layout-splitterLineHorizontal {
+                border-color: $splitter_base_border_color_active;
+            }
+        }
+    }
+
+    .aw-layout-splitterLine {
+        border-color: $splitter_base_border_color;
+    }
+
+    .aw-layout-splitterLineHorizontal {
+        border-color: $splitter_base_border_color;
+    }
+
+    .aw-generic-avatar:focus,
+    .aw-avatar-layout:focus,
+    .aw-tile-tileContainer:focus,
+    .noty_buttons .btn.btn-notify:focus,
+    .noty_close:focus,
+    a.aw-progress-bar-text:focus,
+    button.aw-base-blk-button:focus,
+    button.aw-base-button:focus,
+    input.aw-jswidgets-checkboxButton:focus+.afx-checkbox-md-style .check,
+    input.aw-jswidgets-radioButton:focus+.aw-jswidgets-radioLabel:before,
+    input.aw-jswidgets-checkboxButton:focus+.aw-jswidgets-toggleLabel,
+    .aw-widgets-checkSelect input:focus ~ .aw-widgets-checklistText,
+    .aw-widgets-propertyValueLink:focus {
+        .keyboard & {
+            outline-color: $brand_base_focus_color;
+        }
+    }
+
+    .aw-file-uploadFocus {
+        border-color: $brand_base_focus_color;
+    }
+}
+
+// widget required asterisk light color
+.afx-property-required:after {
+    color: $brand_primary_inverse_text;
+}
+
+// aw-list: needs UX input for color choice
+.aw-widgets-cellListCellTitle {
+    color: $base_text_color;
+    fill: $base_text_color;
+}
+
+// jqueryUI slider styling
+.aw-jswidgets-slider .ui-slider {
+    background-color: $slider_base_background_color;
+
+    .ui-slider-range,
+    .ui-slider-handle {
+        background-color: $slider_handle_base_background_color;
+    }
+}
+
+/**** section 3: apply the mixins ****/
+// base, then main for main background classes, then base for base background classes inside of main
+
+// base background is applied at body, so start with that and then override as-needed
+// base and main background-classes are defined in afx-theme-settings and can be override per theme
+@include base-foreground-styles;
+
+// contrasting main/content backgrounds
+#{$main-background-classes} {
+    @include main-foreground-styles;
+
+    #{$base-background-classes} {
+        // support dark background inside light
+        @include base-foreground-styles;
+    }
+}
+
+/**** section 4: elements that set a their own background color ****/
+// i.e., no need for alternate foreground support
+// could optimize by applying generic background classes
+
+.aw-ui-treeNodeValue:hover {
+    background-color: $cell_list_item_hover;
+    color: $brand_selection_text_hover;
+}
+
+// aw-list has 1 set of selection backgrounds...
+// when changing or customizing, need to be carful not to clash them with the container background
+.aw-jswidgets-nestingListItemDisplay:hover {
+    background-color: $brand_selection_background_hover;
+}
+
+.aw-widgets-cellListWidget,
+.aw-base-scrollPanel {
+    .aw-widgets-cellListItem {
+        &:hover {
+            background-color: $cell_list_item_hover;
+            color: $brand_selection_text_hover;
+            border-color: $cell_list_item_border_color;
+            border-bottom-color: $cell_item_main_border_bottom_color;
+
+            .aw-widgets-cellListCellTitle {
+                color: $default_cell_list_item_cell_content_cell_title_header1_color;
+            }
+
+            .aw-theme-iconOutline {
+                fill: $brand_selection_text_hover;
+            }
+        }
+
+        &.aw-widgets-cellListItemSelected:not(.aw-widgets-dropframe) {
+            background-color: $cell_list_item_selected;
+            fill: $aw_secondary_text;
+            color: $brand_selection_text_selected;
+            border-color: $cell_list_item_border_color_selected;
+            border-bottom-color: $cell_item_main_border_bottom_color;
+
+            .aw-widgets-cellListCellTitle {
+                color: $default_cell_list_item_cell_content_cell_title_header1_color;
+            }
+
+            .aw-theme-iconOutline {
+                fill: $brand_selection_text_selected;
+            }
+
+            &:hover {
+                background-color: $cell_list_item_selected_hover;
+                color: $brand_selection_text_selected_hover;
+                border-color: $cell_list_item_border_color_selected_hover;
+                border-bottom-color: $cell_item_main_border_bottom_color;
+            }
+        }
+    }
+}
+
+/* CLICKABLE CELL TITLE start */
+.aw-widgets-cellListCellTitleBlock {
+
+    .aw-widgets-cellListCellTitle.aw-uiwidgets-cellClickableTitle,
+    a.aw-uiwidgets-cellClickableTitle {
+        color: $aw_link_and_clickable;
+
+        &:hover {
+            color: $default_cell_clickable_title_hover;
+        }
+    }
+}
+
+/* CLICKABLE CELL TITLE end */
+
+.aw-widgets-sliderWithResetPanel button.aw-widgets-minusButton,
+.aw-widgets-sliderWithResetPanel button.aw-widgets-plusButton {
+    background-color: $slider_button_background_color;
+    color: $slider_button_text;
+}
+
+/* jswidget datepicker colors */
+.aw-jswidgets-datepicker.ui-datepicker {
+    background-color: $date_datepicker_background_color;
+    color: $date_datepicker_calender_table_content_color;
+    border-color: $date_datepicker_border_color;
+    box-shadow: $date_datepicker_box_shadow;
+}
+
+.aw-jswidgets-datepicker.ui-datepicker table td a,
+.aw-jswidgets-datepicker.ui-datepicker .ui-widget-content {
+    color: $date_datepicker_calender_table_content_color;
+}
+
+// make only "the first letter" of header (i.e. M, T, W, T, etc) visible, by giving the rest of letters the color same as background
+.aw-jswidgets-datepicker.ui-datepicker table th {
+    color: $date_datepicker_background_color;
+
+    &::first-letter {
+        color: $date_datepicker_calender_table_header_color;
+    }
+}
+
+.aw-jswidgets-datepicker.ui-datepicker .ui-datepicker-calendar .ui-state-active {
+    color: $date_datepicker_calender_selected_date_active_color;
+    background-color: $date_datepicker_calender_selected_date_active_background_color;
+}
+
+.aw-jswidgets-datepicker.ui-datepicker .ui-state-highlight,
+.ui-widget-content .ui-state-highlight,
+.ui-widget-header .ui-state-highlight {
+    color: $date_datepicker_calender_current_date_highlight_color;
+    border: $date_datepicker_calender_current_date_highlight_border;
+}
+
+.aw-jswidgets-datepicker.ui-datepicker .ui-state-default.ui-state-hover:not(.ui-state-active) {
+    background-color: $date_datepicker_calender_date_hover_background_color;
+}
+
+.aw-jswidgets-datepicker.ui-datepicker .ui-state-disabled>span {
+    color: $date_disabled_color;
+}
+
+// textbox, textarea, and password set their own background
+textarea,
+input[type="text"],
+input[type="password"] {
+    background-color: $textbox_background;
+    box-shadow: $textbox_drop_shadow;
+    color: $input_text_color;
+    border-color: $input_border_color;
+
+    &:hover {
+        box-shadow: $textbox_drop_shadow_hover;
+    }
+
+    &:focus {
+        border-color: $brand_primary_border_focus;
+        caret-color: $input_border_color;
+    }
+
+    &:disabled {
+        background-color: rgba($input_disabled_background_color, 0.1);
+        color: rgba($input_disabled_color, 0.57);
+        border-color: rgba($input_disabled_background_color, 0.3);
+        box-shadow: none;
+    }
+
+    &.changed,
+    &.ng-dirty {
+        background-color: $input_pending_change;
+        color: $input_pending_change_text;
+    }
+}
+
+// certain inputs don't show dirty state
+.aw-layout-navigationAreaContainer,
+.aw-jswidgets-cbaSearch,
+.aw-uiwidgets-searchBoxContainer,
+.aw-session-signIn,
+.aw-uiwidgets-typeSelectorContainer {
+
+    input[type="text"],
+    input[type="password"] {
+
+        &.changed,
+        &.ng-dirty {
+            background-color: $textbox_background;
+            color: $input_text_color;
+        }
+    }
+}
+
+input[type="password"] {
+
+    &.changed,
+    &.ng-dirty {
+        background-color: $textbox_background;
+        color: $input_text_color;
+    }
+}
+
+// styling for placeholder
+::-webkit-input-placeholder {
+    color: $placeholder_text_color;
+}
+
+:-ms-input-placeholder {
+    color: $placeholder_text_color !important;
+}
+
+::-moz-placeholder {
+    // Firefox 19+
+    color: $placeholder_text_color;
+}
+
+// popup
+// TODO: will remove in next MR
+aw-balloon-popup-panel .aw-layout-popup {
+    box-shadow: $balloon_popup_box_shadow;
+    background-color: $balloon_popup_background_color;
+    border-color: $balloon_popup_border_color;
+}
+
+aw-balloon-popup-panel .aw-layout-popup:before {
+    border-bottom-color: $balloon_popup_border_color;
+}
+
+// end
+
+.aw-layout-popup {
+    box-shadow: $drop_shadow_2x_large;
+    background-color: $popup_background_color;
+    border-color: $popup_border_color;
+
+    // popup arrow related styles
+    .popupArrow {
+        .arrow_bg {
+            border-color: $popup_arrow_border_color;
+
+            .arrow_fg {
+                border-color: $popup_arrow_fill_color;
+            }
+        }
+    }
+
+    &[x-placement^="bottom"] {
+        .popupArrow {
+            .arrow {
+                border-left-color: transparent;
+                border-right-color: transparent;
+                border-top-color: transparent;
+            }
+        }
+    }
+
+    &[x-placement^="top"] {
+        .popupArrow {
+            .arrow {
+                border-left-color: transparent;
+                border-right-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+    }
+
+    &[x-placement^="right"] {
+        .popupArrow {
+            .arrow {
+                border-left-color: transparent;
+                border-top-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+    }
+
+    &[x-placement^="left"] {
+        .popupArrow {
+            .arrow {
+                border-top-color: transparent;
+                border-right-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+    }
+}
+
+aw-popup-panel2,
+aw-popup {
+    &:not(.aw-popup-defaultStyle) {
+        .aw-popup-screenMaskBackground {
+            background-color: $PL_Black;
+        }
+
+        .aw-popup-contentContainerBackground {
+            background-color: $content_background_color;
+        }
+    }
+
+    button.disabled {
+        color: $aw_gray_9;
+        background-color: $aw_toolbar;
+        border-color: $aw_toolbar;
+    }
+
+    .aw-popup-secondaryButton {
+        background-color: $content_background_color;
+        color: $aw_link_and_clickable;
+        border-color: $aw_panel_header_accent;
+    }
+}
+
+// search-prefilter
+aw-search-prefilter {
+    input.aw-jswidgets-choice[readonly="readOnly"] {
+        color: $search_prefilter_text_color;
+        background-color: $search_prefilter_background_color;
+        border-color: $search_prefilter_border_color;
+
+        &:active {
+            background-color: $search_prefilter_background_color_active;
+        }
+
+        &:focus {
+            background-color: $search_prefilter_background_color_focus;
+        }
+
+        &.aw-search-dirty {
+            background-color: $search_prefilter_background_color_dirty;
+            border-color: $search_prefilter_border_color_dirty;
+        }
+    }
+
+    aw-property-image.aw-search-prefilter-icon .aw-theme-iconOutline {
+        fill: $search_prefilter_icon_color;
+    }
+}
+
+// indeterministic progress indicator
+.aw-layout-progressBarCylon {
+    @include linear_gradient(to right, $progress_indicator_thumb_color 0px, $progress_indicator_thumb_color 0px);
+}
+
+.aw-layout-progressBarIE9 {
+    background-color: $progress_indicator_thumb_color;
+}
+
+.aw-layout-progressBar {
+    background-color: $progress_indicator_path_color;
+}
+
+// Array widget - border and box-shadow aren't unique to array: make generic
+aw-property-array-val,
+aw-search-property-array-val {
+    .aw-jswidgets-arrayWidgetContainer {
+        &.aw-array-border {
+            border-color: $property_array_val_border_color;
+        }
+    }
+
+    aw-property-radio-button-val,
+    aw-property-toggle-button-val,
+    aw-property-checkbox-val {
+        .aw-widgets-innerWidget {
+            border-color: $property_array_val_border_color;
+            box-shadow: $property_array_val_box_shadow;
+        }
+    }
+
+    .aw-jswidgets-arrayWidgetContainerFocused {
+        border-color: $brand_primary_border_focus;
+    }
+}
+
+// AW Search Box
+aw-search-box,
+aw-in-content-search-box,
+aw-filter-category-searchbox {
+    .aw-uiwidgets-searchBoxContainer {
+        border-color: $search_box_border_color;
+        box-shadow: $search_box_drop_shadow;
+        background-color: $search_box_background_color;
+
+        .aw-uiwidgets-searchBoxIcon {
+            background-color: $search_box_background_color;
+        }
+    }
+
+    .aw-search-inContentSearchBox .aw-uiwidgets-searchBoxContainer {
+        border-color: $search_box_border_color;
+    }
+
+    .aw-search-inContentSearchBox .aw-uiwidgets-searchBoxContainer:hover {
+        border-color: $search_box_border_color_hover;
+    }
+
+    .aw-uiwidgets-searchBoxIcon:hover {
+        background-color: $search_box_icon_hover;
+    }
+
+    .aw-uiwidgets-searchBoxIcon:active {
+        background-color: $search_box_icon_active;
+    }
+}
+
+.aw-search-searchIconViewContainer .aw-uiwidgets-searchBoxIcon {
+    background-color: transparent;
+}
+
+.aw-search-globalSearchPreFilterWrapper .aw-widgets-propertyContainer {
+    box-shadow: $search_box_drop_shadow;
+}
+
+.aw-search-globalSearchElementsContainer aw-search-prefilter .aw-jswidgets-popUpVisible .aw-jswidgets-nestingListItemDisplay:hover {
+    color: $aw_prefilter_text_color;
+}
+
+/* NOTIFICATION-CELL or AW-NOTIFICATION-CELL */
+.aw-notification-cell-importance-high {
+    border-left-color: $aw_notification_cell_imp_color;
+}
+
+.aw-notification-cell-importance-medium {
+    border-left-color: $aw_notification_cell_med_color;
+}
+
+.aw-notification-cell-importance-low {
+    border-left-color: $aw_notification_cell_low_color;
+}
+
+/* notification cell title color*/
+.aw-notification-cell-title-high {
+    color: $aw_notification_cell_imp_color;
+}
+
+.aw-notification-cell-title-medium {
+    color: $aw_notification_cell_med_color;
+}
+
+.aw-notification-cell-title-low {
+    color: $aw_notification_cell_low_color;
+}
+
+.aw-notification-cell-read {
+    border-left-color: $aw_notification_cell_read_color;
+}
+
+.aw-notification-cell-prop {
+    color: $aw_notification_cell_prop_color;
+}
+
+.aw-notification-cell:hover {
+    box-shadow: $aw_notification_cell_box_shadow_hover;
+}
+
+.aw-notification-cell {
+    background-color: $aw_notification_cell_read_color;
+    box-shadow: $aw_notification_cell_box_shadow;
+}
+
+.guidance-container-type-information {
+    border-color: $guidance_information_border_color;
+    background-color: $guidance_information_background_color;
+
+    .aw-guidance-guideText {
+        color: $brand_status_information;
+    }
+}
+
+.guidance-container-type-warning {
+    border-color: $guidance_warning_border_color;
+    background-color: $guidance_warning_background_color;
+
+    .aw-guidance-guideText {
+        color: $brand_status_warning;
+    }
+
+    button.aw-base-blk-button {
+        &:not(.disabled) {
+            border-color: $solo_button_border;
+            background-color: $solo_button_background;
+
+            &:hover,
+            &:focus {
+                background-color: $solo_button_background_hover;
+            }
+
+            &:active {
+                background-color: $solo_button_background_active;
+            }
+        }
+    }
+}
+
+.guidance-container-type-error {
+    border-color: $guidance_error_border_color;
+    background-color: $guidance_error_background_color;
+
+    .aw-guidance-guideText {
+        color: $guidance_error_color;
+    }
+
+    button.aw-base-blk-button {
+        &:not(.disabled) {
+            border-color: $error_button_border;
+            background-color: $error_button_background;
+
+            &:hover,
+            &:focus {
+                background-color: $error_button_background_hover;
+            }
+
+            &:active {
+                background-color: $error_button_background_active;
+            }
+        }
+    }
+
+}
+
+.guidance-container-type-success {
+    border-color: $guidance_success_border_color;
+    background-color: $guidance_success_background_color;
+
+    .aw-guidance-guideText {
+        color: $guidance_success_color;
+    }
+
+    button.aw-base-blk-button {
+        &:not(.disabled) {
+            border-color: $success_button_border;
+            background-color: $success_button_background;
+
+            &:hover,
+            &:focus {
+                background-color: $success_button_background_hover;
+            }
+
+            &:active {
+                background-color: $success_button_background_active;
+            }
+        }
+    }
+}
+
+.aw-guidance-message .close-button {
+    svg polygon {
+        fill: $guidance_close_button_color;
+        stroke: $guidance_close_button_color;
+    }
+
+    &:hover,
+    &:focus {
+        svg polygon {
+            fill: $guidance_close_button_color_hover;
+            stroke: $guidance_close_button_color_hover;
+        }
+    }
+}
+
+.aw-guidance-message .aw-guidance-guideText-hyphen,
+.aw-guidance-messageText {
+    color: $brand_tertiary_text;
+}
+
+// AW_STEP_PROGRESS
+.aw-step-progressChevronContainer {
+    li {
+        background-color: $aw_step_progress_container_background_color;
+        color: $aw_step_progress_text_color;
+        border-color: $aw_step_progress_border_color;
+
+        &::after {
+            border-left-color: $aw_step_progress_after_left_border_color;
+            border-top-color: $aw_step_progress_transparent_border_color;
+            border-bottom-color: $aw_step_progress_transparent_border_color;
+        }
+
+        &::before {
+            border-left-color: $aw_step_progress_before_left_border_color;
+            border-top-color: $aw_step_progress_transparent_border_color;
+            border-bottom-color: $aw_step_progress_transparent_border_color;
+        }
+
+        // Styling for Current or Highlighted Chevron
+        &.aw-step-progressCurrentChevron {
+            background-color: $aw_step_progress_current_item_accent_color;
+            color: $aw_step_progress_current_item_text_color;
+            border-color: $aw_step_progress_current_item_accent_color;
+
+            &::after {
+                border-left-color: $aw_step_progress_current_item_accent_color;
+            }
+
+            &~li {
+                color: $aw_step_progress_current_item_child_item_text_color;
+            }
+        }
+
+        //styling for clickable links overriding previous shade of blue
+        a.aw-progress-bar-text {
+            color: $aw_step_progress_current_item_accent_color;
+        }
+    }
+}
+
+@media (max-width: 28.75em) {
+
+    /* Adding an alpha for global navigation panel in narrow mode */
+    .global-navigation {
+        .aw-sidenav-layoutContainer.aw-sidenav-standard {
+            background: rgba($brand_quaternary_content_background, 0.92);
+        }
+    }
+}
+
+// Skip to main link
+.aw-skip-to-main:focus {
+    background-color: $brand_primary_content_background;
+}
+
+.aw-skip-to-main:focus .aw-skip-to-main-text,
+.aw-apply-focus-to-main {
+    border-color: $brand_main_focus_color;
+}
+
+a.aw-skip-to-main:focus {
+    color: $link_main;
+}
+
+.aw-border-focus-chartColor {
+    color: $brand_main_focus_color;
+}
+
+/**** section 5: widgets with a single implementation... so far ****/
+// these widgets are anticipated only to appear in the main or base areas so far, but not both
+// parts of these widgets could be moved in to the mixins as-needed
+
+.aw-jswidgets-arrayEditValueCellList .aw-jswidgets-arrayValueCellListItem:hover {
+    background-color: $aw_hover;
+    fill: $brand_selection_text_selected;
+    color: $brand_selection_text_selected;
+}
+
+.changed {
+    /* !important - https://gitlab.industrysoftware.automation.siemens.com/Apollo/afx/merge_requests/1241 */
+    background-color: $input_pending_change !important;
+    color: $input_pending_change_text !important;
+}
+
+// command decorator
+.aw-commands-cellDecorator div {
+    background-color: $command_bar_command_decorator_background_color;
+    color: $command_bar_command_decorator_color;
+}
+
+// checkbox - single implementation atm
+// if we could get ux to change the black border color to a medium gray, this scheme could work
+// on dark and light backgrounds?
+.afx-checkbox {
+    .afx-checkbox-md-style {
+        .check {
+            color: $checkbox_border_color;
+            -webkit-transition: $hover_border_color_transition;
+            transition: $hover_border_color_transition;
+        }
+
+        &:before {
+            background-color: $checkbox_checked_color;
+            pointer-events: none;
+        }
+    }
+
+    &:hover {
+        input[type=checkbox]:not(:checked) {
+            +.afx-checkbox-md-style {
+                .check {
+                    border: $checkbox_hover_border;
+                }
+            }
+        }
+
+        input[type=checkbox][disabled]:not(:checked) {
+            +.afx-checkbox-md-style {
+                .check {
+                    color: $checkbox_disabled_color;
+                    border: $checkbox_disabled_border;
+                }
+            }
+        }
+    }
+
+    input[type=checkbox]:checked {
+        +.afx-checkbox-md-style {
+            .check {
+                color: $checkbox_checked_color;
+            }
+        }
+    }
+
+    input[type=checkbox][disabled] {
+        +.afx-checkbox-md-style {
+            .check {
+                color: $checkbox_disabled_color;
+            }
+        }
+    }
+}
+
+.changed {
+    .afx-checkbox {
+        .afx-checkbox-md-style {
+            .check {
+                box-shadow: $checkbox_changed_border;
+            }
+        }
+    }
+}
+
+// Buttons and Chips, they have the same style
+button.aw-base-blk-button,
+.noty_buttons .btn,
+.aw-widgets-chip {
+    &:not(.disabled) {
+        &:not(.aw-widgets-staticChip) {
+            box-shadow: $default_main_button_drop_shadow;
+
+            &:hover {
+                box-shadow: $default_main_button_hover_shadow;
+            }
+        }
+
+        &.aw-accent-midContrast,
+        &.aw-base-button.aw-widgets-chipSelected {
+            background-color: $mid_contrast_button_background;
+            border-color: $mid_contrast_button_border;
+            color: $mid_contrast_button_text;
+            fill: $mid_contrast_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $mid_contrast_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $mid_contrast_button_background_active;
+                }
+            }
+        }
+
+        &.aw-positive {
+            background-color: $positive_button_background;
+            border-color: $positive_button_border;
+            color: $positive_button_text;
+            fill: $positive_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $positive_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $positive_button_background_active;
+                }
+            }
+        }
+
+        &.aw-accent-positive {
+            background-color: $accent_positive_button_background;
+            border-color: $accent_positive_button_border;
+            color: $accent_positive_button_text;
+            fill: $accent_positive_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $accent_positive_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $accent_positive_button_background_active;
+                }
+            }
+        }
+
+        &.aw-caution {
+            background-color: $caution_button_background;
+            border-color: $caution_button_border;
+            color: $caution_button_text;
+            fill: $caution_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $caution_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $caution_button_background_active;
+                }
+            }
+        }
+
+        &.aw-accent-caution {
+            background-color: $accent_caution_button_background;
+            border-color: $accent_caution_button_border;
+            color: $accent_caution_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $accent_caution_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $accent_caution_button_background_active;
+                }
+            }
+        }
+
+        &.aw-negative-button {
+            background-color: $negative_button_background;
+            border-color: $negative_button_border;
+            color: $negative_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $negative_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $negative_button_background_active;
+                }
+            }
+        }
+
+        &.aw-accent-negative {
+            background-color: $accent_negative_button_background;
+            border-color: $accent_negative_button_border;
+            color: $accent_negative_button_text;
+            fill: $accent_negative_button_text;
+
+            &:not(.aw-widgets-staticChip) {
+                &:hover {
+                    background-color: $accent_negative_button_background_hover;
+                }
+
+                &:active {
+                    background-color: $accent_negative_button_background_active;
+                }
+            }
+        }
+    }
+}
+
+// checkbox-list separator after selected vals
+.aw-widgets-cellListWidget .afx-selected-vals .aw-jswidgets-nestingListItem:last-child {
+    border-bottom-color: $aw_separator_border_color;
+}
+
+// DRAG AND DROP CHANGES
+.aw-widgets-droppable.aw-widgets-dropframe,
+.ui-grid-row.aw-widgets-droparea,
+.aw-widgets-droparea,
+.aw-widgets-dropframe,
+.aw-widgets-dropframe.aw-theme-dropframe {
+    border-color: $dragdrop_container_border_color;
+    background-color: $dragdrop_container_background_color;
+}
+
+// DRAG AND DROP CHANGES
+.ui-grid-row.aw-theme-dropframe.aw-widgets-dropframe,
+.aw-splm-table .ui-grid-row.aw-theme-dropframe.aw-widgets-dropframe {
+    border-color: $dragdrop_container_border_color;
+    background-color: $dragdrop_container_background_color;
+}
+
+// DRAG AND DROP CHANGES
+.ui-grid-cell.aw-theme-dropframe.aw-widgets-dropframe,
+.aw-splm-table .ui-grid-cell.aw-theme-dropframe.aw-widgets-dropframe {
+    background-color: $dragdrop_container_background_color;
+}
+
+/* PLTable Specific start */
+.aw-splm-tableHeaderRow {
+    background-color: $table_header_background_color;
+}
+
+.aw-splm-tableScrolled .aw-splm-tableHeaderRow {
+    box-shadow: $drop_shadow_table_scroll;
+}
+
+.aw-jswidgets-grid .aw-splm-tablePinnedContainerLeft .aw-splm-tableHeaderCell:last-child .aw-splm-tableHeaderCellSplitter {
+    border-right-color: $drop_shadow_table_scroll_color;
+}
+
+.aw-jswidgets-grid .aw-splm-tablePinnedContainerLeft .aw-splm-tableHeaderCell:last-child:focus .aw-splm-tableHeaderCellSplitter {
+    background-color: $brand_main_focus_color;
+}
+
+.aw-jswidgets-grid {
+
+    .aw-splm-tablePinnedContainer,
+    .aw-splm-tableScrollContainer {
+        .ui-grid-row {
+            /*
+            https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7119159/
+            https://stackoverflow.com/questions/32313551/border-bottom-bug-in-microsoft-edge
+            */
+            background-color: $table_content_background_color;
+            border-color: $table_border_color;
+            margin-bottom: -1px;
+            border-bottom-width: 2px;
+        }
+
+        .ui-grid-row:last-child {
+            /*
+                https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7119159/
+                https://stackoverflow.com/questions/32313551/border-bottom-bug-in-microsoft-edge
+                */
+            margin-bottom: 0px;
+            border-bottom-width: 1px;
+        }
+    }
+}
+
+/**
+ * LCS-167176 - Tables do not follow hover/select color standards
+ * Defines 3 different coloring: hover, selected, selected-hover for table.
+ * For now just reuse cell color definition
+ */
+
+.aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected>[ui-grid-row]>.ui-grid-cell,
+.aw-jswidgets-grid.aw-jswidgets-selectionEnabled .ui-grid-row.ui-grid-row-selected>[ui-grid-row]>.ui-grid-cell,
+.aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected,
+.aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected>.ui-grid-cell,
+.aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected>.ui-grid-cell .aw-widgets-propertyNonEditValue,
+.aw-splm-table .aw-splm-tableContainer .ui-grid-row .ui-grid-column-selected.ui-grid-cell-selected,
+.aw-splm-table .aw-splm-tableHeaderRow .aw-splm-tableHeaderCell.aw-splm-tableHeaderCellSelected {
+    background: $cell_list_item_selected;
+    color: $brand_selection_text_selected;
+}
+
+.aw-table .aw-jswidgets-grid .ui-grid-row:hover>[ui-grid-row]>.ui-grid-cell,
+.aw-table .aw-jswidgets-grid.aw-jswidgets-selectionEnabled .ui-grid-row:hover>[ui-grid-row]>.ui-grid-cell,
+.aw-table .aw-jswidgets-grid .ui-grid-row:hover,
+.aw-table .aw-jswidgets-grid .ui-grid-row:hover>.ui-grid-cell,
+.aw-table .aw-jswidgets-grid .ui-grid-row:hover>.ui-grid-cell .aw-widgets-propertyNonEditValue {
+    background: $cell_list_item_hover;
+    color: $brand_selection_text_hover;
+}
+
+.aw-table .aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected:hover>[ui-grid-row]>.ui-grid-cell,
+.aw-table .aw-jswidgets-grid.aw-jswidgets-selectionEnabled .ui-grid-row.ui-grid-row-selected:hover>[ui-grid-row]>.ui-grid-cell,
+.aw-table .aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected:hover,
+.aw-table .aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected:hover>.ui-grid-cell,
+.aw-table .aw-jswidgets-grid .ui-grid-row.ui-grid-row-selected:hover>.ui-grid-cell .aw-widgets-propertyNonEditValue {
+    background: $cell_list_item_selected_hover;
+    color: $brand_selection_text_selected_hover;
+}
+
+.aw-splm-table .ui-grid-row.ui-grid-row-selected.aw-splm-tableHoverRow {
+    background: $cell_list_item_selected_hover;
+    color: $brand_selection_text_selected_hover;
+}
+
+.aw-splm-table .ui-grid-row.aw-splm-tableHoverRow {
+    background: $cell_list_item_hover;
+    color: $brand_selection_text_hover;
+}
+
+//fix hover styles for change/old-text styles
+.aw-jswidgets-grid .ui-grid-row {
+
+    &.ui-grid-row-selected,
+    &.aw-splm-tableHoverRow,
+    &.ui-grid-row-selected .aw-splm-tableHoverRow {
+        &.aw-jswidgets-change {
+            color: $brand_selection_text_selected_changed;
+
+            >.ui-grid-cell,
+            >.ui-grid-cell .aw-widgets-propertyNonEditValue {
+                color: $brand_selection_text_selected_changed;
+            }
+        }
+
+        &.aw-jswidgets-oldText {
+            color: $brand_selection_text_selected_oldText;
+
+            >.ui-grid-cell,
+            >.ui-grid-cell .aw-widgets-propertyNonEditValue {
+                color: $brand_selection_text_selected_oldText;
+            }
+        }
+    }
+}
+
+.aw-splm-tableHeaderCell,
+.aw-splm-tableHeaderCellSortIcon {
+    background-color: $table_header_background_color;
+    color: $table_header_text_color;
+}
+
+.aw-splm-tableHeaderCell:hover {
+    color: $aw_gray_12;
+}
+
+.aw-jswidgets-grid .ui-grid-cell.dragCell,
+.aw-jswidgets-grid .dragCell,
+.aw-jswidgets-grid .ui-grid-row:last-child .ui-grid-cell.dragCellBottom {
+    border-color: $aw_gray_1;
+    /* Equivalent to #000000; */
+}
+
+.aw-jswidgets-grid .aw-table-scrolled .ui-grid-header {
+    box-shadow: $drop_shadow_table_scroll;
+}
+
+.aw-splm-tableMenuContainer {
+    border-color: $aw_gray_20;
+    /* Equivalent to #bebebe */
+
+    .grid-menu-command .aw-layout-popup,
+    .aw-layout-popupOverlay,
+    aw-popup-command-bar {
+        position: static;
+    }
+
+    .aw-widgets-cellListItem {
+        border: none;
+    }
+}
+
+.aw-splm-tableMenuPopup .aw-widgets-cellListItem {
+    /*background-color: $aw_popup_background;*/
+    color: $aw_popup_font_color;
+}
+
+.aw-splm-tableMenuPopup .aw-widgets-cellListItem.aw-widgets-disabledMenuItem {
+    color: $PL_Black_18;
+    pointer-events: none;
+}
+
+.aw-splm-tableMenuPopup {
+    border-color: $popup_border_color;
+    box-shadow: $popup_drop_shadow;
+    background-color: $aw_popup_background;
+    color: $aw_popup_font_color;
+
+    hr {
+        border-color: $aw_separator_border_color;
+    }
+}
+
+/*  Pointer for grid/table menu */
+.aw-splm-tableMenuPointer:before {
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid $popup_border_color;
+}
+
+.aw-splm-tableMenuPointer:after {
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid $aw_popup_background;
+}
+
+/* Pointers for column menus */
+.aw-splm-tableColumnMenuPointerBeforeLeft {
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid $popup_border_color;
+}
+
+.aw-splm-tableColumnMenuPointerAfterLeft {
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-right: 9px solid $aw_popup_background;
+}
+
+.aw-splm-tableColumnMenuPointerBeforeRight {
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid $popup_border_color;
+}
+
+.aw-splm-tableColumnMenuPointerAfterRight {
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-left: 9px solid $aw_popup_background;
+}
+
+.aw-splm-tableMenuPointerBack {
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid $popup_border_color;
+}
+
+.aw-splm-tableMenuPointerBack.aw-splm-tableMenuPointerBackLeft {
+    border-right: 10px solid $popup_border_color;
+    border-left: none;
+}
+
+.aw-splm-tableMenuPointerBack.aw-splm-tableMenuPointerBackRight {
+    border-left: 10px solid $popup_border_color;
+    border-right: none;
+}
+
+.aw-splm-tableMenuPointerFront {
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-left: 9px solid $aw_popup_background;
+}
+
+.aw-splm-tableMenuPointerFront.aw-splm-tableMenuPointerFrontLeft {
+    border-right: 9px solid $aw_popup_background;
+    border-left: none;
+}
+
+.aw-splm-tableMenuPointerFront.aw-splm-tableMenuPointerFrontRight {
+    border-left: 9px solid $aw_popup_background;
+    border-right: none;
+}
+
+.aw-splm-tableMenuPopup .aw-widgets-cellListItem:hover {
+    background-color: $aw_hover;
+    fill: $aw_hover;
+}
+
+.aw-splm-tableMenu ::-webkit-scrollbar-thumb {
+    background: #aaaaaa;
+}
+
+.aw-splm-tableMenu>.aw-widgets-cellListItem {
+    border-bottom: none;
+}
+
+.aw-splm-tableMenuButton:hover {
+    background-color: $aw_hover;
+}
+
+.aw-splm-tableMenuItemSelected {
+    /* This is currently the same as a table row selection
+    which is $aw_secondary_selection */
+    background-color: $aw_accent_12;
+}
+
+a.aw-splm-tablePropertyValueLinksDisabled,
+a.aw-splm-tablePropertyValueLinksDisabled:hover {
+    color: $main_text_color;
+}
+
+/* This style will override the border-color for the line between pinned & scroll containers. */
+.aw-splm-tablePinnedContainerDropFrame.aw-widgets-dropframe.aw-theme-dropframe.ui-grid-row {
+    border-right-color: $table_border_color;
+}
+
+/* This style will override the border-color for the line between pinned & scroll containers. */
+.aw-splm-tableScrollContainerDropFrame.aw-widgets-dropframe.aw-theme-dropframe.ui-grid-row {
+    border-left-color: $table_border_color;
+}
+
+aw-splm-table .aw-splm-table .ui-grid-row .ui-grid-cell:hover {
+    border-color: $PL_Black_8_Shade_1;
+}
+
+aw-splm-table .aw-splm-table .aw-splm-tableCanvas .ui-grid-row .aw-splm-tableCellSelected {
+    border-color: $PL_Black_16;
+}
+
+aw-splm-table .aw-splm-table .aw-splm-tableContainer .aw-splm-tableCanvas .ui-grid-row .aw-splm-tableCellSelectedEditable {
+    border-color: $Siemens_Blue_9;
+}
+
+.keyboard .aw-splm-table {
+
+    .aw-splm-tableHeaderCell,
+    .aw-splm-tableMenuButton,
+    .ui-grid-tree-base-row-header-buttons,
+    .aw-splm-tablePropertyValueLinks {
+        &:focus {
+            border-color: $brand_main_focus_color;
+        }
+    }
+
+    .aw-splm-tableContainer {
+        .aw-splm-tableRow {
+            .ui-grid-cell:not( .aw-splm-tableCellSelected ) {
+                &:focus {
+                    border-color: $brand_main_focus_color;
+                }
+            }
+        }
+        &:focus {
+            outline-color: $brand_main_focus_color;
+        }
+    }
+}
+
+.aw-splm-tableMenuPopup {
+    .aw-widgets-cellListItem {
+        &:focus {
+            border-color: $brand_main_focus_color;
+        }
+    }
+}
+
+.arrange_submitButton:focus {
+    outline-color: $brand_main_focus_color;
+}
+
+/* PLTable Specific end */
+
+// DRAG AND DROP CHANGES
+.aw-noeachrow-highlight-dropframe {
+    background-color: $dragdrop_container_background_color !important;
+}
+
+// file-upload
+.aw-file-upload-container {
+    &:hover {
+        .aw-file-upload-fileLabel {
+            background-color: $file_upload_button_background_color;
+        }
+
+        .aw-file-upload-fileName {
+            box-shadow: $drop_shadow_file_upload_input_active;
+            border-color: $file_upload_input_border_color;
+        }
+    }
+}
+
+.aw-file-upload-fileName {
+    box-shadow: $drop_shadow_file_upload_input;
+    background-color: $file_upload_input_background_color;
+    border-color: $file_upload_file_name_border_color;
+    color: $file_upload_input_color;
+}
+
+.aw-file-upload-fileLabel {
+    border-color: $file_upload_button_border_color;
+    background-color: $file_upload_label_background_color;
+    color: $file_upload_button_text_color;
+}
+
+.file-upload-selected-file {
+    color: $file_upload_selected_file_text_color;
+}
+
+//multi-file-upload
+.aw-upload {
+    border-color: $multi_file_upload_border_color;
+}
+
+.aw-upload-drop-container {
+    &.aw-widgets-dropframe.aw-theme-dropframe {
+        .aw-commandIcon.aw-commands-svg {
+            svg {
+                fill: $multi_file_upload_drop_label_active_color
+            }
+        }
+    }
+}
+
+// aw-avatar
+.aw-avatar-icon {
+    background-color: $avatar_background_color;
+}
+
+.aw-avatar-name {
+    color: $avatar_text_color;
+}
+
+.aw-avatar-normal-icon .aw-theme-iconOutline {
+    fill: $avatar_icon_fill;
+}
+
+.aw-avatar-layout {
+    background-color: $avatar_layout_background_color;
+    border-color: $avatar_layout_border_color;
+    box-shadow: $avatar_layout_drop_shadow;
+    color: $avatar_text_color;
+}
+
+// aw-sidenav box-shadow
+.aw-sidenav-push.aw-sidenav-leftBackground {
+    box-shadow: $drop_shadow_for_right_panel;
+}
+
+.aw-sidenav-push.aw-sidenav-rightBackground {
+    box-shadow: $drop_shadow_for_left_panel;
+}
+
+.aw-sidenav-float.aw-sidenav-leftBackground {
+    box-shadow: $left_shadow_2x_large;
+}
+
+.aw-sidenav-float.aw-sidenav-rightBackground {
+    box-shadow: $right_shadow_2x_large;
+}
+
+.aw-sidenav-float {
+    &.aw-sidenav-rightBackground {
+        box-shadow: $global_navigation_panel_float_outer_shadow, $global_navigation_panel_inner_shadow;
+    }
+}
+
+.aw-sidenav-push {
+    &.aw-sidenav-rightBackground {
+        box-shadow: $global_navigation_panel_pushed_outer_shadow, $global_navigation_panel_inner_shadow;
+    }
+}
+
+.aw-sidenav-float,
+.aw-sidenav-push {
+    &.aw-sidenav-rightBackground {
+        .aw-layout-declarativePanelRoot {
+            box-shadow: $global_navigation_panel_inner_shadow;
+        }
+    }
+}
+
+/* aw sidenav with pin (directive) */
+.unpinned {
+    aw-property-image {
+        svg path {
+            fill: $panel_unpinned_icon_color;
+        }
+    }
+}
+
+.pinned {
+    box-shadow: none;
+
+    aw-property-image {
+        svg path {
+            fill: $panel_pinned_icon_color;
+        }
+    }
+}
+
+/* sidenav resize gripper */
+.aw-sidenav-resizer {
+    aw-property-image {
+        svg rect {
+            fill: $global_navigation_drag_handle_color;
+        }
+    }
+
+    &.hovered,
+    &:hover {
+        border-right-color: $global_navigation_drag_handle_hover_color;
+
+        aw-property-image {
+            svg rect {
+                fill: $global_navigation_drag_handle_hover_color;
+            }
+        }
+    }
+}
+
+// toolbar
+.aw-toolbar-layout.aw-toolbar-horizontal {
+    box-shadow: $horizontal_tool_bar_drop_shadow;
+}
+
+// Global Navigation Panel aw-header-context
+.aw-user-settings-anchor {
+    .aw-user-settings-anchor-label {
+        color: $link_base;
+    }
+
+    .aw-base-iconButton[command="anchor.dockUserSettingsIconButton"] {
+        .aw-theme-iconOutline {
+            fill: $global_navigation_panel_user_settings_dock_icon_color;
+        }
+    }
+}
+
+/* aw separator */
+// probably don't need a seperate selector for vertical - should color all separators the same
+// and should be based on background class... (section 2)
+.aw-vertical-separator {
+    color: $aw-vertical-separator-color;
+    opacity: 0.45;
+}
+
+/**** section 6: special-cases ****/
+
+.aw-commands-commandIconButton,
+.aw-commands-commandToolbarIconButton,
+.aw-theme-iconButton,
+.aw-base-iconButton {
+    background-color: transparent;
+}
+
+// panel-section has 2 color impls, but shadow has 1 for now
+// aw-comand-panel-section command-bar styling with labels
+.aw-commands-showIconLabel {
+    .aw-layout-declarativePanelRoot.aw-layout-panel .aw-layout-panelSection {
+        aw-command-bar:not(.aw-layout-userSessionCommands):not(.aw-layout-propertyCommandsNoShadow).aw-commands-commandBarHorizontal {
+            box-shadow: $aw_command_panel_section_commandbar_box_shadow;
+        }
+    }
+}
+
+.aw-advanced-bar-horizontal {
+    box-shadow: $horizontal_tool_bar_drop_shadow;
+}
+
+// override copied links to match standard link color
+a.aw-base-osClipboardHyperlink {
+    color: $brand_primary_link
+}
+
+.global-navigation .aw-sidenav-layoutContainer aw-command-bar.aw-commands-commandBarVertical .aw-commands-overflow {
+    border: transparent;
+}

@@ -1,0 +1,283 @@
+{
+    "imports": [
+        "js/aw-link.directive",
+        "js/aw-icon.directive",
+        "js/aw-icon-button.directive",
+        "js/aw-property-double-val.directive",
+        "js/aw-link-with-popup.directive",
+        "js/aw-repeat.directive",
+        "js/extended-tooltip.directive",
+        "js/exist-when.directive",
+        "js/aw-class.directive",
+        "js/aw-click.directive",
+        "js/aw-include.directive"
+    ],
+
+
+    "data": {
+        "recipeTermProp":{
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "recipeTermTooltip": {
+            "view": "TooltipForRecipeTerm"
+        },
+        "deleteRecipeCommand": {
+            "action": "deleteRecipe",
+            "iconName": "miscRemoveBreadcrumb"
+        },
+        "operatorCommandFilter": {
+           "action": "operatorClickFilter",
+           "iconName" : "miscFilter"
+        },
+        "operatorCommandInclude": {
+           "action": "operatorClickInclude",
+           "iconName" : "miscFilterInclude"
+        },
+        "operatorCommandExclude": {
+           "action": "operatorClickExclude",
+           "iconName" : "miscFilterExclude"
+        },
+        "recipeTermLabel":{
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "recipeTermValue":{
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "proximityDistanceProp":{
+            "displayName": "",
+            "type": "STRING",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "nSelectedText": {
+            "displayName": "{{i18n.nSelectedLabel}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "deleteText": {
+            "displayName": "{{i18n.deleteTooltip}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false"
+        },
+        "filterOperatorText": {
+            "displayName": "{{i18n.filterButtonTitle}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false"
+        },
+        "includeOperatorText": {
+            "displayName": "{{i18n.subsetRecipeOperatorInclude}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false"
+        },
+        "excludeOperatorText": {
+            "displayName": "{{i18n.subsetRecipeOperatorExclude}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false"
+        }
+
+    },
+
+    "actions": {
+        "operatorClickFilter":{
+            "actionType": "JSFunction",
+            "method": "show",
+            "inputData": {
+                "data": {
+                    "declView": "RecipeOperatorSelector",
+                    "options": {
+                        "height": "117",
+                        "width": "100",
+                        "isModal": false,
+                        "clickOutsideToClose": true,
+                        "draggable": false,
+                        "placement": "bottom-start",
+                        "reference": "miscFilter{{subPanelContext.index}}"
+                    },
+                    "subPanelContext": {
+                        "recipeItem": "{{subPanelContext.recipeItem}}",
+                        "currentSelection": "{{subPanelContext.recipeItem.criteriaOperatorType}}",
+                        "isEditable": "{{subPanelContext.isEditable}}"
+                    }
+                }
+            },
+            "deps": "js/popupService"
+        },
+        "operatorClickInclude":{
+            "actionType": "JSFunction",
+            "method": "show",
+            "inputData": {
+                "data": {
+                    "declView": "RecipeOperatorSelector",
+                    "options": {
+                        "height": "117",
+                        "width": "100",
+                        "isModal": false,
+                        "clickOutsideToClose": true,
+                        "draggable": false,
+                        "placement": "bottom-start",
+                        "reference": "miscFilterInclude{{subPanelContext.index}}"
+                    },
+                    "subPanelContext": {
+                        "recipeItem": "{{subPanelContext.recipeItem}}",
+                        "currentSelection": "{{subPanelContext.recipeItem.criteriaOperatorType}}",
+                        "isEditable": "{{subPanelContext.isEditable}}"
+                    }
+
+                }
+            },
+            "deps": "js/popupService"
+        },
+        "operatorClickExclude":{
+            "actionType": "JSFunction",
+            "method": "show",
+            "inputData": {
+                "data": {
+                    "declView": "RecipeOperatorSelector",
+                    "options": {
+                        "height": "117",
+                        "width": "100",
+                        "isModal": false,
+                        "clickOutsideToClose": true,
+                        "draggable": false,
+                        "placement": "bottom-start",
+                        "reference": "miscFilterExclude{{subPanelContext.index}}"
+                    },
+                    "subPanelContext": {
+                        "recipeItem": "{{subPanelContext.recipeItem}}",
+                        "currentSelection": "{{subPanelContext.recipeItem.criteriaOperatorType}}",
+                        "isEditable": "{{subPanelContext.isEditable}}",
+                        "index": "{{subPanelContext.index}}"
+                    }
+                }
+            },
+            "deps": "js/popupService"
+        },
+        "expandMultipleAttributes" : {
+            "actionType": "JSFunction",
+            "method": "expandMultipleAttributes",
+            "inputData": {
+                "data": "{{data}}",
+                "recipeTermSelected": "{{subPanelContext.recipeItem.criteriaDisplayValue}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/recipeTermService"
+        },
+        "getAllAttrFromRecipeTerm": {
+            "actionType": "JSFunction",
+            "method": "getAllAttrFromRecipeTerm",
+            "outputData": {
+                "distance.propertyRequiredText": ""
+            },
+            "deps": "js/recipeTermService"
+        },
+        "deleteRecipe" : {
+            "actionType": "JSFunction",
+                "method": "deleteRecipe",
+                "inputData": {
+                    "recipeItem" : "{{subPanelContext.recipeItem}}",
+                    "recipeIndex": "{{data.index}}"
+                },
+                "deps": "js/recipeTermService"
+        },
+        "deleteRecipeInInnerRecipeList" : {
+            "actionType": "Event",
+                "method": "Event",
+                "inputData": {
+                    "events": [
+                        {
+                            "name": "recipeDeleted",
+                            "eventData": {
+                                "selectedValue": "{{$event}}",
+                                "recipeItem" : "{{subPanelContext.recipeItem}}",
+                                "recipeIndex": "{{data.index}}"
+                            }
+                        }
+                    ]
+                }
+
+        },
+        "expandGroup" : {
+            "actionType": "JSFunction",
+            "method": "expandGroup",
+            "inputData": {
+                "data": "{{data}}",
+                "recipeTermSelected": "{{subPanelContext.recipeItem.subCriteria[0].criteriaDisplayValue}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/recipeTermService"
+        },
+        "expandSelectedPartitionScheme" : {
+            "actionType": "JSFunction",
+            "method": "expandSelectedPartitionScheme",
+            "inputData": {
+                "data": "{{data}}",
+                "recipeTermSelected": "{{subPanelContext.recipeItem.criteriaDisplayValue}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/recipeTermService"
+        },
+        "updateProximityValue": {
+            "actionType": "JSFunction",
+            "method": "updateProximityValue",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/recipeTermService"
+        },
+        "populateRecipeTermDisplayValues":{
+            "actionType": "JSFunction",
+            "method": "initializeRecipeTermDisplayValues",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "outputData": {
+            },
+            "deps": "js/recipeTermService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "populateRecipeTermDisplayValues"
+    },
+    "i18n": {
+        "deleteTooltip": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "nSelectedLabel": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "Add": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "filterButtonTitle": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "subsetRecipeOperatorInclude": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "subsetRecipeOperatorExclude": [
+            "OccurrenceManagementSubsetConstants"
+        ]
+    }
+}

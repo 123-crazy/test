@@ -1,0 +1,100 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":
+    {
+        "removeFromEndItems": {
+            "actionType": "JSFunction",
+            "method": "removeFromEndItems",
+            "inputData":
+            {
+                "data": "{{subPanelContext}}",
+                "obj": "{{data.selectedCell}}"
+            },
+            "deps": "js/Arm0CreateTraceLink"
+        },
+        "refreshEndItemList":
+        {
+            "actionType": "dataProvider",
+            "method": "endItemList"
+        },
+        "attachVMO":
+        {
+            "actionType": "JSFunction",
+            "method": "attachVMOToItemLists",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "isStartItemList": false
+            },
+            "deps": "js/Arm0CreateTraceLink"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "CreateTracelink.refreshEndItemList",
+            "action": "refreshEndItemList"
+        }
+    ],
+    "dataParseDefinitions": {
+        
+    },
+     "messages":
+    {
+
+    },
+    "data":
+    {
+        "endItemListcommands":"arm0_endItemListcommands",
+        "endItems": {
+            "isArray": "true",
+            "dbValue":
+            [
+            ]
+        }
+    },
+    "functions":
+    {
+        
+    },
+    "dataProviders":
+    {
+        "endItemList":
+        {
+         "commands":
+            {
+                "delete":
+                {
+                    "id": "cmdRemove",
+                    "title": "{{i18n.Remove}}",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "action":"removeFromEndItems",
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+
+            },
+            "response":"{{data.endItems.dbValue}}",
+            "selectionModelMode": "single"
+         }
+    },
+    "conditions":
+    {
+        
+    },
+
+    "i18n":
+    {
+    },
+
+    "lifecycleHooks" : {
+        "onMount": "attachVMO"
+    }
+}

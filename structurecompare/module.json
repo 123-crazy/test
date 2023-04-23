@@ -1,0 +1,379 @@
+{
+  "name": "structurecompare",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "Awb0CompareCmdGroup": {
+        "iconId": "cmdCompare",
+        "isGroup": true,
+        "title": "{{i18n.CompareGroupCommandTitle}}"
+      },
+      "Awb0Compare": {
+        "isGroup": false,
+        "title": "{{i18n.compareTitle}}",
+        "description": "{{i18n.Awb0CompareDesc}}"
+      },
+      "Awb0ContentCompareMsm": {
+        "isGroup": false,
+        "title": "{{i18n.contentComparePWATitle}}",
+        "description": "{{i18n.Awb0ContentCompareMsmDesc}}"
+      },
+      "Awb0ContentCompare": {
+        "isGroup": false,
+        "title": "{{i18n.contentCompareMsmTitle}}",
+        "description": "{{i18n.Awb0ContentCompareMsmDesc}}"
+      },
+      "Awb0CompareGroup": {
+        "iconId": "cmdCompare",
+        "title": "{{i18n.compareTitle}}",
+        "isRibbon": true,
+        "description": "{{i18n.Awb0CompareGrpDesc}}"
+      }
+    },
+    "commandHandlers": {
+      "awb0CompareCmdHandler": {
+        "id": "Awb0Compare",
+        "action": "launchComparePanel",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.isCompareValid"
+        }
+      },
+      "awb0ContentCompareMsmCmdHandler": {
+        "id": "Awb0ContentCompareMsm",
+        "action": "contentCompareMsmAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.isOccurrenceManagementSubLocation"
+        },
+        "enableWhen": {
+          "condition": "conditions.isContentCompareinMsmValid"
+        }
+      },
+      "awb0ContentCompareCmdHandler": {
+        "id": "Awb0ContentCompare",
+        "action": "contentCompareMsmAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.isCompareContentValidOutsideACE"
+        }
+      },
+      "openCompareNotificationCommandHandler": {
+        "id": "Awp0OpenLineItem",
+        "action": "openCompareNotification",
+        "activeWhen": {
+          "condition": "conditions.enableOpenCompareNotificationCommandCond"
+        },
+        "visibleWhen": {
+          "condition": "conditions.enableOpenCompareNotificationCommandCond"
+        }
+      },
+      "Awb0CompareGroupHandler": {
+        "id": "Awb0CompareGroup",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.isOccurrenceManagementSubLocation"
+        },
+        "enableWhen": true
+      }
+    },
+    "commandPlacements": {
+      "awb0CompareCmdPlacement": {
+        "id": "Awb0Compare",
+        "uiAnchor": "aw_rightWall",
+        "priority": 7,
+        "parentGroupId": "Awp0ViewGroup"
+      },
+      "awb0ContentCompareMsmCmdPlacement": {
+        "id": "Awb0ContentCompareMsm",
+        "uiAnchor": "aw_primaryWorkArea",
+        "parentGroupId": "Awb0CompareGroup",
+        "priority": 10
+      },
+      "awb0ContentCompareCmdPlacement": {
+        "id": "Awb0ContentCompare",
+        "uiAnchor": "aw_rightWall",
+        "parentGroupId": "Awp0ViewGroup",
+        "priority": 20
+      },
+      "Awb0CompareGroupCmdPlacement": {
+        "id": "Awb0CompareGroup",
+        "uiAnchor": "aw_primaryWorkArea",
+        "priority": 24
+      }
+    },
+    "actions": {
+      "launchComparePanel": {
+        "actionType": "JSFunction",
+        "method": "initAndLaunchCommandPanel",
+        "deps": "js/structureCompareService"
+      },
+      "contentCompareMsmAction": {
+        "actionType": "JSFunction",
+        "method": "launchContentCompare",
+        "deps": "js/structureCompareService",
+        "inputData": {}
+      },
+      "openCompareNotification": {
+        "actionType": "JSFunction",
+        "method": "openCompareNotification",
+        "inputData": {
+          "notificationObject": "{{commandContext.lineItem}}"
+        },
+        "events": {
+          "success": [
+            {
+              "name": "NotificationMessage.markRead"
+            }
+          ]
+        },
+        "deps": "js/structureCompareService"
+      }
+    },
+    "messages": {},
+    "conditions": {
+      "isCompareValid": {
+        "expression": "ctx.splitView && ctx.splitView.mode && ctx[ctx.splitView.viewKeys[0]].topElement.uid !== ctx[ctx.splitView.viewKeys[1]].topElement.uid && ctx.visibleServerCommands.Awb0Compare"
+      },
+      "isCompareContentValidOutsideACE": {
+        "expression": "!conditions.isOccurrenceManagementSubLocation && !ctx.isNarrowMode && !ctx.splitView && ctx.mselected && ctx.mselected.length === 2 && ctx.visibleServerCommands.Awb0Compare && !ctx.hiddenCommands.Awb0ContentCompareMsm"
+      },
+      "isContentCompareinMsmValid": {
+        "expression": "!ctx.isNarrowMode && !ctx.splitView && ctx.mselected && ctx.mselected.length === 2 && ctx.visibleServerCommands.Awb0Compare && !ctx.hiddenCommands.Awb0ContentCompareMsm"
+      },
+      "enableOpenCompareNotificationCommandCond": {
+        "expression": "commandContext.group.groupName==='COMPARE'"
+      }
+    },
+    "i18n": {
+      "CompareGroupCommandTitle": [
+        "StructureCompareConstants"
+      ],
+      "compareTitle": [
+        "CompareSplitViewConstants"
+      ],
+      "contentCompareMsmTitle": [
+        "CompareSplitViewConstants"
+      ],
+      "Awb0CompareDesc": [
+        "CompareSplitViewConstants"
+      ],
+      "Awb0ContentCompareMsmDesc": [
+        "CompareSplitViewConstants"
+      ],
+      "Awb0CompareGrpDesc": [
+        "CompareSplitViewConstants"
+      ],
+      "contentComparePWATitle": [
+        "CompareSplitViewConstants"
+      ]
+    },
+    "onEvent": []
+  },
+  "themeExtensions": [
+    "comparesplitviewTheme"
+  ],
+  "decorators": {
+    "structSourceColorDecoratorAdd": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusRed6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusRed6",
+      "title": "{{i18n.compareAddedObjectToolTip}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor1applicableSource": {
+          "expression": {
+            "$source": "ctx.compareContext.sourceColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 1
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "compareAddedObjectToolTip": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structSourceColorDecoratorModified": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusOrange6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusOrange6",
+      "title": "{{i18n.compareModifiedObjectToolTip}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor4applicableSource": {
+          "expression": {
+            "$source": "ctx.compareContext.sourceColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 2
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "compareModifiedObjectToolTip": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structSourceColorDecoratorRemoved": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusRed6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusRed6",
+      "title": "{{i18n.compareRemovedObjectToolTip}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor6applicableSource": {
+          "expression": {
+            "$source": "ctx.compareContext.sourceColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 3
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "compareRemovedObjectToolTip": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structSourceColorDecoratorMatched": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusBlue6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusBlue6",
+      "title": "{{i18n.MatchedTitle}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor3applicableSource": {
+          "expression": {
+            "$source": "ctx.compareContext.sourceColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 4
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "MatchedTitle": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structTargetColorDecoratorAdd": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusRed6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusRed6",
+      "title": "{{i18n.compareAddedObjectToolTip}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor1applicableTarget": {
+          "expression": {
+            "$source": "ctx.compareContext.targetColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 1
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "compareAddedObjectToolTip": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structTargetColorDecoratorModified": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusOrange6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusOrange6",
+      "title": "{{i18n.compareModifiedObjectToolTip}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor4applicableTarget": {
+          "expression": {
+            "$source": "ctx.compareContext.targetColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 2
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "compareModifiedObjectToolTip": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structTargetColorDecoratorRemoved": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusRed6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusRed6",
+      "title": "{{i18n.compareRemovedObjectToolTip}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor6applicableTarget": {
+          "expression": {
+            "$source": "ctx.compareContext.targetColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 3
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "compareRemovedObjectToolTip": [
+          "StructureCompareConstants"
+        ]
+      }
+    },
+    "structTargetColorDecoratorMatched": {
+      "cellClassName": "aw-comparesplitviewjs-borderStatusBlue6",
+      "gridClassName": "aw-comparesplitviewjs-backgroundStatusBlue6",
+      "title": "{{i18n.MatchedTitle}}",
+      "subLocationName": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+      "conditions": {
+        "Compare_IsChartColor3applicableTarget": {
+          "expression": {
+            "$source": "ctx.compareContext.targetColorDiffs",
+            "$query": {
+              "$vlookup": {
+                "lookupValue": "{{localContext.vmo.uid}}",
+                "matchValue": 4
+              }
+            }
+          }
+        }
+      },
+      "i18n": {
+        "MatchedTitle": [
+          "StructureCompareConstants"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,268 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": 
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-numeric.directive"
+    ],
+
+    "actions": 
+    {
+        "populateDetachList" :
+        {
+            "actionType": "JSFunction",
+            "method": "populateDetachList",
+            "inputData": 
+            {
+                "input": "{{data}}"
+            },
+
+            "deps": "js/licenseMgmtService"
+        },
+
+        "detach": 
+        {
+            "actionType": "JSFunction",
+            "method": "getSelectedLicensesforDetach",
+            "inputData": 
+            {
+                "input": "{{data}}",
+                "legacy": false               
+            },
+
+            "deps": "js/licenseMgmtService",
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "awp0AssignLicense.Detach"
+                    }
+                ]
+            }
+        },
+ 
+        "submit": 
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "AuthorizedDataAccess-2017-05-LicenseManagement",
+            "method": "attachOrDetachLicensesFromObjects",
+            "inputData": 
+            {
+                "licenseAttachOrDetachInput": "{{function:detachInput}}"
+            },
+            "outputData":
+            {
+                "partialErrors": "partialErrors",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "actionMessages": 
+            {
+                "success": 
+                [
+                    {
+                        "message": "multipleDetachSuccess"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "condition": "ctx.mselected",
+                        "message": "attachDetachMultiError"
+                    }
+                ]
+            },
+
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps":"js/licenseMgmtUtils"
+        },
+
+        "updateLicenses":
+        {
+            "actionType": "JSFunction",
+            "method": "updateLicenses",
+            "inputData":
+            {
+                "data" : "{{data}}",
+                "detach" : true
+            },
+            "deps": "js/licenseMgmtService"
+        }        
+        
+    },
+
+    "data": 
+    {
+        "level": 
+        {
+            "type": "INTEGER",
+            "dbValue": 0
+        },
+        "applyTo":
+        {
+            "displayName": "{{i18n.detachSelectedLabel}}",
+            "type": "BOOLEAN",
+            "propertyRadioTrueText": "{{i18n.SingleRevision}}",
+            "propertyRadioFalseText": "{{i18n.AllRevisions}}",
+            "dbValue": true
+        },
+        "structure": 
+        {
+            "displayName": "{{i18n.removeSelectedLabel}}",
+            "type": "BOOLEAN",
+            "propertyRadioFalseText": "{{i18n.Level}}",
+            "propertyRadioTrueText": "{{i18n.Structure}}",
+            "dbValue": false
+        },
+
+        "detachSelectedLabel": 
+        {
+            "displayName": "{{i18n.detachSelectedLabel}}",
+            "type": "STRING"
+        }
+    },
+
+    "onEvent": 
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "populateDetachList",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "getDetachableLicense.modelObjectsUpdated",
+            "action": "updateLicenses",
+            "cacheEventData": true
+        },        
+        {
+            "eventId": "awp0AssignLicense.Detach",
+            "action": "submit"
+        }
+    ],
+
+    "conditions": 
+    {
+        "isValidToShowDetachButton": 
+        {
+            "expression": "data.dataProviders.getDetachableLicense.selectedObjects.length>0"
+        },
+        "is4GObject":
+        {
+            "expression": "ctx.licenses.applyToRawList.length>0"
+        },
+        "isValidToShowLevel": 
+        {
+            "expression": "data.structure.dbValue===false"
+        },
+
+        "isACEContext":
+        {
+            "expression": "ctx.sublocation.nameToken==='com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation'"
+        },
+
+        "isValidToShowBOMStructure": 
+        {
+            "expression": "ctx.licenses.levelRawList.length>0 && ctx.licenses.entireBOM.length>0"
+        }
+    },
+
+    "dataProviders": 
+    {
+        "getDetachableLicense": 
+        {
+            "selectionModelMode": "multiple",
+            "response": "{{ctx.licenses.searchResults}}",
+            "totalFound": "{{ctx.licenses.searchResults.length}}"
+        }
+    },
+
+    "functions": 
+    {
+        "getSelectedLicenses": 
+        {
+            "functionName": "getSelectedLicenses",
+            "parameters": 
+            [
+                "{{data}}"
+            ]
+        },
+        "detachInput": 
+        {
+            "functionName": "detachInput",
+            "parameters": 
+            [
+                "{{data}}"
+            ]
+        },
+
+        "getEadfrmSelectedLicenses": 
+        {
+            "functionName": "getEadfrmSelectedLicenses",
+            "parameters": 
+            [
+                "{{data}}"
+            ]
+        },
+
+        "isACEContext": 
+        {
+            "functionName": "isACEContext",
+            "parameters": 
+            [
+                
+            ]
+        }
+
+    },
+    
+    "messages": 
+    {
+        "attachDetachMultiError": 
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.attachDetachMultiError}}",
+            "messageTextParams": 
+            [
+                "{{data.errorMessage}}"
+            ]
+        },
+        "multipleDetachSuccess": 
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleDetachSuccess}}"
+        }
+    },
+
+    "i18n": 
+    {
+        "attachDetachMultiError": [ "SecurityMessages" ],
+        "AllRevisions": ["SecurityMessages"],
+        "DetachLicense": [ "SecurityMessages" ],
+        "DetachLicenseButtonText": [ "SecurityMessages" ],
+        "detachSelectedLabel": [ "SecurityMessages" ],
+        "multipleDetachSuccess": [ "SecurityMessages" ],
+        "removeSelectedLabel": [ "SecurityMessages" ],
+        "SingleRevision": ["SecurityMessages"],
+        "Structure": ["SecurityMessages"]
+    }
+}

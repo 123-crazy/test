@@ -1,0 +1,17 @@
+<div class="aw-step-ProgressChevron" role="progressbar" aria-valuemax="{{steps.length}}" aria-valuenow="{{activeStepNumber}}" aria-valuetext="{{currentStep.propertyDisplayName || steps[ 0 ].propertyDisplayName}}">
+    <div>
+        <ul class="aw-step-progressChevronContainer">
+            <li title="{{progBarEntry.propertyDisplayName}}" ng-class="progBarEntry.isCurrentActive ? 'aw-step-progressCurrentChevron' : 'aw-step-progressChevron'" aw-repeat="progBarEntry : steps">
+                <div ng-if="clickable" class="aw-step-progressChevronText" role="button" aria-disabled="{{(!progBarEntry.isCompleted && !progBarEntry.isInProgress) || progBarEntry.isCurrentActive}}">
+                    <text ng-if="(!progBarEntry.isCompleted && !progBarEntry.isInProgress && !progBarEntry.isCurrentActive)|| progBarEntry.isCurrentActive" ng-class="progBarEntry.isCurrentActive ? 'aw-progress-bar-text-current' : 'aw-progress-bar-text'">{{progBarEntry.propertyDisplayName}}</text>
+                    <a ng-click="doIt($event,progBarEntry)" ng-keydown="moveToStep($event, progBarEntry)" ng-if="!progBarEntry.isCurrentActive && ( progBarEntry.isCompleted || progBarEntry.isInProgress )" ng-class="progBarEntry.isCurrentActive ? 'aw-progress-bar-text-current' : 'aw-progress-bar-text'" tabindex="0">
+                        {{progBarEntry.propertyDisplayName}}
+                    </a>
+                </div>
+                <div ng-if="!clickable" class="aw-step-progressChevronText" role="button" aria-disabled="true">
+                    <text ng-class="progBarEntry.isCurrentActive ? 'aw-progress-bar-text-current' : 'aw-progress-bar-text'">{{progBarEntry.propertyDisplayName}}</text>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

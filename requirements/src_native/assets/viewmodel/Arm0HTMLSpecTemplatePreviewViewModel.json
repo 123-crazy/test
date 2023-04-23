@@ -1,0 +1,83 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-requirement-content.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+
+                    {
+                        "name": "Arm0HTMLSpecTemplatePreview.initContent"
+                    }
+                ]
+            }
+        },
+
+        "initContent": {
+            "actionType": "JSFunction",
+            "method": "initContent",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Arm0HTMLSpecTemplatePreview"
+        },
+        "refreshRefImages": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-FileManagement",
+            "method": "getFileReadTickets",
+            "inputData": {
+                "files": "{{data.missingRefImages}}"
+            },
+
+            "outputData": {
+                "imageRefTickets": ""
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "Arm0HTMLSpecTemplatePreview.updateImages"
+                } ]
+            }
+        },
+        "updateImages": {
+            "actionType": "JSFunction",
+            "method": "updateImages",
+            "inputData": {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Arm0HTMLSpecTemplatePreview"
+        }
+    },
+    "data": {},
+
+    "functions": {
+
+    },
+    "onEvent": [ {
+            "eventId": "Arm0HTMLSpecTemplatePreview.initContent",
+            "cacheEventData": true,
+            "action": "initContent"
+        },
+        {
+            "eventId": "Arm0HTMLSpecTemplatePreview.refreshRefImages",
+            "action": "refreshRefImages"
+        },
+        {
+            "eventId": "Arm0HTMLSpecTemplatePreview.updateImages",
+            "action": "updateImages"
+        }
+    ],
+    "conditions": {},
+    "messages": {
+
+    },
+    "i18n": {
+
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-file-upload.directive"
+    ],
+    "actions": {
+        "create": {
+            "actionType": "JSFunctionAsync",
+            "method": "createIcon",
+            "inputData": {
+                "files": "{{data}}",
+                "iconProp": "{{ctx.panelContext}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.status === 413",
+                    "message": "createIconFailureSizeMessage"
+                } ]
+            },
+            "deps": "js/commandIconService"
+        }
+    },
+    "messages": {
+        "createIconFailureSizeMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.uploadFailureSize}}"
+        }
+    },
+    "conditions": {
+        "isValidToCreate": {
+            "expression": "data.files && data.files.length > 0"
+        }
+    },
+    "i18n": {
+        "Create": [ "CommandBuilderMessages" ],
+        "upload": [ "CommandBuilderMessages" ],
+        "uploadFailureSize": [ "CommandBuilderMessages" ]
+    }
+}

@@ -1,0 +1,375 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-form.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/aw-xrt.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive"
+    ],
+
+    "actions":
+    {
+        "initializeUpdateSWCPanel": {
+            "actionType": "JSFunction",
+            "method": "initializeUpdateSWCPanel",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/saveWorkingContextService"
+        },
+        "findPropsToLoad": {
+            "actionType": "JSFunction",
+            "method": "findPropsToLoad",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/saveWorkingContextService"
+        },
+        "startEditNative":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2012-10-DataManagement",
+            "method": "loadDataForEditing",
+            "inputData":
+            {
+                "inputs":
+                [
+                    {
+                        "obj": "{{data.openedObject}}",
+                        "propertyNames": "{{data.propsToLoad}}",
+                        "isPessimisticLock": false
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "lsd": "outputs[0].objLsds"
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "startEditNative.success",
+                        "eventData":
+                        {
+                            "context": "INFO_PANEL_CONTEXT",
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "populateCreateInputPanel": {
+            "actionType": "JSFunction",
+            "method": "populateCreateInputPanel",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/saveWorkingContextService"
+        },
+        "onSaveAutoBookmarkStatusChange": {
+            "actionType": "JSFunction",
+            "method": "onSaveAutoBookmarkStatusChange",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/saveWorkingContextService"
+        },
+        "initiateUpdateSWCAction": {
+            "actionType": "JSFunction",
+            "method": "saveUserWorkingContextState",
+            "inputData": {
+                "shouldFireEventOnSuccess": true
+            },
+            "deps": "js/backgroundWorkingContextService"
+        },
+        "updateSWCOnPanelReveal": {
+            "actionType": "JSFunction",
+            "method": "saveUserWorkingContextState",
+            "inputData": {
+                "shouldFireEventOnSuccess": false
+            },
+            "deps": "js/backgroundWorkingContextService"
+        },
+        "initiateSaveEdit": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events":
+                [
+                    {
+                        "name": "updateSWC.saveEditRequired",
+                        "condition": "conditions.requiredToSaveEdit"
+                    },
+                    {
+                        "name": "updateSWC.saveEditComplete",
+                        "condition": "!conditions.requiredToSaveEdit"
+                    }
+                ]
+            }
+        },
+        "saveEditNative":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2012-10-DataManagement",
+            "method": "saveEditAndSubmitToWorkflow",
+            "inputData":
+            {
+                "inputs":
+                [
+                    {
+                        "object": "{{data.openedObject}}",
+                        "objLsds": "{{data.lsd}}",
+                        "propertyNameValues": "{{function:getAllModifiedValues}}",
+                        "isPessimisticLock": false,
+                        "workflowData":
+                        {
+
+                        }
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "updateSWC.saveEditComplete"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "setUpdateSWCOperationSuccess",
+                        "condition": "(ctx.aceActiveContext.context.workingContextObj.props.awb0PendingChanges.dbValues[0] !== '1')"
+                    }
+                ]
+            },
+
+            "deps": "js/declUtils"
+        },
+        "initiateUpdateBookMark":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events":
+                [
+                    {
+                        "name": "saveWorkingContext.updateRequired",
+                        "condition": "conditions.requiredToUpdate"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        },
+                        "condition": "!conditions.requiredToUpdate"
+                    }
+                ]
+            }
+        },
+        "saveWorkingContext": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2020-05-OccurrenceManagement",
+            "method": "saveWorkingContext",
+            "inputData": {
+                "workingContexts":
+                [
+                    {
+                        "uid": "{{data.openedObject.uid}}",
+                        "type": "{{data.openedObject.type}}"
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+
+                ],
+                "failure":
+                [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "setUpdateSWCOperationSuccess"
+                    }
+                ]
+            }
+        }
+    },
+
+    "functions":
+    {
+        "getAllModifiedValues":
+        {
+            "functionName": "getAllModifiedValues",
+            "parameters":
+            [
+                "{{data.vmo}}"
+            ]
+        }
+    },
+
+    "data":
+    {
+        "operationType": {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "swcType": {
+            "type": "STRING",
+            "hasLov": true,
+            "dbValue": "",
+            "displayName": "{{i18n.type}}"
+        },
+        "swcTypeList": {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "contributedAppsHaveSavedBookmarkData": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+             "criteria": {
+                "data._internal.panelId": "Awb0UpdateWorkingContext"
+            },
+            "action": "initializeUpdateSWCPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+             "criteria": {
+                "data._internal.panelId": "Awb0UpdateWorkingContext"
+            },
+            "action": "updateSWCOnPanelReveal"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "findPropsToLoad"
+        },
+        {
+            "eventId": "findPropsToLoad.success",
+            "action": "startEditNative"
+        },
+        {
+            "eventId": "startEditNative.success",
+            "action":  "populateCreateInputPanel"
+        },
+        {
+            "eventId": "gwt.SaveAutoBookmarkStatusChangeEvent",
+            "cacheEventData": true,
+            "action": "onSaveAutoBookmarkStatusChange"
+        },
+        {
+            "eventId": "saveBWC.failure",
+            "message": "updateSWCValidationFailure"
+        },
+        {
+            "eventId": "saveBWC.success",
+            "action": "initiateSaveEdit"
+        },
+        {
+            "eventId": "updateSWC.saveEditRequired",
+            "action": "saveEditNative"
+        },
+        {
+            "eventId": "updateSWC.saveEditComplete",
+            "action": "initiateUpdateBookMark"
+        },
+        {
+            "eventId": "saveWorkingContext.updateRequired",
+            "action": "saveWorkingContext"
+
+
+
+
+        }
+    ],
+
+    "conditions": {
+        "requiredToSaveEdit": {
+            "expression": "data.vmo.getDirtyProps().length > 0"
+        },
+        "requiredToUpdate": {
+            "expression": "ctx.aceActiveContext.context.workingContextObj.props.awb0PendingChanges.dbValues[0] === '1'"
+        },
+        "okToShowSaveButton": {
+            "expression": "conditions.requiredToSaveEdit || conditions.requiredToUpdate"
+        }
+    },
+
+    "messages":
+    {
+        "updateSWCValidationFailure":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.autoSaveOfBookmarkNotYetComplete}}"
+        },
+        "setUpdateSWCOperationSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveOfWorkingContextSuccessful}}",
+            "messageTextParams":
+            [
+                "{{ctx.aceActiveContext.context.workingContextObj.props.object_string.dbValues[0]}}"
+            ]
+        }
+    },
+
+    "i18n":
+    {
+        "saveWorkingContextTitle": [ "OccurrenceManagementConstants" ],
+        "saveButtonText": [ "OccurrenceManagementConstants" ],
+        "type": [ "OccurrenceManagementConstants" ],
+        "autoSaveOfBookmarkNotYetComplete": [ "OccurrenceManagementMessages" ],
+        "saveOfWorkingContextSuccessful": [ "OccurrenceManagementMessages" ]
+    }
+
+}

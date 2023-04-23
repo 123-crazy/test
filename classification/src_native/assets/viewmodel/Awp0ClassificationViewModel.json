@@ -1,0 +1,216 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+    ],
+    "actions":
+    {
+        "submitToHostAction":
+        {
+            "actionType": "JSFunction",
+            "method": "sendEventToHost",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyUtils"
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "classifyPanel.panelCloseSuccessful"
+                    },
+                    {
+                        "name": "classifyPanel.displayLostChangesMessage",
+                        "condition": "(data.isInputDirty || data.selectedClass.id !== data.ico.classID) && data.activeView !== 'Awp0ViewClassificationSub' && !data.isAlreadyPrompted"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "resetHierarchy": {
+            "actionType": "JSFunction",
+            "method": "resetHierarchy",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyPanelService"
+        },
+        "setTargetObjectForSelection":
+        {
+            "actionType": "JSFunction",
+            "method": "setTargetObjectForSelection",
+            "inputData":
+            {
+            "selected": "",
+            "data": "{{data}}"
+            },
+            "deps": "js/classifyService"
+        },
+        "checkIfDirtyOnNavigate":
+        {
+            "actionType": "JSFunction",
+            "method": "isDirty",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "classifyPanel.displayLostChangesMessage",
+                        "condition": "(data.isInputDirty || data.selectedClass.id !== data.ico.classID) && !data.isAlreadyPrompted"
+                    }
+                ]
+            },
+            "deps": "js/classifyService"
+        },
+        "checkIfDirtyOnClose":
+        {
+            "actionType": "JSFunction",
+            "method": "isDirty",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "classifyPanel.close"
+                    }
+                ]
+            },
+            "deps": "js/classifyService"
+        },
+        "resetAttributesVisibleAndFireRefreshSecWorkAreaAction": {
+            "actionType": "JSFunction",
+            "method": "setAttributesVisible",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "visible": false
+            },
+            "deps": "js/classifyService"
+        }
+    },
+
+    "conditions":{
+        "createMode":{
+            "expression": "data.panelMode === 0"
+        },
+        "editMode":{
+            "expression": "data.panelMode === 1"
+        },
+        "hierarchyDirty":{
+            "expression":"data.selectedClass.id !== data.ico.classID"
+        },
+        "showClassImagesSection":{
+            "expression":"data.clsImgAvailable === true"
+        },
+        "standaloneUseExistingMode":{
+            "expression":"data.standaloneObjectExists && data.standaloneObjectExists === true"
+        }
+    },
+
+    "messages":
+    {
+        "connectToStandalone":
+        {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.connectToStandalone}}",
+            "messageTextParams": [
+                "{{data.targetObjectForSelection[0].cellHeader1}}",
+                "{{data.selectedClass.className}}"
+            ],
+            "navigationOptions":
+            [
+                {
+                    "option": "Create New",
+                    "text": "{{i18n.createNew}}",
+                    "action": "setCreateModeForStandalone"
+                },
+                {
+                    "option": "Use Existing",
+                    "text": "{{i18n.useExisting}}"
+                }
+            ]
+        },
+        "notifyLostChanges":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.notifyLostChanges}}",
+            "messageTextParams": [
+                "{{data.selectedClass.className}}",
+                "{{data.targetObjectForSelection[0].cellHeader1}}"
+            ]
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "classifyPanel.fireEventsAfterCreateOperation",
+            "action": "submitToHostAction"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "checkIfDirtyOnClose"
+        },
+        {
+            "eventId": "awPanel.panelClose",
+            "action": "checkIfDirtyOnClose"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "criteria": {
+                "destPanelId": "Awp0ViewClassificationSub"
+            },
+            "action": "checkIfDirtyOnNavigate"
+        },
+        {
+            "eventId": "classifyPanel.clearTargetObjectForSelection",
+            "action": "setTargetObjectForSelection"
+        },
+        {
+            "eventId": "classifyPanel.close",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "classifyPanel.resetAttributesVisibleAndFireRefreshSecWorkAreaEvent",
+            "action": "resetAttributesVisibleAndFireRefreshSecWorkAreaAction"
+        },
+        {
+            "eventId": "classifyPanel.promptToHandleStandalone",
+            "message": "connectToStandalone"
+        },
+        {
+            "eventId": "classifyPanel.displayLostChangesMessage",
+            "message": "notifyLostChanges"
+        }
+    ],
+
+    "i18n":
+    {
+        "cancel":               [ "ClassificationPanelMessages" ],
+        "Classify":             [ "ClassificationPanelMessages" ],
+        "images":               [ "ClassificationPanelMessages" ],
+        "connectToStandalone":  [ "ClassificationPanelMessages" ],
+        "createNew":            [ "ClassificationPanelMessages" ],
+        "useExisting":          [ "ClassificationPanelMessages" ],
+        "notifyLostChanges":    [ "ClassificationPanelMessages" ]
+    }
+}

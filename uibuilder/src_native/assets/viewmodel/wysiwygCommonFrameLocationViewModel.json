@@ -1,0 +1,536 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-row.directive",
+        "js/aw-logo.directive",
+        "js/visible-when.directive",
+        "js/aw-header-title.directive",
+        "js/aw-navigate-breadcrumb.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-class.directive"
+    ],
+    "data": {
+        "locationPanelStyle": "",
+        "layoutSummaryOnly": "false",
+        "toolsPanelData": {
+            "slide": "PUSH",
+            "direction": "LEFT_TO_RIGHT",
+            "animation": true,
+            "width": "STANDARD",
+            "height": "FULL"
+        },
+        "navigationBreadcrumbConfig": {
+            "type": "navigate",
+            "popuplist": "/html/defaultbreadcrumblist.html",
+            "id": "d_uids",
+            "noUpdate": true
+        }
+    },
+    "actions": {
+        "loadWysiwygJson": {
+            "actionType": "JSFunction",
+            "method": "processWysiwygJson",
+            "outputData": {
+                "wysiwygJson": "wysiwygJson"
+            },
+            "events": {
+                "success": [ {
+                    "name": "wysiwygJsonLoaded"
+                } ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "displayFilteredNodesAction": {
+            "actionType": "JSFunction",
+            "method": "displayFilteredNodes",
+            "inputData": {
+                "data": "{{data}}",
+                "inputNode": "{{data.eventData}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "wysiwygJsonLoaded"
+                } ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "updateTabs": {
+            "actionType": "JSFunction",
+            "method": "updateTabs",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/defaultLocationService"
+        },
+        "buildCrumbs": {
+            "actionType": "JSFunction",
+            "method": "buildNavigateBreadcrumb",
+            "inputData": {
+                "selectedPanel": "{{ctx.wysiwygCurrentPanel}}",
+                "provider": "{{data.provider}}",
+                "selectedObject": "{{ctx.selected}}"
+            },
+            "outputData": {
+                "provider": ""
+            },
+            "deps": "js/wysiwygBreadcrumbMgmtService"
+        },
+        "updateBreadCrumbProvider": {
+            "actionType": "JSFunction",
+            "method": "buildNavigateBreadcrumb",
+            "inputData": {
+                "selectedPanel": "",
+                "provider": "{{data.eventData.bcProvider}}"
+            },
+            "outputData": {
+                "provider": ""
+            },
+            "deps": "js/wysiwygBreadcrumbMgmtService"
+        },
+        "switchSubLocation": {
+            "actionType": "JSFunction",
+            "method": "switchSubLocation",
+            "inputData": {
+                "pageId": "{{data.pageId}}",
+                "tabTitle": "{{data.tabTitle}}",
+                "subLocationTabs": "{{data.subLocationTabs}}"
+            },
+            "deps": "js/awHeaderService"
+        },
+        "resetHandler": {
+            "actionType": "JSFunction",
+            "method": "unregisterHandler",
+            "deps": "js/wysiwygUtilService"
+        },
+        "registerLocationContext": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "getLocationName"
+                },
+                {
+                    "action": "registerLocationName"
+                },
+                {
+                    "action": "registerKeyBoardEvents"
+                },
+                {
+                    "action": "subscribeForUnloadEvent"
+                },
+                {
+                    "action": "constructTitles"
+                },
+                {
+                    "action": "setTitlesInCtx"
+                },
+                {
+                    "action": "getAvailableSubPages",
+                    "inputArg": {
+                        "parentState": null,
+                        "additionalEvalEnv": "{{actionData.additionalEvalEnv}}"
+                    },
+                    "outputArg": [
+                        "availablePages"
+                    ]
+                },
+                {
+                    "action": "constructTabs",
+                    "inputArg": {
+                        "availablePages": "{{actionData.availablePages}}"
+                    }
+                },
+                {
+                    "action": "registeronMessageListener"
+                },
+                {
+                    "action": "buildCrumbs"
+                },
+                {
+                    "action": "fireloadPanelInWysiwyg"
+                }
+            ]
+        },
+        "switchTabLocation": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "resetHandler"
+                },
+                {
+                    "action": "switchSubLocation"
+                }
+            ]
+        },
+        "subscribeForUnloadEvent": {
+            "actionType": "JSFunction",
+            "method": "subscribeForLocationUnloadEvent",
+            "inputData": {
+                "name": "wysiwygCommonFrameLocation"
+            },
+            "deps": "js/defaultLocationService"
+        },
+        "checkNarrowMode": {
+            "actionType": "JSFunction",
+            "method": "checkNarrowMode",
+            "deps": "js/aw.narrowMode.service"
+        },
+        "getLocationName": {
+            "actionType": "JSFunction",
+            "method": "normalizeStateName",
+            "deps": "js/defaultLocationService",
+            "outputData": {
+                "normalizeStateName": ""
+            }
+        },
+        "registerLocationName": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "locationContext",
+                "value": {
+                    "ActiveWorkspace:Location": "{{data.normalizeStateName}}"
+                }
+            }
+        },
+        "registerKeyBoardEvents": {
+            "actionType": "JSFunction",
+            "method": "registerKeyDownEvent",
+            "deps": "js/keyboardService"
+        },
+        "constructTitles": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTitles",
+            "deps": "js/awHeaderService",
+            "outputData": {
+                "browserTitle": "result.browserTitle",
+                "browserSubTitle": "result.browserSubTitle",
+                "headerTitle": "result.headerTitle"
+            }
+        },
+        "setTitlesInCtx": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "location.titles",
+                "value": {
+                    "browserTitle": "{{data.browserTitle}}",
+                    "browserSubTitle": "{{data.browserSubTitle}}",
+                    "headerTitle": "{{data.headerTitle}}"
+                }
+            }
+        },
+        "getAvailableSubPages": {
+            "actionType": "JSFunctionAsync",
+            "method": "getAvailableSubpages",
+            "deps": "js/page.service",
+            "inputData": {
+                "parentState": null,
+                "additionalEvalEnv": "{{parameters.additionalEvalEnv}}"
+            },
+            "outputData": {
+                "availablePages": ""
+            }
+        },
+        "constructTabs": {
+            "actionType": "JSFunctionAsync",
+            "method": "constructTabs",
+            "deps": "js/awHeaderService",
+            "inputData": {
+                "availablePages": "{{parameters.availablePages}}"
+            },
+            "outputData": {
+                "subLocationTabs": ""
+            }
+        },
+        "updateTitles": {
+            "actionType": "JSFunction",
+            "method": "updateDocumentTitles",
+            "deps": "js/awHeaderService"
+        },
+        "registerDefaultViewModelId": {
+            "actionType": "JSFunction",
+            "method": "setCurrentPanelId",
+            "inputData": {
+                "newViewViewModelFileName": "{{ctx.wysiwyg.state.params.viewModelId? ctx.wysiwyg.state.params.viewModelId: 'Untitled'}}",
+                "currentPanelIdStatus": "new"
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "loadPanelProvidedInUrl": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.loadPanelInWysiwyg",
+                    "eventData": {
+                        "currentLayoutName": "{{ctx.wysiwygCurrentPanel.id}}",
+                        "layoutStatus": "new"
+                    }
+                } ]
+            }
+        },
+        "registeronMessageListener": {
+            "actionType": "JSFunction",
+            "method": "registerWysiwygChannel",
+            "deps": "js/wysiwygUtilService"
+        },
+        "loadNewPanelInWysiwyg": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "cleanLoadedViewViewModel"
+                },
+                {
+                    "action": "registerViewModelId"
+                },
+                {
+                    "action": "loadViewAndViewModel"
+                },
+                {
+                    "action": "setViewmodelData"
+                },
+                {
+                    "action": "reloadWysiwyg"
+                },
+                {
+                    "action": "refreshNestedView"
+                }
+            ]
+        },
+        "fireloadPanelInWysiwyg": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.loadPanelInWysiwyg",
+                    "condition": "ctx.sublocation.clientScopeURI !== 'Awp0WysiwygActions'",
+                    "eventData": {
+                        "currentLayoutName": "{{ctx.wysiwyg.state.params.viewModelId? ctx.wysiwyg.state.params.viewModelId: 'Untitled'}}",
+                        "layoutStatus": "new"
+                    }
+                } ]
+            }
+        },
+        "registerViewModelId": {
+            "actionType": "JSFunction",
+            "method": "setCurrentPanelId",
+            "inputData": {
+                "newViewViewModelFileName": "{{data.eventMap['wysiwyg.loadPanelInWysiwyg'].currentLayoutName}}",
+                "currentPanelIdStatus": "{{data.eventMap['wysiwyg.loadPanelInWysiwyg'].layoutStatus}}"
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "cleanLoadedViewViewModel": {
+            "actionType": "JSFunction",
+            "method": "cleanLoadedViewViewModel",
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "loadViewAndViewModel": {
+            "actionType": "JSFunctionAsync",
+            "method": "getPanelContent",
+            "inputData": {
+                "viewModelId": "{{data.eventMap['wysiwyg.loadPanelInWysiwyg'].currentLayoutName}}"
+            },
+            "outputData": {
+                "wysiwygData": ""
+            },
+            "deps": "js/wysiwygLocationService"
+        },
+        "setViewmodelData": {
+            "actionType": "JSFunction",
+            "method": "updateViewAndViewModel",
+            "inputData": {
+                "viewXML": "{{data.wysiwygData.view}}",
+                "viewModelJson": "{{data.wysiwygData.viewModel}}"
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "reloadWysiwyg": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.reloadWysiwygEditor",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "refreshNestedView": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.refreshNestedView",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "locationChanged": {
+            "actionType": "JSFunction",
+            "method": "locationChanged",
+            "inputData": {
+                "data": "{{data.eventMap['appCtx.register'].value.params}}",
+                "stateName": "{{ctx.sublocation.clientScopeURI}}"
+            },
+            "deps": "js/wysiwygLocationService"
+        },
+        "confirmUnsavedChangesAction": {
+            "actionType": "JSFunction",
+            "method": "unsavedChangesAction",
+            "inputData": {
+                "data": "{{data.eventMap['wysiwyg.confirmUnsavedChanges']}}"
+            },
+            "deps": "js/wysiwygUtilService"
+        },
+        "saveChanges": {
+            "actionType": "JSFunctionAsync",
+            "method": "saveViewAndViewModel",
+            "inputData": {
+                "viewName": "{{ctx.wysiwygCurrentPanel.id}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "wysiwyg.confirmUnsavedChanges",
+                        "eventData": {
+                            "action": "save"
+                        }
+                    },
+                    {
+                        "name": "wysiwyg.updateConfigService"
+                    }
+                ],
+                "failure": [ {
+                    "name": "wysiwyg.confirmUnsavedChanges",
+                    "eventData": {
+                        "action": "cancel"
+                    }
+                } ]
+            },
+            "deps": "js/wysiwygLoadAndSaveService"
+        },
+        "updateConfigService": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "deps": "js/configurationService",
+            "inputData": {
+                "path": "viewmodel.{{ctx.wysiwygCurrentPanel.id}}"
+            }
+        },
+        "discardChanges": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.confirmUnsavedChanges",
+                    "eventData": {
+                        "action": "discard"
+                    }
+                } ]
+            }
+        },
+        "cancelChanges": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwyg.confirmUnsavedChanges",
+                    "eventData": {
+                        "action": "cancel"
+                    }
+                } ]
+            }
+        }
+    },
+    "dataProviders": {},
+    "onEvent": [ {
+            "eventId": "aw.windowResize",
+            "action": "checkNarrowMode"
+        },
+        {
+            "eventId": "wysiwygCommonFrameLocation.refreshBreadCrumb",
+            "cacheEventData": true,
+            "action": "updateBreadCrumbProvider"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'wysiwygCurrentPanel'",
+            "action": "buildCrumbs"
+        },
+        {
+            "eventId": "wysiwyg.loadPanelInWysiwyg",
+            "cacheEventData": true,
+            "action": "loadNewPanelInWysiwyg"
+        },
+        {
+            "eventId": "appCtx.update",
+            "condition": "name === 'location.titles'",
+            "action": "updateTitles"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'state' ",
+            "cacheEventData": true,
+            "action": "locationChanged"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'state' ",
+            "action": "updateTabs"
+        },
+        {
+            "eventId": "wysiwyg.confirmLeave",
+            "message": "confirmLeave"
+        },
+        {
+            "eventId": "wysiwyg.updateConfigService",
+            "action": "updateConfigService"
+        },
+        {
+            "eventId": "wysiwyg.confirmUnsavedChanges",
+            "cacheEventData": true,
+            "action": "confirmUnsavedChangesAction"
+        }
+    ],
+    "i18n": {
+        "navigationConfirmationSingle": [
+            "locationMessages"
+        ],
+        "cancel": [
+            "ActionBuilderMessages"
+        ],
+        "discard": [
+            "XRTMessages"
+        ],
+        "save": [
+            "XRTMessages"
+        ]
+    },
+    "messages": {
+        "confirmLeave": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.navigationConfirmationSingle}}",
+            "messageTextParams": [
+                "{{ctx.wysiwygCurrentPanel.id}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": "cancelChanges"
+                },
+                {
+                    "option": "Discard",
+                    "text": "{{i18n.discard}}",
+                    "action": "discardChanges"
+                },
+                {
+                    "option": "Save",
+                    "text": "{{i18n.save}}",
+                    "action": "saveChanges"
+                }
+            ]
+        }
+    },
+    "conditions": {},
+    "lifecycleHooks": {
+        "onMount": "registerLocationContext"
+    }
+}

@@ -1,0 +1,116 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[ "js/aw-tab-set.directive",
+                "js/exist-when.directive",
+                "js/aw-panel-footer.directive",
+                "js/aw-button.directive",
+                "js/aw-i18n.directive",
+                "js/aw-panel-body.directive"
+                ],
+    "i18n":
+    {
+        "sharedEffectivities":[ "OccurrenceManagementConstants"],
+        "searchEndItemPresenterBtn":[ "OccurrenceManagementConstants"],
+        "new":[ "OccurrenceManagementConstants"],
+        "endItemMessage":[ "OccurrenceManagementConstants"],
+        "addElementBtn":["OccurrenceManagementConstants"],
+        "protect":[ "OccurrenceManagementConstants" ],
+        "replaceElementBtn":["OccurrenceManagementConstants"]
+    },
+    "data" :
+    {
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "panelId": "AuthorEffectivityForRelStatus",
+                    "name": "{{i18n.new}}",
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "SearchEffectivitiesForRelStatus",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}"
+                }
+            ]
+        }
+    },
+    "actions":
+    {
+        "addSearchButtonClicked":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-EffectivityManagment",
+            "method": "addOrRemoveRelStatusEffectivities",
+            "inputData":
+            {
+                "input":
+                {
+                    "status": "{{ctx.editEffectivityContext.selectedReleaseStatus}}",
+                    "effectivities": "{{data.dataProviders.performSearchForSharedEffectivities.selectedObjects}}",
+                    "addOrRemove": true
+                }
+            },
+            "outputData":
+            {
+                "occurrenceConfigured": "updated",
+                "occurrenceUnconfigured": "deleted"
+            },
+            "events":
+            {
+                "success": [
+                    {
+                        "name" : "releaseStatusUpdatedByEffectivityEvent"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "DisplayAndRemoveEffectivitiesForRelStatus"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name" : "releaseStatusUpdatedByEffectivityEvent"
+                    }
+                ]
+            },
+             "actionMessages":
+             {
+                 "failure":
+                 [
+                     {
+                         "condition": "errorCode.code!==710079",
+                         "message": "failedToApplyEffectivityMessage"
+                     },
+                     {
+                        "condition": "errorCode.code==710079",
+                        "message" : "duplicateAppliedEffectivityErrorMessage"
+                     }
+                 ]
+             },
+             "deps":"js/sharedEffectivityService"
+        },
+
+        "refreshSelectedObject":{
+            "actionType":"JSFunction",
+            "method":"updateEffectivities",
+            "inputData":{
+                "selectedModelObject":"{{ctx.selected}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "releaseStatusUpdatedByEffectivityEvent",
+            "action":  "refreshSelectedObject",
+            "criteria": {
+                "data.activeView": "AddReleaseStatusEffectivities"
+            }
+        }
+    ]
+}

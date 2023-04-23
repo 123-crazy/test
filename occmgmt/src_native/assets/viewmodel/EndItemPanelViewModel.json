@@ -1,0 +1,63 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive"
+    ],
+
+    "actions": {
+
+        "clearEndItemInfoSection": {
+            "actionType": "dataProvider",
+            "method": "clearEndItemInfo"
+        },
+
+        "clearEndItemInfo": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "configPanel.revealEndItems",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        }
+    },
+
+    "dataProviders": {
+        "clearEndItemInfo": {
+            "action": "clearEndItemInfo"
+        }
+    },
+
+    "onEvent": [ {
+        "eventId": "awPanel.navigate",
+        "action": "clearEndItemInfoSection",
+        "criteria": {
+            "destPanelId": "ConfigurationPanelFilters"
+        }
+    } ],
+
+    "data": {
+        "endItemTabsModel": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "panelId": "EndItemSearchTab",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}",
+                    "recreatePanel": true,
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "EndItemPaletteTab",
+                    "name": "{{i18n.paletteEndItemPresenterBtn}}",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+
+    "i18n": {
+        "paletteEndItemPresenterBtn": [ "OccurrenceManagementConstants" ],
+        "searchEndItemPresenterBtn": [ "OccurrenceManagementConstants" ],
+        "endItemMessage": [ "OccurrenceManagementConstants" ]
+    }
+}

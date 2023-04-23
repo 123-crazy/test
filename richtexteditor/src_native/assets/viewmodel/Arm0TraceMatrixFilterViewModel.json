@@ -1,0 +1,131 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive",
+        "js/exist-when.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-i18n.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-filter-category.directive"
+    ],
+    "actions":
+    {
+        "onReveal":{
+            "actionType": "JSFunction",
+            "method": "populateFilterInformation",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+            },
+            "events": {
+                "success": [ {
+                    "name": "Arm0TraceabilityMatrix.resizeWindow"
+                }
+             ]
+            },
+            "deps": "js/Arm0FilterTMService"
+        },
+        "destroyFilterPanel": {
+            "actionType": "JSFunction",
+            "method": "destroyFilterPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0FilterTMService"
+        },
+        "applyMatrixFilter": {
+            "actionType": "JSFunction",
+            "method": "applyMatrixFilter",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0FilterTMService"
+        },
+        "discoveryFilterPanelRevealedFromRM": {
+            "actionType": "JSFunction",
+            "method": "discoveryFilterPanelRevealedFromRM",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0FilterTMService"
+        },
+        "selectTracelinkTypeFilterAction":
+        {
+            "actionType": "JSFunction",
+            "method": "selectTracelinkTypeFilterAction",
+            "inputData":
+            {
+                "category"     : "{{category}}",
+                "filter"       : "{{filter}}",
+                "data"         : "{{data}}"
+            },
+            "deps": "js/Arm0FilterTMService"
+        }
+    },
+    "data":
+    {
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId" : "Awb0DiscoveryFilterCommandSubPanel"
+            },
+            "action": "discoveryFilterPanelRevealedFromRM"
+        },
+        {
+            "eventId": "Arm0MatrixFilter.populateFilterInformation",
+            "action": "onReveal"
+        },
+        {
+            "eventId": "Arm0TraceMatrixFilter.contentUnloaded",
+            "action": "destroyFilterPanel"
+        }
+    ],
+    "i18n": {
+        "TracelinkType": [
+            "MatrixMessages"
+        ],
+        "all": [
+            "MatrixMessages"
+        ],
+        "funnel": [
+            "MatrixMessages"
+        ],
+        "matrixApply": [
+            "MatrixMessages"
+        ],
+        "row": [
+            "MatrixMessages"
+        ],
+        "column": [
+            "MatrixMessages"
+        ],
+        "andLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "filterButtonTitle": ["OccurrenceManagementSubsetConstants"],
+        "filter" :  ["OccurrenceManagementConstants"]
+    },
+    "conditions": {
+        "isRMFilterButtonVisible": {
+            "expression": "(data.delayedApply && data.enableApply) || (ctx.MatrixContext.activeFilterView === 'TRACELINK' && data.enableTracelinkFilterApply)"
+        },
+        "ifNoSubPanelOpenedUnderDiscoveryFilter": {
+            "expression": "(data.activeView !== 'Awb0FilterPanelSettings' && data.activeView !== 'ProximitySubPanel' && data.activeView !== 'BoxZoneSubPanel' && data.activeView !== 'PlaneZoneSubPanel')"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "onReveal"
+    }
+}

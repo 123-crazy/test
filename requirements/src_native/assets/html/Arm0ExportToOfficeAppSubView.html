@@ -1,0 +1,49 @@
+<aw-panel-body>
+    <aw-tab-set tabs="data.tabModels.dbValues" visible-when="conditions.asShownVisible">
+        <aw-panel-section visible-when="data.selectedTab.pageId==0 ">
+            <aw-radiobutton prop="data.exportAllSearchResults"></aw-radiobutton>
+        </aw-panel-section>
+        <aw-panel-section visible-when="data.selectedTab.pageId==1">
+            <aw-radiobutton prop="data.exportOption"></aw-radiobutton>
+        </aw-panel-section>
+        <aw-panel-section visible-when="data.selectedTab.pageId==1">
+            <aw-listbox prop="data.activity" visible-when="data.exportOption.dbValue" list="data.activityList"></aw-listbox>
+            <aw-listbox prop="data.exportWordActivity" visible-when="!data.exportOption.dbValue" list="data.exportWordActivityList"></aw-listbox>
+            <aw-listbox prop="data.specTemplates" visible-when="!data.exportOption.dbValue" list="data.specTemplatesList"></aw-listbox>
+            <aw-listbox prop="data.excelTemplates" visible-when="data.exportOption.dbValue" list="data.excelTemplatesList"></aw-listbox>
+
+            <aw-widget prop="data.compare" visible-when="conditions.isCompareAllowed"></aw-widget>
+            <aw-widget prop="data.checkOutWord" visible-when="conditions.toVisibleWordCheckOutButton"></aw-widget>
+            <aw-widget prop="data.checkOutExcel" visible-when="conditions.toVisibleExcelCheckOutButton"></aw-widget>
+        </aw-panel-section>
+    </aw-tab-set>
+    <aw-panel-section visible-when="!conditions.asShownVisible">
+        <aw-radiobutton prop="data.exportOption"></aw-radiobutton>
+    </aw-panel-section>
+    <aw-panel-section class="aw-export-panel-section" visible-when="!conditions.asShownVisible">
+        <aw-listbox prop="data.activity" visible-when="data.exportOption.dbValue" list="data.activityList"></aw-listbox>
+        <aw-listbox prop="data.exportWordActivity" visible-when="!data.exportOption.dbValue" list="data.exportWordActivityList"></aw-listbox>
+        <aw-listbox prop="data.specTemplates" visible-when="!data.exportOption.dbValue" list="data.specTemplatesList"></aw-listbox>
+        <aw-listbox prop="data.excelTemplates" visible-when="data.exportOption.dbValue" list="data.excelTemplatesList"></aw-listbox>
+
+        <aw-widget prop="data.compare" visible-when="conditions.isCompareAllowed"></aw-widget>
+        <aw-widget prop="data.checkOutWord" visible-when="conditions.toVisibleWordCheckOutButton"></aw-widget>
+        <aw-widget prop="data.checkOutExcel" visible-when="conditions.toVisibleExcelCheckOutButton"></aw-widget>
+    </aw-panel-section>
+    <aw-command-panel-section caption="i18n.overrideTypeTitle" anchor="data.exportCommands" visible-when="conditions.toVisibleOverrideTypes && !conditions.asShownVisible">
+        <aw-list dataprovider="data.dataProviders.overrideTypeList" visible-when="data.overrideTypes.dbValue.length >0">
+            <aw-include name="Arm0OverrideTypeCell" sub-panel-context="item"></aw-include>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>
+
+<aw-panel-footer>
+    <aw-checkbox prop="data.runInBackgroundExcel" visible-when="conditions.toVisibleRunInBackgroundExcelButton && (data.selectedTab.pageId==1 || !conditions.asShownVisible)"></aw-checkbox>
+    <aw-checkbox prop="data.runInBackgroundWord" visible-when="conditions.toVisibleRunInBackgroundWordButton && (data.selectedTab.pageId==1 || !conditions.asShownVisible)"></aw-checkbox>
+    <aw-button action="export" visible-when="conditions.toVisibleExportButton && (data.selectedTab.pageId==1 || !conditions.asShownVisible)">
+        <aw-i18n>i18n.export</aw-i18n>
+    </aw-button>
+    <aw-button action="exportSearch" visible-when="data.selectedTab.pageId==0 && conditions.asShownVisible">
+        <aw-i18n>i18n.export</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

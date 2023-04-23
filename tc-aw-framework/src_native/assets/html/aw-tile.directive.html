@@ -1,0 +1,55 @@
+<div class="{{colorClassNames[tile.themeIndex]}} aw-layout-flexColumn aw-tile-tileContainer {{tile.styleOverride}}"
+    ng-class="{'aw-tile-tileEdit': tile.editing, 'aw-tile-smallSize': tile.tileSize === 0, 'aw-tile-doubleSize': tile.tileSize === 1,
+    'aw-tile-doubleSize aw-tile-doubleVerticalSize': tile.tileSize === 2}"
+    aw-right-click="startEdit()"
+    aw-long-press="startEdit()"
+    ng-click="openLocation()"
+    ng-keydown="handleKeyPress($event)"
+    tabindex="0"
+    title="{{tile.displayName}}"
+    role="button">
+    <div class="aw-tile-brand aw-tile-displayTitle aw-theme-tileText" aria-hidden="true" ng-class="colorClassNames[tile.themeIndex]">
+        <div class="aw-tile-tileName" ng-class="textClassNames[tile.themeIndex]">
+            {{tile.displayName}}
+        </div>
+    </div>
+    <div class="aw-tile-tileContent aw-layout-flexColumn aw-theme-tileText">
+        <div ng-if="tile.tileSize !== 0 && tile.content.length > 0" class="aw-layout-flexColumn">
+            <ul class="aw-tile-tileContentData" >
+                <li ng-repeat-start="entry in tile.content">
+                   <span class="aw-tile-counter">{{entry.contentValue}}</span>
+                   <span class="aw-tile-countDesc">{{entry.contentName}}</span>
+                </li>
+                <li ng-hide="$last" ng-repeat-end class="aw-tile-contentSep">/</li>
+            </ul>
+        </div>
+        <div class="aw-tile-tileIcon aw-tile-tileImage aw-layout-flexColumn aw-tile-fullsizeIcon"
+          ng-if="tile.content.length === 0 || tile.tileSize === 0"
+          ng-class="{'aw-tile-dynamicIcon': tile.icons.primaryIcon !== '__TYPEICON__'}">
+            <aw-tile-icon icon="tile.icons" primary="true"></aw-tile-icon>
+        </div>
+    </div>
+    <div class="aw-tile-brand aw-layout-flexColumnContainer aw-theme-tileText">
+        <div class="aw-layout-flexColumn" ng-if="tile.content.length > 0">
+            <div class="aw-tile-tileIcon aw-tile-tileImage aw-tile-dynamicIcon"
+              ng-if="tile.tileSize !== 0">
+                <aw-tile-icon icon="tile.icons" primary="true"></aw-tile-icon>
+            </div>
+            <div ng-if="tile.content[0].contentValue !== '0'"
+              class="aw-tile-tileBadge">{{tile.content[0].contentValue}}</div>
+        </div>
+        <div class="aw-layout-flexColumn" ng-if="tile.content.length === 0 && tile.icons.secondaryIcon">
+            <div class="aw-tile-tileIcon aw-tile-tileImage aw-tile-dynamicIcon">
+                <aw-tile-icon icon="tile.icons"></aw-tile-icon>
+            </div>
+        </div>
+    </div>
+    <div class="aw-tile-tileEditButton aw-tile-unpin"
+        ng-click="removeTile($event)" ng-if="!tile.isProtected" title="{{i18n.unpin}}">
+        <aw-icon icon-id="homeUnpinButton"></aw-icon>
+    </div>
+    <div class="aw-tile-tileEditButton aw-tile-resize"
+        ng-click="toggleTileSize($event)" title="{{i18n.resize}}">
+        <aw-icon icon-id="{{resizeSvg}}"></aw-icon>
+    </div>
+</div>

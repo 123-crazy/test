@@ -1,0 +1,162 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-search-box.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-i18n.directive",
+        "js/enable-when.directive"
+    ],
+    "data": {
+        "typeFilter": "ItemRevision",
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "autofocus": "true"
+        },
+        "searchFilterPanels": [
+            {
+                "tabKey": "results",
+                "panelId": "resultsTabPageSub",
+                "name": "{{i18n.results}}",
+                "visibleWhen": "true"
+            },
+            {
+                "tabKey": "filters",
+                "panelId": "filtersTabPageSub",
+                "name": "{{i18n.filterTabTitle}}",
+                "visibleWhen": "true"
+            }
+        ],
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        },
+        "showAddObjectTabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "panelId": "resultsTabPageSub",
+                    "name": "{{i18n.results}}",
+                    "recreatePanel": true,
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "filtersTabPageSub",
+                    "name": "{{i18n.filterTabTitle}}",
+                    "recreatePanel": true
+                }
+            ]
+        },
+        "replaceType": {
+            "type": "BOOLEAN",
+            "propertyRadioTrueText": "{{i18n.row}}",
+            "propertyRadioFalseText": "{{i18n.column}}",
+            "dbValue": false
+        }
+    },
+    "actions": {
+        "search": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "CreateTracelink.searchGloabal"
+                    }
+                ]
+            }
+        },
+        "searchGloabal": {
+            "actionType": "JSFunction",
+            "method": "findSubBusinessObjectsAndInvokeSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "handleSearchSelection": {
+            "actionType": "JSFunction",
+            "method": "handleSearchSelection",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjects": "{{data.eventData.selectedUids}}"
+            },
+            "deps": "js/Arm0ReplacePanel"
+        },
+        "generateTraceabilityMatrix": {
+            "actionType": "JSFunction",
+            "method": "generateTraceabilityMatrix",
+            "inputData": {
+                "replaceType": "{{data.replaceType.dbValue}}",
+                "selectedObject": "{{data.selectedObject}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Arm0TraceabilityMatrix"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "performSearch.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleSearchSelection"
+        },
+        {
+            "eventId": "CreateTracelink.searchGloabal",
+            "action": "searchGloabal"
+        }
+    ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "replaceButtonEnabled": {
+            "expression": "data.selectedObject !== undefined"
+        }
+    },
+    "i18n": {
+        "results": [
+            "UIMessages"
+        ],
+        "filterTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ],
+        "row": [
+            "MatrixMessages"
+        ],
+        "column": [
+            "MatrixMessages"
+        ],
+        "replace": [
+            "ReplaceFileMessages"
+        ]
+    }
+}

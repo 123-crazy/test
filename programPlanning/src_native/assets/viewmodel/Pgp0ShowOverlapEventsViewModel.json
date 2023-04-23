@@ -1,0 +1,177 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-balloon-popup-panel.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-link.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions": {
+        "callDataProvider": {
+            "actionType": "dataProvider",
+            "methods": [
+                "listDataProvider"
+            ]
+        },
+        "loadData": {
+            "actionType": "JSFunction",
+            "method": "eventsToShowInPopUp",
+            "inputData": {
+                "data": "{{data}}",
+                "flag": false
+            },
+            "deps": "js/Timeline/uiTimelineUtils",
+            "events": {
+                "success": [ {
+                        "name": "updateCtxPopupOpen"
+                    },
+                    {
+                        "name": "fireShowHighlightedEventInPopup"
+                    }
+                ]
+            }
+        },
+        "updateSelection": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionInPopup",
+            "deps": "js/Timeline/uiTimelineUtils",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "stackEventsPanel": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Pgp0ShowOverlapEventsCmdPanel",
+                "location": "aw_toolsAndInfo",
+                "context": null,
+                "push": false,
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "closeStackPopup"
+                } ]
+            }
+        },
+        "hideGoToOptionsPopup": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "deps": "js/popupService"
+        },
+        "updateCtxPopupOpenAction": {
+            "actionType": "JSFunction",
+            "method": "updateCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isPopupOpen",
+                "value": true
+            }
+        },
+        "updateCtxPopUpCloseAction": {
+            "actionType": "JSFunction",
+            "method": "updateCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isPopupOpen",
+                "value": false
+            }
+        },
+        "fireShowHighlightedEventInPopupAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "showHighlightedEventInPopup"
+                } ]
+            }
+        },
+        "showHighlightedEventInPopupAction": {
+            "actionType": "JSFunction",
+            "method": "showHighlightedEventInPopup",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "selectEventOnTimeline": {
+            "actionType": "JSFunction",
+            "method": "selectEventOnTimeline",
+            "deps": "js/PlanNavigationTimelineSync",
+            "inputData": {
+                "id": "{{data.dataProviders.listDataProvider.selectedObjects[0].uid}}"
+            }
+        }
+    },
+    "data": {
+        "moreLink": {
+            "displayName": "{{i18n.Pgp0MoreLink}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        }
+    },
+    "functions": {},
+    "dataProviders": {
+        "listDataProvider": {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.searchResults.length}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "conditions": {
+        "whetherToShowLink": {
+            "expression": "ctx.popupContext.eventsCount > 3"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Pgp0ShowOverlapEvents.contentLoaded",
+            "action": "callDataProvider"
+        },
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "action": "selectEventOnTimeline"
+        },
+        {
+            "eventId": "closeStackPopup",
+            "action": "hideGoToOptionsPopup"
+        },
+        {
+            "eventId": "updateCtxPopupOpen",
+            "action": "updateCtxPopupOpenAction"
+        },
+        {
+            "eventId": "Pgp0ShowOverlapEvents.contentUnloaded",
+            "action": "updateCtxPopUpCloseAction"
+        },
+        {
+            "eventId": "showHighlightedEventInPopup",
+            "action": "showHighlightedEventInPopupAction",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "fireShowHighlightedEventInPopup",
+            "action": "fireShowHighlightedEventInPopupAction"
+        }
+    ],
+    "i18n": {
+        "Pgp0MoreLink": [
+            "ProgramPlanningCommandPanelsMessages"
+        ]
+    }
+}

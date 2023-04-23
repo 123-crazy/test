@@ -1,0 +1,56 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-xrt.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {    
+        "startEdit": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "objInfo.startEdit"
+                } ]
+            }
+        },
+
+        "save": {
+            "actionType": "JSFunction",
+            "method": "infoPanelSaveEdit",
+            "deps": "js/Aqc0FailureManagerUtils",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "createdObjects": ""
+            }
+        }
+    },
+    "conditions": {
+        "aqc0isEditButtonVisible": {
+            "expression": "ctx['INFO_PANEL_CONTEXT'] && ctx['INFO_PANEL_CONTEXT'].canStartEdit() && !ctx['INFO_PANEL_CONTEXT'].editInProgress() && ctx.selected.props.qc0IsLatest.dbValues[0] === '1'"
+        },
+        "aqc0isSaveButtonVisible": {
+            "expression": "ctx['INFO_PANEL_CONTEXT'] && ctx['INFO_PANEL_CONTEXT'].editInProgress()"
+        }
+    },
+    "i18n": {
+        "navigationConfirmationSingle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "discard": [
+            "TCUICommandPanelsMessages"
+        ],
+        "save": [
+            "TCUICommandPanelsMessages"
+        ],
+        "startEditButtonText": [
+            "TCUICommandPanelsMessages"
+        ]
+    }
+}

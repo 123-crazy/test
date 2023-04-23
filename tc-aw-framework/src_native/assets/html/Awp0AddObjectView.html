@@ -1,0 +1,32 @@
+<aw-command-panel caption="i18n.ADD_BUTTON_TITLE" anchor="data.addObjectPanelPinCommands" context="data">
+    <aw-form name="commandPanelForm" visible-when="data.activeView === 'addObjectPrimarySub'">
+        <aw-add target-object='ctx.addObject.targetObject'
+            relations='{{ctx.addObject.relationType}}'
+            include-types='{{ctx.addObject.includedTypes}}'
+            load-sub-types='ctx.addObject.loadSubTypes'
+            auto-select-on-unique-type='ctx.addObject.autoSelectOnUniqueType'
+            visible-tabs='{{ctx.addObject.visibleTabs}}'
+            max-recent-count='{{ctx.addObject.maxRecentCount}}'
+            type-filter="{{ctx.addObject.typeFilterNames}}"
+            relation-map="ctx.addObject.relationMap"
+            search-filter="{{ctx.addObject.searchFilter}}">
+        </aw-add>
+    </aw-form>
+
+    <!-- Panel footer-->
+    <aw-panel-footer visible-when="data.activeView === 'addObjectPrimarySub'">
+        <!-- panel-footer button for New tab -->
+        <aw-button default="true" action="createObject" enable-when="!ctx.addItemEventProgressing" visible-when="commandPanelForm.$valid&&conditions.isNewTabAddButtonVisible">
+            <aw-i18n>i18n.ADD_BUTTON_TITLE</aw-i18n>
+        </aw-button>
+        <aw-button default="true" action="createObject" enable-when="!ctx.addItemEventProgressing" visible-when="commandPanelForm.$valid&&conditions.isNewTabAddAndSubmitButtonVisible">
+                <aw-i18n>i18n.submitButtonTitle</aw-i18n>
+        </aw-button>
+
+            <!-- panel-footer button for Palette and Search tab -->
+        <aw-button default="true" action="createRelationForPaletteOrSearch" visible-when="conditions.isPaletteSearchTabAddButtonVisible" >
+            <aw-i18n>i18n.ADD_BUTTON_TITLE</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+
+</aw-command-panel>

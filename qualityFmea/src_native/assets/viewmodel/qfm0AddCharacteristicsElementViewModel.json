@@ -1,0 +1,139 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-xrt.directive",
+        "js/aw-i18n.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-header.directive"
+    ],
+    "data": {
+        "filterBox": {
+            "displayName": "{{i18n.qfm0MyFilter}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "actions": {
+        "createCharacteristicsElement": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "",
+                        "data": {
+                            "boName": "Qfm0CharacteristicsElement",
+                            "stringProps": {
+                                "qfm0Id" :"{{data.qfm0Id.dbValue}}",
+                                "object_name": "{{data.object_name.dbValue}}"
+                            },
+                            "tagProps": {
+                                "qfm0ParentElement": {
+                                    "uid": "{{ctx.selected.uid}}",
+                                    "type": "{{ctx.selected.type}}"
+                                },
+                                "qfm0FmeaRoot":"{{ctx.locationContext.modelObject}}"
+                            }
+                        }
+                    }
+                ]
+            },
+            "outputData":{
+                "createdObject":"output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name":"elementAddComplete"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "primaryWorkarea.reset"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.createdObject && data.createdObject.props.object_string.dbValues[0]",
+                        "message": "createObjectSuccess"
+                    }
+                ]
+            }
+        },
+        "setTargetObjectOnReveal": {
+            "actionType": "JSFunction",
+            "method": "createViewModelObject",
+            "inputData": {
+                "selectedUid": "{{ctx.selected.uid}}"
+            },
+            "outputData": {
+                "targetObject": ""
+            },
+            "deps": "js/viewModelObjectService"
+        },
+        "elementAddComplete":{
+            "actionType": "JSFunction",
+            "method": "clearCtx",
+            "deps": "js/qfm0FmeaManagerUtils"
+        }
+    },
+    "functions": {
+        "relationCreation": {
+            "functionName": "relationCreation",
+            "parameters": []
+        }
+    },
+    "i18n": {
+        "qfm0Add": [
+            "qualityFmeaMessages"
+        ],
+        "toTitle": [
+            "qualityFmeaMessages"
+        ],
+        "pasteSuccessful": [
+            "awAddDirectiveMessages"
+        ],
+        "qfm0MyFilter": [
+            "qualityFmeaMessages"
+        ]
+    },
+    "messages": {
+        "createObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pasteSuccessful}}",
+            "messageTextParams": [
+                "{{data.createdObject.props.object_string.dbValues[0]}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setTargetObjectOnReveal"
+        },
+        {
+            "eventId": "elementAddComplete",
+            "action": "elementAddComplete"
+        }
+    ]
+}

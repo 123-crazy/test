@@ -1,0 +1,82 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-sub-panel.directive",
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive"
+    ],
+    "data":
+    {
+        "pinnedToForm":
+        {
+
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm":
+        {
+
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "awb0pincommands": "awb0_oneStepPinCommands"
+    },
+    "actions":
+    {
+        "awb0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+
+        "awb0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+
+        "resetOccurrencePropertiesIndicatorOnCtx": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.addElement.AddOccurrencePropertiesOnCreate",
+                "value": "false"
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "onEvent":
+    [
+         {
+           "eventId": "addChildElement.awb0SetPin",
+           "cacheEventData": true,
+           "action": "awb0SetPin"
+         },
+         {
+           "eventId": "addChildElement.awb0SetUnPin",
+           "cacheEventData": true,
+           "action": "awb0SetUnPin"
+         },
+         {
+            "eventId": "Awb0AddSiblingElementDeclarative.contentUnloaded",
+            "action": "resetOccurrencePropertiesIndicatorOnCtx"
+        }
+    ],
+    "i18n":
+    {
+       "addElementBtn": ["OccurrenceManagementConstants"]
+    }
+}

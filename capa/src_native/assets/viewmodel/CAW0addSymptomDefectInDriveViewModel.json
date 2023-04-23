@@ -1,0 +1,151 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-listbox.directive",
+        "js/aw-radiobutton.directive"
+    ],
+    "actions": {
+        "loadSymptomDefects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "searchInput": {
+                    "maxToLoad": 100,
+                    "maxToReturn": 100,
+                    "providerName": "CAW0SymptomDefectProvider",
+                    "searchCriteria": {
+                        "parentUid": "{{ctx.selected.uid}}",
+                        "searchString": "{{data.filterBox.dbValue}}"
+                    }
+                }
+            },
+            "outputData": {
+                "searchResults": "{{function:getLoadedSymtomDefects}}",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "addSymptomDefect": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "caw0addSymptomDefect",
+                    "eventData": {
+                        "selectedProjects": "{{data.eventMap['loadSymptomDefectsProvider.selectionChangeEvent'].selectedObjects}}"
+                    }
+                } ]
+            }
+        }
+
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "deriveType": {
+            "displayName": "{{i18n.caw0SymptomDefect}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": "CarryOver",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "deriveTypeValues": {
+            "type": "STRING",
+            "dbValue": [ {
+                    "propDisplayValue": "{{i18n.caw0CarryOver}}",
+                    "propInternalValue": "CarryOver"
+                },
+                {
+                    "propDisplayValue": "{{i18n.caw0Duplicate}}",
+                    "propInternalValue": "Duplicate"
+                }
+            ]
+        }
+    },
+    "dataProviders": {
+        "loadSymptomDefectsProvider": {
+            "action": "loadSymptomDefects",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getLoadedSymtomDefects": {
+            "functionName": "getLoadedSymtomDefects",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isSymptomDefectSelected": {
+            "expression": "data.dataProviders.getLoadedSymtomDefects.selectedObjects.length>0"
+        }
+    },
+    "i18n": {
+        "caw0add": [
+            "CAW0CapaMessages"
+        ],
+        "caw0SymptomDefect": [
+            "CAW0CapaMessages"
+        ],
+        "caw0CarryOver": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Duplicate": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "loadSymptomDefectsProvider"
+        },
+        {
+            "eventId": "intiateDataprovider",
+            "action": "loadSymptomDefectsProvider"
+        },
+        {
+            "eventId": "loadSymptomDefectsProvider.selectionChangeEvent",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "filterBox.keydown",
+            "action": "loadSymptomDefects"
+        }
+    ]
+}

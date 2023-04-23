@@ -1,0 +1,20 @@
+<div ng-if="prop.hasLov">
+    <aw-property-lov-val prop="prop" ></aw-property-lov-val>
+</div>
+<div ng-if="!prop.hasLov && prop.renderingHint">
+    <aw-property-rendering-hint hint="prop.renderingHint" prop="prop" ></aw-property-rendering-hint>
+</div>
+<div ng-if="!prop.hasLov && !prop.renderingHint">
+    <div ng-if="(prop.maxLength && prop.maxLength < 60) && !prop.isRichText">
+        <aw-property-text-box-val prop="prop" ></aw-property-text-box-val>
+    </div>
+    <div ng-if="prop.isRichText"
+         ng-class="{'aw-layout-popup aw-propertyrenderjs-tableCellArrayValPopup': inTableCell}">
+        <aw-property-rich-text-area-val prop="prop" ></aw-property-rich-text-area-val>
+    </div>
+    <!-- Max length is undefine for LongString. Show text area if prop is long string or String with length greater than 60 -->
+    <div ng-if="( !prop.maxLength || prop.maxLength >= 60 ) && !prop.isRichText"
+         ng-class="{'aw-layout-popup aw-propertyrenderjs-tableCellArrayValPopup': inTableCell}">
+        <aw-property-text-area-val prop="prop" ></aw-property-text-area-val>
+    </div>
+</div>

@@ -1,0 +1,972 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-include.directive",
+        "js/aw-splitter.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-column.directive",
+        "js/aw-flex-row.directive"
+    ],
+    "data": {
+        "clientColumns": []
+    },
+    "actions": {
+        "setParamForEventPosition": 
+        {
+            "actionType": "JSFunction",
+            "method": "setZoomParamForEventPosition",
+            "inputData": {
+                "event": "{{ctx.locationContext.modelObject.uid}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "setZoomParamForEventPosition":
+        {
+            "actionType": "JSFunction",
+            "method": "setZoomParamForEventPosition",
+            "inputData": {
+                "event": "{{ctx.locationContext.modelObject.uid}}",
+                "data": "{{data}}",
+                "operationType": "Zoom"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "setAddParamForEventPosition":
+        {
+            "actionType": "JSFunction",
+            "method": "setInputParamForEventPosition",
+            "inputData": {
+                "event": "{{data.eventData}}",
+                "data": "{{data}}",
+                "operationType": "Add"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "setDeleteParamForEventPosition":
+        {
+            "actionType": "JSFunction",
+            "method": "setInputParamForEventPosition",
+            "inputData": {
+                "event": [ "{{data.eventData}}" ],
+                "data": "{{data}}",
+                "operationType": "Delete"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "setUpdateParamForEventPosition":
+        {
+            "actionType": "JSFunction",
+            "method": "setInputParamForEventPosition",
+            "inputData": {
+                "event": "{{data.eventData}}" ,
+                "data": "{{data}}",
+                "operationType": "Update"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "fetchAllParentOfEvent": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": {
+                        "searchContentType": "parentPlansOfEvent",
+                        "parentUid": "{{data.eventMap.fetchAllParentOfEvent}}"
+                    }
+                }
+            },
+            "outputData": {
+                "searchResults": "searchResults"
+            },
+            "events": {
+                "success": [ {
+                    "name": "checkForParentAndExpand"
+                } ]
+            }
+        },
+        "checkForParentAndExpand": {
+            "actionType": "JSFunction",
+            "method": "checkForParentAndExpand",
+            "deps": "js/SearchByObjectOnTimeline",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "loadTreeColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.planNavigationTreeDataProvider}}"
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "saveColumnConfigData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.planNavigationTreeDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.planNavigationTreeDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {}
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.planNavigationTreeDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.planNavigationTreeDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "planNavigationTree.ColumnConfigSaved"
+                } ]
+            }
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "operationType": "union",
+                        "typeNames": "{{function:getTypeNames}}",
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [
+                        {}
+                    ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.gridDataProvider.resetColumnConfigs": "columnConfigurations",
+                "newColumnConfig": "columnConfigurations[0].columnConfigurations[0]"
+            },
+            "events": {
+                "success": [ {
+                    "name": "planNavigationTree.plTable.reload"
+                } ]
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "loadDataForSavedColumnConfig": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTableViewModelProperties",
+            "deps": "js/tcViewModelObjectService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.planNavigationTreeDataProvider.viewModelCollection.loadedVMObjects}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "typesForArrange": "{{data.dataProviders.planNavigationTreeDataProvider.columnConfig.typesForArrange}}",
+                    "columnsToExclude": [],
+                    "operationType": "{{eventData.operationType}}"
+                }
+            },
+            "outputData": {
+                "newColumnConfig": "result.output.columnConfig"
+            },
+            "events": {
+                "success": [ {
+                    "name": "planNavigationTree.updateTreeTableColumns"
+                } ]
+            }
+        },
+        "updatePlanNavTreeTableColumns": {
+            "actionType": "JSFunction",
+            "method": "updatePlanNavTreeTableColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.planNavigationTreeDataProvider}}"
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "doGridDataProvider": {
+            "actionType": "dataProvider",
+            "method": "planNavigationTreeDataProvider"
+        },
+        "loadInitialTreeData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "0": {
+                    "attributesToInflate": [],
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.planNavigationTreeColumnProvider.sortCriteria}}",
+                    "startIndex": "request.treeLoadInput.startChildNdx",
+                    "columnFilters": "{{data.columnProviders.planNavigationTreeColumnProvider.columnFilters}}"
+                },
+                "1": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "operationType": "{{data.dataProviders.planNavigationTreeColumnProvider.columnConfig.operationType}}"
+                },
+                "2": null,
+                "3": "request.treeLoadInput",
+                "4": "true",
+                "5": {
+                    "declViewModel": "{{data}}"
+                }
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "searchResults": "result.treeLoadResult.searchResults",
+                "ctx.search.totalFound": "result.treeLoadResult.totalChildCount",
+                "ctx.search.totalLoaded": "result.treeLoadResult.childNodes.length",
+                "ctx.search.filterMap": "result.treeLoadResult.filterMap",
+                "ctx.search.filterCategories": "result.treeLoadResult.filterCategories",
+                "ctx.search.objectsGroupedByProperty": "result.treeLoadResult.objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "result.treeLoadResult.searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "result.treeLoadResult.searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "result.treeLoadResult.objectsGroupedByProperty",
+                "treeLoadResult": "result.treeLoadResult.childNodes"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "planNavigationTree.loadInitialEventsForPlan"
+                    },
+                    {
+                        "name": "addPlanObjectToPrgBreadcrumb"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "loadTreeData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "0": {
+                    "attributesToInflate": [],
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.planNavigationTreeColumnProvider.sortCriteria}}",
+                    "startIndex": "request.treeLoadInput.startChildNdx",
+                    "columnFilters": "{{data.columnProviders.planNavigationTreeColumnProvider.columnFilters}}"
+                },
+                "1": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "operationType": "{{data.dataProviders.planNavigationTreeColumnProvider.columnConfig.operationType}}"
+                },
+                "2": null,
+                "3": "request.treeLoadInput",
+                "4": "false",
+                "5": {
+                    "declViewModel": "{{data}}"
+                }
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "searchResults": "result.treeLoadResult.searchResults",
+                "ctx.search.totalFound": "result.treeLoadResult.totalChildCount",
+                "ctx.search.totalLoaded": "result.treeLoadResult.childNodes.length",
+                "ctx.search.filterMap": "result.treeLoadResult.filterMap",
+                "ctx.search.filterCategories": "result.treeLoadResult.filterCategories",
+                "ctx.search.objectsGroupedByProperty": "result.treeLoadResult.objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "result.treeLoadResult.searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "result.treeLoadResult.searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "result.treeLoadResult.objectsGroupedByProperty",
+                "treeLoadResult": "result.treeLoadResult.childNodes"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "planNavigationTree.loadEventsForPlan"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "loadPlanNavigationTreeProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "propertyLoadInput": "request.propertyLoadInput"
+            },
+            "outputData": {
+                "dataProviders.planNavigationTreeDataProvider.columnConfig": "result.propertyLoadResult.columnConfig"
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "checkPlanAndEventQuickPreference": {
+            "actionType": "JSFunction",
+            "method": "checkPlanAndEventQuickPreference",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addPlanObjectUtils"
+        },
+        "onObjectsCreated": {
+            "actionType": "JSFunction",
+            "method": "addCreatedObjects",
+            "inputData": {
+                "data": "{{data}}",
+                "eventMap": "{{data.eventMap}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "planNavigationTree.plTable.clientRefresh"
+                } ]
+            },
+            "deps": "js/planNavigationTreeEditService"
+        },
+        "onObjectsDeleted": {
+            "actionType": "JSFunction",
+            "method": "removeDeletedObjects",
+            "inputData": {
+                "data": "{{data}}",
+                "eventMap": "{{data.eventMap}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "planNavigationTree.plTable.clientRefresh"
+                } ]
+            },
+            "deps": "js/planNavigationTreeEditService"
+        },
+        "updateTimelineContext": {
+            "actionType": "JSFunction",
+            "method": "updateTimelineContext",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/planNavigationTreeService",
+            "events": {
+                "success": [
+                    {
+                        "condition": "conditions.checkWhetherStackEventPanelActive",
+                        "name": "closePanelEvent"
+
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "loadInitialEventsForPlan": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}"
+                },
+                "searchInput": {
+                    "attributesToInflate": "{{ctx.search.tableViewProperties}}",
+                    "maxToLoad": 200000000,
+                    "maxToReturn": 200000000,
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": {
+                        "searchContentType": "EventsOfPlanObjects",
+                        "parentUid": "{{data.treeLoadInput.parentElement}}",
+                        "searchEventRecursive": "false",
+                        "returnParentHierarchy": "true",
+                        "planUidsList":"{{function:getListOfPlanObj}}"
+                    },
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.clientScopeUI.sortCriteria}}",
+                    "startIndex": "{{data.dataProviders.gridDataProvider.startIndex}}"
+                },
+                "inflateProperties": true
+            },
+            "outputData": {
+                "planEvents": "{{function:processEvents}}"
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "loadEventsForPlan": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}"
+                },
+                "searchInput": {
+                    "attributesToInflate": "{{ctx.search.tableViewProperties}}",
+                    "maxToLoad": 200000000,
+                    "maxToReturn": 200000000,
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": {
+                        "searchContentType": "EventsOfPlanObjects",
+                        "parentUid": "{{data.treeLoadInput.parentElement}}",
+                        "searchEventRecursive": "false",
+                        "planUidsList":"{{function:getListOfPlanObj}}"
+                    },
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.clientScopeUI.sortCriteria}}",
+                    "startIndex": "{{data.dataProviders.gridDataProvider.startIndex}}"
+                },
+                "inflateProperties": true
+            },
+            "outputData": {
+                "planEvents": "{{function:processEvents}}"
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "updateCtxWithCommandConditionData": {
+            "actionType": "JSFunction",
+            "method": "updateCtxWithCommandConditionData",
+            "deps": "js/planNavigationTreeService"
+        },
+        "movePlanObjects": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProgramInfra-2021-06-ProgramManagement",
+            "method": "movePlanObjects",
+            "inputData": {
+                "movePlanObjectsInput": "{{function:getMovePlanObjectsInput}}",
+                "moveOptions": [ {
+                    "name": "",
+                    "keyValue": ""
+
+                } ]
+            },
+            "outputData": {
+                "movePlanObjectsResponse": ""
+
+            },
+            "events": {
+                "success": [ {
+                    "name": "updatePlanTreeNodePositionEvent",
+                    "eventData": {
+                        "activeMove": "{{data.eventMap['movePlanObjectsEvent'].activeMove}}"
+                    }
+
+                } ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Prg0AbsPlan",
+                    "properties": [ {
+                        "name": "prg0PlanOrder"
+                    } ]
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "soaErrorFailureMsg"
+                } ]
+            },
+            "deps": "js/MovePlanObjectsService"
+        },
+        "updatePlanTreeNodePositionAction": {
+            "actionType": "JSFunction",
+            "method": "updateAndReturnPlanTreeNodePosition",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.planNavigationTreeDataProvider}}",
+                "activeMoveCommand": "{{data.eventMap['updatePlanTreeNodePositionEvent'].activeMove}}",
+                "movePlanObjectsInput": "{{data.movePlanObjectsInput}}"
+
+            },
+            "outputData": {
+                "movePlanContainer": ""
+            },
+            "events":{
+                "success":[{
+                    "name": "planNavigation.planReordered",
+                    "eventData": {
+                        "timelineMovePlanContainer": "{{data.movePlanContainer}}"
+                    }
+                }]
+            },
+            "deps": "js/MovePlanObjectsService"
+        },
+        "updateSelectionForSecondary": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionForSecondary",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success":[{
+                    "name": "selectEventForSecondaryEvent",
+                    "eventData": {
+                        "vmo": "{{data.eventData}}"
+                    }
+                },
+                {
+                    "name": "setSelectionForEvent",
+                    "eventData": {
+                        "vmo": "{{data.eventData}}"
+                    },
+                    "condition": "conditions.isTreeView"
+                }]
+            },
+            "deps": "js/PlanNavigationTreeUtils"
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "callForOnObjectsUpdatedMethod": {
+            "actionType": "JSFunction",
+            "method": "onObjectsUpdated",
+            "inputData": {
+                "eventMap": "{{data.eventMap}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "timelineDataToRefresh": ""
+            },
+            "deps": "js/TimelineDataSourceService",
+            "events": {
+                "success": [
+                    {
+                        "name": "timelineRefresh"
+                    }
+                ]
+            }
+        },
+        "updatePlanDisplayNames": {
+            "actionType": "JSFunction",
+            "method": "updatePlanDisplayNames",
+            "inputData": {
+                "eventData": "{{data}}"
+            },
+            "deps": "js/planNavigationTreeService"
+        },
+        "closeProgramBoard": {
+            "actionType": "JSFunction",
+            "method": "closeProgramBoard",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/TimelineProgramBoardHelper"
+        },
+        "publishClientRefreshEventForPlTableTimeline": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "planNavigationTree.plTable.clientRefresh"
+                } ]
+            }
+        },
+        "fireListenPrimarySelectionAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "selectEventForSecondary",
+                    "eventData": {
+                        "vmo":"{{data.eventMap['selectEventForSecondaryEvent'].vmo}}"
+                    }
+                } ]
+            }
+        },
+        "listenPrimarySelection": {
+            "actionType": "JSFunction",
+            "method": "listenPrimarySelection",
+            "deps": "js/PlanNavigationTreeUtils",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "cleanupStackEventsData": {
+           "actionType": "JSFunction",
+           "method": "cleanupStackEventsData",
+           "deps": "js/TimelineDataSourceService"
+        },
+        "setColumnFilterTimeline": {
+            "actionType":"JSFunction",
+            "method":"setColumnFilterTimeline",
+            "inputData" : {
+                "eventData":"{{data.context}}"
+            },
+            "deps":"js/planNavigationTreeService"
+        },
+        "getFilterFacets": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-12-Finder",
+            "method": "getFilterValues",
+            "inputData": {
+                "filterFacetInput": {
+                    "columnFilters": "{{filterFacetInput.columnFilters}}",
+                    "columnName": "{{filterFacetInput.column.field}}",
+                    "maxToReturn": "{{filterFacetInput.maxToReturn}}",
+                    "providerName": "Pgp0PlanObjsSearchProvider",
+                    "searchCriteria": {
+                        "searchContentType": "childPlanObjects",
+                        "parentUid": "{{data.treeLoadInput.parentElement}}",
+                        "searchEventRecursive": "false",
+                        "returnParentHierarchy": "true"
+                    },
+                    "searchFilterMap": "{{ctx.search.activeFilterMap}}",
+                    "startIndex": "{{filterFacetInput.startIndex}}"
+                }
+            },
+            "outputData": {
+                "filterFacetResults": "{{json:facetValues}}"
+            }
+        },
+        "fireSelectionForEventAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "selectEventOnSelectionService",
+                    "eventData": {
+                        "vmo": "{{data.eventMap['setSelectionForEvent'].vmo}}"
+                    }
+                } ]
+            }
+        },
+        "selectEventOnSelectionService": {
+            "actionType": "JSFunction",
+            "method": "selectEventOnSelectionService",
+            "deps": "js/PlanNavigationTreeUtils",
+            "inputData": {
+                "data": "{{data.eventMap['selectEventOnSelectionService'].vmo}}"
+            }
+        },
+        "getFilteredPlanLevelsInput": {
+            "actionType":"JSFunction",
+            "method":"getFilteredPlanLevelsInput",
+            "deps":"js/SearchByObjectOnTimeline",
+            "inputData":{
+                "data":"{{data}}"
+            }
+        },
+        "clearAndReinitPrgBreadcrumb": {
+            "actionType":"JSFunction",
+            "method":"clearAndReinitPrgBreadcrumb",
+            "deps":"js/Pgp0ProgramBreadcrumbPanel",
+            "inputData":{
+                "planObj":"{{ctx.locationContext.modelObject}}"
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "checkPlanAndEventQuickPreference",
+        "onUnmount": "cleanupStackEventsData"
+    },
+    "columnProviders": {
+        "planNavigationTreeColumnProvider": {
+            "loadColumnAction": "loadTreeColumns",
+            "columns": "{{planNavigationTreeDataProvider.columnConfig.columns}}",
+            "clientColumns": "{{data.clientColumns}}",
+            "saveColumnAction": "saveColumnConfigData",
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig"
+        }
+    },
+    "messages": {},
+    "dataProviders": {
+        "planNavigationTreeDataProvider": {
+            "initializeAction": "loadInitialTreeData",
+            "nextAction": "loadTreeData",
+            "previousAction": "loadTreeData",
+            "editContext": "TABLE_CONTEXT",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}",
+                "accessMode": "tree",
+                "topNodeUid": "{{ctx.state.params.uid}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands",
+            "filterFacetAction": "getFilterFacets",
+            "filterFacetResults": "{{data.filterFacetResults}}"
+        },
+        "planNavigationTreePropertyProvider": {
+            "action": "loadPlanNavigationTreeProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "grids": {
+        "planNavigationTree": {
+            "dataProvider": "planNavigationTreeDataProvider",
+            "columnProvider": "planNavigationTreeColumnProvider",
+            "propertyProvider": "planNavigationTreePropertyProvider",
+            "addIconColumn": false,
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "useStaticFirstCol": true,
+                "enableGridMenu": true,
+                "enableExpandAndPaginationInEdit": true,
+                "enableDragAndDrop": false,
+                "headerHeight": "XLARGE",
+                "enableSorting": false,
+                "enableExpansionStateCaching": true,
+                "isFilteringEnabled": true
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "showEventProperties",
+            "action": "setParamForEventPosition"
+        },
+        {
+            "eventId": "aw-splitter-update",
+            "cacheEventData": true,
+            "action": "setZoomParamForEventPosition"
+        },
+        {
+            "eventId":"getEventsInformationForFilteredResult",
+            "action":"getFilteredPlanLevelsInput"
+        },
+        {
+            "eventId": "timelineZoomPreferenceUpdated",
+            "cacheEventData": true,
+            "action": "setZoomParamForEventPosition"
+        },
+        {
+            "eventId": "eventsAddedOnTimeline",
+            "cacheEventData": true,
+            "action": "setAddParamForEventPosition"
+        },
+        {
+            "eventId": "pltable.columnFilterApplied",
+            "cacheEventData": true,
+            "action": "setColumnFilterTimeline"
+        },
+        {
+            "eventId": "onEventUpdation",
+            "cacheEventData": true,
+            "action": "setUpdateParamForEventPosition"
+        },
+        {
+            "eventId": "objectsDeletedFromTimeline",
+            "cacheEventData": true,
+            "action": "setDeleteParamForEventPosition"
+        },
+        {
+            "eventId": "checkForParentAndExpand",
+            "action": "checkForParentAndExpand"
+        },
+        {
+            "eventId": "fetchAllParentOfEvent",
+            "cacheEventData": true,
+            "action": "fetchAllParentOfEvent"
+        },
+        {
+            "eventId": "gridView.initialized",
+            "action": "doGridDataProvider"
+        },
+        {
+            "eventId": "closePanelEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "planNavigationTree.ColumnConfigSaved",
+            "cacheEventData": true,
+            "action": "loadDataForSavedColumnConfig",
+            "condition": "!ctx.editInProgress"
+        },
+        {
+            "eventId": "planNavigationTree.updateTreeTableColumns",
+            "action": "updatePlanNavTreeTableColumns"
+        },
+        {
+            "eventId": "primaryWorkarea.multiSelectAction",
+            "action": "publishClientRefreshEventForPlTableTimeline"
+        },
+        {
+            "eventId": "cdm.created",
+            "cacheEventData": true,
+            "action": "onObjectsCreated"
+        },
+        {
+            "eventId": "cdm.deleted",
+            "cacheEventData": true,
+            "action": "onObjectsDeleted"
+        },
+        {
+            "eventId": "planNavigationTreeDataProvider.selectionChangeEvent",
+            "action": "updateTimelineContext",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "planNavigationTree.loadInitialEventsForPlan",
+            "action": "loadInitialEventsForPlan"
+        },
+        {
+            "eventId": "planNavigationTree.loadEventsForPlan",
+            "action": "loadEventsForPlan"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updateCtxWithCommandConditionData"
+        },
+        {
+            "eventId": "movePlanObjectsEvent",
+            "action": "movePlanObjects",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "updatePlanTreeNodePositionEvent",
+            "action": "updatePlanTreeNodePositionAction",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "updateSWAForEvent",
+            "action": "updateSelectionForSecondary",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "cdm.updated",
+            "condition": "conditions.onObjectsUpdatedToBeCalled",
+            "cacheEventData": true,
+            "action": "callForOnObjectsUpdatedMethod"
+        },
+        {
+            "eventId": "vmc.modified.planNavigationTreeDataProvider",
+            "cacheEventData": true,
+            "action": "updatePlanDisplayNames"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "ctx.activeProgramBoard && name === 'ViewModeContext' && value.ViewModeContext === 'TreeSummaryView' ",
+            "action": "closeProgramBoard"
+        },
+        {
+            "eventId": "selectEventForSecondaryEvent",
+            "cacheEventData": true,
+            "action": "fireListenPrimarySelectionAction"
+        },
+        {
+            "eventId": "selectEventForSecondary",
+            "cacheEventData": true,
+            "action": "listenPrimarySelection"
+        },
+        {
+            "eventId": "setSelectionForEvent",
+            "cacheEventData": true,
+            "action": "fireSelectionForEventAction"
+        },
+        {
+            "eventId": "selectEventOnSelectionService",
+            "cacheEventData": true,
+            "action": "selectEventOnSelectionService"
+        },
+        {
+            "eventId": "addPlanObjectToPrgBreadcrumb",
+            "action": "clearAndReinitPrgBreadcrumb"
+        }
+    ],
+    "preferences": [
+        "AWC_PAGE_SIZE",
+        "AWC_Timeline_Zoom_Level",
+        "PP_Quick_Create_Plan_Types",
+        "PP_Quick_Create_Event_Types",
+        "AWC_DefaultPageSize"
+    ],
+    "conditions": {
+        "onObjectsUpdatedToBeCalled": {
+            "expression": "ctx.mselected[0].modelType.typeHierarchyArray.indexOf('Prg0AbsEvent') > -1 || ctx.mselected[0].modelType.typeHierarchyArray.indexOf('Prg0AbsPlan') > -1 || ctx.mselected[0].modelType.typeHierarchyArray.indexOf('ScheduleTask') > -1 "
+        },
+        "isTreeSummaryView": {
+            "expression": "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+        },
+        "isTreeView": {
+            "expression": "ctx.ViewModeContext.ViewModeContext === 'TreeView'"
+        },
+        "checkWhetherStackEventPanelActive": {
+            "expression": "ctx.activeToolsAndInfoCommand.commandId === 'Pgp0ShowOverlapEventsCmdPanel'"
+        }
+    },
+    "functions": {
+        "getDefaultPageSize": {
+            "functionName": "getDefaultPageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "processEvents": {
+            "functionName": "processEvents",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getListOfPlanObj": {
+            "functionName": "getListOfPlanObj",
+            "parameters":[
+                "{{data}}"
+            ]
+        },
+        "getMovePlanObjectsInput": {
+            "functionName": "getMovePlanObjectsInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getTypeNames": {
+            "functionName": "getTypeNames",
+            "parameters": [
+                "{{ctx.searchResponseInfo.searchFilterMap}}"
+            ]
+        }
+    },
+    "i18n": {}
+}

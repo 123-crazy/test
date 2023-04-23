@@ -1,0 +1,43 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-guidance-message.directive",
+        "js/visible-when.directive"
+    ],
+    "data": {},
+    "actions": {
+        "getDuplicateCautionBannerFlag": {
+            "actionType": "TcSoaService",
+            "serviceName": "BusinessModeler-2008-06-ConditionEngine",
+            "method": "evaluateConditions",
+            "inputData": {
+                "inputs":
+                [{
+                    "conditionName": "Awb0BomCloneCautionBannerDisplayCond",
+                    "conditionSignature":[ 
+                    {
+                        "type": "u",
+                        "uid": "{{ctx.userSession.uid}}"
+                    }]
+                }]
+            },
+            "outputData": {
+                "verdict": "outputs[0].result"
+            }
+        }
+    },
+    "i18n": {
+        "duplicateActionValidationMessage": [
+            "OccurrenceManagementMessages"
+        ]  
+    },
+    "messages": {
+        "bomCloneCautionBannerMessage":{
+            "messageType": "INFO",
+            "messageText": "{{i18n.duplicateActionValidationMessage}}"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "getDuplicateCautionBannerFlag"
+    }
+}

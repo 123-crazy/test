@@ -1,0 +1,236 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list-filter.directive"
+    ],
+    "data": {
+        "variantRuleFilterBox": {
+            "displayName": "{{i18n.filter1}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "defaultVariantRule": {
+            "displayName": "{{i18n.useNoVariantRuleLabel}}",
+            "uiValue": "{{i18n.useNoVariantRuleLabel}}",
+            "type": "STRING"
+        },
+        "customVariantRule":
+        {
+            "displayName": "{{i18n.customVariantRule}}",
+            "type": "STRING"
+        },
+        "newVariantRule":
+        {
+            "displayName": "{{i18n.new}}",
+            "type": "STRING"
+        }
+    },
+    "actions": {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "getAllVariantRulesAction"
+                },
+                {
+                    "action": "activateCurrentView",
+                    "condition": "conditions.isActiveViewDifferent"
+                }
+            ]
+        },
+        "getAllVariantRulesAction": {
+            "actionType": "dataProvider",
+            "method": "getAllVariantRules"
+        },
+        "getAllVariantRules": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceConfiguration",
+            "method": "getConfigurationRules2",
+            "inputData": {
+                "input": {
+                    "maxToLoad": 20,
+                    "startIndex": "{{function:evaluateStartIndex}}",
+                    "searchCriteria": "{{data.variantRuleFilterBox.dbValue}}",
+                    "productContext": {
+                        "type": "Awb0ProductContextInfo",
+                        "uid": "{{data.contextKeyObject.productContextInfo.uid}}"
+                    },
+                    "typeToFetch": "VariantRule",
+                    "fetchOnlyPreferredConfiguration": false
+                }
+            },
+            "outputData": {
+                "variantRules": "{{function:processVariantRules}}",
+                "totalFound": "totalFound"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "errorInGettingPreferredConfigInfo"
+                } ]
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "applyVariantInfoChangeBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "applyVariantInfoChange"
+                }
+            ]
+        },
+        "updateRequestPrefOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref",
+                "value": {
+                    "jitterFreePropLoad" : true,
+                    "userGesture": "VARIANT_RULE_CHANGE"
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "applyVariantInfoChange": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "{{data.contextKey + '.configContext'}}",
+                "value": {
+                    "r_uid": "{{data.contextKeyObject.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "var_uids": "{{data.eventData.variantRules}}",
+                    "iro_uid": "{{data.eventData.svrOwningItem.uid}}",
+                    "de": "{{data.contextKeyObject.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "ue": "{{data.contextKeyObject.productContextInfo.props.awb0EffUnitNo.dbValues[0]}}",
+                    "ei_uid": "{{data.contextKeyObject.productContextInfo.props.awb0EffEndItem.dbValues[0]}}",
+                    "eg_uids": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffectivityGroups.dbValues}}",
+                    "startDate": "{{data.contextKeyObject.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate": "{{data.contextKeyObject.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "fromUnit": "{{data.contextKeyObject.productContextInfo.props.awb0StartEffUnits.dbValues[0]}}",
+                    "toUnit": "{{data.contextKeyObject.productContextInfo.props.awb0EndEffUnits.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "updateVariantRule": {
+            "actionType": "JSFunction",
+            "method": "updateVariantRule",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "selectVariantRule": {
+            "actionType": "JSFunction",
+            "method": "selectVariantRule",
+            "inputData": {
+                "data": "{{data}}",
+                "dataprovider": "{{data.dataProviders.getAllVariantRules}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "activateCurrentView": {
+            "actionType": "JSFunction",
+            "method": "updateActiveContext",
+            "inputData": {
+                "data": "{{data.viewKey}}"
+            },
+            "deps": "js/contextStateMgmtService"
+        },
+        "showCustomVariantPanel": {
+            "actionType": "JSFunction",
+            "method": "showCustomVariantPanel",
+            "inputData": {
+                "variantRuleToEdit": "{{data.eventData.ruleToEdit.dbValue}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+        "processVariantInfoChange": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "setVariantRuleChangeFlag"
+                },
+                {
+                    "action": "applyVariantInfoChangeBatchJob"
+                }
+            ]
+        },
+        "setVariantRuleChangeFlag": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "variantRule.changeRule",
+                "value": true
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "dataProviders": {
+        "getAllVariantRules": {
+            "action": "getAllVariantRules",
+            "response": "{{data.variantRules}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "messages": {
+        "errorInGettingPreferredConfigInfo": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorInGettingPreferredConfigInfo}}"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "getAllVariantRules.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updateVariantRule"
+        },
+        {
+            "eventId": "getAllVariantRules.modelObjectsUpdated",
+            "action": "selectVariantRule"
+        },
+        {
+            "eventId": "awConfigPanel.variantInfoChanged",
+            "cacheEventData": true,
+            "action": "processVariantInfoChange"
+        },
+        {
+            "eventId": "awConfigPanel.customVariantClicked",
+            "cacheEventData": true,
+            "action": "showCustomVariantPanel"
+        }
+    ],
+    "conditions": {
+        "isActiveViewDifferent": {
+            "expression": "data.viewKey !== ctx.aceActiveContext.key"
+        }
+    },
+    "functions": {
+        "evaluateStartIndex": {
+            "functionName": "evaluateStartIndexForVariantRuleDataProvider",
+            "parameters": [ "{{data.dataProviders.getAllVariantRules}}" ]
+        }
+    },
+    "i18n": {
+        "customVariantRule": [ "OccurrenceManagementConstants" ],
+        "useNoVariantRuleLabel": [ "OccurrenceManagementConstants" ],
+        "errorInGettingPreferredConfigInfo": [ "OccurrenceManagementMessages" ],
+        "new": [ "OccurrenceManagementConstants" ],
+        "filter1":["OccurrenceManagementConstants"]
+    }
+}

@@ -1,0 +1,78 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+    ],
+    "actions":{
+        "initCkeditor":{
+            "actionType": "JSFunction",
+            "method": "initCkeditor",
+            "inputData":
+            {
+                "subPanelContext": "{{subPanelContext}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0RequirementCkeditor4Service"
+        },
+        "destroyCkeditor":{
+            "actionType": "JSFunction",
+            "method": "destroyCkeditor",
+            "inputData":
+            {
+                "subPanelContext": "{{subPanelContext}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0RequirementCkeditor4Service"
+        },
+        "resizeEditor":{
+            "actionType": "JSFunction",
+            "method": "resizeEditor",
+            "inputData":
+            {
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/Arm0RequirementCkeditor4Service"
+        }
+    },
+
+    "data": {
+
+    },
+    "conditions": {
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "commandBarResized",
+            "action": "resizeEditor"
+        },
+        {
+            "eventId": "aw-splitter-update",
+            "action": "resizeEditor"
+        },
+        {
+            "eventId": "appCtx.register",
+            "criteria": {
+                "name": "activeToolsAndInfoCommand"
+            },
+            "action": "resizeEditor"
+        },
+        {
+            "eventId": "requirementsEditor.resizeEditor",
+            "action": "resizeEditor"
+        },
+        {
+            "eventId": "aw.windowResize",
+            "action": "resizeEditor"
+        }
+    ],
+
+    "i18n": {
+
+    },
+    "lifecycleHooks": {
+        "onMount": "initCkeditor",
+        "onUnmount": "destroyCkeditor"
+    }
+}

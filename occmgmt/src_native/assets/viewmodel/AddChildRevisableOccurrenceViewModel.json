@@ -1,0 +1,87 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": 
+    [
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive"
+    ],
+    "data" : {},
+    "actions" : {
+        "setCtxAddElementInputParentElementToSelectedElement": 
+        {
+            "actionType": "JSFunction",
+            "method": "setCtxAddElementInputParentElementToSelectedElement",
+            "inputData": 
+            {
+                "parent" : "{{ctx.selected}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "addRevOcc.inputParentElementSetOnCtx"
+                } ]
+            },
+            "deps": "js/addElementService"
+        },
+        "initializeCreateOccurrencePanel": {
+            "actionType": "JSFunction",
+            "method": "initializeCreateOccurrencePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevOccService"
+        },
+        "loadArchetypeObject": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "inputData": {
+                "data": ["{{ctx.aceActiveContext.context.addElementInput.parentElement.props.awb0Archetype.dbValues[0]}}"]
+            },
+            "events": {
+                "success": [ {
+                    "name": "loadObjects.archetypeObjectLoaded"
+                } ]
+            },
+            "deps": "soa/dataManagementService"
+        },
+        "setTargetObjectVmo":
+        {
+            "actionType": "JSFunction",
+            "method": "createViewModelObject",
+            "inputData":
+            {
+                "uid": "{{ctx.aceActiveContext.context.addElementInput.parentElement.props.awb0Archetype.dbValues[0]}}"
+            },
+            "outputData":
+            {
+                "targetObjectToAdd" : ""
+            },
+            "deps": "js/viewModelObjectService"
+        }
+    },
+    "onEvent": 
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setCtxAddElementInputParentElementToSelectedElement",
+            "criteria": {
+                "panelId": "AddChildRevisableOccurrence"
+            }
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "initializeCreateOccurrencePanel",
+            "criteria": {
+                "panelId": "AddChildRevisableOccurrence"
+            }
+        },
+        {
+            "eventId": "addRevOcc.inputParentElementSetOnCtx",
+            "action": "loadArchetypeObject"
+        },
+        {
+            "eventId": "loadObjects.archetypeObjectLoaded",
+            "action": "setTargetObjectVmo"
+        }
+    ]
+}

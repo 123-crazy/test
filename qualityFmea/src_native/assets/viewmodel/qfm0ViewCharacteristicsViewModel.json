@@ -1,0 +1,47 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-xrt-2.directive",
+        "js/aw-column.directive",
+        "js/aw-panel-section.directive"
+    ],
+    "actions": {
+        "loadCharViewModel": {
+            "actionType": "JSFunction",
+            "method": "loadCharViewModel",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "getCharViewModel": {
+            "actionType": "JSFunction",
+            "method": "getCharViewModel",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "eventData": "{{data.eventMap['InspectionDefinitionSelectionChanged']}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "actionViewModel": "vmo"
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "loadCharViewModel"
+    },
+    "onEvent": [
+        {
+            "eventId": "InspectionDefinitionSelectionChanged",
+            "action": "getCharViewModel",
+            "cacheEventData": true
+        }
+    ],
+    "data": {},
+    "i18n": {
+        "qfm0CharacteristicsInfo": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

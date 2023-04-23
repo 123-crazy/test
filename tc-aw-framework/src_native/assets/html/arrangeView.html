@@ -1,0 +1,72 @@
+<aw-command-panel caption="i18n.arrangeMenu">
+    <aw-panel-body scrollable="false">
+        <aw-flex-column width="fill" justify="space-between">
+            <aw-flex-row height="auto" offset-bottom="1f">
+                <aw-flex-column width="fill">
+                    <aw-flex-row height="auto" justify="space-between">
+                        <aw-flex-column width="5">
+                            <aw-flex-row offset="1f" justify="left">
+                                <aw-label prop="data.arrangeData.columnConfigName" visible-when="data.arrangeData.columnConfigName.uiValue" class="aw-arrange-columnConfigLabel"></aw-label>
+                            </aw-flex-row>
+                        </aw-flex-column>
+                        <aw-flex-column width="2"></aw-flex-column>
+                        <aw-flex-column width="5">
+                            <aw-command-bar anchor="arrangeCommandbar" context="data" alignment="HORIZONTAL"></aw-command-bar>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-flex-column>
+            </aw-flex-row>
+            <aw-flex-row height="fill" class="aw-arrange-noSelect" justify="space-between">
+                <aw-flex-column width="5">
+                    <aw-flex-row height="10">
+                        <aw-command-panel-section caption="i18n.availableColumnsTitle" name="arrangeAvailableColumnsSection">
+                            <aw-list-filter prop="data.filterAvailableBox" dataprovider="data.dataProviders.dataProviderAvailableColumnConfigs">
+                                {{item.displayName}}
+                            </aw-list-filter>
+                        </aw-command-panel-section>
+                    </aw-flex-row>
+                </aw-flex-column>
+                <aw-flex-column width="2" justify="center" align-content="center">
+                    <aw-command-bar anchor="arrangeTwoPanelCommandbar" context="data" alignment="VERTICAL"></aw-command-bar>
+                </aw-flex-column>
+                <aw-flex-column width="5">
+                    <aw-flex-row height="12">
+                        <aw-flex-column width="fill" justify="space-between">
+                            <aw-flex-row height="fill">
+                                <aw-command-panel-section caption="i18n.tableColumnsTitle" name="arrangeTableColumnsSection">
+                                    <aw-list-filter prop="data.filterBox" dataprovider="data.dataProviders.dataProviderColumnConfigs">
+                                        {{item.displayName}}
+                                    </aw-list-filter>
+                                </aw-command-panel-section>
+                            </aw-flex-row>
+                            <aw-flex-row height="auto" align-content="end">
+                                <aw-flex-column width="fill" justify="space-between">
+                                    <aw-flex-row height="auto">
+                                        <aw-checkbox prop="data.arrangeData.newColumnConfig" action="markDirty"></aw-checkbox>
+                                    </aw-flex-row>
+                                    <aw-flex-row height="auto" offset-bottom="1f" >
+                                        <aw-textbox prop="data.arrangeData.newColumnConfigName" class="invisible" id="arrange_newColumnConfigName"></aw-textbox>
+                                    </aw-flex-row>
+                                    <aw-flex-row height="auto">
+                                        <aw-button action="arrange" class="arrange_submitButton" visible-when="data.arrangeData.isArrange && data.arrangeData.dirty && data.arrangeData.isColumnsSelected">
+                                            <aw-i18n>i18n.arrangeMenu</aw-i18n>
+                                        </aw-button>
+                                        <aw-button action="arrangeAndSet" class="arrange_submitButton" visible-when="data.arrangeData.isArrangeAndSave && data.arrangeData.isColumnsSelected && !data.arrangeData.dirty && data.arrangeData.isExistingColumnConfigLoaded">
+                                            <aw-i18n>i18n.arrangeMenu</aw-i18n>
+                                        </aw-button>
+                                        <aw-button action="arrangeAndSave" class="arrange_submitButton" visible-when="data.arrangeData.isArrangeAndSave && data.arrangeData.isColumnsSelected && data.arrangeData.dirty">
+                                            <aw-i18n>i18n.arrangeAndSaveButtonTitle</aw-i18n>
+                                        </aw-button>
+                                        <aw-button action="arrangeAndCreate" class="arrange_submitButton" visible-when="data.arrangeData.isArrangeAndCreate && data.arrangeData.isColumnsSelected">
+                                            <aw-i18n>i18n.arrangeAndCreateButtonTitle</aw-i18n>
+                                        </aw-button>
+                                    </aw-flex-row>
+                                </aw-flex-column>
+                            </aw-flex-row>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-flex-column>
+            </aw-flex-row>
+        </aw-flex-column>
+    </aw-panel-body>
+</aw-command-panel>

@@ -1,0 +1,135 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[ "js/aw-tab-set.directive",
+                "js/aw-panel-footer.directive",
+                "js/aw-button.directive",
+                "js/aw-i18n.directive",
+                "js/exist-when.directive",
+                "js/aw-panel-body.directive"
+                ],
+    "i18n":
+    {
+        "sharedEffectivities":[ "OccurrenceManagementConstants"],
+        "searchEndItemPresenterBtn":[ "OccurrenceManagementConstants"],
+        "new":[ "OccurrenceManagementConstants"],
+        "endItemMessage":[ "OccurrenceManagementConstants"],
+        "addElementBtn":["OccurrenceManagementConstants"],
+        "protect":[ "OccurrenceManagementConstants" ],
+        "replaceElementBtn":["OccurrenceManagementConstants"],
+        "effectivitesSuccessfullyApplied" :["OccurrenceManagementMessages"]
+
+    },
+    "data" :
+    {
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "panelId": "AuthorEffectivity",
+                    "name": "{{i18n.new}}",
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "SearchEffectivities",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}"
+                }
+            ]
+        }
+    },
+    "actions":
+    {
+        "addSearchButtonClicked":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2016-03-OccurrenceManagement",
+            "method": "addOrRemoveOccurrenceEffectivities",
+            "inputData":
+            {
+                "input":
+                {
+                    "elements":"{{ctx.mselected}}",
+                    "effectivities": "{{data.dataProviders.performSearchForSharedEffectivities.selectedObjects}}",
+                    "addOrRemove": true
+                }
+            },
+            "outputData":
+            {
+                "occurrenceConfigured": "updated",
+                "occurrenceUnconfigured": "deleted"
+            },
+            "events":
+            {
+                "success": [
+                    {
+                        "name": "occurrenceUpdatedByEffectivityEvent",
+                        "eventData":
+                        {
+                            "updated" : "{{data.occurrenceConfigured}}",
+                            "deleted" : "{{data.occurrenceUnconfigured}}",
+                            "addedEffectivities": "{{data.dataProviders.performSearchForSharedEffectivities.selectedObjects}}",
+                            "state" : "COMPLETED",
+                            "source"  : "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "DisplayAndRemoveEffectivities",
+                            "configured":"{{data.occurrenceConfigured}}"
+                        },
+                        "condition": "data.occurrenceConfigured && data.occurrenceConfigured.includes(ctx.selected.uid)"
+                    },
+                    {
+                        "name": "aceElementsDeSelectedEvent",
+                         "eventData":
+                        {
+                            "elementsToDeselect": "{{ctx.mselected}}"
+                        },
+                        "condition": "data.occurrenceUnconfigured && data.occurrenceUnconfigured.includes(ctx.selected.uid)"
+                    }
+                ]
+            },
+             "actionMessages":
+             {
+                 "failure":
+                 [                    
+                    {
+                        "message": "failedToApplyEffectivityMessage"
+                    }
+                 ],
+                 "success": [
+                    {
+                        "condition": "ctx.mselected.length > 1",
+                        "message": "succsessfullyAddedEffectivityMessage"
+                    }
+                ]
+             },
+             "deps":"js/sharedEffectivityService"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action":  "getInfoForAddElementAction",
+            "criteria": {
+                "panelId": "AddEffectivities"
+            }
+        }
+    ],
+    "messages":
+    {
+        "succsessfullyAddedEffectivityMessage":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.effectivitesSuccessfullyApplied}}",
+            "messageTextParams":
+            [
+                "{{ctx.mselected.length}}"
+            ]
+        }
+    }
+}

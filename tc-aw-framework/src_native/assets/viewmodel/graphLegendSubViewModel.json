@@ -1,0 +1,197 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-graph-legend-view.directive",
+        "js/aw-listbox.directive"
+    ],    
+    "data": {
+        "legendViewBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "labelPosition":"PROPERTY_LABEL_AT_RIGHT",
+            "hasLov": "true",
+            "dbValue": "{{ctx.graph.legendState.activeViewIndex}}",
+            "dispValue": "{{ctx.graph.legendState.activeView.displayName}}"
+        },
+        "legendViewValues": []
+    },
+    "actions": {
+        "selectView": {
+            "actionType": "JSFunction",
+            "method": "selectView",
+            "inputData": {
+                "activeView": "{{data.legendViewBox.dbValue}}",
+                "legendData": "{{ctx.graph.legendData}}",
+                "legendState": "{{ctx.graph.legendState}}"
+            },
+            "deps": "js/graphLegendService"
+        },
+        "clearGraph": {
+            "actionType": "JSFunction",
+            "method": "clearGraph",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "awGraphLegend.activeViewChanged"
+                } ]
+            },
+            "deps": "js/awGraphService"
+        },
+        "updateLegendCountAndSelection": {
+            "actionType": "JSFunction",
+            "method": "updateLegendCountAndSelection",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "legendView": "{{ctx.graph.legendState.activeView}}"
+            },
+            "deps": "js/graphLegendService"
+        },
+        "updateGraphSelection": {
+            "actionType": "JSFunction",
+            "method": "updateGraphSelectionByCategory",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "category": "{{data.eventData.category}}",
+                "isMultiSelect": "{{data.eventData.isMultiSelect}}"
+            },
+            "deps": "js/graphLegendService"
+        },
+        "updateLegendSelection": {
+            "actionType": "JSFunction",
+            "method": "updateLegendSelection",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "legendView": "{{ctx.graph.legendState.activeView}}",
+                "selected": "{{parameters.eventData.selected}}",
+                "unselected": "{{parameters.eventData.unSelected}}"
+            },
+            "deps": "js/graphLegendService"
+        },
+        "initLegend": {
+            "actionType": "JSFunction",
+            "method": "initLegend",
+            "inputData": {
+                "legendData": "{{ctx.graph.legendData}}",
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "legendState": "{{ctx.graph.legendState}}",
+                "legendView": "{{ctx.graph.legendState.activeView}}"
+            },
+            "deps": "js/graphLegendService"
+        },
+        "updateCreationCategory": {
+            "actionType": "JSFunction",
+            "method": "updateCreationCategory",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "legendState": "{{ctx.graph.legendState}}",
+                "category": "{{data.eventData.category}}",
+                "typeCategory": "{{data.eventData.typeCategory}}"
+            },
+            "deps": "js/graphLegendService"
+        },
+        "getLegendViewList": {
+            "actionType": "JSFunction",
+            "method": "getLegendViewList",
+            "inputData": {
+                "input": "{{ctx.graph.legendData.legendViews}}",
+                "propName": "displayName"
+            },
+
+            "outputData": {
+                "legendViewValues":""
+            },
+
+            "deps": "js/graphLegendService"
+        }
+    },
+    "onEvent": [ 
+        {
+            "eventId": "toggleExpansion",
+            "action": "selectView",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "toggleExpansionUnpopulated",
+            "action": "selectView",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraphLegend.viewChanged",
+            "action": "clearGraph"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "initLegend",
+            "criteria": {
+                "panelId": "graphLegendSub"
+            }
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "getLegendViewList",
+            "criteria": {
+                "panelId": "graphLegendSub"
+            }
+        },
+        {
+            "eventId": "awGraph.itemsRemoved",
+            "action": "updateLegendCountAndSelection",
+            "condition": "conditions.isMasterGraphEvent"
+        },
+        {
+            "eventId": "awGraph.graphCleared",
+            "action": "updateLegendCountAndSelection",
+            "condition": "conditions.isMasterGraphEvent"
+        },
+        {
+            "eventId": "awGraph.groupStateChanged",
+            "action": "updateLegendCountAndSelection",
+            "condition": "conditions.isMasterGraphEvent"
+        },
+        {
+            "eventId": "awGraph.visibilityChanged",
+            "action": "updateLegendCountAndSelection",
+            "condition": "conditions.isMasterGraphEvent"
+        },
+        {
+            "eventId": "awGraph.itemsAdded",
+            "action": "updateLegendCountAndSelection",
+            "condition": "conditions.isMasterGraphEvent"
+        },
+        {
+            "eventId": "awGraphLegend.categorySelectionChanged",
+            "action": "updateGraphSelection",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "updateLegendSelection",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "condition": "conditions.isMasterGraphEvent",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraphLegend.creationCategoryChanged",
+            "action": "updateCreationCategory",
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {
+        "isMasterGraphEvent": {
+            "expression": "sourceGraph == ctx.graph.graphModel"
+        }
+    },
+    "i18n": {
+        "Objects": [ "GraphMessages" ],
+        "Relations": [ "GraphMessages" ],
+        "Ports": [ "GraphMessages" ],
+        "Annotations": [ "GraphMessages" ]
+    }
+}

@@ -1,0 +1,164 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive"
+    ],
+    "actions": {
+        "updateBaselineToView":{
+            "actionType": "JSFunction",
+            "method": "setBaselineToView",
+            "inputData":{
+                "loadedBaselines": "{{data.eventData.selectedBaselines}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "deps": "js/scheduleNavigationGanttIntegrationService"
+        },
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getBaselines",
+                "activeBaseline"
+            ]
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getBaselines}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "addActiveBaselineEvent"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/Saw1BaselineScheduleService"
+        },
+        "addActiveBaselineAction":
+        {
+            "actionType": "JSFunction",
+            "method": "addActiveBaseline",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1BaselineCellCommandsHandler"
+        },
+        "updateProvidersDeleteAction":
+        {
+            "actionType": "JSFunction",
+            "method": "updateProvidersForDelete",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1BaselineCellCommandsHandler"
+        },
+        "updateProvidersActiveAction":
+        {
+            "actionType": "JSFunction",
+            "method": "updateProvidersForActive",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1BaselineCellCommandsHandler"
+        }
+    },
+    "dataProviders": {
+        "getBaselines": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_manageBaselineCellCommand"
+        },
+        "activeBaseline": {
+            "commandsAnchor": "aw_manageBaselineCellCommand"
+        }
+    },
+    "data": {
+        "filterBox": {
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "messages": {
+         "displayError": {
+             "messageType": "ERROR",
+             "messageText": "{{errorCode}}"
+         }
+      },
+    "i18n": {
+        "manageBaselines": [
+            "ScheduleManagerMessages"
+        ],
+        "availableSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "saw1ActiveBaseline": [
+            "ScheduleManagerMessages"
+        ],
+        "baselineName": [
+            "ScheduleManagerMessages"
+        ],
+        "creationDate": [
+            "ScheduleManagerMessages"
+        ],
+        "owningUser": [
+            "ScheduleManagerMessages"
+        ],
+        "owner": [
+            "ScheduleManagerMessages"
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "updateBaselineToView",
+            "cacheEventData": true,
+            "action": "updateBaselineToView"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },
+        {
+            "eventId": "addActiveBaselineEvent",
+            "action": "addActiveBaselineAction"
+        },
+        {
+            "eventId": "Saw1BaselinesSchedule.updateProvidersForDelete",
+            "action": "updateProvidersDeleteAction"
+        },
+        {
+            "eventId": "Saw1BaselinesSchedule.updateProvidersForActive",
+            "action": "updateProvidersActiveAction"
+        }
+    ]
+}

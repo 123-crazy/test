@@ -1,0 +1,343 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-break.directive",
+        "js/aw-column.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-property-label.directive",
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive"
+    ],
+    "actions": {
+        "startEditPreference": {
+            "actionType": "JSFunction",
+            "method": "startEditPreference",
+            "inputData": {
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/editAdminPreferenceService"
+        },
+        "savePreferenceEdits": {
+            "actionType": "JSFunction",
+            "method": "savePreferenceEdits",
+            "inputData": {
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}"
+            },
+            "deps": "js/editAdminPreferenceService"
+        },
+        "cancelPreferenceEdits": {
+            "actionType": "JSFunction",
+            "method": "cancelPreferenceEdits",
+            "inputData": {
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}"
+            },
+            "deps": "js/editAdminPreferenceService"
+        },
+        "updatePreference": {
+            "actionType": "JSFunctionAsync",
+            "inputData": {
+                "vmData": "{{data}}",
+                "selectedObj": "{{ctx.selected}}",
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}"
+            },
+            "outputData": {
+                "ctx.tcadmconsole.searchCriteria.newPref": ""
+            },
+            "method": "updatePreference",
+            "deps": "js/editAdminPreferenceService",
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    }
+                ]
+            }
+        },
+        "populateLists": {
+            "actionType": "JSFunction",
+            "method": "populateEditPreferencePanel",
+            "inputData": {
+                "vmData": "{{data}}"
+            },
+            "outputData": {
+                "ctx.tcadmconsole.preferences.editInProgress": false
+            },
+            "deps": "js/editAdminPreferenceService"
+        },
+        "selectionChange": {
+            "actionType": "JSFunction",
+            "method": "preferenceInfoSelectionChange",
+            "inputData": {
+                "selectedObj": "{{data.eventData}}",
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}"
+            },
+            "dataParsers": [ {
+                "id": "prefInfo",
+                "responseObjs": "response"
+            } ],
+            "outputData": {
+                "preferenceInfo": "response"
+            },
+            "deps": "js/editAdminPreferenceService"
+        },
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "preferenceInfoReveal",
+            "inputData": {
+                "selectedObj": "{{ctx.selected}}",
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}"
+            },
+            "dataParsers": [ {
+                "id": "prefInfo",
+                "responseObjs": "response"
+            } ],
+            "outputData": {
+                "preferenceInfo": "response"
+            },
+            "deps": "js/editAdminPreferenceService",
+            "events": {
+                "success": [ {
+                        "name": "Preferences.addEditHandler",
+                        "condition": "ctx.tcadmconsole.preferences.editInProgress === true"
+                    }
+                ]
+            }
+        },
+        "addEditHandler": {
+            "actionType": "JSFunction",
+            "method": "addEditHandler",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObj": "{{ctx.selected}}",
+                "prefCtx": "{{ctx.tcadmconsole.preferences}}"
+            },
+            "deps": "js/editAdminPreferenceService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "preferenceProperties.contentLoaded",
+            "action": "populateLists"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "cacheEventData": true,
+            "condition": "conditions.isTablePopulated",
+            "action": "selectionChange"
+        },
+        {
+            "eventId": "Preferences.revealPreferenceInfo",
+            "action": "reveal"
+        },
+        {
+            "eventId": "Preferences.updatePreference",
+            "action": "updatePreference"
+        },
+        {
+            "eventId": "Preferences.addEditHandler",
+            "action": "addEditHandler"
+        }
+    ],
+    "dataParseDefinitions": {
+        "prefInfo": {
+            "props": {
+                "fnd0PreferenceName": {
+                    "name": "fnd0PreferenceName",
+                    "displayName": "{{data.nameTitle}}",
+                    "value": "{{response.definition.name}}",
+                    "displayValue": "{{response.definition.name}}",
+                    "type": "STRING",
+                    "isEditable": false
+                },
+                "fnd0ProductArea": {
+                    "name": "fnd0ProductArea",
+                    "displayName": "{{data.productAreaTitle}}",
+                    "value": "{{response.definition.category}}",
+                    "displayValue": "{{response.definition.category}}",
+                    "type": "STRING",
+                    "isEditable": "{{function:isPropertyEditable}}",
+                    "dataProvider": "productAreaProvider",
+                    "isRequired": true
+                },
+                "fnd0ProtectionScope": {
+                    "name": "fnd0ProtectionScope",
+                    "displayName": "{{data.protectionScopeTitle}}",
+                    "value": "{{response.definition.protectionScope}}",
+                    "displayValue": "{{function:getProtectionScopeDisplayValue}}",
+                    "type": "STRING",
+                    "isEditable": "{{function:isProtectionScopeEditable}}",
+                    "dataProvider": "protectionScopeProvider",
+                    "isRequired": true
+                },
+                "fnd0Environment": {
+                    "name": "fnd0Environment",
+                    "displayName": "{{data.environmentTitle}}",
+                    "value": "{{response.definition.isEnvEnabled}}",
+                    "displayValue": "{{function:getEnvironmentEnabledDisplayValue}}",
+                    "type": "BOOLEAN",
+                    "isEditable": false,
+                    "isRequired": true
+                },
+                "fnd0EditEnvironment": {
+                    "name": "fnd0EditEnvironment",
+                    "displayName": "{{data.enabledEnv}}",
+                    "value": "{{response.definition.isEnvEnabled}}",
+                    "displayValue": "{{function:getEnvironmentEnabledDisplayValue}}",
+                    "type": "BOOLEAN",
+                    "isEditable": true,
+                    "isRequired": true,
+                    "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+                },
+                "fnd0Description": {
+                    "name": "fnd0Description",
+                    "displayName": "{{data.descriptionTitle}}",
+                    "value": "{{response.definition.description}}",
+                    "displayValue": "{{response.definition.description}}",
+                    "type": "STRING",
+                    "isEditable": "{{function:isPropertyEditable}}",
+                    "isRequired": true
+                },
+                "fnd0ValueType": {
+                    "name": "fnd0ValueType",
+                    "displayName": "{{data.valueTypeTitle}}",
+                    "value": "{{response.definition.type}}",
+                    "displayValue": "{{function:getTypeDisplayValue}}",
+                    "type": "STRING",
+                    "isEditable": false
+                },
+                "fnd0IsMultiValue": {
+                    "name": "fnd0IsMultiValue",
+                    "displayName": "{{data.isMultiValueTitle}}",
+                    "value": "{{response.definition.isArray}}",
+                    "displayValue": "{{function:getIsArrayDisplayValue}}",
+                    "type": "BOOLEAN",
+                    "isEditable": false
+                },
+                "fnd0Location": {
+                    "name": "fnd0Location",
+                    "displayName": "{{data.locationTitle}}",
+                    "value": "{{response.locationInfo.location.prefLoc}}",
+                    "displayValue": "{{response.locationInfo.location.uiVal}}",
+                    "type": "STRING",
+                    "isEditable": false
+                },
+                "fnd0PreferenceValues": {
+                    "name": "fnd0PreferenceValues",
+                    "displayName": "{{data.valuesTitle}}",
+                    "value": "{{function:getClonedValue}}",
+                    "displayValue": "{{function:getClonedValue}}",
+                    "isArray": "{{response.definition.isArray}}",
+                    "type": "{{function:getVMPropertyType}}",
+                    "isEditable": true
+                }
+            }
+        }
+    },
+    "dataProviders": {
+        "productAreaProvider": {
+            "response": "{{data.productAreaList}}"
+        },
+        "protectionScopeProvider": {
+            "response": "{{data.protectionScopeList}}"
+        }
+    },
+    "data": {
+        "nameTitle": "{{i18n.Name}}",
+        "productAreaTitle": "{{i18n.ProductArea}}",
+        "descriptionTitle": "{{i18n.Description}}",
+        "protectionScopeTitle": "{{i18n.ProtectionScope}}",
+        "locationTitle": "{{i18n.location}}",
+        "valueTypeTitle": "{{i18n.ValueType}}",
+        "isMultiValueTitle": "{{i18n.IsMultiValue}}",
+        "environmentTitle": "{{i18n.Environment}}",
+        "canUserEdit": "false",
+        "localizedProtectionScopes": {
+            "User": "{{i18n.User}}",
+            "Role": "{{i18n.Role}}",
+            "Group": "{{i18n.Group}}",
+            "Site": "{{i18n.Site}}",
+            "System": "{{i18n.System}}"
+        },
+        "valuesTitle": "{{i18n.Values}}",
+        "enabledEnv": "{{i18n.enabledEnv}}",
+        "fnd0EnvironmentLabelProp": {
+            "displayName": "{{i18n.Environment}}",
+            "isRequired": true
+        }
+    },
+    "i18n": {
+        "definitionPropSectionHdr": [ "preferenceInfoMessages" ],
+        "Values": [ "preferenceMessages" ],
+        "Name": [ "preferenceMessages" ],
+        "ProductArea": [ "preferenceMessages" ],
+        "Description": [ "preferenceInfoMessages" ],
+        "ProtectionScope": [ "preferenceInfoMessages" ],
+        "Environment": [ "preferenceInfoMessages" ],
+        "location": [ "preferenceMessages" ],
+        "ValueType": [ "preferenceInfoMessages" ],
+        "IsMultiValue": [ "preferenceInfoMessages" ],
+        "enabledEnv": [ "preferenceInfoMessages" ],
+        "disabledEnv": [ "preferenceInfoMessages" ],
+        "User": [ "preferenceMessages" ],
+        "Role": [ "preferenceMessages" ],
+        "Group": [ "preferenceMessages" ],
+        "Site": [ "preferenceMessages" ],
+        "System": [ "preferenceMessages" ],
+        "startEdit": [ "preferenceInfoMessages" ],
+        "saveEdit": [ "preferenceInfoMessages" ],
+        "cancelEdit": [ "preferenceInfoMessages" ]
+    },
+    "conditions": {
+        "showEditButton": {
+            "expression": "!ctx.tcadmconsole.preferences.editInProgress && ctx.tcadmconsole.preferences.canUserEdit && ctx.search.tableLoaded"
+        },
+        "showCancelButton": {
+            "expression": "ctx.tcadmconsole.preferences.editInProgress"
+        },
+        "showSaveButton": {
+            "expression": "ctx.tcadmconsole.preferences.editInProgress && $$childHead.awPanelBody.$valid"
+        },
+        "showDisabledSaveButton": {
+            "expression": "ctx.tcadmconsole.preferences.editInProgress && $$childHead.awPanelBody.$valid === false"
+        },
+        "isTablePopulated" : {
+            "expression": "ctx.search.tableLoaded === true"
+        }
+    },
+    "functions": {
+        "getEnvironmentEnabledDisplayValue": {
+            "functionName": "getDisplayValueForEnvEnabled",
+            "parameters": [ "{{response.definition.isEnvEnabled}}" ]
+        },
+        "getTypeDisplayValue": {
+            "functionName": "getDisplayValueForType",
+            "parameters": [ "{{response.definition.type}}" ]
+        },
+        "getProtectionScopeDisplayValue": {
+            "functionName": "getDisplayValueForProtectionScope",
+            "parameters": [ "{{response.definition.protectionScope}}" ]
+        },
+        "getIsArrayDisplayValue": {
+            "functionName": "getDisplayValueForBoolean",
+            "parameters": [ "{{response.definition.isArray}}" ]
+        },
+        "getVMPropertyType": {
+            "functionName": "getVMPropertyType",
+            "parameters": [ "{{response.definition.isArray}}", "{{response.definition.type}}" ]
+        },
+        "getClonedValue": {
+            "functionName": "getClonedValue",
+            "parameters": [ "{{response.locationInfo.values}}" ]
+        },
+        "isPropertyEditable": {
+            "functionName": "isPropertyEditable",
+            "parameters": [ "{{ctx.tcadmconsole.preferences.canUserEditDefinition}}", "{{ctx.tcadmconsole.preferences.editInProgress}}" ]
+        },
+        "isProtectionScopeEditable": {
+            "functionName": "isProtectionScopeEditable",
+            "parameters": [ "{{ctx.tcadmconsole.preferences.canUserEditDefinition}}", "{{ctx.tcadmconsole.preferences.editInProgress}}", "{{response.definition.protectionScope}}" ]
+        }
+    }
+}

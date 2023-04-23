@@ -1,0 +1,203 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-toolbar.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "loadTreeTablePropertiesOnInitialLoad": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTablePropertiesOnInitialLoad",
+            "deps": "js/qfm0ActionGroupTreeViewService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.qfm0ActGrpsAndDepActsDataProvider.viewModelCollection.loadedVMObjects}}",
+                "declViewModel": "{{data}}",
+                "uwDataProvider": "{{data.dataProviders.qfm0ActGrpsAndDepActsDataProvider}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{function:getClientScopeURI}}",
+                    "typesForArrange": "{{data.dataProviders.qfm0ActGrpsAndDepActsDataProvider.columnConfig.typesForArrange}}"
+                },
+                "contextKey": "search"
+            },
+            "outputData": {
+                "dataProviders.qfm0ActGrpsAndDepActsDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            }
+        },
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadActionGroupsAndDependentActionsData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.qfm0ActGrpsAndDepActsDataProvider}}",
+                "i18nString": "{{data.i18n}}",
+                "data": "{{data}}",
+                "sortCriteria": "{{data.columnProviders.qfm0ActGrpsAndDepActsColumnProvider.sortCriteria}}"
+            },
+            "outputData": {
+                "ctx.fmeaContext.qualityActionCount.totalFound": "result.treeLoadResult.totalChildCount",
+                "ctx.fmeaContext.qualityActionCount.totalLoaded": "result.treeLoadResult.childNodes.length",
+                "ctx.fmeaContext.qualityActionCount.searchResults": "result.treeLoadResult.childNodes"
+            },
+            "deps": "js/qfm0ActionGroupTreeViewService"
+        },
+        "loadColumns":{
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "data":"{{data}}",
+                "dataProvider": "{{data.dataProviders.qfm0ActGrpsAndDepActsDataProvider}}"
+            },
+
+            "deps": "js/qfm0ActionGroupTreeViewService"
+        },
+        "editEventAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "plTable.editStateChange",
+                        "eventData": {
+                            "state": "{{data.eventData.state}}",
+                            "dataSource": {
+                                "dataProviders": "{{data.dataProviders}}"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "addEventDataToNativeData": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "nativeDataLoadEvent",
+                        "eventData": {
+                            "viewModelObjects": "{{data.dataProviders.qfm0ActGrpsAndDepActsDataProvider.viewModelCollection.loadedVMObjects}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "refreshTable": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "qfm0ActionGroupAndDependentActionsGrid.plTable.reload"
+                    }
+                ]
+            }
+        },
+        "showMessageIfNoGuideline":{
+            "actionType": "JSFunction",
+            "method": "showMessageIfNoGuideline",
+            "inputData": {},
+            "deps": "js/qfm0ActionGroupTreeViewService"
+        }
+    },
+    "data": {},
+    "lifecycleHooks": {
+        "onMount": "showMessageIfNoGuideline"
+    },
+    "onEvent": [
+        {
+            "eventId": "editHandlerStateChange",
+            "cacheEventData": true,
+            "action": "editEventAction"
+        },
+        {
+            "eventId": "qfm0ActGrpsAndDepActsDataProvider.modelObjectsUpdated",
+            "cacheEventData": true,
+            "action": "addEventDataToNativeData"
+        },
+        {
+            "eventId": "qfm0ActGrpsAndDepActsDataProvider.treeNodesLoaded",
+            "cacheEventData": true,
+            "action": "addEventDataToNativeData"
+        },
+        {
+            "eventId": "qfm0ActGrpsAndDepActsDataProvider.treeNodesLoaded",
+            "action": "loadTreeTablePropertiesOnInitialLoad"
+        },
+        {
+            "eventId": "qfm0ActGrpsAndDepActsDataProvider.treeNodesLoaded",
+            "cacheEventData": true,
+            "action": "addEventDataToNativeData"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved'  && state !== 'starting' && state !== 'canceling' && ctx.selected.type === 'Qam0QualityAction'",
+            "action": "refreshTable",
+            "cacheEventData": true
+        }
+    ],
+    "dataProviders": {
+        "qfm0ActGrpsAndDepActsDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "editContext": "TABLE_CONTEXT",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "response": "{{data.actionGroupsAndDepAction}}",
+            "totalFound": "{{data.totalFound}}",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "columnProviders": {
+        "qfm0ActGrpsAndDepActsColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false
+        }
+    },
+    "grids": {
+        "qfm0ActionGroupAndDependentActionsGrid": {
+            "dataProvider": "qfm0ActGrpsAndDepActsDataProvider",
+            "columnProvider": "qfm0ActGrpsAndDepActsColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "maxRowsToShow": 15,
+                "enablePinning": true
+            }
+        }
+    },
+    "functions": {
+        "getClientScopeURI": {
+            "functionName": "getClientScopeURI"
+        },
+        "getFMEAGuidelineObjectUid":{
+            "functionName" :"getFMEAGuidelineObjectUid"
+        }
+    },
+    "i18n": {
+        "qfm0Name": ["qualityFmeaMessages" ],
+        "qfm0QualActionSubType": ["qualityFmeaMessages" ],
+        "qfm0QualActionOccurence": ["qualityFmeaMessages" ],
+        "qfm0QualActionDetection": ["qualityFmeaMessages" ],
+        "qfm0QualActionnItemId": ["qualityFmeaMessages" ],
+        "qfm0QualActionStatus": ["qualityFmeaMessages" ],
+        "qfm0ReleaseStatus": ["qualityFmeaMessages" ],
+        "qfm0QualActionComment": ["qualityFmeaMessages" ],
+        "qfm0QualActionDesc": ["qualityFmeaMessages" ],
+        "qfm0ControlAction": ["qualityFmeaMessages" ],
+        "qfm0OptimizationAction": ["qualityFmeaMessages" ],
+        "qfm0RPN": ["qualityFmeaMessages" ],
+        "qfm0ActionPriority": ["qualityFmeaMessages" ]
+    }
+}

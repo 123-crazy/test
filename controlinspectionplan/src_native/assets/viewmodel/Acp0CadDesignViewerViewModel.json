@@ -1,0 +1,391 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/exist-when.directive",
+        "js/aw-break.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-splitter.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/visible-when.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-advanced-bar.directive",
+        "js/aw-listbox.directive",
+        "js/aw-separator.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "actions": {
+        "loadRefPartsProvider": {
+            "actionType": "dataProvider",
+            "method": "refPartsProvider"
+        },
+        "loadPartListProvider": {
+            "actionType": "dataProvider",
+            "method": "partListProvider"
+        },
+        "loadPartRevisionsListProvider":{
+            "actionType": "dataProvider",
+            "method": "partRevisionListProvider"
+        },
+        "showHidePartsListPanel":{
+            "actionType": "JSFunction",
+            "method": "showHidePartsListPanel",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0BCTService"
+        },
+        "getPartCharacteristics": {
+            "actionType": "JSFunction",
+            "method": "getPartCharacteristics",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0BCTService"
+        },
+        "performSearchForPartList": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Acp0IpxmlDatasetProvider",
+                    "searchCriteria":
+                    {
+                        "searchString":"{{data.filterBox.dbValue}}"
+                    },
+                    "searchSortCriteria":
+                    [
+                        {
+                            "fieldName":"creation_date",
+                            "sortDirection":"DESC"
+                        }
+                    ],
+                    "startIndex": "{{data.dataProviders.partListProvider.startIndex}}"
+                }
+            },
+            "outputData":
+            {
+                "searchResultsForPartList": "searchResults",
+                "totalLoadedForPartList": "totalLoaded",
+                "totalFoundForPartList": "totalFound"
+
+            }
+        },
+        "getReferencedPart": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 20,
+                    "maxToReturn": 20,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria":
+                    {
+                        "parentUid": "{{function:getContextObjectUid}}",
+                        "objectSet": "Acp0PMIPartRefProvider.ItemRevision"
+                    }
+                }
+            },
+            "outputData":
+            {
+                "searchResultsForRefParts": "searchResults",
+                "totalLoadedForRefParts": "totalLoaded",
+                "totalFoundForRefParts": "totalFound"
+
+            },
+            "events": {
+                "success": [ {
+                        "name": "Acp0.getReferencedPartSuccess"
+                    }
+                ]
+            },
+           "deps": "js/Acp0BCTService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.refPartsProvider}}"
+            },
+
+            "deps": "js/Acp0BCTService"
+        },
+        "drawingSheetSelectionChange": {
+            "actionType": "JSFunction",
+            "method": "drawingSheetSelectionChange",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0BCTInspCompRenderService"
+        },
+        "getPartForDirectRenderingInPMITab": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 20,
+                    "maxToReturn": 20,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria":
+                    {
+                        "parentUid": "{{function:getContextObjectUid}}",
+                        "objectSet": "{{ctx.viewMci0PMIObjectSet}}"
+                    },
+                    "searchSortCriteria": [
+                        {
+                            "fieldName": "creation_date",
+                            "sortDirection": "DESC"
+                        }
+                    ]
+                }
+            },
+            "outputData":
+            {
+                "searchResultsForRefPartsOfInspDef": "searchResults",
+                "totalLoadedForRefPartsOfInspDef": "totalLoaded",
+                "totalFoundForRefPartsOfInspDef": "totalFound"
+
+            },
+            "events": {
+                "success": [ {
+                    "name": "Acp0.getPartFromSearchResultsAndRenderDrawing"
+                    }
+                ]
+            },
+           "deps": "js/Acp0BCTService"
+        },
+        "getPartFromSearchResultsAndRenderDrawing": {
+            "actionType": "JSFunction",
+            "method": "getPartFromSearchResultsAndRenderDrawing",
+            "inputData": {
+                "searchResultsForPartList": "{{data.searchResultsForRefPartsOfInspDef}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0BCTService"
+        },
+        "getRevisionsFromSelectedPart": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 20,
+                    "maxToReturn": 20,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria":
+                    {
+                        "parentUid": "{{function:getPartItemTagFromSelectedPartRev}}",
+                        "objectSet": "revision_list.ItemRevision"
+                    },
+                    "searchSortCriteria": [
+                        {
+                            "fieldName": "creation_date",
+                            "sortDirection": "DESC"
+                        }
+                    ]
+                }
+            },
+            "outputData":
+            {
+                "searchResultsForPartRevisionList": "searchResults",
+                "totalLoadedForPartRevisionList": "totalLoaded",
+                "totalFoundForPartRevisionList": "totalFound"
+
+            },
+            "deps": "js/Acp0BCTService"
+        }
+    },
+    "functions":
+    {
+        "getContextObjectUid":
+        {
+            "functionName": "getContextObjectUid",
+            "parameters":[
+                "{{ctx}}"
+            ]
+        },
+        "getPartItemTagFromSelectedPartRev": {
+            "functionName": "getPartItemTagFromSelectedPartRev",
+            "parameters":[
+            ]
+        }
+    },
+    "dataProviders": {
+        "partListProvider": {
+            "action": "performSearchForPartList",
+            "response": "{{data.searchResultsForPartList}}",
+            "totalFound": "{{data.totalFoundForPartList}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "aw_oneStep" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "refPartsProvider": {
+            "response": "{{data.searchResultsForRefParts}}",
+            "totalFound": "{{data.totalFoundForRefParts}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "aw_oneStep" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "partRevisionListProvider": {
+            "action": "getRevisionsFromSelectedPart",
+            "response": "{{data.searchResultsForPartRevisionList}}",
+            "totalFound": "{{data.totalFoundForPartRevisionList}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "aw_oneStep" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "columnProviders": {
+        "refPartsColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex": 1
+        }
+    },
+    "grids": {
+        "refPartsGrid": {
+            "dataProvider": "refPartsProvider",
+            "columnProvider": "refPartsColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "maxRowsToShow": 5,
+                "enablePinning": true
+            }
+        }
+    },
+    "conditions":{
+        "acp0AddButtonCond": {
+            "expression": " conditions.acp0VersionAndTabCheckCond && (ctx.selected &&(ctx.selected.modelType.typeHierarchyArray.indexOf( 'Acp0ControlPlanElement' ) > -1 || ctx.selected.modelType.typeHierarchyArray.indexOf( 'Acp0InspOpElement' ) > -1))"
+        },
+        "acp0IsBctInspViewForDrawing": {
+            "expression": "ctx.selectedPart && ( ctx.inspCombineViewMode || ctx.inspDrawingViewMode )"
+        },
+        "acp0IsBctInspViewForTable": {
+            "expression": "ctx.selectedPart && ( ctx.inspCombineViewMode || ctx.inspTableViewMode )"
+        },
+        "acp0VersionAndTabCheckCond": {
+            "expression": "!(ctx.tcSessionData.tcMajorVersion < 12 || ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion <= 3) && ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_CAD_View'"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Acp0CadDesignViewer.contentLoaded",
+            "action": "getPartCharacteristics"
+        },
+        {
+            "eventId": "Acp0.getReferencedPartSuccess",
+            "action": "loadRefPartsProvider"
+        },
+        {
+            "eventId": "Acp0CadDesignViewer.contentLoaded",
+            "action": "getReferencedPart"
+        },
+        {
+            "eventId": "Acp0.callPartListDataProvider",
+            "action": "loadPartListProvider"
+        },
+        {
+            "eventId": "Acp0.getPartForDirectRenderingInPMITab",
+            "action": "getPartForDirectRenderingInPMITab"
+        },
+        {
+            "eventId": "Acp0.getPartFromSearchResultsAndRenderDrawing",
+            "action": "getPartFromSearchResultsAndRenderDrawing"
+        },
+        {
+            "eventId": "Acp0.getPartItemTagFromSelectedPartRev",
+            "action": "loadPartRevisionsListProvider"
+        }
+    ],
+    "data": {
+        "filterBox": {
+            "displayName": "{{i18n.Filter}}",
+            "type": "STRING",
+            "dbValue":"*"
+        },
+        "acp0DrawingSheetList": {
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "i18n": {
+        "Acp0Add": [ "ControlInspectionPlanMessages" ],
+        "Acp0Cancel": [ "ControlInspectionPlanMessages" ],
+        "Acp0Close": [ "ControlInspectionPlanMessages" ],
+        "Acp0DrawingViewTitle": [ "ControlInspectionPlanMessages" ],
+        "Acp0ItemId": [ "ControlInspectionPlanMessages" ],
+        "Acp0ItemRevisionType": [ "ControlInspectionPlanMessages" ],
+        "Acp0LoadingAttachmentFailed": [ "ControlInspectionPlanMessages" ],
+        "Acp0NoAttachmentMatchingPref": [ "ControlInspectionPlanMessages" ],
+        "Acp0NotGetReqPreference": [ "ControlInspectionPlanMessages" ],
+        "Acp0ObjectDesc": [ "ControlInspectionPlanMessages" ],
+        "Acp0ObjectName": [ "ControlInspectionPlanMessages" ],
+        "Acp0PrefNotLoaded": [ "ControlInspectionPlanMessages" ],
+        "Acp0TableViewTitle" :[ "ControlInspectionPlanMessages" ],
+        "Acp0Type":[ "ControlInspectionPlanMessages" ],
+        "bctDrawingMessage": [ "ControlInspectionPlanMessages" ],
+        "beforePartSelectMessage": [ "ControlInspectionPlanMessages" ],
+        "CompareRevisions": ["ControlInspectionPlanMessages"],
+        "Filter": [ "qualitycharacteristicsmanagerMessages" ],
+        "partsToInspect": [ "ControlInspectionPlanMessages" ],
+        "Preview": [ "ControlInspectionPlanMessages" ],
+        "Z_3DRenderingErrorAttachJT": [ "ControlInspectionPlanMessages" ],
+        "Z_3DRenderingErrorAttachValidJT": [ "ControlInspectionPlanMessages" ],
+        "Z_3DRenderingErrorInvalidIpxml": [ "ControlInspectionPlanMessages" ],
+        "Z_3DRenderingErrorIpxmlWithMultiJTModel": [ "ControlInspectionPlanMessages" ]
+    }
+}

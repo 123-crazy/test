@@ -1,0 +1,68 @@
+<aw-flex-row>
+    <aw-flex-column width="12">
+    <aw-panel-body>
+        <aw-flex-column width="12">
+            <aw-flex-row>
+                <aw-flex-column width="12">
+                    </br>
+                    <aw-radiobutton prop="data.dateOrUnitEffectivityTypeRadioButton"></aw-radiobutton>
+                    <aw-checkbox prop="data.isShared"></aw-checkbox>
+                    <aw-textbox prop="data.nameBox" exist-when="data.isShared.dbValue"></aw-textbox>
+                </aw-flex-column>
+            </aw-flex-row>
+            <aw-flex-row>
+                <aw-flex-column width="12" exist-when="data.dateOrUnitEffectivityTypeRadioButton.dbValue">
+                    <aw-flex-row aw-init="prop=data.startDate">
+                        <aw-flex-column width="12">
+                            <aw-date prop="data.startDate" exist-when="!data.isTimeEnabled"></aw-date>
+                            <aw-datetime prop="data.startDate" exist-when="data.isTimeEnabled"></aw-datetime>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                    <aw-flex-row>
+                        <aw-flex-column width="12">
+                            <aw-listbox action="clearDate" prop="data.endDateOptions" list="data.endDateList.dbValue"></aw-listbox>
+                            <aw-date prop="data.endDate" exist-when="data.endDateOptions.dbValue=='Date' && !data.isTimeEnabled" class="aw-endDate-authorEffectivityPanel"></aw-date>
+                            <aw-datetime prop="data.endDate" exist-when="data.endDateOptions.dbValue=='Date' && data.isTimeEnabled" class="aw-endDate-authorEffectivityPanel"></aw-datetime>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-flex-column>
+            </aw-flex-row>
+            <aw-flex-row exist-when="!data.dateOrUnitEffectivityTypeRadioButton.dbValue">
+                <aw-flex-column aw-init="prop=data.unitRangeText" width="12">
+                    <aw-textbox title="{{data.i18n.dateEffectivityPlaceholder}}" prop="data.unitRangeText" exist-when="!data.dateOrUnitEffectivityTypeRadioButton.dbValue"></aw-textbox>
+                </aw-flex-column>
+            </aw-flex-row>
+            <br>
+            <aw-flex-row height="5f" exist-when="!data.dateOrUnitEffectivityTypeRadioButton.dbValue" class="aw-occmgmt-elemEffEndItem">
+                <aw-label prop="data.endItemLabel"></aw-label>
+                <aw-property-non-edit-val prop="data.endItemVal"></aw-property-non-edit-val>
+                <aw-icon-button command="data.navigateCommand" class="aw-commands-commandIconButton aw-jswidgets-rmButton"></aw-icon-button>
+            </aw-flex-row>
+        </aw-flex-column>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-flex-column width="12">
+            <aw-flex-row height="6f">
+                <aw-flex-column width="12">
+                    <aw-checkbox prop="data.isProtected"></aw-checkbox>
+                    <div exist-when="(conditions.isNewTabSelected || conditions.isSearchTabSelected) && conditions.isValidEffectivityPanel">                        
+                        <aw-button exist-when="!conditions.isRevisionEffectivity && data.flag.dbValue!=='EDIT'" size="block" action="authorEffectivity">
+                            <aw-i18n>i18n.addElementBtn</aw-i18n>
+                        </aw-button>
+                        <aw-button exist-when="conditions.isRevisionEffectivity && data.flag.dbValue!=='EDIT'" size="block" action="authorRevisionEffectivity">
+                            <aw-i18n>i18n.addElementBtn</aw-i18n>
+                        </aw-button>
+                        <aw-button exist-when="data.flag.dbValue==='EDIT' && ctx.elementEffectivity.currentEffectivityType === 'Element'" size="block" action="editEffectivity">
+                            <aw-i18n>i18n.saveButtonText</aw-i18n>
+                        </aw-button>
+                        <aw-button exist-when="data.flag.dbValue==='EDIT' && ctx.elementEffectivity.currentEffectivityType === 'Release'" size="block" action="editRevisionEffectivity">
+                            <aw-i18n>i18n.saveButtonText</aw-i18n>
+                        </aw-button>
+                    </div>
+                </aw-flex-column>
+            </aw-flex-row>
+        </aw-flex-column>
+    </aw-panel-footer>
+    </aw-flex-column>
+    </aw-flex-row>
+

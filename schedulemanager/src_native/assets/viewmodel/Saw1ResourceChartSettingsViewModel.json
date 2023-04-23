@@ -1,0 +1,133 @@
+{   
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-date.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-break.directive"
+    ],
+    "actions": {
+        "goToDateApply": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "Apply"
+                } ]
+            },
+            "events":
+                {
+                    "success":
+                    [
+                        {
+                            "name": "Saw1ResourceChart.ApplyDate",
+                            "eventData":
+                            {
+                                "newStartDate": "{{data.goToDate.dbValue}}",
+                                "radioSelection": "{{data.workloadRadio.dbValue}}"
+                            }
+                        },
+                        {
+                            "name": "complete",
+                            "eventData": 
+                            {
+                                "source": "toolAndInfoPanel"
+                            }
+                        }
+                    ]
+                },
+            "deps": "js/Saw1ResourceChartService"
+        },
+        "isCurrentSchedule":{
+            "actionType": "JSFunction",
+            "method": "isCurrentSchedule",
+            "inputData": {
+                "ctx":"{{ctx}}",
+                "data":"{{data}}"
+            },
+            "deps": "js/Saw1ResourceChartService"
+        }
+    },
+    "functions": {
+        "getStartDate": {
+            "functionName": "getStartDate",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getWorkload": {
+            "functionName": "getWorkload",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ] 
+        },
+        "isCurrentSchedule":{
+            "functionName": "isCurrentSchedule",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ] 
+        }
+    },
+    "data": {
+        "workloadRadio": {
+            "displayName": "{{i18n.saw1Workload}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "vertical": true,
+            "propertyRadioTrueText": "{{i18n.saw1CurrentScheduleOnly}}",
+            "propertyRadioFalseText": "{{i18n.saw1AllSchedules}}"
+        },
+        "goToDate": {
+            "displayName": "{{i18n.saw1GoTo}}",
+            "type": "DATE",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.resourceLoadTableData.startDate}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "onEvent": [
+        {
+
+            "eventId": "awPanel.reveal",
+            "action": "isCurrentSchedule",
+            "cacheEventData": true
+
+        }
+
+    ],
+    "conditions": {
+        "isGoToDateSet": {
+            "expression": "(data.goToDate && data.goToDate.valueUpdated) || (data.workloadRadio && data.workloadRadio.valueUpdated)"
+        }
+    },
+    "i18n": {
+        "saw1Workload":[
+            "ScheduleManagerMessages"
+        ],
+        "saw1CurrentScheduleOnly":[
+            "ScheduleManagerMessages"
+        ],
+        "saw1AllSchedules":[
+            "ScheduleManagerMessages"
+        ],
+        "saw1GoTo":[
+            "ScheduleManagerMessages"
+        ],
+        "applyButtonTxt":[
+            "ScheduleManagerMessages"
+        ],
+        "saw1ResourceChartSettingsTitle":[
+            "ScheduleManagerMessages"
+        ]
+    }
+}

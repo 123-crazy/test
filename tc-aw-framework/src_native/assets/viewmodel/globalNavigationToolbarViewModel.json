@@ -1,0 +1,104 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-avatar.directive"
+    ],
+    "data": {
+        "applicationImage": "assets/image/cmd16Chrome24.svg"
+    },
+    "actions": {
+        "updateUserAndUserSessionOnContext": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateUserOnContext"
+                },
+                {
+                    "action": "updateUserSessionOnContext"
+                }
+            ]
+        },
+        "updateUserOnContext": {
+            "actionType": "createViewModelObject",
+            "inputData": {
+                "source": "{{ctx.user}}"
+            },
+            "outputData": {
+                "ctx.user": ""
+            }
+        },
+        "updateUserSessionOnContext": {
+            "actionType": "createViewModelObject",
+            "inputData": {
+                "source": "{{ctx.userSession.uid}}"
+            },
+            "outputData": {
+                "ctx.userSession": ""
+            }
+        },
+        "avatarAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awsidenav.openClose",
+                    "eventData": {
+                        "id": "globalNavigationSideNav",
+                        "includeView": "avatar",
+                        "commandId": "globalNavigationSideNavCommand",
+                        "keepOthersOpen": true,
+                        "config": {
+                            "width": "{{ctx.awSidenavConfig && ctx.awSidenavConfig.avatarPanel && ctx.awSidenavConfig.avatarPanel.width ? ctx.awSidenavConfig.avatarPanel.width : 'STANDARD' }}",
+                            "height": "{{ctx.awSidenavConfig && ctx.awSidenavConfig.avatarPanel && ctx.awSidenavConfig.avatarPanel.height ? ctx.awSidenavConfig.avatarPanel.height : 'FULL' }}"
+                        }
+                    }
+                } ]
+            }
+        },
+        "globalNavigationToolbarMountAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "globalNavigationToolbarMountActionEvent"
+                } ]
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "globalNavigationToolbarMountActionEvent",
+            "action": "updateUserAndUserSessionOnContext",
+            "condition": "conditions.hasTcSessionData"
+        },
+        {
+            "eventId": "cdm.updated",
+            "action": "updateUserSessionOnContext",
+            "condition": "conditions.isSessionVmoUpdated"
+        }
+    ],
+    "conditions": {
+        "hasTcSessionData": {
+            "expression": "ctx.tcSessionData"
+        },
+        "isSessionVmoUpdated": {
+            "expression": {
+                "$source": {
+                    "$adapt": "updatedObjects"
+                },
+                "$query": {
+                    "$source": "uid",
+                    "$query": {
+                        "$in": [
+                            "{{ctx.userSession.uid}}"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "globalNavigationToolbarMountAction"
+    }
+}

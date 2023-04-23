@@ -1,0 +1,410 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/exist-when.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-listbox.directive"
+    ],
+
+    "data": {
+         "isAddButtonVisible": true,
+         "allObjectTypes":
+         {
+             "displayName": "{{i18n.objectType}}",
+             "type": "STRING",
+             "dataProvider": "objectTypeDataProvider"
+         },
+         "reassignOutsideGroupRoleOption": {
+            "displayName": "{{i18n.reassignOutsideGroupRoleQuestion}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": true,
+            "vertical": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+
+    "actions":
+    {
+        "initializeDataProvider": {
+          "actionType": "dataProvider",
+          "methods": [ "participantsDataProvider", "projectsDataProvider", "workflowDataProvider"]
+        },
+        "loadProjectMembersData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadMembersData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "memberList": "{{ctx.workflow.keyRoleHandlerArguments.projectMembers}}"
+            },
+            "outputData":
+            {
+                "projectTotalFound": "totalFound",
+                "projectSearchResults": "searchResults"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "loadOtherMembersData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadMembersData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "memberList": "{{ctx.workflow.keyRoleHandlerArguments.workflowMembers}}"
+            },
+            "outputData":
+            {
+                "workflowTotalFound": "totalFound",
+                "workflowSearchResults": "searchResults"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "addProjectSelection": {
+            "actionType": "JSFunction",
+            "method": "addKeyRoleSelectedObject",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled": "{{function:getMultiSelectMode}}",
+                "selection": "{{data.dataProviders.projectsDataProvider.selectedObjects}}"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "addOtherSelection": {
+            "actionType": "JSFunction",
+            "method": "addKeyRoleSelectedObject",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled": "{{function:getMultiSelectMode}}",
+                "selection": "{{data.dataProviders.workflowDataProvider.selectedObjects}}"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "addParticipantObjectSelection": {
+            "actionType": "JSFunction",
+            "method": "addKeyRoleSelectedObject",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled": "{{function:getMultiSelectMode}}",
+                "selection": "{{data.dataProviders.participantsDataProvider.selectedObjects}}"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "addUsers": {
+            "actionType": "JSFunction",
+            "method": "addSelectionToMainPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled":"{{function:getMultiSelectMode}}",
+                "participantDataProviderSelections": "{{data.dataProviders.participantsDataProvider.selectedObjects}}",
+                "workflowDataProviderSelections": "{{data.dataProviders.workflowDataProvider.selectedObjects}}",
+                "projectDataProviderSelections": "{{data.dataProviders.projectsDataProvider.selectedObjects}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "loadObjectTypesListFirstPage": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+             {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "searchString": "{{data.allObjectTypes.uiValue}}",
+                        "resourceProviderContentType": "WorkspaceObjectType",
+                        "findSubTypesOfParentType": "ItemRevision"
+                    },
+                    "cursor": {
+                        "startIndex": 0
+                    },
+                    "attributesToInflate" : [ "fnd0InternalName" ],
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap6": {},
+                    "searchSortCriteria": []
+                }
+             },
+             "policy":
+             {
+                 "types":
+                 [
+                     {
+                         "name": "ImanType",
+                         "properties": [
+                             {
+                                 "name": "fnd0InternalName"
+                             },
+                             {
+                                 "name": "object_string"
+                             }
+                         ]
+                     }
+                 ]
+             },
+             "outputData": {
+              "objectTypeSearchResults": "{{function:getObjectTypeLOVListValues}}",
+              "totalFound": "totalFound",
+              "totalLoaded": "totalLoaded"
+           },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "loadObjectTypesListNextPage": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+             {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "searchString": "{{data.allObjectTypes.uiValue}}",
+                        "resourceProviderContentType": "WorkspaceObjectType",
+                        "findSubTypesOfParentType": "ItemRevision"
+                    },
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.objectTypeDataProvider.startIndex}}"
+                    },
+                    "attributesToInflate" : [ "fnd0InternalName" ],
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap6": {},
+                    "searchSortCriteria": []
+                }
+             },
+             "policy":
+             {
+                 "types":
+                 [
+                     {
+                         "name": "ImanType",
+                         "properties": [
+                             {
+                                 "name": "fnd0InternalName"
+                             },
+                             {
+                                 "name": "object_string"
+                             }
+                         ]
+                     }
+                 ]
+             },
+             "outputData": {
+              "objectTypeSearchResults": "{{function:getObjectTypeLOVListValues}}",
+              "totalFound": "totalFound",
+              "totalLoaded": "totalLoaded"
+           },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "populateDynamicParticipantsAction":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+             {
+                "searchInput":
+                {
+                    "maxToLoad": -1,
+                    "maxToReturn": -1,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "responseType": "",
+                        "searchString": "{{data.allObjectTypes.selectedLovEntries[0].propInternalValue.props.fnd0InternalName.dbValues[0]}}",
+                        "resourceProviderContentType": "ParticipantType",
+                        "ParticipantAllowMultipleAssignee": "{{ctx.workflow.ParticipantAllowMultipleAssignee}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap6": {},
+                    "searchSortCriteria": [],
+                    "cursor": {
+                        "startIndex": 0
+                    }
+            }
+             },
+             "outputData": {
+                "dynamicParticipants":"{{function:getDynamicParticipantTypes}}"
+           },
+           "events":
+           {
+               "success":
+               [
+                   {
+                       "name": "workflowTemplate.participantsLoaded"
+                   }
+               ]
+           },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "loadAllParticipantData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": -1,
+                    "maxToReturn": -1,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "responseType": "",
+                        "searchString": "",
+                        "resourceProviderContentType": "ParticipantType",
+                        "ParticipantAllowMultipleAssignee": "{{ctx.workflow.ParticipantAllowMultipleAssignee}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap6": {},
+                    "searchSortCriteria": [],
+                    "cursor": {
+                        "startIndex": 0
+                    }
+                }
+            },
+            "outputData":
+            {
+                "dynamicParticipants":"{{function:getDynamicParticipantTypes}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowTemplate.participantsLoaded"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        },
+        "updateParticipantProvider": {
+            "actionType": "JSFunction",
+            "method": "updateProvider",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.participantsDataProvider}}",
+                "objects": "{{data.dynamicParticipants}}"
+            },
+            "deps": "js/Awp0WorkflowKeyRoles"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+               "panelId": "Awp0WorkflowKeyRoles"
+           },
+            "action": "initializeDataProvider"
+        },
+        {
+            "eventId": "projectsDataProvider.selectionChangeEvent",
+            "action": "addProjectSelection"
+        },
+        {
+            "eventId": "workflowDataProvider.selectionChangeEvent",
+            "action": "addOtherSelection"
+        },
+        {
+            "eventId": "allObjectTypes.lovValueChanged",
+            "action": "populateDynamicParticipantsAction"
+        },
+        {
+            "eventId": "workflowTemplate.participantsLoaded",
+            "action": "updateParticipantProvider"
+        },
+        {
+            "eventId": "participantsDataProvider.selectionChangeEvent",
+            "action": "addParticipantObjectSelection"
+        }
+    ],
+    "messages": {
+    },
+    "functions":
+    {
+        "getMultiSelectMode": {
+            "functionName": "getMultiSelectMode",
+            "parameters":
+            [
+                "{{ctx.workflow.selectionModelMode}}"
+            ]
+        },
+        "getObjectTypeLOVListValues": {
+            "functionName": "getObjectTypeLOVListValues",
+            "parameters":
+            [
+            ]
+        },
+        "getDynamicParticipantTypes": {
+            "functionName": "getParticipantTypes",
+            "parameters":
+            []
+        }
+    },
+    "conditions": {
+        "isValidObjectToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        }
+    },
+    "dataProviders": {
+        "participantsDataProvider": {
+            "dataProviderType":"Action",
+            "action": "loadAllParticipantData",
+            "response": "{{data.dynamicParticipants}}",
+            "totalFound": "{{data.dynamicParticipants.length}}",
+            "selectionModelMode": "{{ctx.workflow.selectionModelMode}}"
+        },
+        "projectsDataProvider": {
+            "dataProviderType":"Action",
+            "action": "loadProjectMembersData",
+            "response": "{{data.projectSearchResults}}",
+            "totalFound": "{{data.projectTotalFound}}",
+            "selectionModelMode": "{{ctx.workflow.selectionModelMode}}"
+        },
+        "workflowDataProvider": {
+            "dataProviderType":"Action",
+            "action": "loadOtherMembersData",
+            "response": "{{data.workflowSearchResults}}",
+            "totalFound": "{{data.workflowTotalFound}}",
+            "selectionModelMode": "{{ctx.workflow.selectionModelMode}}"
+        },
+        "objectTypeDataProvider" : {
+            "initializeAction" : "loadObjectTypesListFirstPage",
+            "nextAction": "loadObjectTypesListNextPage",
+            "response": "{{data.objectTypeSearchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "moreValuesExist": "{{data.moreValuesExist}}"
+        }
+    },
+
+    "i18n": {
+        "projectsSectionTitle": [ "TCUICommandPanelsMessages" ],
+        "Add_Title": [ "WorkflowCommandPanelsMessages"],
+        "Workflow": [ "WorkflowCommandPanelsMessages"],
+        "dynamicParticipants": [ "WorkflowDesignerMessages" ],
+        "objectType": [ "WorkflowDesignerMessages" ],
+        "reassignOutsideGroupRoleQuestion": [ "WorkflowDesignerMessages" ]
+    }
+
+}

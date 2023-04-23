@@ -1,0 +1,343 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-image-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "showData": {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "addSnippetsToVMO": {
+            "actionType": "JSFunction",
+            "method": "addSnippetsToVMO",
+            "inputData": {
+                "vmos": "{{ctx.mselected}}"
+            },
+            "deps": "js/searchSnippetsService"
+        },
+        "groupObjectsByProperties": {
+            "actionType": "JSFunction",
+            "method": "groupObjectsByProperties",
+            "inputData": {
+                "vmos": "{{data.dataProviders.imageDataProvider.viewModelCollection.loadedVMObjects}}"
+            },
+            "deps": "js/searchColorDecoratorService"
+        },
+        "loadSearchData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "searchInput": {
+                    "attributesToInflate": [ "object_name", "checked_out_user", "object_desc", "release_status_list", "fnd0InProcess" ],
+                    "internalPropertyName": "{{function:getInternalPropertyName}}",
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "{{function:getDataProvider}}",
+                    "searchCriteria": "{{function:getSearchCriteria}}",
+                    "searchFilterFieldSortType": "Priority",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.imageDataProvider.startIndex}}",
+                        "endIndex": "{{data.dataProviders.imageDataProvider.endIndex}}",
+                        "startReached": "{{data.dataProviders.imageDataProvider.startReached}}",
+                        "endReached": "{{data.dataProviders.imageDataProvider.endReached}}"
+                    },
+                    "searchFilterMap6": "{{function:updateFilterMap}}",
+                    "searchSortCriteria": "{{function:getSearchSortCriteria}}"
+                },
+                "inflateProperties": false,
+                "noServiceData": false
+            },
+
+            "outputData": {
+                "totalFound": "{{function:getActualTotalFound}}",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.searchInfo.thresholdExceeded": "{{function:getThresholdState}}",
+                "ctx.search.totalFound": "{{function:getActualTotalFound}}",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchString": "{{ctx.search.criteria.searchString}}",
+                "originalInputCategories": "{{function:setOriginalInputCategories}}",
+                "ctx.searchResponseInfo.searchFilterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.searchResponseInfo.unpopulatedSearchFilterCategories": "searchFilterCategoriesUnpopulated",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.search.filterString": "{{function:getActiveFilterString}}",
+                "ctx.search.saveSearchFilterMap": "{{function:getSaveSearchFilterMap}}",
+                "ctx.searchChart.categoryToChartOn": "{{function:getEmptyString}}",
+                "ctx.searchResponseInfo.hasMoreFacetValues": "additionalSearchInfoMap.categoryHasMoreFacetValuesList",
+                "ctx.searchResponseInfo.defaultFilterFieldDisplayCount": "defaultFilterFieldDisplayCount",
+                "ctx.searchResponseInfo.searchSnippets": "{{function:getSearchSnippets}}",
+                "dataProviders.imageDataProvider.cursorObject": "cursor",
+                "dataProviders.imageDataProvider.cursorObject.startReached": true
+            },
+            "events": {
+                "success": [ {
+                        "name": "highlighterKeyWordsEvent",
+                        "eventData": {
+                            "searchTermsToHighlight": "{{data.additionalSearchInfoMap.searchTermsToHighlight}}"
+                        }
+                    },
+                    {
+                        "name": "search.updateSearchSearchCriteria"
+                    },
+                    {
+                        "name": "search.filterPanelOpenCloseEvent",
+                        "condition": "!ctx.preferences.AW_Disable_Auto_Open_Filter_Panel || ctx.preferences.AW_Disable_Auto_Open_Filter_Panel[0] === 'FALSE'"
+                    },
+                    {
+                        "name": "targetFilterCategoryUpdated"
+                    }
+                ]
+            },
+            "deps": "js/awSearchService"
+        },
+        "targetFilterCategoryUpdated": {
+            "actionType": "JSFunction",
+            "method": "targetFilterCategoryUpdated",
+            "inputData": {
+                "chartListboxPropData": "{{ctx.chartProvider.chartListboxPropData}}",
+                "targetFilterCategoryValue": "{{data.eventData}}"
+            },
+            "outputData": {},
+            "deps": "js/awChartDataProviderService"
+        },
+        "selectSeedItem": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}",
+                "newSelection": "{{ctx.shapeSearch.geolusCriteria}}"
+            },
+            "deps": "js/selectionModelFactory"
+        },
+        "updateSearchSearchCriteria": {
+            "actionType": "JSFunction",
+            "method": "updateSearchSearchCriteria",
+            "inputData": {
+                "hidden_filter": "{{ctx.searchResponseInfo.searchFilterMap}}"
+            },
+            "outputData": {},
+            "deps": "js/searchCommonUtils"
+        },
+        "filterPanelOpenCloseEvent": {
+            "actionType": "JSFunction",
+            "method": "filterPanelOpenCloseEvent",
+            "inputData": {},
+            "outputData": {},
+            "deps": "js/awSearchLocationFilterPanelService"
+        },
+        "searchImageViewLoadData": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "getSearchStringFromURL"
+                }, {
+                    "action": "getSavedSearchLocaleFromURL"
+                }, {
+                    "action": "getTranslatedSearchString",
+                    "condition": "conditions.getTranslatedSearchString"
+                }, {
+                    "action": "showData"
+            } ]
+        },
+        "getTranslatedSearchString": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2020-05-FullTextSearch",
+            "method": "getSearchSettings",
+            "inputData": {
+                "searchSettingInput": {
+                    "inputSettings": {
+                        "getSearchCriteriaWithCurrentLocalePropNames": [
+                            "{{data.savedSearchLocaleFromURL.dbValue}}",
+                            "{{data.searchStringFromURL.dbValue}}"
+                        ]
+                    }
+                }
+            },
+            "outputData": {
+                "translatedSearchString": "{{function:setTranslatedSearchString}}"
+            },
+            "deps": "js/searchCommonUtils"
+        },
+        "getSearchStringFromURL": {
+            "actionType": "JSFunction",
+            "method": "getSearchStringFromURL",
+            "inputData": {
+                "searchStringFromURL": "{{data.searchStringFromURL}}"
+            },
+            "outputData": {
+                "searchStringFromURL": ""
+            },
+            "deps": "js/searchCommonUtils"
+        },
+        "getSavedSearchLocaleFromURL": {
+            "actionType": "JSFunction",
+            "method": "getSavedSearchLocaleFromURL",
+            "inputData": {
+                "savedSearchLocaleFromURL": "{{data.savedSearchLocaleFromURL}}"
+            },
+            "outputData": {
+                "savedSearchLocaleFromURL": ""
+            },
+            "deps": "js/searchCommonUtils"
+        }
+    },
+    "data": {
+        "translatedSearchString": {
+            "type": "STRING"
+        },
+        "searchStringFromURL": {
+            "type": "STRING"
+        },
+        "savedSearchLocaleFromURL": {
+            "type": "STRING"
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize": {
+            "functionName": "getDefaultPageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "setOriginalInputCategories": {
+            "functionName": "setOriginalInputCategories",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getHighlightKeywords": {
+            "functionName": "getHighlightKeywords",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "updateFilterMap": {
+            "functionName": "updateFilterMap",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}",
+                "{{ctx.search.provider}}"
+            ]
+        },
+        "getDataProvider": {
+            "functionName": "getDataProvider",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "getSearchCriteria": {
+            "functionName": "getSearchCriteria",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}",
+                "{{data.translatedSearchString.dbValue}}"
+            ]
+        },
+        "getSearchSortCriteria": {
+            "functionName": "getSearchSortCriteria",
+            "parameters": [
+                "{{data.columnProviders.clientScopeUI.sortCriteria}}"
+            ]
+        },
+        "getActiveFilterString": {
+            "functionName": "getActiveFilterString",
+            "parameters": []
+        },
+        "getSaveSearchFilterMap": {
+            "functionName": "getSaveSearchFilterMap",
+            "parameters": []
+        },
+        "getEmptyString": {
+            "functionName": "getEmptyString",
+            "parameters": []
+        },
+        "getInternalPropertyName": {
+            "functionName": "getInternalPropertyName",
+            "parameters": []
+        },
+        "getActualTotalFound": {
+            "functionName": "getActualTotalFound",
+            "parameters": [ "{{data}}" ]
+        },
+        "getActualSearchFilterCategories": {
+            "functionName": "getActualSearchFilterCategories",
+            "parameters": [ "{{data}}" ]
+        },
+        "getThresholdState": {
+            "functionName": "getThresholdState",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getSearchSnippets": {
+            "functionName": "getSearchSnippets",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "setTranslatedSearchString": {
+            "functionName": "setTranslatedSearchString",
+            "parameters": [
+                "{{data.translatedSearchString}}"
+            ]
+        }
+    },
+    "dataProviders": {
+        "imageDataProvider": {
+            "action": "loadSearchData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "conditions": {
+        "getTranslatedSearchString": {
+            "expression": "data.savedSearchLocaleFromURL.dbValue && data.savedSearchLocaleFromURL.dbValue !== ''"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "searchImageViewLoadData"
+    },
+    "onEvent": [
+        {
+            "eventId": "selectSeedItem",
+            "action": "selectSeedItem"
+        },
+        {
+            "eventId": "groupObjectCategoryChanged",
+            "action": "groupObjectsByProperties"
+        },
+        {
+            "eventId": "imageDataProvider.modelObjectsUpdated",
+            "action": "groupObjectsByProperties"
+        },
+        {
+            "eventId": "search.updateSearchSearchCriteria",
+            "action": "updateSearchSearchCriteria",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "search.filterPanelOpenCloseEvent",
+            "action": "filterPanelOpenCloseEvent",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "viewModelObject.propsUpdated",
+            "action": "addSnippetsToVMO"
+        }
+    ],
+    "i18n": {
+        "resultsNoCriteriaDefaultMessage": [ "SearchMessages" ],
+        "noFiltersFound": [ "SearchMessages" ]
+    }
+}

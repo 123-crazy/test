@@ -1,0 +1,575 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive"
+    ],
+    "actions": {
+        "groupObjectsByProperties": {
+            "actionType": "JSFunction",
+            "method": "groupObjectsByProperties",
+            "inputData": {
+                "vmos": "{{data.dataProviders.gridDataProvider.viewModelCollection.loadedVMObjects}}"
+            },
+            "deps": "js/searchColorDecoratorService"
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "operationType": "intersection",
+                        "typeNames": "{{function:getTypeNames}}",
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [
+                        {}
+                    ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.gridDataProvider.resetColumnConfigs": "columnConfigurations"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "saveColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.gridDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.gridDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {}
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadData",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "operationType": "{{data.eventMap['columnArrange'].operationType}}",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}"
+                },
+                "saveColumnConfigData": {
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.gridDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.gridDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{function:getSearchCriteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{function:updateFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.clientScopeUI.sortCriteria}}",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.gridDataProvider.startIndex}}"
+                    }
+                }
+            },
+            "outputData": {
+                "totalFound": "{{function:getActualTotalFound}}",
+                "searchResults": "searchResults",
+                "dataProviders.gridDataProvider.columnConfig": "columnConfig",
+                "ctx.search.totalFound": "{{function:getActualTotalFound}}",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.columnConfig": "columnConfig",
+                "ctx.searchResponseInfo.propDescriptors": "propDescriptors"
+            },
+            "deps": "js/awSearchService"
+        },
+        "loadSearchData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadData",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                    "operationType": "{{data.dataProviders.gridDataProvider.columnConfig.operationType}}"
+                },
+                "saveColumnConfigData": {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "internalPropertyName": "{{function:getInternalPropertyName}}",
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "{{function:getDataProvider}}",
+                    "searchCriteria": "{{function:getSearchCriteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{function:updateFilterMap}}",
+                    "searchSortCriteria": "{{function:getSearchSortCriteria}}",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.gridDataProvider.startIndex}}",
+                        "endIndex": "{{data.dataProviders.gridDataProvider.endIndex}}",
+                        "startReached": "{{data.dataProviders.gridDataProvider.startReached}}",
+                        "endReached": "{{data.dataProviders.gridDataProvider.endReached}}"
+                    }
+                }
+            },
+            "outputData": {
+                "totalFound": "{{function:getActualTotalFound}}",
+                "searchResults": "searchResults",
+                "ctx.searchInfo.thresholdExceeded": "{{function:getThresholdState}}",
+                "dataProviders.gridDataProvider.columnConfig": "columnConfig",
+                "ctx.search.totalFound": "{{function:getActualTotalFound}}",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.endIndex": "endIndex",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "originalInputCategories": "{{function:setOriginalInputCategories}}",
+                "ctx.searchResponseInfo.searchFilterCategories": "{{function:getActualSearchFilterCategories}}",
+                "ctx.searchResponseInfo.unpopulatedSearchFilterCategories": "searchFilterCategoriesUnpopulated",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.columnConfig": "columnConfig",
+                "ctx.searchResponseInfo.propDescriptors": "propDescriptors",
+                "ctx.search.filterString": "{{function:getActiveFilterString}}",
+                "ctx.search.saveSearchFilterMap": "{{function:getSaveSearchFilterMap}}",
+                "ctx.searchChart.categoryToChartOn": "{{function:getEmptyString}}",
+                "ctx.searchChart.forceChart": "{{function:checkIfNotFirstSearch}}",
+                "highlighter": "{{function:getHighlightKeywords}}",
+                "ctx.searchResponseInfo.hasMoreFacetValues": "additionalSearchInfoMap.categoryHasMoreFacetValuesList",
+                "ctx.searchResponseInfo.defaultFilterFieldDisplayCount": "defaultFilterFieldDisplayCount",
+                "dataProviders.gridDataProvider.cursorObject": "cursor",
+                "dataProviders.gridDataProvider.cursorObject.startReached": true,
+                "ctx.searchResponseInfo.additionalInfoMessages": "{{function:getInfoMessages}}"
+            },
+            "events": {
+                "failure": [ {
+                    "name": "search.handleFailedSort",
+                    "condition": "errorCode.code==141208"
+                } ],
+                "success": [ {
+                        "name": "aw.tableDataLoaded"
+                    },
+                    {
+                        "name": "teamcenter_search_searchTable.selectFirstItem",
+                        "condition": "dataProviders.gridDataProvider.cursorObject.endIndex<=ctx.search.defaultPageSize && ctx.search.totalLoaded===1"
+                    },
+                    {
+                        "name": "search.updateSearchSearchCriteria"
+                    },
+                    {
+                        "name": "search.filterPanelOpenCloseEvent",
+                        "condition": "!ctx.preferences.AW_Disable_Auto_Open_Filter_Panel || ctx.preferences.AW_Disable_Auto_Open_Filter_Panel[0] === 'FALSE'"
+                    },
+                    {
+                        "name": "targetFilterCategoryUpdated"
+                    }
+                ]
+            },
+            "deps": "js/awSearchService",
+            "actionMessages": {
+                "failure": [ {
+                    "message": "loadSearchDataFailure"
+                } ],
+                "success": [
+                    {
+                        "condition": "ctx.searchResponseInfo.additionalInfoMessages.length > 0",
+                        "message": "showAdditionalInfoMessages"
+                    }
+                ]
+            }
+        },
+        "targetFilterCategoryUpdated": {
+            "actionType": "JSFunction",
+            "method": "targetFilterCategoryUpdated",
+            "inputData": {
+                "chartListboxPropData": "{{ctx.chartProvider.chartListboxPropData}}",
+                "targetFilterCategoryValue": "{{data.eventData}}"
+            },
+            "outputData": {},
+            "deps": "js/awChartDataProviderService"
+        },
+        "updateSearchSearchCriteria": {
+            "actionType": "JSFunction",
+            "method": "updateSearchSearchCriteria",
+            "inputData": {
+                "hidden_filter": "{{ctx.searchResponseInfo.searchFilterMap}}"
+            },
+            "outputData": {},
+            "deps": "js/searchCommonUtils"
+        },
+        "filterPanelOpenCloseEvent": {
+            "actionType": "JSFunction",
+            "method": "filterPanelOpenCloseEvent",
+            "inputData": {},
+            "outputData": {},
+            "deps": "js/awSearchLocationFilterPanelService"
+        },
+        "handleFailedSort": {
+            "actionType": "JSFunction",
+            "method": "clearSortValuesFromCtx",
+            "inputData": {},
+            "outputData": {},
+            "deps": "js/globalSearchService"
+        },
+        "plTableClientRefresh": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "gridView.plTable.clientRefresh"
+                } ]
+            }
+        },
+        "startEditForNewVmos": {
+            "actionType": "JSFunction",
+            "method": "startEditForNewVmos",
+            "inputData": {
+                "editContext": "{{data.dataProviders.gridDataProvider.json.editContext}}"
+            },
+            "deps": "js/editEventsService"
+        },
+        "invokeSaveEditsCommand": {
+            "actionType": "Command",
+            "inputData": {
+                "commandId": "Awp0SaveEditsPWA"
+            }
+        },
+        "selectFirstItem": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "gridDataProvider.selectAction",
+                    "eventData": {
+                        "setSelection": "{{data.searchResults[0].uid}}"
+                    }
+                } ]
+            }
+        },
+        "selectSeedItem": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.gridDataProvider.selectionModel}}",
+                "newSelection": "{{ctx.shapeSearch.geolusCriteria}}"
+            },
+            "deps": "js/selectionModelFactory"
+        },
+        "showChart": {
+            "actionType": "JSFunction",
+            "method": "showChart",
+            "inputData": {
+                "currentSelection": "{{ctx.mselected}}"
+            },
+            "deps": "js/searchCommonUtils"
+        },
+        "searchTableViewLoadData": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "getSearchStringFromURL"
+                }, {
+                    "action": "getSavedSearchLocaleFromURL"
+                }, {
+                    "action": "getTranslatedSearchString",
+                    "condition": "conditions.getTranslatedSearchString"
+                }, {
+                    "action": "loadSearchData"
+            } ]
+        },
+        "getTranslatedSearchString": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2020-05-FullTextSearch",
+            "method": "getSearchSettings",
+            "inputData": {
+                "searchSettingInput": {
+                    "inputSettings": {
+                        "getSearchCriteriaWithCurrentLocalePropNames": [
+                            "{{data.savedSearchLocaleFromURL.dbValue}}",
+                            "{{data.searchStringFromURL.dbValue}}"
+                        ]
+                    }
+                }
+            },
+            "outputData": {
+                "translatedSearchString": "{{function:setTranslatedSearchString}}"
+            },
+            "deps": "js/searchCommonUtils"
+        },
+        "getSearchStringFromURL": {
+            "actionType": "JSFunction",
+            "method": "getSearchStringFromURL",
+            "inputData": {
+                "searchStringFromURL": "{{data.searchStringFromURL}}"
+            },
+            "outputData": {
+                "searchStringFromURL": ""
+            },
+            "deps": "js/searchCommonUtils"
+        },
+        "getSavedSearchLocaleFromURL": {
+            "actionType": "JSFunction",
+            "method": "getSavedSearchLocaleFromURL",
+            "inputData": {
+                "savedSearchLocaleFromURL": "{{data.savedSearchLocaleFromURL}}"
+            },
+            "outputData": {
+                "savedSearchLocaleFromURL": ""
+            },
+            "deps": "js/searchCommonUtils"
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "data": {
+        "translatedSearchString": {
+            "type": "STRING"
+        },
+        "searchStringFromURL": {
+            "type": "STRING"
+        },
+        "savedSearchLocaleFromURL": {
+            "type": "STRING"
+        }
+    },
+    "functions": {
+        "getDefaultPageSize": {
+            "functionName": "getDefaultPageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "setOriginalInputCategories": {
+            "functionName": "setOriginalInputCategories",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getHighlightKeywords": {
+            "functionName": "getHighlightKeywords",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "updateFilterMap": {
+            "functionName": "updateFilterMap",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "getDataProvider": {
+            "functionName": "getDataProvider",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}"
+            ]
+        },
+        "getSearchCriteria": {
+            "functionName": "getSearchCriteria",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}",
+                "{{data.translatedSearchString.dbValue}}"
+            ]
+        },
+        "getSearchSortCriteria": {
+            "functionName": "getSearchSortCriteria_table",
+            "parameters": [
+                "{{data.columnProviders.clientScopeUI}}"
+            ]
+        },
+        "getTypeNames": {
+            "functionName": "getTypeNames",
+            "parameters": [
+                "{{ctx.searchResponseInfo.searchFilterMap}}"
+            ]
+        },
+        "getActiveFilterString": {
+            "functionName": "getActiveFilterString",
+            "parameters": []
+        },
+        "getSaveSearchFilterMap": {
+            "functionName": "getSaveSearchFilterMap",
+            "parameters": []
+        },
+        "getEmptyString": {
+            "functionName": "getEmptyString",
+            "parameters": []
+        },
+        "checkIfNotFirstSearch":{
+            "functionName": "checkIfNotFirstSearch",
+            "parameters": []
+        },
+        "getInternalPropertyName": {
+            "functionName": "getInternalPropertyName",
+            "parameters": []
+        },
+        "getActualTotalFound": {
+            "functionName": "getActualTotalFound",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getActualSearchFilterCategories": {
+            "functionName": "getActualSearchFilterCategories",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getThresholdState": {
+            "functionName": "getThresholdState",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getInfoMessages": {
+            "functionName": "getInfoMessages",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "setTranslatedSearchString": {
+            "functionName": "setTranslatedSearchString",
+            "parameters": [
+                "{{data.translatedSearchString}}"
+            ]
+        }
+    },
+    "dataProviders": {
+        "gridDataProvider": {
+            "action": "searchTableViewLoadData",
+            "editContext": "TABLE_CONTEXT",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "columnProviders": {
+        "clientScopeUI": {
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "saveColumnAction": "saveColumnConfig",
+            "resetColumnAction": "resetColumnConfig",
+            "sortCriteria": "{{ctx.sublocation.sortCriteria}}"
+        }
+    },
+    "grids": {
+        "gridView": {
+            "dataProvider": "gridDataProvider",
+            "columnProvider": "clientScopeUI",
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enableExpandAndPaginationInEdit": true
+            }
+        }
+    },
+    "conditions": {
+        "getTranslatedSearchString": {
+            "expression": "data.savedSearchLocaleFromURL.dbValue && data.savedSearchLocaleFromURL.dbValue !== ''"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "groupObjectCategoryChanged",
+            "action": "groupObjectsByProperties"
+        },
+        {
+            "eventId": "gridDataProvider.modelObjectsUpdated",
+            "action": "groupObjectsByProperties"
+        },
+        {
+            "eventId": "targetFilterCategoryUpdated",
+            "action": "targetFilterCategoryUpdated",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "search.updateSearchSearchCriteria",
+            "action": "updateSearchSearchCriteria",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "search.filterPanelOpenCloseEvent",
+            "action": "filterPanelOpenCloseEvent",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "search.handleFailedSort",
+            "action": "handleFailedSort",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "primaryWorkarea.multiSelectAction",
+            "action": "plTableClientRefresh"
+        },
+        {
+            "eventId": "gridDataProvider.startEditForNewVmosRequested",
+            "action": "startEditForNewVmos"
+        },
+        {
+            "eventId": "saveEditsRequested",
+            "action": "invokeSaveEditsCommand"
+        },
+        {
+            "eventId": "teamcenter_search_searchTable.selectFirstItem",
+            "action": "selectFirstItem"
+        },
+        {
+            "eventId": "selectSeedItem",
+            "action": "selectSeedItem"
+        },
+        {
+            "eventId": "gridDataProvider.selectionChangeEvent",
+            "action": "showChart"
+        }
+    ],
+    "i18n": {
+        "noFiltersFound": [
+            "SearchMessages"
+        ]
+    },
+    "messages": {
+        "loadSearchDataFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "showAdditionalInfoMessages": {
+            "messageType": "INFO",
+            "messageText": "{{ctx.searchResponseInfo.additionalInfoMessages}}"
+        }
+    }
+}

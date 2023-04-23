@@ -1,0 +1,14 @@
+<aw-column width=fill class="aw-occmgmt-tooltip-list">
+    <aw-label class="aw-occmgmt-labelAlignmentInTooltip aw-occmgmt-labelHeight" prop="data.effectivityTooltipLabel"></aw-label>
+    <aw-panel>
+            <aw-list dataprovider="data.dataProviders.effectivityDataProvider" class="aw-occmgmt-tooltipEffectivityCell" exist-when="conditions.isTCVersion132OrLater">
+                <aw-include exist-when="!item.uid" name="ps0EffectivitiyCell" sub-panel-context="item"></aw-include>
+                <aw-default-cell exist-when="item.uid" vmo="item"></aw-default-cell>
+            </aw-list>
+            <aw-list dataprovider="data.dataProviders.objectEffectivityDataProvider" class="aw-occmgmt-tooltipEffectivityCell" exist-when="!conditions.isTCVersion132OrLater">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+    </aw-panel>
+    <aw-link prop="data.moreEffectivitiesLink" action="selectAndLaunchEffPanel" exist-when="data.enableMoreLink.dbValue && !conditions.isExpressionEffectivity"></aw-link>
+    <aw-link prop="data.moreEffectivitiesLink" action="selectAndLaunchExprEffPanel" exist-when="data.enableMoreLink.dbValue && conditions.isExpressionEffectivity"></aw-link>
+</aw-column>

@@ -1,0 +1,829 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-label.directive",
+        "js/aw-panel.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-chart.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/exist-when.directive",
+        "js/visible-when.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-chip-list.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-link.directive"
+    ],
+    "actions": {
+        "goToSource": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{ctx.state.params.referenceId}}"
+            }
+        },
+        "getSourceObject":{
+            "actionType": "JSFunctionAsync",
+            "method": "getSourceObject",
+            "inputData": {
+                "sourceUid": "{{ctx.state.params.referenceId}}",
+                "data":"{{data}}"
+            },
+            "outputData":{
+                "startShowSourceLink": ""
+            },
+            "deps": "js/myDashboardTileService"
+        },
+        "filterUpdated": {
+            "actionType": "JSFunction",
+            "method": "filterUpdated",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "updateTable": "updateTable"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateTable"
+                } ]
+            },
+            "deps": "js/showReportService"
+        },
+        "removeDataTable": {
+            "actionType": "JSFunction",
+            "method": "removeDataTable",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "dataIsReadyTable": "dataIsReadyTable"
+            },
+            "deps": "js/showReportService"
+        },
+        "updateDataTable": {
+            "actionType": "JSFunction",
+            "method": "updateDataTable",
+            "inputData": {},
+            "outputData": {},
+            "deps": "js/showReportService"
+        },
+        "showPreviewClicked": {
+            "actionType": "JSFunction",
+            "method": "showPreviewClicked",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "updateTable": "updateTable",
+                "dataIsReadyTitle": "dataIsReadyTitle",
+                "dataIsReadyChart1": "dataIsReadyChart1",
+                "dataIsReadyChart2": "dataIsReadyChart2",
+                "dataIsReadyChart3": "dataIsReadyChart3",
+                "instructions": "instructions",
+                "dataIsReady": "dataIsReady",
+                "numCharts": "numCharts",
+                "dataIsReadyTable": "dataIsReadyTable"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateTable"
+                } ]
+            },
+            "deps": "js/showReport2Service"
+        },
+        "doGridReportDataProvider": {
+            "actionType": "dataProvider",
+            "method": "gridReportDataProvider"
+        },
+        "getChartDataActionForGenChart1": {
+            "actionType": "JSFunction",
+            "method": "createChartFromArray1",
+            "inputData": {
+                "searchResultFilters": "{{ctx.ReportsContext.searchIncontextInfo.searchResultFilters}}",
+                "filterCategories": "{{ctx.ReportsContext.searchIncontextInfo.searchFilterCategories}}",
+                "input": "{{ctx.ReportsContext.searchIncontextInfo.searchFilterMap}}",
+                "data": "{{data}}",
+                "ctxReports": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart1}}"
+            },
+            "outputData": {
+                "chartProviders.genericChart1.chartPoints": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "chartReadyGen1"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "chart1CreateFailedMessage"
+                } ]
+            },
+            "deps": "js/showReportService"
+        },
+        "getChartDataActionForGenChart2": {
+            "actionType": "JSFunction",
+            "method": "createChartFromArray2",
+            "inputData": {
+                "searchResultFilters": "{{ctx.ReportsContext.searchIncontextInfo.searchResultFilters}}",
+                "filterCategories": "{{ctx.ReportsContext.searchIncontextInfo.searchFilterCategories}}",
+                "input": "{{ctx.ReportsContext.searchIncontextInfo.searchFilterMap}}",
+                "data": "{{data}}",
+                "ctx": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart2}}"
+            },
+            "outputData": {
+                "chartProviders.genericChart2.chartPoints": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "chartReadyGen2"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "chart2CreateFailedMessage"
+                } ]
+            },
+            "deps": "js/showReportService"
+        },
+        "getChartDataActionForGenChart3": {
+            "actionType": "JSFunction",
+            "method": "createChartFromArray3",
+            "inputData": {
+                "searchResultFilters": "{{ctx.ReportsContext.searchIncontextInfo.searchResultFilters}}",
+                "filterCategories": "{{ctx.ReportsContext.searchIncontextInfo.searchFilterCategories}}",
+                "input": "{{ctx.ReportsContext.searchIncontextInfo.searchFilterMap}}",
+                "data": "{{data}}",
+                "ctx": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportChart3}}"
+            },
+            "outputData": {
+                "chartProviders.genericChart3.chartPoints": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "chartReadyGen3"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "chart3CreateFailedMessage"
+                } ]
+            },
+            "deps": "js/showReportService"
+        },
+        "initiateReportDisplay": {
+            "actionType": "JSFunction",
+            "method": "initiateReportDisplay",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "subPanelContext": "{{subPanelContext}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/showReport2Service"
+        },
+        "chartReadyGen1": {
+            "actionType": "JSFunction",
+            "method": "chartReadyGen1",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen1": "dataIsReadyChartGen1"
+            },
+            "deps": "js/showReportService"
+        },
+        "chartRemovedGen1": {
+            "actionType": "JSFunction",
+            "method": "chartRemoveGen1",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen1": "dataIsReadyChartGen1"
+            },
+            "deps": "js/showReportService"
+        },
+        "chartRemovedGen2": {
+            "actionType": "JSFunction",
+            "method": "chartRemoveGen2",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen2": "dataIsReadyChartGen2"
+            },
+            "deps": "js/showReportService"
+        },
+        "chartRemovedGen3": {
+            "actionType": "JSFunction",
+            "method": "chartRemoveGen3",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen3": "dataIsReadyChartGen3"
+            },
+            "deps": "js/showReportService"
+        },
+        "chartReadyGen2": {
+            "actionType": "JSFunction",
+            "method": "chartReadyGen2",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen2": "dataIsReadyChartGen2"
+            },
+            "deps": "js/showReportService"
+        },
+        "chartReadyGen3": {
+            "actionType": "JSFunction",
+            "method": "chartReadyGen3",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen3": "dataIsReadyChartGen3"
+            },
+            "deps": "js/showReportService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunction",
+            "method": "loadColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.gridReportDataProvider}}",
+                "reportTable": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportTable1}}"
+            },
+            "outputData": {
+                "columns": ""
+            },
+            "deps": "js/showReportService"
+        },
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadData",
+            "deps": "js/showReportService",
+            "inputData": {
+                "data": "{{data}}",
+                "searchInput": {
+                    "attributesToInflate": [],
+                    "internalPropertyName": "",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "{{function:callRepGetProviderName}}",
+                    "searchCriteria": "{{function:callRepGetSearchCriteria}}",
+                    "searchFilterFieldSortType": "Priority",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.gridReportDataProvider.startIndex}}"
+                    },
+                    "searchFilterMap6": "{{function:getSearchFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.staticColumnProvider.sortCriteria}}"
+                },
+                "columnConfigInput": {
+                    "clientName": "",
+                    "clientScopeURI": ""
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "dataProviders.gridReportDataProvider.columnConfig": "columnConfig",
+                "ctx.ReportsContext.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.ReportsContext.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.ReportsContext.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty"
+            },
+            "events": {
+                "success": [ {
+                    "name": "aw.tableDataLoaded"
+                } ]
+            }
+        },
+        "performSearchToSetReportData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadData",
+            "deps": "js/showReportService",
+            "inputData": {
+                "data": "{{data}}",
+                "searchInput": {
+                    "attributesToInflate": [],
+                    "internalPropertyName": "",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "{{function:callRepGetProviderName}}",
+                    "searchCriteria": "{{function:callRepGetSearchCriteria}}",
+                    "searchFilterFieldSortType": "Priority",
+                    "cursor": {
+                        "startIndex": 0
+                    },
+                    "searchFilterMap6": "{{ctx.ReportsContext.reportParameters.ReportDefProps.ReportSearchInfo.activeFilterMap}}",
+                    "searchSortCriteria": []
+                },
+                "columnConfigInput": {
+                    "clientName": "",
+                    "clientScopeURI": ""
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "dataProviders.gridReportDataProvider.columnConfig": "columnConfig",
+                "ctx.ReportsContext.searchIncontextInfo.searchFilterCategories": "{{function:callRepGetCategories}}",
+                "ctx.ReportsContext.searchIncontextInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.ReportsContext.searchIncontextInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.ReportsContext.reportParameters.totalFound": "totalFound"
+            },
+            "events": {
+                "success": [ {
+                        "name": "ConfigureReportPanel.showReportPreview",
+                        "condition": "ctx.ReportsContext.filterApplied === undefined || ctx.ReportsContext.filterApplied === false"
+                    },
+                    {
+                        "name": "showReport.updateReportForFilterUpdate",
+                        "condition": "ctx.ReportsContext.filterApplied !== undefined && ctx.ReportsContext.filterApplied === true"
+                    }
+                ]
+            }
+        },
+        "clearReportsCtx": {
+            "actionType": "JSFunction",
+            "method": "clearReportsCtx",
+            "inputData": {},
+            "outputData": {
+                "dataIsReadyChartGen3": "dataIsReadyChartGen3"
+            },
+            "deps": "js/showReport2Service"
+        },
+        "callTotalFoundUpdate": {
+            "actionType": "JSFunction",
+            "method": "updateTotalFound",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/showReport2Service"
+        },
+        "applyFilterAndInitiateReportUpdate": {
+            "actionType": "JSFunction",
+            "method": "applyFilterAndInitiateReportUpdate",
+            "inputData": {
+                "filterValue": "{{data.eventData.label}}",
+                "filterProperty": "{{data.eventData.seriesName}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "filtersDataProvider.reset"
+                } ]
+            },
+            "deps": "js/showReport2Service"
+        },
+        "removeFilterAction": {
+            "actionType": "JSFunction",
+            "method": "removeReportFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "chipArray": "{{data.filterChips}}",
+                "chipToRemove": "{{chip}}"
+            },
+            "parameters": {
+                "chip": "{{chip}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "filtersDataProvider.reset"
+                } ]
+            },
+            "deps": "js/showReport2Service"
+        },
+        "fetchTranslatedSearchCriteria":{
+            "actionType": "JSFunction",
+            "method": "fetchAndUpdateTranslatedSearchCriteria",
+            "inputData": {},
+            "deps": "js/showReportService"
+        },
+        "updateRevisionRuleLabel": {
+            "actionType": "JSFunction",
+            "method": "updateRevisionRuleLabel",
+            "inputData": {
+                "revRuleLabel": "{{data.appliedRevRule}}"
+            },
+            "deps": "js/showReport2Service"
+        }
+    },
+    "columnProviders": {
+        "staticColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "sortCriteria": [
+
+            ]
+        }
+    },
+    "grids": {
+        "gridView": {
+            "dataProvider": "gridReportDataProvider",
+            "columnProvider": "staticColumnProvider",
+            "enableArrangeMenu": false,
+            "gridOptions": {
+                "enableGridMenu": false
+            }
+        }
+    },
+    "data": {
+        "reportSource":{
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false"
+        },
+        "noChartData": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dispValue": "{{i18n.noChartData}}"
+        },
+        "dataIsReady": false,
+        "timeOfRequest": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "Time",
+            "dispValue": "Time"
+        },
+        "appliedRevRule": {
+            "displayName": "{{i18n.appliedRevRule}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "totalFoundString": {
+            "displayName": "{{i18n.totalObjsFound}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "instructionsTitle": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{i18n.instructionsTitle}}",
+            "dispValue": "{{i18n.instructionsTitle}}"
+        },
+        "title": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "title",
+            "dispValue": "{{ctx.state.params.title}}"
+        },
+        "dataIsReadyLine": {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "dataIsReadyChart": {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "dataIsReadyChart1": {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "dataIsReadyChart2": {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "dataIsReadyChart3": {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "titleGen1": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "typeGen1": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "filterChips": [],
+        "chipName": {
+            "type": "STRING",
+            "propertyName": "Chip Name",
+            "editable": true
+        },
+        "itemInstructions":{
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{i18n.itemReportinstructions}}",
+            "dispValue": "{{i18n.itemReportinstructions}}"
+        },
+        "reportViewerCommands": "rb0_reportViewerCommands"
+    },
+    "chartProviders": {
+        "genericChart1": {
+            "title": "",
+            "chartType": "line",
+            "loadDataAction": "getChartDataActionForGenChart1",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "linear",
+                "xAxisLabel": "",
+                "yAxisLabel": "{{i18n.objectCount}}",
+                "isDataLabelOnChartEnabled": true
+            }
+        },
+        "genericChart2": {
+            "title": "",
+            "chartType": "line",
+            "loadDataAction": "getChartDataActionForGenChart2",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "linear",
+                "xAxisLabel": "",
+                "yAxisLabel": "{{i18n.objectCount}}",
+                "isDataLabelOnChartEnabled": true
+            }
+        },
+        "genericChart3": {
+            "title": "",
+            "chartType": "line",
+            "loadDataAction": "getChartDataActionForGenChart3",
+            "chartConfig": {
+                "isChartZoomable": true,
+                "isYAxisLinearOrLogarithmic": "linear",
+                "xAxisLabel": "",
+                "yAxisLabel": "{{i18n.objectCount}}",
+                "isDataLabelOnChartEnabled": true
+            }
+        }
+    },
+    "dataProviders": {
+        "gridReportDataProvider": {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        },
+        "filtersDataProvider": {
+            "type": "Static",
+            "response": "{{data.filterChips}}",
+            "selectionModelMode": "none"
+        }
+    },
+    "functions": {
+        "getSearchFilterMap": {
+            "functionName": "getSearchFilterMap",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "callRepGetCategories": {
+            "functionName": "callRepGetCategories",
+            "parameters": []
+        },
+        "callRepGetProviderName": {
+            "functionName": "callRepGetProviderName",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "callRepGetSearchCriteria": {
+            "functionName": "callRepGetSearchCriteria",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showSourceLink":{
+            "expression": "data.startShowSourceLink"
+        },
+        "shouldShowFilterChips":{
+            "expression": "data.filterChips.length > 0"
+        },
+        "totalFoundDone": {
+            "expression": "data.dataIsReady"
+        },
+        "dispInstructions": {
+            "expression": "ctx.state.params.referenceId === 'new' && !data.dataIsReady"
+        },
+        "oneCharts": {
+            "expression": "data.numCharts === 1"
+        },
+        "twoCharts": {
+            "expression": "data.numCharts === 2"
+        },
+        "threeCharts": {
+            "expression": "data.numCharts === 3"
+        },
+        "dataReady": {
+            "expression": "data.dataIsReady"
+        },
+        "dataReady1": {
+            "expression": "data.dataIsReady && data.dataIsReadyChart1"
+        },
+        "dataReady2": {
+            "expression": "data.dataIsReady && data.dataIsReadyChart2"
+        },
+        "dataReady3": {
+            "expression": "data.dataIsReady && data.dataIsReadyChart3"
+        },
+        "dataReadyTable": {
+            "expression": "data.dataIsReady && data.dataIsReadyTable && !ctx.updateTable && data.numCharts > 0"
+        },
+        "dataReadyTableNoCharts": {
+            "expression": "data.dataIsReady && data.dataIsReadyTable && !ctx.updateTable && data.numCharts === 0"
+        },
+        "chartReadyGen1": {
+            "expression": "data.dataIsReadyChartGen1"
+        },
+        "chartReadyGen2": {
+            "expression": "data.dataIsReadyChartGen2"
+        },
+        "chartReadyGen3": {
+            "expression": "data.dataIsReadyChartGen3"
+        },
+        "titleChosen": {
+            "expression": "data.dataIsReadyTitle"
+        },
+        "showRevRule": {
+            "expression": "data.dataIsReady && ctx.ReportsContext.reportParameters.ReportDefProps.ReportSearchInfo.SearchCriteria.includes('searchMethod\":\"BOM')"
+        }
+    },
+    "i18n": {
+        "dashboardLastRefresh":[ "ReportChartMessages" ],
+        "totalObjsFound": [ "ReportChartMessages" ],
+        "objectCount": [ "ReportChartMessages" ],
+        "instructionsTitle": [ "ReportChartMessages" ],
+        "showChartCreateFailedMessage": [ "ReportChartMessages" ],
+        "chart1Label": [ "ReportChartMessages" ],
+        "chart2Label": [ "ReportChartMessages" ],
+        "chart3Label": [ "ReportChartMessages" ],
+        "pieChartMultiplePropMessage": [ "ReportChartMessages" ],
+        "noChartData": [ "ReportChartMessages" ],
+        "itemReportinstructions":["ReportChartMessages"],
+        "rep_month_Jan": [ "ReportChartMessages" ],
+        "rep_month_Feb": [ "ReportChartMessages" ],
+        "rep_month_Mar": [ "ReportChartMessages" ],
+        "rep_month_Apr": [ "ReportChartMessages" ],
+        "rep_month_May": [ "ReportChartMessages" ],
+        "rep_month_Jun": [ "ReportChartMessages" ],
+        "rep_month_Jul": [ "ReportChartMessages" ],
+        "rep_month_Aug": [ "ReportChartMessages" ],
+        "rep_month_Sep": [ "ReportChartMessages" ],
+        "rep_month_Oct": [ "ReportChartMessages" ],
+        "rep_month_Nov": [ "ReportChartMessages" ],
+        "rep_month_Dec": [ "ReportChartMessages" ],
+        "appliedRevRule": [ "ReportChartMessages" ]
+    },
+    "onEvent": [
+        {
+            "eventId": "reportDashboard.getSourceObject",
+            "action": "getSourceObject"
+        },
+        {
+            "eventId": "updateTable",
+            "action": "updateDataTable"
+        },
+        {
+            "eventId": "ConfigureReportPanel.showReportPreview",
+            "action": "showPreviewClicked"
+        },
+        {
+            "eventId": "ConfigureReportPanel.showReportPreview",
+            "action": "updateRevisionRuleLabel"
+        },
+        {
+            "eventId": "showReportImage.contentLoaded",
+            "action": "initiateReportDisplay"
+        },
+        {
+            "eventId": "showReportImage.editReportCriteriaIssued",
+            "action": "initiateReportDisplay"
+        },
+        {
+            "eventId": "showReportImage.refreshData",
+            "cacheEventData": true,
+            "action": "initiateReportDisplay"
+        },
+        {
+            "eventId": "removeTable",
+            "action": "removeDataTable"
+        },
+        {
+            "eventId": "chartRemovedGen1",
+            "action": "chartRemovedGen1"
+        },
+        {
+            "eventId": "chartRemovedGen2",
+            "action": "chartRemovedGen2"
+        },
+        {
+            "eventId": "chartRemovedGen3",
+            "action": "chartRemovedGen3"
+        },
+        {
+            "eventId": "chartReadyGen1",
+            "action": "chartReadyGen1"
+        },
+        {
+            "eventId": "chartReadyGen2",
+            "action": "chartReadyGen2"
+        },
+        {
+            "eventId": "chartReadyGen3",
+            "action": "chartReadyGen3"
+        },
+        {
+            "eventId": "updateChartGen1",
+            "action": "getChartDataActionForGenChart1"
+        },
+        {
+            "eventId": "updateChartGen2",
+            "action": "getChartDataActionForGenChart2"
+        },
+        {
+            "eventId": "updateTableProvider",
+            "action": "doGridReportDataProvider"
+        },
+        {
+            "eventId": "updateChartGen3",
+            "action": "getChartDataActionForGenChart3"
+        },
+        {
+            "eventId": "ShowReportService.InitiateReportDisplay",
+            "action": "performSearchToSetReportData"
+        },
+        {
+            "eventId": "showReportImage.contentUnloaded",
+            "action": "clearReportsCtx"
+        },
+        {
+            "eventId": "showReportImage.updatePrviewForFilterUpdate",
+            "action": "filterUpdated"
+        },
+        {
+            "eventId": "configureReportService.totalFoundUpdateDone",
+            "action": "callTotalFoundUpdate"
+        },
+        {
+            "eventId": "genericChart1.selected",
+            "action": "applyFilterAndInitiateReportUpdate",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "genericChart2.selected",
+            "action": "applyFilterAndInitiateReportUpdate",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "genericChart3.selected",
+            "action": "applyFilterAndInitiateReportUpdate",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "showReport.updateReportForFilterUpdate",
+            "action": "filterUpdated"
+        },
+        {
+            "eventId": "showReport.updateReportForFilterUpdate",
+            "action": "updateRevisionRuleLabel"
+        },
+        {
+            "eventId": "initiateCalltoFetchTranslatedSearchCriteria",
+            "action": "fetchTranslatedSearchCriteria",
+            "cacheEventData": true
+        }
+    ],
+    "messages": {
+        "chart1CreateFailedMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.showChartCreateFailedMessage}}",
+            "messageTextParams": [
+                "{{data.i18n.chart1Label}}"
+            ]
+        },
+        "chart2CreateFailedMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.showChartCreateFailedMessage}}",
+            "messageTextParams": [
+                "{{data.i18n.chart2Label}}"
+            ]
+        },
+        "chart3CreateFailedMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.showChartCreateFailedMessage}}",
+            "messageTextParams": [
+                "{{data.i18n.chart3Label}}"
+            ]
+        },
+        "pieChartMultiplePropNotSupportedMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pieChartMultiplePropMessage}}"
+        }
+    }
+}

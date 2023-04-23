@@ -1,0 +1,110 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [{
+                    "panelId": "Saw1Users",
+                    "name": "{{i18n.users}}",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Saw1ResourcePool",
+                    "name": "{{i18n.resourcePool}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx.workspace.workspaceId != 'TcXSimplifiedWorkspace'"
+                },
+                {
+                    "panelId": "Saw1Disciplines",
+                    "name": "{{i18n.discipline}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx.workspace.workspaceId != 'TcXSimplifiedWorkspace'"
+                },
+                {
+                    "panelId": "Saw1ScheduleMembers",
+                    "name": "{{i18n.scheduleMembers}}",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Sc1Suppliers",
+                    "name": "{{i18n.suppliers}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx.preferences.SC_exchange_object_modifiable_states !== undefined"
+                }
+            ]
+        }
+    },
+    "actions":
+    {
+        "save": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "condition": "data.selectedTab.panelId ==='Saw1Users'",
+                        "name": "Saw1UsersEvent"
+                    },
+                    {
+                        "condition": "data.selectedTab.panelId ==='Saw1ResourcePool'",
+                        "name": "Saw1ResourcePoolEvent"
+                    },
+                    {
+                        "condition": "data.selectedTab.panelId ==='Saw1Disciplines'",
+                        "name": "Saw1DisciplinesEvent"
+                    },
+                    {
+                        "condition": "data.selectedTab.panelId ==='Saw1ScheduleMembers'",
+                        "name": "Saw1ScheduleMembersEvent"
+                    }
+                ]
+            }
+        },
+        "reveal" : {
+            "actionType": "JSFunction",
+            "method": "subscribeSelectionEvent",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1AssignResourceToTasks"
+            },
+            "action": "reveal"
+        }
+    ],
+    "i18n": {
+        "users": [
+            "ScheduleManagerMessages"
+        ],
+        "discipline": [
+            "ScheduleManagerMessages"
+        ],
+        "saveBtnTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "resourcePool": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleMembers": [
+            "ScheduleManagerMessages"
+        ],
+        "suppliers": [
+            "supplierCollaborationMessages"
+        ]
+    }
+}

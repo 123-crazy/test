@@ -1,0 +1,60 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive"
+    ],
+
+    "actions": {
+        "updateEndItemAndNavigateToNewPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "updateEndItemAndNavigateToNewPanel",
+            "inputData":
+            {
+                "destPanelId": "{{data.previousView}}"
+            },
+            "deps": "js/sharedEffectivityService"
+        }
+
+    },
+
+    "onEvent": [
+        {
+            "eventId": "getClipboardProvider.selectionChangeEvent",
+            "action": "updateEndItemAndNavigateToNewPanel"
+        },
+        {
+            "eventId": "getFavoriteProvider.selectionChangeEvent",
+            "action": "updateEndItemAndNavigateToNewPanel"
+        },
+        {
+            "eventId": "getRecentObjsProvider.selectionChangeEvent",
+            "action": "updateEndItemAndNavigateToNewPanel"
+        }
+    ],
+
+    "data": {
+        "endItemTabsModel": {
+            "isArray": "true",
+            "dbValue": [ {
+                    "panelId": "AuthorEffectivityEndItemSearchTab",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}",
+                    "recreatePanel": true,
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "paletteTabPageSub",
+                    "name": "{{i18n.paletteEndItemPresenterBtn}}",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+
+    "i18n": {
+        "paletteEndItemPresenterBtn": [ "OccurrenceManagementConstants" ],
+        "searchEndItemPresenterBtn": [ "OccurrenceManagementConstants" ],
+        "endItemMessage": [ "OccurrenceManagementConstants" ],
+        "addElementBtn": [ "OccurrenceManagementConstants" ]
+    }
+}

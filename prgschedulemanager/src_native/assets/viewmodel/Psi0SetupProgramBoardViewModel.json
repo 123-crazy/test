@@ -1,0 +1,438 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-command-panel-section.directive",
+        "js/exist-when.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-link.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "psi0ProgramObjectsProvider"
+            ]
+        },
+        "initializeProgramBoard": {
+            "actionType": "JSFunction",
+            "method": "initializeProgramBoard",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "errorCode == 'objectPresentError'",
+                        "message": "objectPresentErrorMsg"
+                    },
+                    {
+                        "condition": "errorCode=='invalidSelectionForBoard'",
+                        "message": "invalidSelectionBoardMessage"
+                    }
+                ]
+            },
+            "events": {
+                "success":[{
+                    "name": "prgBoardSyncSelection"
+                }]
+            },
+            "deps": "js/Psi0ProgramBoardService"
+        },
+        "createProgramBoard": {
+            "actionType": "TcSoaService",
+            "serviceName": "PPSMInterfaceAw-2019-06-PPSMInterface",
+            "method": "getProgramRelatedObjects",
+            "inputData": {
+                "getRelatedObjectsInput": "{{function:getRelatedObjectsInput}}"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Psi0PrgDelRevision",
+                        "properties": [
+                            {
+                                "name": "psi0DueDate"
+                            },
+                            {
+                                "name": "psi0ResponsibleUsr",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Psi0AbsRIO",
+                        "properties": [
+                            {
+                                "name": "psi0TargetDate"
+                            },
+                            {
+                                "name": "psi0ResponsibleUsr",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Psi0AbsChecklist",
+                        "properties": [
+                            {
+                                "name": "psi0DueDate"
+                            },
+                            {
+                                "name": "psi0ResponsibleUser",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Schedule",
+                        "properties": [
+                            {
+                                "name": "finish_date"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Prg0AbsCriteria",
+                        "properties": [
+                            {
+                                "name": "fnd0ResponsibleUser",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "WorkspaceObject",
+                        "properties": [
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "object_string"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ItemRevision",
+                        "properties": [
+                            {
+                                "name": "object_string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "relatedObjects": "{{function:processResultUpdateCtx}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "prepareProgramBoard"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "condition": "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'",
+                        "name": "setupProgramBoard.switchToTreeView"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "SOAFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Psi0ProgramBoardService"
+        },
+        "addToProgramBoard": {
+            "actionType": "JSFunction",
+            "method": "addToProgramBoard",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "newObjectUid": "{{data.eventMap['setupProgramBoard.selectionChanged']}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "errorCode == 'objectPresentError'",
+                        "message": "objectPresentErrorMsg"
+                    },
+                    {
+                        "condition": "errorCode=='invalidSelectionForBoard'",
+                        "message": "invalidSelectionBoardMessage"
+                    }
+                ]
+            },
+            "deps": "js/Psi0ProgramBoardService"
+        },
+        "selectionChangeOfListContext": {
+            "actionType": "JSFunction",
+            "method": "selectionChangeOfListContext",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "errorCode == 'invalidSelectionInBoard'",
+                        "message": "invalidSelectionBoardMessage"
+                    }
+                ]
+            },
+            "deps": "js/Psi0ProgramBoardService"
+        },
+        "clearAllAction": {
+            "actionType": "JSFunction",
+            "method": "clearAllAction",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Psi0ProgramBoardService"
+        },
+        "updateProgramBoard": {
+            "actionType": "JSFunction",
+            "method": "updateProgramBoard",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Psi0ProgramBoardService"
+        },
+        "switchToTreeView": {
+            "actionType": "JSFunction",
+            "method": "changeViewMode",
+            "deps": "js/viewMode.service",
+            "inputData": {
+                "viewMode": "TreeView"
+            }
+        },
+        "syncSelectionInPrgBoardPanel": {
+            "actionType":"JSFunction",
+            "method": "syncSelectionInPrgBoardPanel",
+            "deps": "js/Psi0ProgramBoardService",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.psi0ProgramObjectsProvider}}",
+                "objectToSelect": "{{ctx.selected}}"
+            }
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "programBoardCreated": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.programBoardCreated}}"
+        },
+        "objectPresentErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.objectPresentInProgramBoardError}}"
+        },
+        "invalidSelectionBoardMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.invalidSelectionInBoardMessage}}",
+            "messageTextParams": [
+                "{{data.listContext.dbValue}}",
+                "{{data.validObjectType}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showWidget": {
+            "expression": "data.dataProviders.psi0ProgramObjectsProvider && data.dataProviders.psi0ProgramObjectsProvider.viewModelCollection.loadedVMObjects.length > 0"
+        },
+        "showClearAll": {
+            "expression": "data.dataProviders.psi0ProgramObjectsProvider.viewModelCollection.loadedVMObjects.length > 0"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "setupProgramBoard.selectionChanged",
+            "cacheEventData": true,
+            "action": "addToProgramBoard"
+        },
+        {
+            "eventId": "updateProgramBoardView",
+            "cacheEventData": true,
+            "action": "updateProgramBoard"
+        },
+        {
+            "eventId": "setupProgramBoard.switchToTreeView",
+            "cacheEventData": true,
+            "action": "switchToTreeView"
+        },
+        {
+            "eventId": "prgBoardSyncSelection",
+            "action": "syncSelectionInPrgBoardPanel"
+        }
+    ],
+    "functions": {
+        "getRelatedObjectsInput": {
+            "functionName": "getRelatedObjectsInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "processResultUpdateCtx": {
+            "functionName": "processResultUpdateCtx",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "dataProviders": {
+        "psi0ProgramObjectsProvider": {
+            "action": "initializeProgramBoard",
+            "selectionModelMode": "single",
+            "response": "{{data.dataProviders.psi0ProgramObjectsProvider.viewModelCollection.loadedVMObjects}}",
+            "commandsAnchor": "psi0_removeProgramObject"
+        }
+    },
+    "data": {
+        "listContext": {
+            "displayName": "{{i18n.setContext}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": "{{ctx.timelineProgramBoard.context}}"
+        },
+        "listContextValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.deliverables}}",
+                    "propInternalValue": "Deliverables"
+                },
+                {
+                    "propDisplayValue": "{{i18n.changes}}",
+                    "propInternalValue": "Changes"
+                },
+                {
+                    "propDisplayValue": "{{i18n.schedules}}",
+                    "propInternalValue": "Schedules"
+                },
+                {
+                    "propDisplayValue": "{{i18n.risks}}",
+                    "propInternalValue": "Risks"
+                },
+                {
+                    "propDisplayValue": "{{i18n.issues}}",
+                    "propInternalValue": "Issues"
+                },
+                {
+                    "propDisplayValue": "{{i18n.opportunities}}",
+                    "propInternalValue": "Opportunities"
+                },
+                {
+                    "propDisplayValue": "{{i18n.criteria}}",
+                    "propInternalValue": "Criteria"
+                },
+                {
+                    "propDisplayValue": "{{i18n.checklists}}",
+                    "propInternalValue": "Checklists"
+                }
+            ]
+        },
+        "setupProgramBoardClearAll": {
+            "displayName": "{{i18n.setupProgramBoardClearAll}}",
+            "type": "STRING"
+        }
+    },
+    "i18n": {
+        "createProgramBoard": [
+            "PrgScheduleManagerMessages"
+        ],
+        "view": [
+            "PrgScheduleManagerMessages"
+        ],
+        "dropHint": [
+            "PrgScheduleManagerMessages"
+        ],
+        "objectPresentInProgramBoardError": [
+            "PrgScheduleManagerMessages"
+        ],
+        "programBoardCreated": [
+            "PrgScheduleManagerMessages"
+        ],
+        "selectHint": [
+            "PrgScheduleManagerMessages"
+        ],
+        "objectNotSupportedError": [
+            "PrgScheduleManagerMessages"
+        ],
+        "setContext": [
+            "PrgScheduleManagerMessages"
+        ],
+        "deliverables": [
+            "PrgScheduleManagerMessages"
+        ],
+        "changes": [
+            "PrgScheduleManagerMessages"
+        ],
+        "risks": [
+            "PrgScheduleManagerMessages"
+        ],
+        "issues": [
+            "PrgScheduleManagerMessages"
+        ],
+        "opportunities": [
+            "PrgScheduleManagerMessages"
+        ],
+        "criteria": [
+            "PrgScheduleManagerMessages"
+        ],
+        "checklists": [
+            "PrgScheduleManagerMessages"
+        ],
+        "schedules": [
+            "PrgScheduleManagerMessages"
+        ],
+        "setupProgramBoardClearAll": [
+            "PrgScheduleManagerMessages"
+        ],
+        "invalidSelectionInBoardMessage": [
+            "PrgScheduleManagerMessages"
+        ]
+    }
+}

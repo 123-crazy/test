@@ -1,0 +1,68 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive"
+    ],
+    "actions": {
+        "formSheetHeightCalculation": {
+            "actionType": "JSFunction",
+            "method": "formSheetHeightCalculation",
+            "inputData": {
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/qfm0FormsheetService"
+        },
+        "reloadFormsheet": {
+            "actionType": "JSFunction",
+            "method": "reloadFormsheet",
+            "inputData": {
+                "addElementInput": "{{addElementInput}}",
+                "formsheetColIdx": "{{formsheetColIdx}}"
+            },
+            "deps": "js/qfm0FormsheetManagerUtils"
+        },
+        "registerVariables": {
+            "actionType": "JSFunction",
+            "method": "registerVariables",
+            "inputData": {},
+            "deps": "js/qfm0FormsheetService"
+        },
+        "unRegisterVariables": {
+            "actionType": "JSFunction",
+            "method": "unRegisterVariables",
+            "inputData": {},
+            "deps": "js/qfm0FormsheetService"
+        }
+    },
+    "conditions": {},
+    "onEvent": [
+        {
+            "eventId": "awPanelSection.collapse",
+            "action": "formSheetHeightCalculation",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "commandBarResized",
+            "action": "formSheetHeightCalculation"
+        },
+        {
+            "eventId": "qfm0.addToFormsheet",
+            "action": "reloadFormsheet"
+        }
+    ],
+    "data": {},
+    "messages": {},
+    "i18n": {
+        "qfm0FormsheetHeader": [
+            "qualityFmeaFormsheetMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "reloadFormsheet",
+        "onInit": "registerVariables",
+        "onUnmount": "unRegisterVariables"
+    }
+}

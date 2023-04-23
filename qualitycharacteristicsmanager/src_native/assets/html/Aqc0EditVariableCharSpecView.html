@@ -1,0 +1,62 @@
+<aw-row exist-when="ctx.isClassificationPropSupported">
+    <aw-column width="100%">
+        <aw-listbox prop="data.qc0Criticality" action="loadClassificationValues" list="data.qc0CriticalityList">
+        </aw-listbox>
+    </aw-column>
+</aw-row>
+<aw-row exist-when="ctx.selected.type ==='Qc0VariableCharSpec' || ctx.pselected.type ==='Qc0VariableCharSpec'">
+    <aw-row exist-when="ctx.isLimitationSupported">
+        <aw-column width="100%">
+            <aw-listbox prop="data.qc0limitation" action="loadQc0limitation" list="data.qc0limitationList"></aw-listbox>
+        </aw-column>
+    </aw-row>
+    <aw-row>
+        <aw-column width="100%">
+            <aw-listbox prop="data.qc0UnitOfMeasure" action="loadUnitOfMeasure" list="data.unitOfMeasureList">
+            </aw-listbox>
+        </aw-column>
+    </aw-row>
+    <aw-row>
+        <aw-column width="100%">
+            <aw-widget
+                exist-when="data.qc0limitation.dbValue === 'Both Sides' || data.qc0limitation.dbValue === 'Zero' ||  data.qc0limitation.dbValue === 'Down' || data.qc0limitation.dbValue === 'Up'"
+                prop="data.qc0NominalValue"></aw-widget>
+        </aw-column>
+    </aw-row>
+    <aw-row exist-when="ctx.isToleranceTypeSupported">
+        <aw-column width="100%">
+            <aw-listbox prop="data.qc0ToleranceType" action="loadQc0ToleranceType" list="data.ToleranceTypeList">
+            </aw-listbox>
+        </aw-column>
+    </aw-row>
+    <aw-row>
+        <aw-column width="100%">
+            <aw-widget
+                exist-when="data.qc0limitation.dbValue === 'Both Sides' || data.qc0limitation.dbValue === 'Zero' ||  data.qc0limitation.dbValue === 'Down'"
+                prop="data.qc0UpperTolerance"></aw-widget>
+        </aw-column>
+    </aw-row>
+    <aw-row>
+        <aw-column width="100%">
+            <aw-widget exist-when="data.qc0limitation.dbValue === 'Both Sides' || data.qc0limitation.dbValue === 'Up'"
+                prop="data.qc0LowerTolerance"></aw-widget>
+        </aw-column>
+    </aw-row>
+</aw-row>
+<aw-row exist-when="ctx.selected.type ==='Qc0VariableCharSpec' && !ctx.isLimitationSupported">
+    <aw-row>
+        <aw-column width="100%">
+            <aw-widget prop="data.qc0NominalValue"></aw-widget>
+        </aw-column>
+    </aw-row>
+    <aw-row>
+        <aw-column width="100%">
+            <aw-widget prop="data.qc0UpperTolerance"></aw-widget>
+        </aw-column>
+    </aw-row>
+    <aw-row>
+        <aw-column width="100%">
+            <aw-widget prop="data.qc0LowerTolerance"></aw-widget>
+        </aw-column>
+    </aw-row>
+</aw-row>

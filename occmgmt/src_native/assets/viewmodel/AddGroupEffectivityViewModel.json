@@ -1,0 +1,248 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[ "js/aw-tab-set.directive",
+                "js/aw-panel-section.directive",
+                "js/aw-panel-footer.directive",
+                "js/aw-button.directive",
+                "js/aw-i18n.directive",
+                "js/aw-panel-body.directive"
+                ],
+    "i18n":
+    {
+        "searchEndItemPresenterBtn":[ "OccurrenceManagementConstants"],
+        "new":[ "OccurrenceManagementConstants"],
+        "endItemMessage":[ "OccurrenceManagementConstants"],
+        "addElementBtn":["OccurrenceManagementConstants"],
+        "failedToApplyEffectivity":[ "OccurrenceManagementConstants"]
+    },
+    "functions": {
+        "applyEffectivityGroups": {
+            "functionName": "applyEffectivityGroups",
+            "parameters": ["{{data}}", "{{data.dataProviders.performSearchForSharedEffectivities.selectedObjects}}"]
+        },
+        "getEffectivityGroupRevision": {
+            "functionName": "getEffectivityGroupRevision",
+            "parameters":
+            [
+            ]
+        },
+        "getEffectivitiesInfo": {
+            "functionName": "getEffectivitiesInfo",
+            "parameters":
+            [
+            ]
+        },
+        "getEffGroupsToApply": {
+            "functionName": "getEffGroupsToApply",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+    },
+    "data" :
+    {
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "panelId": "AuthorGroupEffectivity",
+                    "name": "{{i18n.new}}"
+
+                },
+                {
+                    "panelId": "SearchGroupEffectivity",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}",
+                    "selectedTab": true
+                 }
+            ]
+        }
+    },
+    "actions":
+    {
+        "applyGroupEffectivityBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "applyGroupEffectivity"
+                }
+            ]
+        },
+        "applyGroupEffectivity":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path": "aceActiveContext.context.configContext",
+                "value":{
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "eg_uids": "{{function:applyEffectivityGroups}}",
+                    "de": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "var_uids": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "startDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+            "events": {
+                "success": [{
+                    "name": "awPanel.navigate",
+                    "eventData":
+                    {
+                        "destPanelId": "GroupEffectivities"
+                    }
+                }
+               ]
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+        "createGroupEffectivity": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2016-09-DataManagement",
+            "method": "createAttachAndSubmitObjects",
+            "inputData":
+            {
+                "inputs": [
+                    {
+                    "clientId": "CreateObject",
+                    "createData": {
+                        "boName": "Fnd0EffectvtyGrp",
+                        "propertyNameValues": {
+                            "object_name": ["{{data.nameBox.dbValue}}"]
+                        }
+                    },
+                    "dataToBeRelated": {},
+                    "pasteProp": ""
+                   }
+                ]
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Item",
+                        "properties":
+                        [
+                            {
+                                "name": "revision_list"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "groupRevision": "{{function:getEffectivityGroupRevision}}"
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "authorGrp.groupCreated"
+                    }
+                ]
+            },
+            "deps": "js/effectivityGroupTableService"
+        },
+        "addEffectivities": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-StructureManagement-2009-10-EffectivitiesManagement",
+            "method": "createOrUpdateEffectivites",
+            "inputData":
+            {
+                "effectivitiesInfo": "{{function:getEffectivitiesInfo}}",
+                "effectivityGroupRevision": {
+                    "uid": "{{data.groupRevision.uid}}",
+                    "type": "ItemRevision"
+                }
+           },
+           "events":
+           {
+               "success":
+               [
+                   {
+                       "name": "authorGrp.applyGroupEffectivity"
+                   }
+               ]
+           },
+           "deps": "js/effectivityGroupTableService"
+        },
+
+        "applyEffectivityGroupBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "applyEffectivityGroup"
+                }
+            ]
+        },
+        "updateRequestPrefOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref",
+                "value": {
+                    "jitterFreePropLoad" : true,
+                    "userGesture": "EFFECTIVITY_CHANGE"
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "applyEffectivityGroup":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path": "aceActiveContext.context.configContext",
+                "value":{
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "eg_uids": "{{function:getEffGroupsToApply}}",
+                    "de": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "var_uids": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "startDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+            "events": {
+                "success": [{
+                    "name": "awPanel.navigate",
+                    "eventData":
+                    {
+                        "destPanelId": "GroupEffectivities"
+                    }
+                }
+               ]
+            },
+            "deps": "js/effectivityGroupTableService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "authorGrp.groupCreated",
+            "cacheEventData": true,
+            "action": "addEffectivities"
+        },
+        {
+            "eventId": "authorGrp.applyGroupEffectivity",
+            "action": "applyEffectivityGroupBatchJob"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='AuthorGroupEffectivity'"
+        }
+    }
+}

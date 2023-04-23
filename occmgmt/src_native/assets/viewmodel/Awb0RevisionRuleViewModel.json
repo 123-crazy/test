@@ -1,0 +1,92 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-link-with-popup.directive",
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions": {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "initializeRevisionRuleConfigurationInfo"
+                }
+            ]
+        },
+        "initializeRevisionRuleConfigurationInfo": {
+            "actionType": "JSFunction",
+            "method": "getInitialRevisionRuleConfigurationData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/revisionRuleConfigurationService"
+        },
+
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+
+        "updateCurrentRevisionRule": {
+            "actionType": "JSFunction",
+            "method": "updateCurrentRevisionRule",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/revisionRuleConfigurationService"
+        }
+
+    },
+    "conditions": {
+        "isUpdateApplicable": {
+            "expression": "data.viewKey === viewKey"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeRevisionRuleConfigurationInfo"
+        },
+        {
+            "eventId": "awConfigPanel.revisionRuleChanged",
+            "cacheEventData": true,
+            "condition": "conditions.isUpdateApplicable",
+            "action": "updateCurrentRevisionRule"
+        }
+    ],
+
+    "data": {
+        "globalLabel": {
+            "uiValue": "{{i18n.globalLabel}}",
+            "type": "STRING"
+        },
+        "globalRuleValue": {
+            "dbValue": "{{data.globalRuleValue}}",
+            "type": "STRING"
+        },
+        "currentRevisionRule": {
+            "uiValue": "{{data.currentRevisionRule}}",
+            "type": "STRING"
+        }
+    },
+
+    "i18n": {
+        "revision": [ "OccurrenceManagementConstants" ],
+        "currentRevisionRule": [ "OccurrenceManagementConstants" ],
+        "globalLabel": [ "OccurrenceManagementConstants" ],
+        "occurrenceManagementLoadingMsg": [ "OccurrenceManagementConstants" ],
+        "errorInGettingPreferredConfigInfo": [ "OccurrenceManagementMessages" ]
+    }
+}

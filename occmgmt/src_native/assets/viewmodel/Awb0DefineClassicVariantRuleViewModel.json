@@ -1,0 +1,270 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-back-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-repeat.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-listbox.directive"
+    ],
+    "actions": {
+        "getClassicVariantData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceConfiguration",
+            "method": "getClassicVariants",
+            "inputData": {
+                "inputData": {
+                    "optionFilter": {},
+                    "optionValuesCursor":{},
+                    "productContext": {
+                        "type": "Awb0ProductContextInfo",
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}"
+                    },
+                    "variantRule": {
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0VariantRules.dbValues[0]}}",
+                        "type": "unknownType"
+                    }
+                }
+            },
+            "outputData": {
+                "classicVariants": "{{function:processGetClassicVariantsResponse}}"
+            },
+            "deps": "js/classicVariantService"
+        },
+        "applyVariantConfiguration": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceConfiguration",
+            "method": "createOrUpdateClassicVariantRule",
+            "inputData": {
+                "inputData": {
+                    "productContext": {
+                        "type": "Awb0ProductContextInfo",
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}"
+                    },
+                    "variantRuleName": "{{ctx.classicCfgContext.newSVR && ctx.classicCfgContext.newSVR === true ? ctx.variantConfigContext.initialVariantRule.props.object_name.dbValue : '' }}",
+                    "variantContent": {
+                        "variantRule": {
+                            "uid": "{{function:fetchSVRUid}}",
+                            "type": "unknownType"
+                        },
+                        "variantOptionValueEntry": "{{function:fetchSelectedOptions}}"
+                    },
+                    "saveRule": "{{function:fetchSaveFlag}}"
+                }
+            },
+            "outputData": {
+                "classicVariants": "{{function:processSetClassicVariantsResponse}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Awb0ClassicVariantPanel.configure"
+                } ]
+            },
+            "actionMessages":{
+                "failure":[
+                    {
+                        "message":"applyVariantConfigurationFailure"
+                    }
+                ]
+            },
+            "deps": "js/classicVariantService"
+        },
+        "saveVariantRule": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceConfiguration",
+            "method": "createOrUpdateClassicVariantRule",
+            "inputData": {
+                "inputData": {
+                    "productContext": {
+                        "type": "Awb0ProductContextInfo",
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}"
+                    },
+                    "variantRuleName": "",
+                    "variantContent": {
+                        "variantRule": {
+                            "uid": "{{ctx.variantConfigContext.initialVariantRule.uid}}",
+                            "type": "unknownType"
+                        },
+                        "variantOptionValueEntry": "{{function:fetchSelectedOptions}}"
+                    },
+                    "saveRule": true
+                }
+            },
+            "outputData": {
+                "classicVariants": "{{function:processSetClassicVariantsResponse}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "Awb0ClassicVariantPanel.configure"
+                    },
+                    {
+                        "name": "Awb0ClassicVariantPanel.resetDirtyFlag"
+                    }
+                ]
+            },
+            "deps": "js/classicVariantService"
+        },
+        "updateVisibilityOfSaveCommand": {
+            "actionType": "JSFunction",
+            "method": "updateVisibilityOfSaveCommand",
+            "deps": "js/classicVariantService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete.subPanel",
+                    "eventData": {
+                        "source": "Awb0SaveVariantRule"
+                    }
+                } ]
+            }
+        },
+        "closeClassicVariantPanel": {
+            "actionType": "JSFunction",
+            "method": "setPreviousView",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete.subPanel",
+                    "eventData": {
+                        "source": "Awb0DefineClassicVariantRule"
+                    }
+                } ]
+            },
+            "deps": "js/classicVariantService"
+        },
+        "resetClassicConfigContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "path": "classicCfgContext",
+                "value": {}
+            }
+        },
+        "updateCtxForIsConfigure": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "path": "classicCfgContext.isConfigure",
+                "value": true
+            }
+        },
+        "resetModifiedFlag": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "path": "variantConfigContext.initialVariantRule.props.object_string.dbValue",
+                "value": "classicCfgContext.oldSVRname"
+            }
+        },
+        "resetDirtyFlag": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "path": "classicCfgContext.isSavePanelDirty",
+                "value": false
+            }
+        },
+        "selectiveConfigureAction": {
+            "actionType": "JSFunction",
+            "method": "selectiveConfigureAction",
+            "deps": "js/classicVariantService",
+            "inputData": {
+                "classicCfgContext": "{{ctx.classicCfgContext}}"
+            }
+        }
+    },
+    
+    "functions": {
+        "processGetClassicVariantsResponse": {
+            "functionName": "processGetClassicVariantsResponse",
+            "parameters": []
+        },
+        "fetchSVRUid": {
+            "functionName": "fetchSVRUid",
+            "parameters": [ "{{ctx.variantConfigContext.initialVariantRule}}", "{{ctx.classicCfgContext}}" ]
+        },
+        "fetchSelectedOptions": {
+            "functionName": "fetchSelectedOptions",
+            "parameters": [ "{{ctx.classicCfgContext}}" ]
+        },
+        "processSetClassicVariantsResponse": {
+            "functionName": "processSetClassicVariantsResponse",
+            "parameters": []
+        },
+        "fetchSaveFlag": {
+            "functionName": "fetchSaveFlag",
+            "parameters": [ "{{ctx.classicCfgContext}}" ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "occMgmt.visibilityStateChanged",
+            "action": "getClassicVariantData",
+            "condition": "ctx.classicCfgContext.isConfigure"
+        },
+        {
+            "eventId": "Awb0ClassicVariantPanel.configure",
+            "action": "updateCtxForIsConfigure"
+        },
+        {
+            "eventId": "Awb0ClassicVariantPanel.resetModifiedFlag",
+            "action": "resetModifiedFlag"
+        },
+        {
+            "eventId": "Awb0ClassicVariantPanel.resetDirtyFlag",
+            "action": "resetDirtyFlag"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Awb0DefineClassicVariantRule"
+            },
+            "action": "getClassicVariantData"
+        },
+        {
+            "eventId": "Awb0SaveVariantPanel.close",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "ClassicVariants.updateVariantRule",
+            "action": "saveVariantRule"
+        },
+        {
+            "eventId": "ClassicVariants.invokeCVUpdateAndConfigureAction",
+            "action": "applyVariantConfiguration"
+        }
+    ],
+    "messages":{
+        "applyVariantConfigurationFailure":{
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "configure": [
+            "OccurrenceManagementConstants"
+        ],
+        "customCVConfigurationTitle": [
+            "OccurrenceManagementConstants"
+        ],
+        "modified": [
+            "OccurrenceManagementConstants"
+        ],
+        "emptyClassicVariants": [
+            "OccurrenceManagementMessages"
+        ]
+    }
+}

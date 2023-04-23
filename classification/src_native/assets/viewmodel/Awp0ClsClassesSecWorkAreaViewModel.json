@@ -1,0 +1,117 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-link.directive",
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-repeat.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-widget.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive"
+    ],
+    "actions":{
+        "selectNodeInSecWorkArea":{
+            "actionType": "JSFunction",
+            "method": "selectNodeInSecWorkArea",
+            "inputData": {
+                "data": "{{data}}",
+                "selected":"{{ctx.mselected}}"
+            },
+            "deps":"js/classifyAdminService"
+        },
+        "selectLink":{
+            "actionType": "JSFunction",
+            "method": "selectNodeForPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "selected":"{{ctx.clsAdmin.reference}}"
+            },
+            "deps":"js/classifyAdminService"
+        },
+        "activeClassificationPanel": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Awp0ClsAdminLink",
+                "location": "aw_toolsAndInfo"
+            }
+        },
+        "loadDataForAttributes": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadDataForAttributes",
+            "inputData": {
+                "data": "{{data}}",
+                "type":"Attributes"
+            },
+            "outputData": {
+                "attributes":"objects",
+                "totalFound":"totalFound"
+            },
+            "deps": "js/classifyAdminService"
+        }
+    },
+    "data":{ },
+    "dataProviders": {
+        "attributes":
+        {
+            "action": "loadDataForAttributes",
+            "commands": {},
+            "response":"{{data.attributes}}",
+            "totalFound":"{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "columnProviders": {
+        "structureColumnProvider": {
+            "columns": [
+                {
+                    "name": "Name",
+                    "displayName": "Name",
+                    "minWidth": 200,
+                    "width": 600,
+                    "isTableCommand": true
+                }
+            ],
+            "frozenColumnIndex" : -1
+        }
+    },
+    "grids": {
+        "entryGrid": {
+            "dataProvider": "attributes",
+            "columnProvider": "structureColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": false,
+                "enableSorting": false,
+                "useStaticFirstCol": true,
+                "maxRowsToShow":15
+            }
+        }
+    },
+    "onEvent":[
+        {
+            "eventId":"attributes.selectionChangeEvent",
+            "action":"selectNodeInSecWorkArea"
+        },
+        {
+            "eventId":"classifyAdmin.launchPanel",
+            "action":"activeClassificationPanel"
+        }
+    ],
+
+    "i18n": {
+        "dataType":  [ "ClassificationAdminMessages" ],
+        "metric":  [ "ClassificationAdminMessages" ],
+        "nonMetric":  [ "ClassificationAdminMessages" ],
+        "associations":["ClassificationAdminMessages"],
+        "attributes":  [ "ClassificationAdminMessages" ],
+        "propertiesTitle":  [ "ClassificationAdminMessages" ]
+    }
+
+}

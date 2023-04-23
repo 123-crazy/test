@@ -1,0 +1,725 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-graph.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-sidenav.directive",
+        "js/aw-include.directive",
+        "js/aw-splitter.directive",
+        "js/exist-when.directive"
+    ],
+
+    "actions": {
+        "openLegendPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awsidenav.openClose",
+                    "eventData": {
+                        "id": "actionPanel",
+                        "keepOthersOpen": true
+                    }
+                } ]
+            }
+        },
+        "openPropertiesPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awsidenav.openClose",
+                    "eventData": {
+                        "id": "actionPropertiesPanel",
+                        "keepOthersOpen": true
+                    }
+                } ]
+            }
+        },
+        "initLegendData": {
+            "actionType": "JSFunction",
+            "method": "initLegendData",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/actionBuilderService"
+        },
+
+        "updateSelection": {
+            "actionType": "JSFunction",
+            "method": "updateContextSelection",
+            "inputData": {
+                "selected": "{{data.eventMap['awGraph.selectionChanged'].selected}}",
+                "unselected": "{{data.eventMap['awGraph.selectionChanged'].unSelected}}",
+                "graphModel": "{{data.graphModel}}",
+                "isShiftKeyDown": "{{data.eventMap['awGraph.selectionChanged'].isShiftKeyDown}}",
+                "isCtrlKeyDown": "{{data.eventMap['awGraph.selectionChanged'].isCtrlKeyDown}}",
+                "isAltKeyDown": "{{data.eventMap['awGraph.selectionChanged'].isAltKeyDown}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "deleteKeyDown": {
+            "actionType": "JSFunction",
+            "method": "deleteKeyDown",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "isAltKeyDown": "{{data.eventMap['awGraph.deleteKeyDown'].isAltKey}}",
+                "isShiftKeyDown": "{{data.eventMap['awGraph.deleteKeyDown'].isShiftKey}}",
+                "isCtrlKeyDown": "{{data.eventMap['awGraph.deleteKeyDown'].isCtrlKey}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "graphItemsResized": {
+            "actionType": "JSFunction",
+            "method": "graphItemsResized",
+            "inputData": {
+                "eventData": "{{data.eventMap['awGraph.graphItemsResized'].items}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "actionBuilderGraphItemsMoved": {
+            "actionType": "JSFunction",
+            "method": "graphItemsMoved",
+            "inputData": {
+                "items": "{{data.eventMap['awGraph.graphItemsMoved'].items}}",
+                "graphModel": "{{data.graphModel}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "hoverChanged": {
+            "actionType": "JSFunction",
+            "method": "hoverChanged",
+            "inputData": {
+                "hoveredItem": "{{data.eventMap['awGraph.hoverChanged'].hoveredItem}}",
+                "unHoveredItem": "{{data.eventMap['awGraph.hoverChanged'].unHoveredItem}}",
+                "graphModel": "{{data.graphModel}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "requestGraphDataForViewModelAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "retriveGraphInfo",
+            "inputData": {
+                "actionId": "{{ctx.selected.uid}}",
+                "viewModelId": "{{ctx.state.params.viewModelId}}"
+            },
+            "outputData": {
+                "actionFlow": "data.action",
+                "graphData": "{{function:getGraphDataFromResponse}}",
+                "expandDirection": "direction"
+            },
+            "events": {
+                "success": [ {
+                    "name": "sampleGraphDataProvider.graphDataLoaded",
+                    "eventData": {
+                        "graphData": "{{data.graphData}}"
+                    }
+                } ]
+            },
+            "deps": "js/actionParserService"
+        },
+        "appendGraphDataForDroppedViewModelAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "retriveGraphInfo",
+            "inputData": {
+                "actionId": "{{data.eventMap['awGraph.graphActionItemAdded'].uid}}",
+                "viewModelId": "{{ctx.state.params.viewModelId}}"
+            },
+            "outputData": {
+                "actionFlow": "data.action",
+                "graphData": "{{function:getGraphDataFromResponse}}",
+                "expandDirection": "direction"
+            },
+            "events": {
+                "success": [ {
+                    "name": "sampleGraphDataProvider.graphDataLoaded",
+                    "eventData": {
+                        "graphData": "{{data.graphData}}"
+                    }
+                } ]
+            },
+            "deps": "js/actionParserService"
+        },
+        "connectGraphDataForDroppedViewModelAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "connectGraphData",
+            "inputData": {
+                "selActionId": "{{ctx.state.params.s_uid}}",
+                "dropActionId": "{{data.eventMap['awGraph.reuseActionFlowAdded'].uid}}",
+                "viewModelId": "{{ctx.state.params.viewModelId}}",
+                "eventName": "{{data.eventMap['awGraph.reuseActionFlowAdded'].eventName}}"
+            },
+            "outputData": {
+                "actionFlow": "data.action",
+                "graphData": "{{function:getGraphDataFromResponse}}",
+                "expandDirection": "direction"
+            },
+            "events": {
+                "success": [ {
+                    "name": "sampleGraphDataProvider.graphDataLoaded",
+                    "eventData": {
+                        "graphData": "{{data.graphData}}"
+                    }
+                } ]
+            },
+            "deps": "js/actionParserService"
+        },
+        "appendGraphDataForDroppedCommandAction": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($actionId:ID!, $viewModelId:ID){action(id:$actionId, viewModelId:$viewModelId){id flow}}",
+                    "variables": {
+                        "actionId": "{{data.eventMap['awGraph.graphActionItemAdded'].uid}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "actionFlow": "data.action",
+                "graphData": "{{function:getGraphDataFromResponse}}",
+                "expandDirection": "direction"
+            },
+            "events": {
+                "success": [ {
+                    "name": "sampleGraphDataProvider.graphDataLoaded",
+                    "eventData": {
+                        "graphData": "{{data.graphData}}"
+                    }
+                } ]
+            },
+            "deps": "js/actionParserService"
+        },
+        "requestGraphDataForCommandAction": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($actionId:ID!, $viewModelId:ID){action(id:$actionId, viewModelId:$viewModelId){id flow}}",
+                    "variables": {
+                        "actionId": "{{ctx.selected.uid}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "actionFlow": "data.action",
+                "graphData": "{{function:getGraphDataFromResponse}}",
+                "expandDirection": "direction"
+            },
+            "events": {
+                "success": [ {
+                    "name": "sampleGraphDataProvider.graphDataLoaded",
+                    "eventData": {
+                        "graphData": "{{data.graphData}}"
+                    }
+                } ]
+            },
+            "deps": "js/actionParserService"
+        },
+        "openPanel": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "openLegendPanel"
+                },
+                {
+                    "action": "openPropertiesPanel"
+                }
+            ]
+        }
+    },
+
+    "functions": {
+        "getGraphDataFromResponse": {
+            "functionName": "getGraphDataFromResponse"
+        }
+    },
+
+    "data": {
+        "actionToolboxConfig": {
+            "slide": "PUSH",
+            "direction": "RIGHT_TO_LEFT",
+            "animation": true,
+            "width": "STANDARD",
+            "height": "FULL"
+        },
+
+        "actionPropertiesConfig": {
+            "slide": "PUSH",
+            "direction": "RIGHT_TO_LEFT",
+            "animation": true,
+            "width": "STANDARD",
+            "height": "FULL"
+        },
+
+        "graphModel": {
+            "graphDataProvider": {
+                "name": "sampleGraphDataProvider",
+                "dataParser": {
+                    "nodes": "nodes",
+                    "edges": "edges",
+                    "ports": "ports",
+                    "node": {
+                        "id": "id",
+                        "category": "category",
+                        "label": "labelText",
+                        "position": "position",
+                        "initialExpanded": "isExpanded"
+                    },
+                    "edge": {
+                        "id": "id",
+                        "category": "category",
+                        "labelPosition": "edgeLabelPosition",
+                        "sourceNodeId": "props.startNodeId",
+                        "targetNodeId": "props.endNodeId",
+                        "sourcePortId": "props.startPort",
+                        "sourcePortLocation": "props.startLocation",
+                        "targetPortId": "props.endPort",
+                        "targetPortLocation": "props.endLocation",
+                        "position": "edgePosition"
+                    },
+                    "port": {
+                        "id": "id",
+                        "category": "category",
+                        "ownerNodeId": "nodeId",
+                        "position": "position"
+                    },
+                    "boundary": {
+                        "id": "id",
+                        "category": "category",
+                        "label": "boundaryLabelText",
+                        "position": "position"
+                    }
+                },
+                "groupRelationCategory": "Structure",
+                "graphRenderInterface": "js/actionBuilderGraphProviderImpl"
+            },
+
+            "config": {
+                "enableEdit": true,
+                "minZoom": 0,
+                "maxZoom": 2,
+                "autoEdgeRoutingType": "HV",
+                "fitViewPosition": "CENTER",
+                "hoverDelayTime": 500,
+                "tooltipDelayTime": 500,
+                "tooltipOffset": {
+                    "x": 0,
+                    "y": 20
+                },
+                "movableItems": [
+                    "Node"
+                ],
+                "selectableItems": [
+                    "Node",
+                    "Edge"
+                ],
+                "layout": {
+                    "layoutMode": "IncUpdateLayout",
+                    "defaultOption": "LeftToRight",
+                    "options": [
+                        "TopToBottom",
+                        "RightToLeft",
+                        "LeftToRight",
+                        "BottomToTop",
+                        "Incremental"
+                    ],
+                    "config": {
+                        "nodeToNodeDistance": {
+                            "x": 100,
+                            "y": 100
+                        },
+                        "edgeToEdgeDistance": {
+                            "x": 12.5,
+                            "y": 12.5
+                        },
+                        "portSize": {
+                            "width": 0,
+                            "height": 0
+                        },
+                        "enableRSOP": true,
+                        "makeRoomInRSOPDisable": true,
+                        "snakeWrapLength": 500
+                    }
+                },
+                "showNodeOverlay": true,
+
+                "nodeOverlay": {
+                    "zoomThreshold": 0.7
+                },
+
+                "inputMode": "editInputMode",
+                "graphEditHandler": "js/actionBuilderGraphEditHandler",
+                "tooltipHandler": "js/actionBuilderGraphTooltipHandler",
+                "moveWithoutSelection": true,
+                "enableAutoPan": true,
+                "enableMarqueeSelection": false,
+                "marqueeSelectionModifierKey": [
+                    [ "Shift" ]
+                ],
+                "enableMultipleSelection": false,
+                "showOverview": true,
+                "enableObjectArrangement": true,
+                "snapToGridByAnchorPoint": false,
+                "showGrid": false,
+                "grid": {
+                    "lineStyle": "LINE",
+                    "lineColor": "rgb(129,182,196)",
+                    "showMajorLines": true,
+                    "showMinorLines": true,
+                    "bringToTop": false,
+                    "majorSpacing": 50,
+                    "minorLinesPerMajor": 5,
+                    "enableSnapping": true,
+                    "enableSnapConnections": false,
+                    "snapPointsPerMinor": 1,
+                    "snapConnectionTolerance": 0
+                },
+                "enableAlignment": false,
+                "alignment": {
+                    "strokeColor": "rgb(0,255,0)",
+                    "strokeWidth": 2,
+                    "strokeDashStyle": "SOLID",
+                    "tolerance": 10,
+                    "separateGridSnapAndAlignment": true
+                },
+                "defaults": {
+                    "nodeSize": {
+                        "width": 120,
+                        "height": 60
+                    },
+                    "minimumNodeSize": {
+                        "width": 50,
+                        "height": 50
+                    },
+                    "nodeStyle": {
+                        "templateId": "defaultNodeSampleTemplate"
+                    },
+                    "portStyle": {
+                        "portShape": "SQUARE",
+                        "borderColor": "(0, 0, 0)",
+                        "fillColor": "(255, 255, 255)",
+                        "thickness": 1,
+                        "size": 24,
+                        "iconId": "miscRedoMarkup"
+                    },
+                    "edgeStyle": {
+                        "dashStyle": "DASH",
+                        "thickness": 1.0,
+                        "color": "(0,0,0)"
+                    },
+                    "edgeLabel": {
+                        "maxWidth": 100,
+                        "contentStyleClass": "aw-widgets-label aw-base-normal aw-graph-label aw-gctest-edge-label",
+                        "placementRule": {
+                            "positionOption": "CENTER_OF_LONGEST_SEGMENT_HORIZONTAL",
+                            "rotationMode": "AlongWithSegment"
+                        }
+                    },
+                    "label": {
+                        "hasBackground": true,
+                        "backgroundFillColor": "rgb(1,244,244,244)",
+                        "backgroundStyleClass": "aw-graph-labelBackground",
+                        "backgroundAnchor": [ 0.5, 0.5 ],
+                        "textAnchor": [ 0.5, 0.5 ],
+                        "contentStyleClass": "aw-widgets-label aw-base-normal aw-graph-label",
+                        "allowWrapping": false,
+                        "maxMoveDistance": 500
+                    }
+                },
+                "dragAndDropModifierKey": {
+                    "copy": [ "Alt", "Shift" ],
+                    "move": [ "Alt" ]
+                },
+                "enableJumper": true,
+                "jumper": {
+                    "jumperType": "ARC",
+                    "jumperSize": {
+                        "width": 10,
+                        "height": 10
+                    },
+                    "jumperPriority": "HORIZONTAL"
+                },
+                "dragAndDropHandler": "js/actionBuilderDragAndDropHandler"
+            },
+
+            "nodeTemplates": {
+                "defaultNodeSampleTemplate": {
+                    "templateUrl": "/html/defaultNodeSampleTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "rgb(218,239,250)",
+                        "Name": "New Task",
+                        "Name_editable": false
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    },
+                    "roundCorner": {
+                        "rx": 10,
+                        "ry": 10,
+                        "borderColor": "rgb(130,202,237)",
+                        "strokeColorProperty": "node_fill_color",
+                        "borderStyleClass": "aw-graph-node-border aw-widgets-cellListItemNode"
+                    },
+                    "padding": 50
+                },
+                "taskNodeTemplate": {
+                    "templateUrl": "/html/taskNodeTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "rgb(218,239,250)",
+                        "Name": "New Task",
+                        "Name_editable": false
+                    },
+                    "padding": 50,
+                    "textOverflow": "ELLIPSIS",
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    },
+                    "roundCorner": {
+                        "rx": 10,
+                        "ry": 10,
+                        "borderColor": "rgb(130,202,237)",
+                        "strokeColorProperty": "node_fill_color",
+                        "borderStyleClass": "aw-graph-node-border aw-widgets-cellListItemNode"
+                    }
+                },
+                "startNodePreviewTemplate": {
+                    "templateUrl": "/html/startNodePreviewTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "",
+                        "Name": "",
+                        "Name_editable": false
+                    },
+                    "padding": 0,
+                    "isResizable": false,
+                    "minNodeSize": {
+                        "width": 25,
+                        "height": 25
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    }
+                },
+                "startNodeTemplate": {
+                    "templateUrl": "/html/startNodeTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "",
+                        "Name": "Start",
+                        "Name_editable": false
+                    },
+                    "padding": 0,
+                    "isResizable": false,
+                    "minNodeSize": {
+                        "width": 25,
+                        "height": 25
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    }
+                },
+                "endNodePreviewTemplate": {
+                    "templateUrl": "/html/endNodePreviewTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "",
+                        "Name": "",
+                        "Name_editable": false
+                    },
+                    "padding": 0,
+                    "isResizable": false,
+                    "minNodeSize": {
+                        "width": 25,
+                        "height": 25
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    }
+                },
+                "endNodeTemplate": {
+                    "templateUrl": "/html/endNodeTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "",
+                        "Name": "End",
+                        "Name_editable": false
+                    },
+                    "padding": 0,
+                    "isResizable": false,
+                    "minNodeSize": {
+                        "width": 25,
+                        "height": 25
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    }
+                },
+                "eventPreviewTemplate": {
+                    "templateUrl": "/html/eventPreviewTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "",
+                        "Name": "",
+                        "Name_editable": false
+                    },
+                    "padding": 0,
+                    "isResizable": false,
+                    "minNodeSize": {
+                        "width": 25,
+                        "height": 25
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    }
+                },
+                "eventTemplate": {
+                    "templateUrl": "/html/eventTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "",
+                        "Name": "Continue",
+                        "Name_editable": false
+                    },
+                    "padding": 0,
+                    "isResizable": false,
+                    "minNodeSize": {
+                        "width": 25,
+                        "height": 25
+                    },
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    }
+                }
+            },
+
+            "inputModes": {
+                "viewInputMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": false,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+                "edgeCreationMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "creatableItem": "Edge",
+                    "defaultCursor": "hand",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur",
+                    "enableSelfLoopConnection": true,
+                    "endPointTolerance": 15,
+                    "attachableObjects": [ "Node" ],
+                    "showPortCandidate": true,
+                    "portCandidateSvgStr": "<circle cx='5' cy='5' r='5' stroke='black' stroke-width='1' fill='white' />",
+                    "portHiCandidateSvgStr": "<circle cx='5' cy='5' r='5' stroke='black' stroke-width='1' fill='gray' />"
+                },
+                "nodeCreationMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "creatableItem": "Node",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+                "editInputMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "creatableItem": "",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                }
+            },
+            "hoverStyle": {
+                "node": "aw-widgets-cellListItemNodeHovered",
+                "edge": { "thicknessScale": 2.0 }
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "actionBuilder.legendInitialized",
+            "action": "requestGraphDataForCommandAction",
+            "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'"
+        },
+        {
+            "eventId": "actionBuilder.legendInitialized",
+            "action": "requestGraphDataForViewModelAction",
+            "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'"
+        },
+        {
+            "eventId": "awGraph.initialized",
+            "action": "initLegendData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.graphItemsMoved",
+            "action": "actionBuilderGraphItemsMoved",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.graphActionItemAdded",
+            "action": "appendGraphDataForDroppedViewModelAction",
+            "cacheEventData": true,
+            "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'"
+        },
+        {
+            "eventId": "awGraph.graphActionItemAdded",
+            "action": "appendGraphDataForDroppedCommandAction",
+            "cacheEventData": true,
+            "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'"
+        },
+        {
+            "eventId": "awGraph.reuseActionFlowAdded",
+            "action": "connectGraphDataForDroppedViewModelAction",
+            "cacheEventData": true,
+            "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'"
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "updateSelection",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.deleteKeyDown",
+            "action": "deleteKeyDown",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.graphItemsResized",
+            "action": "graphItemsResized",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.hoverChanged",
+            "action": "hoverChanged",
+            "cacheEventData": true
+        }
+    ],
+
+    "i18n": {
+        "filter": [ "ActionBuilderMessages" ],
+        "objects": [ "ActionBuilderMessages" ],
+        "relations": [ "ActionBuilderMessages" ]
+    },
+    "lifecycleHooks": {
+        "onMount": "openPanel"
+    }
+}

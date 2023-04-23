@@ -1,0 +1,267 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-bpmn-cell.directive",
+        "js/exist-when.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-action-cell.directive",
+        "js/aw-list-filter.directive"
+    ],
+    "data": {
+        "tabModels": [ {
+                "name": "New",
+                "tabKey": "newPage"
+            },
+            {
+                "name": "Existing",
+                "tabKey": "existingPage"
+            }
+        ],
+        "_cursorObject": {
+            "endIndex": 0,
+            "endReached": false,
+            "startIndex": 0,
+            "startReached": true
+        },
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING"
+        }
+    },
+    "actions": {
+        "retrieveCommandActions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{data.filterBox.dbValue}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data._cursorObject.endIndex}}",
+                            "endReached": "{{data._cursorObject.endReached}}",
+                            "startIndex": "{{data._cursorObject.startIndex}}",
+                            "startReached": "{{data._cursorObject.startReached}}",
+                            "pagingType": "GetCurrentPage"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.prevCursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.nextCursorObject": "data.actions.cursor"
+            }
+        },
+        "retrieveCommandActionsNext": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{data.filterBox.dbValue}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.commandActionsDataProvider.cursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.commandActionsDataProvider.cursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.commandActionsDataProvider.cursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.commandActionsDataProvider.cursorObject.startReached}}",
+                            "pagingType": "GetNextPage"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject.endReached": "data.actions.cursor.endReached",
+                "dataProviders.commandActionsDataProvider.nextCursorObject": "data.actions.cursor"
+            }
+        },
+        "retrieveCommandActionsPrevious": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{data.filterBox.dbValue}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.commandActionsDataProvider.cursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.commandActionsDataProvider.cursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.commandActionsDataProvider.cursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.commandActionsDataProvider.cursorObject.startReached}}",
+                            "pagingType": "GetPreviousPage"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject.startReached": "data.actions.cursor.startReached",
+                "dataProviders.commandActionsDataProvider.prevCursorObject": "data.actions.cursor"
+            }
+        },
+        "retrieveCommandActionsFocus": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{data.filterBox.dbValue}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.commandActionsDataProvider.cursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.commandActionsDataProvider.cursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.commandActionsDataProvider.cursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.commandActionsDataProvider.cursorObject.startReached}}",
+                            "pagingType": "GetCurrentPage"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.prevCursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.nextCursorObject": "data.actions.cursor"
+            }
+        },
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [ "getOperatorsProvider", "getObjectActivitiesProvider", "commandActionsDataProvider" ]
+        },
+        "getOperators": {
+            "actionType": "JSFunctionAsync",
+            "method": "getActionTypes",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "dataParsers": [ {
+                "id": "vmoActionTypes",
+                "responseObjs": "operatorsArray"
+            } ],
+            "outputData": {
+                "operators": "operatorsArray"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "getObjectActivities": {
+            "actionType": "JSFunctionAsync",
+            "method": "getActionTypes",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "dataParsers": [ {
+                "id": "vmoActionTypes",
+                "responseObjs": "objectActivitiesArray"
+            } ],
+            "outputData": {
+                "objectActivities": "objectActivitiesArray"
+            },
+            "deps": "js/actionBuilderService"
+        }
+    },
+    "dataProviders": {
+        "getOperatorsProvider": {
+            "action": "getOperators",
+            "response": "{{data.operators}}",
+            "totalFound": "{{data.operators.length}}",
+            "selectionModelMode": "single"
+        },
+        "getObjectActivitiesProvider": {
+            "action": "getObjectActivities",
+            "response": "{{data.objectActivities}}",
+            "totalFound": "{{data.objectActivities.length}}",
+            "selectionModelMode": "single"
+        },
+        "commandActionsDataProvider": {
+            "action": "retrieveCommandActions",
+            "response": "{{data.actionList}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "dataParseDefinitions": {
+        "vmoActionTypes": {
+            "identifier": "{{response.id}}",
+            "props": {
+                "title": {
+                    "name": "title",
+                    "displayName": "Title",
+                    "value": "{{response.id}}",
+                    "displayValue": "{{response.title}}",
+                    "type": "STRING"
+                },
+                "icon": {
+                    "name": "icon",
+                    "displayName": "iconName",
+                    "value": "{{response.icon}}",
+                    "displayValue": "{{response.icon}}",
+                    "type": "STRING"
+                }
+            }
+        },
+        "actions": {
+            "cellHeader1": "{{response.id}}",
+            "uid": "{{response.id}}",
+            "cellHeader2": "{{response.cellHeader2}}",
+            "cellProperties": "{{response.cell_properties}}",
+            "thumbnailURL": "{{response.thumbnailURL}}",
+            "type": "{{response.type}}",
+            "typeHierarchy": "{{response.typeHierarchy}}",
+            "hasThumbnail": "{{response.hasThumbnail}}",
+            "identifier": "{{response.uid}}",
+            "indicators": "{{response.indicators}}",
+            "props": "{{response.props}}"
+        }
+    },
+    "onEvent": [],
+    "conditions": {
+        "showNewPage": {
+            "expression": "data.selectedTab.tabKey === 'newPage'"
+        },
+        "showExistingPage": {
+            "expression": "data.selectedTab.tabKey === 'existingPage'"
+        }
+    },
+    "i18n": {
+        "actionOperators": [ "ActionBuilderMessages" ],
+        "actionObjectActivities": [ "ActionBuilderMessages" ],
+        "actionToolbox": [ "ActionBuilderMessages" ],
+        "loading": [ "ActionBuilderMessages" ]
+    }
+}

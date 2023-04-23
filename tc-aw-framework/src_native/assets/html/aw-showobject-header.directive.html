@@ -1,0 +1,40 @@
+<div class="aw-layout-flexColumn">
+    <header aria-label="i18n.applicationHeader" class="aw-layout-header aw-layout-flexRowContainer" ng-class="{'afx-layout-fullscreen-header': ctx.fullscreen}">
+        <div class="aw-layout-headerLeft aw-layout-flexRow">
+            <div ng-hide="ctx.fullscreen" class="aw-layout-headerIcon" ng-if="headerVMO">
+                <aw-model-icon ng-if="headerVMO.props" vmo="headerVMO"></aw-model-icon>
+            </div>
+
+            <div class="aw-layout-flexColumn aw-layout-headerContent">
+                <div class="aw-layout-flexRowContainer aw-layout-locationTitlePanel">
+                    <h1 class="aw-layout-locationTitle aw-layout-flexRow" ng-if="!breadcrumbConfig">{{headerTitle}}</h1>
+
+                    <div class="aw-layout-flexRow aw-layout-breadCrumbContainer" ng-if="breadcrumbConfig">
+                        <div class="aw-layout-validationErrorMessage" ng-if="validationErrorMessage">
+                            {{validationErrorMessage}}
+                        </div>
+                        <aw-workarea-title breadcrumb-config="breadcrumbConfig" ng-if="!validationErrorMessage"></aw-workarea-title>
+                    </div>
+                </div>
+                <div ng-hide="ctx.fullscreen" class="aw-layout-headerPropContainer aw-layout-flexRowContainer">
+                    <!-- Header Visual Indicator -->
+                    <div class="aw-layout-flexRowContainer aw-visual-indicatorContainer">
+                        <aw-visual-indicator ng-if="headerVMO.indicators.length > 0" vmo="headerVMO"></aw-visual-indicator>
+                    </div>
+                    <!-- PlaceHolder for other applications. -->
+                    <div class="aw-layout-flexRowContainer aw-layout-headerContribution" ng-if="headerContributedView">
+                        <aw-include name="{{headerContributedView}}" sub-panel-context="subPanelContext"></aw-include>
+                    </div>
+                    <!-- Header Properties -->
+                    <div class="aw-layout-flexRowContainer aw-layout-headerContribution">
+                        <aw-header-props headerProperties="headerProperties"></aw-header-props>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-hide="ctx.fullscreen" class="aw-layout-flexRowContainer aw-layout-alignItemsCenter aw-layout-headerRight">
+            <aw-global-search exist-when="!subPanelContext.provider.headerPreference.hideGlobalSearch" visible-when="!ctx.embeddedLocationView"></aw-global-search>
+            <aw-logo exist-when="!subPanelContext.provider.headerPreference.hideLogo"></aw-logo>
+        </div>
+    </header>
+</div>

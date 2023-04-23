@@ -1,0 +1,113 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-image-cell.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-flex-row.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "loadData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "Awp0MyActiveFolders",
+                    "operationType": "union"
+                },
+                "searchInput":
+                {
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "objectSet": "contents.WorkspaceObject",
+                        "parentUid": "{{data.uid}}",
+                        "returnTargetObjs": "true"
+                    },
+                    "searchFilterFieldSortType" : "Alphabetical",
+                    "searchSortCriteria": "{{ctx.sublocation.sortCriteria}}",
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}"
+                },
+                "inflateProperties": false
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.searchFolder.totalFound": "totalFound",
+                "ctx.searchFolder.totalLoaded": "totalLoaded",
+                "dataProviders.listDataProvider.columnConfig": "columnConfig",
+                "ctx.searchFolder.exportPanelContext": "{{function:setExportPanelContextForSearchFolder2}}"
+            },
+            "deps": "js/Awp0SearchFolderOverviewService"
+        }
+    },
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "selectionModel": {
+                "multiSelectEnabled": true
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "data": {
+        "uid": "{{ctx.xrtSummaryContextObject.uid}}"
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize":
+        {
+            "functionName": "getDefaultPageSize",
+            "parameters":
+            [
+                 "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "setExportPanelContextForSearchFolder2": {
+            "functionName": "setExportPanelContextForSearchFolder2",
+            "parameters": [
+                "{{data}}",
+                "{{dataProviders}}"
+            ]
+        }
+    },
+    "onEvent": [{
+        "eventId": "Awp0SearchFolderContentsImage.contentLoaded",
+        "action": "reveal"
+    }]
+}
+

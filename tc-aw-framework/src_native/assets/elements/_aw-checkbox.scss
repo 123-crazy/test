@@ -1,0 +1,307 @@
+// Copyright (c) 2020 Siemens
+.afx-checkbox {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: $checkbox_padding;
+    margin: 0 0 -6px;
+    border-radius: $checkbox_border_radius;
+    transform: translateZ(0); // 3d rendering
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .aw-jswidgets-checkboxWrapper,
+    .aw-jswidgets-checkboxLabel {
+        font-size: $checkbox_label_font_size;
+        font-weight: $checkbox_label_font_weight;
+        cursor: pointer;
+        padding-left: 0; // Bootstrap reset
+        margin-right: 8px;
+        display: inline;
+        vertical-align: inherit;
+    }
+
+    // Hide the native checkbox
+    input[type=checkbox] {
+        opacity: 0;
+        position: absolute;
+        margin: 0;
+        z-index: -1;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        left: 0;
+        pointer-events: none;
+    }
+
+    .afx-checkbox-md-style {
+        top: 3px;
+        vertical-align: middle;
+        position: relative;
+
+        &:before {
+            position: absolute;
+            left: 8px;
+            top: 2px;
+            content: "";
+            height: 4px;
+            width: 4px;
+            border-radius: 100%;
+            z-index: 1;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .check {
+            position: relative;
+            display: inline-block;
+            width: $checkbox_check_width;
+            height: $checkbox_check_height;
+            border: $checkbox_border;
+            border: 1px solid;
+            border-radius: $checkbox_border_radius;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .check:before {
+            position: absolute;
+            content: "";
+            transform: rotate(45deg);
+            display: block;
+            margin-top: -3px;
+            margin-left: 7px;
+            width: 0;
+            height: 0;
+            box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 inset;
+        }
+    }
+
+    &.afx-checkbox-label-side {
+        padding: 0;
+
+        .afx-checkbox-md-style {
+            top: 0;
+        }
+    }
+
+    &.afx-checkbox-label-right {
+        direction: rtl; // padding: $checkbox_padding_rtl;
+        margin: 1px -5px 1px -10px;
+        vertical-align: middle;
+
+        .check:before {
+            left: 0;
+        }
+
+        .aw-jswidgets-checkboxLabel {
+            font-size: $checkbox_label_font_size;
+        }
+    }
+
+    &.afx-checkbox-label-top {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+        width: auto;
+        min-width: 44px;
+
+        .aw-jswidgets-checkboxWrapper,
+        .aw-jswidgets-checkboxLabel {
+            margin-bottom: 4px;
+            font-size: $checkbox_label_font_size;
+            font-weight: $checkbox_label_font_weight;
+        }
+    }
+
+    &:hover {
+        input[type=checkbox] {
+            &:not(:checked) {
+                &+.afx-checkbox-md-style {
+                    .check {
+                        width: rem-calc(10);
+                        height: rem-calc(10);
+                    }
+                }
+            }
+        }
+
+        input[type=checkbox][disabled] {
+            &+.afx-checkbox-md-style {
+                .check {
+                    width: $checkbox_check_width;
+                    height: $checkbox_check_height;
+                }
+            }
+        }
+    }
+
+    input[type=checkbox]:focus+.afx-checkbox-md-style .check:after {
+        opacity: 0.2;
+    }
+
+    input[type=checkbox]:checked+.afx-checkbox-md-style .check:before {
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+        animation: checkbox-on $checkbox_check_animation forwards ease-out;
+    }
+
+    input[type=checkbox]:focus+.afx-checkbox-md-style:before {
+        animation: rippleOn $checkbox_ripple_animation forwards ease-out;
+    }
+
+    input[type=checkbox]:checked {
+        +.afx-checkbox-md-style {
+            .check {
+                border: none;
+                width: $checkbox_check_width_checked;
+                height: $checkbox_check_height_checked;
+            }
+        }
+    }
+
+    // Style for disabled inputs
+
+    input[type=checkbox][disabled]:not(:checked)~.afx-checkbox-md-style .check:before,
+    input[type=checkbox][disabled]+.circle {
+        opacity: 0.5;
+    }
+
+    input[type=checkbox][disabled]+.afx-checkbox-md-style .check:after {
+        transform: rotate(-45deg);
+    }
+
+    .afx-checkbox-md-style {
+        top: 3px;
+    }
+}
+
+aw-checkbox {
+    .disabled,
+    &.disabled {
+        // refreshed elements shouldn't use opacity this way
+        // override until we have a consistent approach
+        opacity: 1;
+    }
+    aw-property-checkbox-val {
+        .afx-property-required:after {
+            margin-left: $checkbox_required_label_right_margin_left;
+        }
+    }
+    .afx-property-required:after {
+        margin-left: $checkbox_required_margin_left;
+    }
+}
+
+.aw-jswidgets-arrayEditWidgetContainer .afx-checkbox.afx-checkbox-label-side {
+    padding: $checkbox_array_padding;
+}
+
+// Animations
+@keyframes checkbox-on {
+    0% {
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px;
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 20px 2px 0 11px;
+    }
+
+    100% {
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px;
+    }
+}
+
+@keyframes checkbox-off {
+    0% {
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+    }
+
+    25% {
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 20px -12px 0 11px, 0 0 0 0 inset;
+    }
+
+    50% {
+        transform: rotate(45deg);
+        margin-top: -4px;
+        margin-left: 6px;
+        width: 0px;
+        height: 0px;
+        box-shadow: 0 0 0 10px, 10px -10px 0 10px, 32px 0px 0 20px, 0px 32px 0 20px, -5px 5px 0 10px, 15px 2px 0 11px, 0 0 0 0 inset;
+    }
+
+    51% {
+        transform: rotate(0deg);
+        margin-top: -2px;
+        margin-left: -2px;
+        width: 20px;
+        height: 20px;
+        box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 10px inset;
+    }
+
+    100% {
+        transform: rotate(0deg);
+        margin-top: -2px;
+        margin-left: -2px;
+        width: 20px;
+        height: 20px;
+        box-shadow: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0px 0px 0 0px inset;
+    }
+}
+
+@keyframes rippleOn {
+    0% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(13, 13);
+    }
+}
+
+.aw-jswidgets-drop li.aw-jswidgets-nestingListItem label.aw-jswidgets-checkboxLabel {
+    font-size: $checkbox_label_font_size;
+    font-weight: $checkbox_label_font_weight;
+    vertical-align: middle;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 2.25rem);
+}
+
+// checkbox-list filter
+.aw-jswidgets-cbaSearch {
+    margin: 5px 10px 0;
+
+    .aw-widget-icon {
+        top: 0;
+        height: $icon_button_height;
+        width: $icon_button_width;
+        padding: $icon_button_padding;
+    }
+}
+
+// popup has been moved to body, now only related to .aw-jswidgets-checkboxDrop
+.aw-jswidgets-checkboxDrop {
+    .aw-widgets-cellListCellItemType {
+        margin-left: $checkbox_desc_indent;
+        margin-top: -2px;
+        padding: 0;
+        font-size: $fontsize_small;
+        width: calc(100% - #{$checkbox_desc_indent});
+    }
+
+    .aw-jswidgets-nestingListItemDisplay {
+        @include flex-direction(column);
+    }
+}
+
+// checkbox-list seperator after selected vals
+.aw-widgets-cellListWidget .afx-selected-vals .aw-jswidgets-nestingListItem:last-child {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}

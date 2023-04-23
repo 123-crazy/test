@@ -1,0 +1,62 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-toolbar-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "toolbarDataProvider"
+        },
+        "retrieveToolbars": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){anchors(filter:$filter){id title{value}}}",
+                    "variables": {
+                        "filter": "{{ctx.search.criteria.searchString}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "toolbarList": "{{function:convertAnchorsToVMOs}}",
+                "ctx.search.totalFound": "data.anchors.length"
+            },
+            "deps": "js/toolbarsSublocationService"
+        }
+    },
+    "data": {
+        "_cursorObject": {
+            "endIndex": 0,
+            "endReached": false,
+            "startIndex": 0,
+            "startReached": true
+        }
+    },
+    "dataProviders": {
+        "toolbarDataProvider": {
+            "action": "retrieveToolbars",
+            "response": "{{data.toolbarList}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            }
+        }
+    },
+    "conditions": {},
+    "onEvent": [
+        {
+            "eventId": "toolbarsList.retrievedToolbarssVmJson",
+            "action": "reveal"
+        }
+    ],
+    "i18n": {},
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    }
+}

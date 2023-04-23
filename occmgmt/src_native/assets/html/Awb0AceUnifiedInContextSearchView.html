@@ -1,0 +1,29 @@
+<aw-command-panel caption="{{conditions.hasStructureSearchTitle ? ctx[data.navigateContext.dbValue].structureSearchConfig.structureSearchTitle : i18n.find}}">
+    <aw-panel-body scrollable="false">
+
+        <div>
+            <aw-column width="1.6f">
+                <aw-label prop="data.searchByLabel"></aw-label>
+            </aw-column>
+            <aw-column >
+                <aw-link-with-popup-menu class="abc" prop="data.awb0ContextQuery" dataprovider="data.dataProviders.getAllContextQueries" aw-class="{'disabled': conditions.isWorksetSelected || !conditions.isFindInFeatureSupported}"></aw-link-with-popup-menu>
+            </aw-column>
+        </div>
+        <div visible-when="data.awb0ContextQuery.uiValue === data.i18n.keyword">
+            <aw-search-box prop="data.searchStringIndexed" action="performIndexedSearch"  aw-class="{'disabled': conditions.isWorksetSelected}"></aw-search-box>
+        </div>
+        <div visible-when="ctx[data.navigateContext.dbValue].supportedFeatures.Awb0ScopedFindInStructure
+        && ( !ctx[data.navigateContext.dbValue].pwaSelectionModel.multiSelectEnabled && ctx[data.navigateContext.dbValue].pwaSelectionModel.getCurrentSelectedCount() < 2)
+        && data.awb0ContextQuery.uiValue === data.i18n.keyword
+            && conditions.isValidSelection && !conditions.isLeafNode && !(ctx[data.navigateContext.dbValue].selectedModelObjects[0].modelType.typeHierarchyArray.indexOf('Fgf0PartitionElement') > -1)" aw-class="{'disabled': conditions.isSearchScopeDisable}">
+            <aw-checkbox prop="data.searchScope"></aw-checkbox>
+        </div>
+        <aw-panel-section >
+            <aw-scrollpanel aw-class="{'disabled': conditions.isWorksetSelected}">
+                <div>
+                    <aw-tab-set tabs="data.tabsModel.dbValues" aw-class="{'disabled': conditions.isWorksetSelected}"></aw-tab-set>
+                </div>
+            </aw-scrollpanel>
+        </aw-panel-section>
+    </aw-panel-body>
+</aw-command-panel>

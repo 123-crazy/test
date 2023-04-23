@@ -1,0 +1,18 @@
+<aw-flex-row height="fill">
+    <aw-panel-body scrollable="false" class="propBody">
+        <aw-panel-section caption="i18n.properties" exist-when="!data.canvasData.currentSelectedElementId"></aw-panel-section>
+        <div aw-repeat="node : data.props.baseproperty" exist-when="data.canvasData.currentSelectedElementId">
+            <aw-command-panel-section caption="{{node.name}}" collapsed="false">
+                <aw-textbox prop="node.vmProp" exist-when="node.hasVMBinding"></aw-textbox>
+                <wysiwyg-prop vmo="node.children"></wysiwyg-prop>
+            </aw-command-panel-section>
+        </div>
+    </aw-panel-body>
+</aw-flex-row>
+<aw-flex-row height="2.2f">
+    <aw-panel-footer exist-when="data.canvasData.currentSelectedElementId && data.props.baseproperty.length > 0">
+        <aw-button action="updatePropValue">
+            <aw-i18n>i18n.updateParams</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-flex-row>

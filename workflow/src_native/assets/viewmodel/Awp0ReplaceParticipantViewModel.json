@@ -1,0 +1,300 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData":
+            {
+                "objects":"{{function:getObjectsToLoad}}",
+                "attributes": [
+                    "assignee",
+                    "parent_process",
+                    "fnd0StoreParticipantsOnJob"
+                ]
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Participant",
+                        "properties":
+                        [
+                            {
+                                "name": "assignee",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMTask",
+                        "properties": [
+                            {
+                                "name": "root_target_attachments"
+                            },
+                            {
+                                "name": "parent_process"
+                            },
+                            {
+                                "name": "fnd0StoreParticipantsOnJob"
+                            }
+
+                        ]
+                    },
+                    {
+                        "name": "Signoff",
+                        "properties":
+                        [
+                            {
+                                "name": "fnd0ParentTask",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "fnd0StoreParticipantsOnJob"
+                            },
+                            {
+                                "name": "root_target_attachments"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps": "js/Awp0ReplaceParticipant"
+        },
+
+        "replaceParticipants":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-10-DataManagement",
+            "method": "reassignParticipants",
+            "inputData":
+            {
+                "reassignParticipantInfo":
+                [
+                    {
+                        "itemRevs": ["{{ctx.workflow.selectedObject}}"],
+                        "allParticipantTypes": false,
+                        "comments": "",
+                        "participantTypes": ["{{ctx.workflow.participantType}}"],
+                        "fromAssignee": "{{function:getFromAssignee}}",
+                        "toAssignee": "{{data.selectedObjects[0]}}"
+                    }
+                ]
+            },
+            "events":{
+               "success":[
+                  {
+                     "name":"cdm.relatedModified",
+                     "eventData":{
+                        "relatedModified":[
+                           "{{ctx.workflow.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                     "name": "workflow.resetParticipantTable",
+                     "condition": "ctx.participantCtx.isParticipantTable"
+                  },
+                  {
+                     "name":"complete",
+                     "eventData":{
+                        "source":"toolAndInfoPanel"
+                     }
+                  }
+               ],
+                "failure":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0ReplaceParticipant",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "serverError"
+                    }
+                ]
+            }
+        },
+        "replaceTaskParticipants":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Participant-2018-11-Participant",
+            "method": "reassignParticipants",
+            "inputData":
+            {
+                "input":
+                [
+                    {
+                        "clientId": "",
+                        "wsoList": ["{{function:getWsoList}}"],
+                        "allParticipantTypes": false,
+                        "comment": "",
+                        "participantTypes": ["{{ctx.workflow.participantType}}"],
+                        "fromAssignee": "{{function:getFromAssignee}}",
+                        "toAssignee": {
+                            "type":"{{data.selectedObjects[0].type}}",
+                            "uid":"{{data.selectedObjects[0].uid}}"
+                           },
+                        "additionalData":{
+                            "SampleStringKey":[]
+                        }
+                    }
+                ]
+            },
+            "events":{
+               "success":[
+                  {
+                     "name":"cdm.relatedModified",
+                     "eventData":{
+                        "relatedModified":[
+                           "{{ctx.workflow.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                     "name":"complete",
+                     "eventData":{
+                        "source":"toolAndInfoPanel"
+                     }
+                  }
+               ],
+                "failure":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0ReplaceParticipant",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "serverError"
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+
+    "functions":
+    {
+        "getFromAssignee": {
+            "functionName": "getFromAssignee",
+            "parameters":
+            [
+                "{{ctx.workflow.selectedObject}}",
+                "{{ctx.workflow.selParticipantObject}}",
+                "{{ctx.workflow.participantType}}"
+            ]
+        },
+        "getWsoList": {
+            "functionName": "getWsoList",
+            "parameters":
+            [
+                "{{ctx.workflow.selectedObject}}"
+            ]
+        },
+        "getObjectsToLoad": {
+            "functionName": "getObjectsToLoad",
+            "parameters":
+            [
+                "{{ctx}}"
+            ]
+        }
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        }
+    ],
+
+    "conditions":
+    {
+        "isValidToReplace":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0 && ctx.workflow.selectedObject.modelType.typeHierarchyArray.indexOf('ItemRevision')>-1"
+        },
+        "isValidToReplaceTaskParticipant":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0 && (ctx.workflow.selectedObject.modelType.typeHierarchyArray.indexOf('EPMTask')>-1 || ctx.workflow.selectedObject.modelType.typeHierarchyArray.indexOf('Signoff')>-1)"
+        },
+        "checkSelectionChange":
+        {
+            "expression": "name == 'selected'"
+        }
+    },
+    "i18n":
+    {
+        "Add_Title": [ "WorkflowCommandPanelsMessages"],
+        "Replace_Title": [ "WorkflowCommandPanelsMessages"]
+    },
+    "messages": {
+        "serverError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    }
+}

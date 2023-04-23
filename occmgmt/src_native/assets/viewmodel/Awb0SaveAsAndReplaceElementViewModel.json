@@ -1,0 +1,586 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-header.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-init.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-xrt.directive",
+        "js/aw-radiobutton.directive"
+    ],
+    "data": {
+        "adaptedPropForSaveAsReplace": {
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "awb0UnderlyingObject"
+        },
+        "targetObject": {},
+        "copyChildrenCheckBox": {
+            "displayName": "{{i18n.copyChildren}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": false
+        },
+        "defaultIdsOrIdNamingRuleCheckBox": {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioFalseText": "{{i18n.idNamingRule}}",
+            "propertyRadioTrueText": "{{i18n.defaultIds}}",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "prefixTextBox": {
+            "displayName": "{{i18n.prefix}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "suffixTextBox": {
+            "displayName": "{{i18n.suffix}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "replaceTextBox": {
+            "displayName": "{{i18n.replaceElementBtn}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "validationCriteria": [
+                {
+                    "condition": "conditions.isWithTextBoxFilledWithoutReplaceValue",
+                    "value": "{{i18n.PROP_REQUIRED_ERROR}}"
+                }
+            ]
+        },
+        "withTextBox": {
+            "displayName": "{{i18n.with}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "runInBackgroundCheckBox": {
+            "displayName": "{{i18n.runInBackground}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": false
+        },
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "awb0pincommands": "awb0_oneStepPinCommands"
+    },
+    "actions": {
+        "getObjectAndUpdateCtxForSaveAsAndReplace": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateDataFromCtx",
+                    "condition": "ctx.aceActiveContext.context.adaptedPropForSaveAsReplace"
+                },
+                {
+                    "action": "getObjectForSaveAsAndReplace"
+                },
+                {
+                    "action": "updateCtxForSaveAsOnReveal"
+                }
+            ]
+        },
+        "updateDataFromCtx": {
+            "actionType": "JSFunction",
+            "method": "updateDataFromCtx",
+            "inputData": {
+                "data": "{{data}}",
+                "objectToUpdate": "adaptedPropForSaveAsReplace",
+                "value": "{{ctx.aceActiveContext.context.adaptedPropForSaveAsReplace}}"
+            },
+            "deps": "js/occmgmtUtils"
+        },
+        "getObjectForSaveAsAndReplace": {
+            "actionType": "JSFunction",
+            "method": "getObject",
+            "inputData": {
+                "modelObj": "{{function:getAdaptedPropertyValueForSaveAsAndReplace}}"
+            },
+            "outputData": {
+                "modelObjectForSaveAsAndReplace": ""
+            },
+            "deps": "js/occmgmtUtils"
+        },
+        "clearCtxForSaveAsAndReplace": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.adaptedPropForSaveAsReplace",
+                "value": "undefined"
+            },
+            "deps": "js/appCtxService"
+        },
+        "saveAsAndReplace": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "saveAsAndReplace.duplicate",
+                        "condition": "data.copyChildrenCheckBox.dbValue"
+                    },
+                    {
+                        "name": "saveAsAndReplace.saveAs",
+                        "eventData": {
+                            "selectedObjectForReplaceElement": "{{ctx.selected}}"
+                        },
+                        "condition": "!data.copyChildrenCheckBox.dbValue"
+                    }
+                ]
+            }
+        },
+        "duplicateAndReplace": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2018-05-OccurrenceManagement",
+            "method": "duplicateAndReplace",
+            "inputData": {
+                "inputData": {
+                    "elements": [
+                        {
+                            "uid": "{{data.targetObject.uid}}",
+                            "type": "{{data.targetObject.type}}"
+                        }
+                    ],
+                    "defaultName": {
+                        "autogen": "{{data.defaultIdsOrIdNamingRuleCheckBox.dbValue}}",
+                        "fromString": "{{data.replaceTextBox.dbValue}}",
+                        "toString": "{{data.withTextBox.dbValue}}",
+                        "prefix": "{{data.prefixTextBox.dbValue}}",
+                        "suffix": "{{data.suffixTextBox.dbValue}}"
+                    },
+                    "duplicateFlags": "{{function:getDuplicateFlags}}",
+                    "productContextInfo": {
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}",
+                        "type": "{{ctx.aceActiveContext.context.productContextInfo.type}}"
+                    }
+                }
+            },
+            "outputData": {
+                "duplicateAndReplaceResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "acePwa.reset",
+                        "condition": "!_internal.conditionStates.isInTreeMode"
+                    },
+                    {
+                        "name": "saveAsAndReplace.closePanel"
+                    },
+                    {
+                        "name": "replaceElement.elementReplacedSuccessfully",
+                        "eventData": {
+                            "viewToReact": "{{ctx.aceActiveContext.key}}"
+                        }
+                    },
+                    {
+                        "name": "ace.replaceRowsInTree",
+                        "eventData": {
+                            "srcUids": "{{data.duplicateAndReplaceResponse.plain}}"
+                        },
+                        "condition": "_internal.conditionStates.isInTreeMode && data.duplicateAndReplaceResponse.plain.includes(ctx.selected.uid)"
+                    },
+                    {
+                        "name": "aceSecondaryWorkArea.refreshTabs"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "acePwa.reset",
+                        "condition": "!_internal.conditionStates.isInTreeMode"
+                    },
+                    {
+                        "name": "saveAsAndReplace.closePanel"
+                    },
+                    {
+                        "name": "replaceElement.elementReplacedSuccessfully",
+                        "eventData": {
+                            "viewToReact": "{{ctx.aceActiveContext.key}}"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "message": "duplicateAndReplaceInBackgroundSuccessMessage",
+                        "condition": "data.runInBackgroundCheckBox.dbValue"
+                    }
+                ],
+                "failure": [
+                    {
+                        "message": "duplicateAndReplaceFailure"
+                    }
+                ]
+            },
+            "deps": "js/evaluateExpressionInGivenContext"
+        },
+        "saveAs": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2012-09-DataManagement",
+            "method": "saveAsObjectAndRelate",
+            "inputData": {
+                "saveAsInput": "{{function:getSaveAsInput}}",
+                "relateInfo": [
+                    {
+                        "relate": true
+                    }
+                ]
+            },
+            "outputData": {
+                "replacement": "result.saveAsTrees[0].objectCopy"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "saveAs.saveAsComplete"
+                    }
+                ]
+            },
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+        "replaceElement": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2016-03-OccurrenceManagement",
+            "method": "replaceElement",
+            "inputData": {
+                "input": {
+                    "replacement": "{{data.replacement}}",
+                    "elements": [
+                        "{{data.eventMap['saveAsAndReplace.saveAs'].selectedObjectForReplaceElement}}"
+                    ],
+                    "productContextInfo": "{{ctx.aceActiveContext.context.productContextInfo}}"
+                }
+            },
+            "outputData": {
+                "replaceElementResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "acePwa.reset",
+                        "condition": "!_internal.conditionStates.isInTreeMode"
+                    },
+                    {
+                        "name": "saveAsAndReplace.closePanel"
+                    },
+                    {
+                        "name": "replaceElement.elementReplacedSuccessfully",
+                        "eventData": {
+                            "viewToReact": "{{ctx.aceActiveContext.key}}"
+                        }
+                    },
+                    {
+                        "name": "ace.replaceRowsInTree",
+                        "eventData": {
+                            "srcUids": "{{data.replaceElementResponse.ServiceData.updated}}"
+                        },
+                        "condition": "_internal.conditionStates.isInTreeMode && data.replaceElementResponse.ServiceData.updated.includes(data.eventMap['saveAsAndReplace.saveAs'].selectedObjectForReplaceElement.uid)"
+                    },
+                    {
+                        "name": "aceSecondaryWorkArea.refreshTabs"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "saveAsAndReplace.closePanel"
+                    }
+                ]
+            },
+            "deps": "js/addElementService"
+        },
+        "setTargetObjectOnReveal": {
+            "actionType": "JSFunction",
+            "method": "createViewModelObject",
+            "inputData": {
+                "selectedUid": "{{ctx.selected.uid}}"
+            },
+            "outputData": {
+                "targetObject": ""
+            },
+            "deps": "js/viewModelObjectService"
+        },
+        "updateCtxForSaveAsOnReveal": {
+            "actionType": "JSFunction",
+            "method": "updateSaveAsContext",
+            "inputData": {
+                "selectedObject": "{{data.modelObjectForSaveAsAndReplace}}"
+            },
+            "deps": "js/Awp0ShowSaveAsService"
+        },
+        "setTargetObjectOnSelectionChange": {
+            "actionType": "JSFunction",
+            "method": "createViewModelObject",
+            "inputData": {
+                "selectedUid": "{{data.eventData.dataProvider.selectedObjects[0].uid}}"
+            },
+            "outputData": {
+                "targetObject": ""
+            },
+            "deps": "js/viewModelObjectService"
+        },
+        "awb0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "awb0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "autoAssignProperty":
+        {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData":
+            {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "SAVEAS",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{ctx['SaveAsReviseWorkSpace'].SelectedObjects[0]}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+
+            "deps": "js/autoAssignService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "condition": "!data._internal.isDestroyed && !conditions.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "messages": {
+        "duplicateAndReplaceInBackgroundSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.duplicateAndReplaceInBackgroundSuccessMessage}}",
+            "messageTextParams": [
+                "{{data.targetObject.props.object_string.uiValues[0]}}"
+            ]
+        },
+        "duplicateAndReplaceFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setTargetObjectOnReveal"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "getObjectAndUpdateCtxForSaveAsAndReplace"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "setTargetObjectOnSelectionChange",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "getObjectAndUpdateCtxForSaveAsAndReplace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "addChildElement.awb0SetPin",
+            "cacheEventData": true,
+            "action": "awb0SetPin"
+        },
+        {
+            "eventId": "addChildElement.awb0SetUnPin",
+            "cacheEventData": true,
+            "action": "awb0SetUnPin"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        },
+        {
+            "eventId": "saveAsAndReplace.duplicate",
+            "action": "duplicateAndReplace"
+        },
+        {
+            "eventId": "saveAsAndReplace.saveAs",
+            "cacheEventData": true,
+            "action": "saveAs"
+        },
+        {
+            "eventId": "saveAs.saveAsComplete",
+            "action": "replaceElement"
+        },
+        {
+            "eventId": "saveAsAndReplace.closePanel",
+            "action": "closePanel"
+        }
+    ],
+    "conditions": {
+        "isInTreeMode": {
+            "expression": "(ctx.ViewModeContext.ViewModeContext === 'TreeView' || ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView')"
+        },
+        "defaultIdsSectionVisible": {
+            "expression": "data.defaultIdsOrIdNamingRuleCheckBox.dbValue && !data.copyChildrenCheckBox.dbValue"
+        },
+        "idNamingRuleSectionVisible": {
+            "expression": "!data.defaultIdsOrIdNamingRuleCheckBox.dbValue"
+        },
+        "isCopyChildrenChecked": {
+            "expression": "data.copyChildrenCheckBox.dbValue"
+        },
+        "isPrefixPresent": {
+            "expression": "data.prefixTextBox.dbValue !== ''"
+        },
+        "isSuffixPresent": {
+            "expression": "data.suffixTextBox.dbValue !== ''"
+        },
+        "isValidReplaceStringPresent": {
+            "expression": "data.replaceTextBox.dbValue !== ''"
+        },
+        "isNamingRuleValid": {
+            "expression": "conditions.isPrefixPresent || conditions.isSuffixPresent || conditions.isValidReplaceStringPresent"
+        },
+        "isSaveAsAndReplaceButtonVisible": {
+            "expression": "data.defaultIdsOrIdNamingRuleCheckBox.dbValue || conditions.isNamingRuleValid"
+        },
+        "isPanelPinned": {
+            "expression": "data.pinnedToForm.dbValue === false"
+        },
+        "isPanelUnPinned": {
+            "expression": "data.pinnedToForm.dbValue === true"
+        },
+        "isWithTextBoxFilledWithoutReplaceValue": {
+            "expression": "data.withTextBox.dbValue!='' && data.replaceTextBox.dbValue == ''"
+        }
+    },
+    "functions": {
+        "getAdaptedPropertyValueForSaveAsAndReplace": {
+            "functionName": "parseExpression",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}",
+                "",
+                "ctx.selected.props[data.adaptedPropForSaveAsReplace.dbValue].dbValues[0]",
+                ""
+            ]
+        },
+        "getDuplicateFlags": {
+            "functionName": "parseExpression",
+            "parameters": [
+                "{{data}}",
+                "",
+                "",
+                "data.runInBackgroundCheckBox.dbValue && 8 || 0",
+                "INTEGER"
+            ]
+        },
+        "getSaveAsInput": {
+            "functionName": "getSaveAsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx['SaveAsReviseWorkSpace']}}"
+            ]
+        }
+    },
+    "i18n": {
+        "saveAsAndReplace": [
+            "OccurrenceManagementConstants"
+        ],
+        "copyChildren": [
+            "OccurrenceManagementConstants"
+        ],
+        "namingRule": [
+            "OccurrenceManagementConstants"
+        ],
+        "defaultIds": [
+            "OccurrenceManagementConstants"
+        ],
+        "idNamingRule": [
+            "OccurrenceManagementConstants"
+        ],
+        "properties": [
+            "OccurrenceManagementConstants"
+        ],
+        "id": [
+            "OccurrenceManagementConstants"
+        ],
+        "revision": [
+            "OccurrenceManagementConstants"
+        ],
+        "description": [
+            "OccurrenceManagementConstants"
+        ],
+        "runInBackground": [
+            "OccurrenceManagementConstants"
+        ],
+        "name": [
+            "OccurrenceManagementConstants"
+        ],
+        "prefix": [
+            "OccurrenceManagementConstants"
+        ],
+        "suffix": [
+            "OccurrenceManagementConstants"
+        ],
+        "replaceElementBtn": [
+            "OccurrenceManagementConstants"
+        ],
+        "with": [
+            "OccurrenceManagementConstants"
+        ],
+        "PROP_REQUIRED_ERROR": [
+            "BaseMessages"
+        ],
+        "duplicateAndReplaceInBackgroundSuccessMessage": [
+            "OccurrenceManagementMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onUnmount": "clearCtxForSaveAsAndReplace"
+    }
+}

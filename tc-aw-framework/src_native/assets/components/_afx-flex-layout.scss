@@ -1,0 +1,43 @@
+@use 'sass:math';
+$device_list: xsmall small medium large xlarge;
+$xlarge: "(min-width: 1200px)";
+$large: "(min-width: 992px)";
+$medium: "(min-width: 768px)";
+$small: "(min-width: 576px) and (max-width: 767px)";
+$xsmall: "(max-width: 575px)";
+
+@mixin generate-grid-col($device){
+    @for $index from 0 through 12 {
+        .aw-#{$device}-#{$index} {
+            $acquired_width: math.div($index, 12)*100%;
+            max-width: $acquired_width;
+            flex: 0 0 $acquired_width;
+            height: auto;
+        }
+    }
+}
+
+@each $device in $device_list{
+
+    @if ($device == xsmall) {
+        @media #{$xsmall} {
+            @include generate-grid-col($device);
+        }
+    } @else if ($device == small) {
+        @media #{$small} {
+            @include generate-grid-col($device);
+        }
+    } @else if ($device == medium) {
+        @media #{$medium} {
+            @include generate-grid-col($device);
+        }
+    } @else if ($device == large) {
+        @media #{$large} {
+            @include generate-grid-col($device);
+        }
+    } @else if ($device == xlarge) {
+        @media #{$xlarge} {
+            @include generate-grid-col($device);
+        }
+    }
+}

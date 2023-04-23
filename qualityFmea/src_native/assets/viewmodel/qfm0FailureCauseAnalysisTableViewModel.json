@@ -1,0 +1,248 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "getFailureCauseData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "Qfm0CauseFailureAnaURI",
+                    "operationType": "configured"
+                },
+                "saveColumnConfigData": {
+                    "clientScopeURI": "Qfm0CauseFailureAnaURI",
+                    "columnConfigId": "{{data.dataProviders.failureCauseTableProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.failureCauseTableProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "objectSet": "Qfm0Cause.WorkspaceObject,Qfm0Cause",
+                        "parentUid": "{{function:getSelectedFailureMode}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "startIndex": "{{data.dataProviders.failureCauseTableProvider.startIndex}}",
+                    "searchSortCriteria": "{{data.columnProviders.failureCauseTableColumnProvider.sortCriteria}}",
+                    "columnFilters": "{{data.columnProviders.failureCauseTableColumnProvider.columnFilters}}"
+                },
+                "inflateProperties": true,
+                "noServiceData": false
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Awp0XRTObjectSetRow",
+                    "properties": [ 
+                        {
+                            "name": "is_modifiable"
+                        },
+                        {
+                            "name": "awp0Target"                            
+                        },
+                        {
+                            "name": "awp0IsCutAllowed"                            
+                        },
+                        {
+                            "name": "awp0Primary"                            
+                        },
+                        {
+                            "name": "awp0Relation"                            
+                        },
+                        {
+                            "name": "awp0Secondary"                            
+                        },
+                        {
+                            "name": "awp0RelationTypeName"                            
+                        },
+                        {
+                            "name": "awp0RelationTypeDisplayName"                            
+                        },
+                        {
+                            "name": "awp0RefPropertyName"                            
+                        }
+                    ]
+                } ]
+            },
+            "outputData": {
+                "failureCauseTotalFound": "totalFound",
+                "failureCauseTotalLoaded": "totalLoaded",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "failureCauseSearchResults": "{{function:processFailureAnalysisResponse}}",
+                "dataProviders.failureCauseTableProvider.columnConfig": "{{function:setNonModifiablePropForAbsFailureAnalysis}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "SOAFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FailureAnalysisTableServices"
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "Qfm0CauseFailureAnaURI",
+                    "columnConfigId": "{{data.dataProviders.failureCauseTableProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.failureCauseTableProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {},
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "Qfm0CauseFailureAnaURI",
+                        "operationType": "configured",
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [ {} ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.failureCauseTableProvider.resetColumnConfigs": "columnConfigurations"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "setProviderForEdit": {
+            "actionType": "JSFunction",
+            "method": "setCauseProviderForEdit",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/qfm0FailureAnalysisTableServices"
+        },
+        "getAdaptedObjects": {
+            "actionType": "JSFunction",
+            "method": "getAdaptedObjects",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx" :"{{ctx}}",
+                "relationType" : "Qfm0Cause"
+            },
+            "deps": "js/qfm0FailureAnalysisTableServices"
+        },
+        "getFilterFacets": {
+            "actionType": "JSFunction",
+            "method": "getFilterFacetValues",
+            "inputData": {
+                "columnName": "{{filterFacetInput.column.field}}",
+                "objects": "{{data.dataProviders.failureCauseTableProvider.viewModelCollection.loadedVMObjects}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "filterFacetResults": "{{data.filterFacetResults}}"
+            },
+            "deps": "js/qfm0SortFilterUtilService"
+        }
+    },
+    "data": {},
+    "dataProviders": {
+        "failureCauseTableProvider": {
+            "action": "getFailureCauseData",
+            "response": "{{data.failureCauseSearchResults}}",
+            "totalFound": "{{data.failureCauseTotalFound}}",
+            "totalLoaded": "{{data.failureCauseTotalLoaded}}",
+            "selectionModelMode": "multiple",
+            "editContext": "TABLE_CONTEXT_CAUSE",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands",
+            "filterFacetAction": "getFilterFacets",
+            "filterFacetResults": "{{data.filterFacetResults}}"
+        }
+    },
+    "columnProviders": {
+        "failureCauseTableColumnProvider": {
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "columnFilters": "{{filterFacetInput.columnFilters}}",
+            "sortCriteria": []
+        }
+    },
+    "conditions": {},
+    "functions": {
+        "getSelectedFailureMode": {
+            "functionName": "getSelectedFailureMode",
+            "parameters": []
+        },
+        "processFailureAnalysisResponse": {
+            "functionName": "processFailureAnalysisObjects",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "setNonModifiablePropForAbsFailureAnalysis": {
+            "functionName": "setNonModifiablePropForAbsFailureAnalysis",
+            "parameters": []
+        }
+    },
+    "grids": {
+        "failureCauseTable": {
+            "dataProvider": "failureCauseTableProvider",
+            "columnProvider": "failureCauseTableColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true,
+                "isFilteringEnabled": true
+            }
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "failureCauseTableProvider.modelObjectsUpdated",
+            "action": "setProviderForEdit"
+        },
+        {
+            "eventId": "failureCauseTableProvider.selectionChangeEvent",
+            "action": "getAdaptedObjects",
+            "condition": "selectedObjects.length !== 0"
+        }
+    ],
+    "i18n": {
+        "qfm0Name": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FailureCause": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

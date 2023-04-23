@@ -1,0 +1,29 @@
+<aw-command-panel caption="i18n.addPanelTitle" context="data">
+    <aw-panel-header>
+        <aw-panel-section caption="i18n.toTitle">
+            <aw-default-cell vmo="ctx.parentContextObject"></aw-default-cell>
+        </aw-panel-section>
+    </aw-panel-header>
+    <aw-panel-body exist-when="!data.isObjectTypeSelected">
+        <aw-panel-section caption="i18n.objectType">
+            <aw-type-selector prop="data.filterBox" include="CAW05Why" override-id="IssueAndCapa" load-sub-types="true">
+            </aw-type-selector>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-body exist-when="data.isObjectTypeSelected">
+        <aw-title-link prop="ctx.type_name" action="clearSelectedType"></aw-title-link>
+        <aw-panel-section>
+            <aw-widget prop="data.caw0ProbDefinition"></aw-widget>
+            <aw-widget prop="data.object_desc"></aw-widget>
+            <aw-widget exist-when="ctx.selected.caw0Context!=='Capa' && ctx.tcSessionData.tcMajorVersion >= 13" prop="data.caw0AnalysisDimensionStatic"></aw-widget>
+            <aw-listbox exist-when="ctx.selected.caw0Context==='Capa' && ctx.tcSessionData.tcMajorVersion >= 13" prop="data.caw0AnalysisDimension" list="data.dimension"></aw-listbox>
+            <aw-listbox exist-when="ctx.tcSessionData.tcMajorVersion < 13" prop="data.caw05WhyType" list="data.WhyTypes"></aw-listbox>
+            <aw-listbox exist-when="ctx.tcSessionData.tcMajorVersion >= 13" prop="data.caw0AnalysisType" list="data.WhyTypes"></aw-listbox>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer exist-when="data.isObjectTypeSelected">
+        <aw-button default="true" action="getNextId" enable-when="!ctx.addItemEventProgressing">
+            <aw-i18n>i18n.addButtonTitle</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

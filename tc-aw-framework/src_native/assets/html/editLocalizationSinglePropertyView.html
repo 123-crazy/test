@@ -1,0 +1,27 @@
+<aw-command-panel caption="i18n.editLocalizationSingle">
+    <aw-form name="commandPanelForm">
+        <aw-panel-body>
+            <aw-panel-section caption="i18n.masterValue">
+                <aw-widget prop="data.targetProperty"></aw-widget>
+                <aw-widget prop="data.masterProp"></aw-widget>
+            </aw-panel-section>
+
+            <aw-command-panel-section caption="i18n.translationLanguages" anchor="data.addorRemoveLocaleAnchor"
+              context="data.languageProps">
+                <div class="aw-layout-flexRowContainer aw-tcPanels-translationLanguages" aw-repeat="localizedProp : data.localizedProps"
+                  exist-when="data.languagePropObj[localizedProp.prop.propertyName].dbValue">
+                    <aw-widget class="aw-tcPanels-localeProp" exist-when="data.masterProp.index === localizedProp.prop.index" prop="localizedProp.prop"></aw-widget>
+                    <aw-widget class="aw-tcPanels-localeStatusProp" exist-when="data.masterProp.index === localizedProp.statusProp.index" prop="localizedProp.statusProp"></aw-widget>
+                    <div exist-when="data.masterProp.index === localizedProp.prop.index" class="aw-layout-flexRowContainer aw-tcPanels-removeLocale">
+                        <aw-command-bar anchor="aw_removeLocale" context="localizedProp" alignment="HORIZONTAL"></aw-command-bar>
+                    </div>
+                </div>
+            </aw-command-panel-section>
+        </aw-panel-body>
+    </aw-form>
+   <aw-panel-footer>
+        <aw-button action="setLocalizedProperties" visible-when="( data.isPanelDirty || ( !data.isLocaleNew && commandPanelForm.$dirty ) ) && commandPanelForm.$valid">
+            <aw-i18n>i18n.saveEditsGroupPWATitle</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

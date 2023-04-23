@@ -1,0 +1,1012 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-password.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":
+    {
+       "initializeDataProvider":
+       {
+          "actionType": "dataProvider",
+          "methods": ["reviewProfileSignoffProvider", "reviewAdhocSignoffProvider", "acknowledgeSignoffProvider", "notifySignoffProvider"]
+        },
+        "populateTaskSubPanel":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-Workflow",
+            "method": "getWorkflowTaskViewModel",
+            "inputData":
+            {
+                "input": [ {
+                    "selection": "{{ctx.task_to_perform.task[0]}}",
+                    "typeToPropertiesMap": {
+                        "Signoff": [ "REF(group_member,GroupMember).group", "REF(group_member,GroupMember).role",
+                            "REF(group_member,GroupMember).user", "REF(resource_pool,ResourcePool).group",
+                            "REF(resource_pool,ResourcePool).role", "fnd0DecisionRequired", "resource_pool" ],
+                        "EPMSignoffProfile": [ "REF(group,Group).object_full_name", "REF(role,Role).role_name", "number_of_signoffs", "allow_subgroups" ],
+                        "EPMTask": [ "comments" ]
+                    }
+                } ]
+            },
+            "outputData":
+            {
+                "taskRelatedData": "output",
+                "reviewProfiles" : "output[0].taskJSONStrings.EPMReviewTask_profiles",
+                "reviewProfileSignoffs" : "output[0].taskJSONStrings.EPMReviewTask_profile_signoffs",
+                "reviewAdhocSignoffs" : "output[0].taskJSONStrings.EPMReviewTask_adhoc_signoffs",
+                "acknowledgeAdhocSignoffs" : "output[0].taskJSONStrings.EPMAcknowledgeTask_adhoc_signoffs",
+                "notifyAdhocSignoffs" : "output[0].taskJSONStrings.EPMNotifyTask_adhoc_signoffs",
+                "is_allow_complete": "output[0].additionalData.is_allow_complete[0]",
+                "is_all_child_complete": "output[0].additionalData.is_all_child_complete[0]"
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "EPMRouteTask",
+                        "properties":
+                        [
+                            {
+                                "name": "secure_task"
+                            },
+                            {
+                                "name": "comments"
+                            },
+                            {
+                                "name": "object_desc"
+                            },
+                            {
+                                "name": "fnd0Instructions"
+                            },
+                            {
+                                "name": "has_failure_paths"
+                            },
+                            {
+                                "name": "fnd0ObjectsToDigitallySign",
+                                "modifiers": [{
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }]
+                            },
+                            {
+                                "name": "fnd0IsPKIAuthRequired",
+                                "modifiers": [{
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }]
+                            },
+                            {
+                                "name": "fnd0RequireCompleteConfirm"
+                            },
+                            {
+                                "name": "parent_process",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Job",
+                        "properties":
+                        [
+                            {
+                                "name": "object_desc"
+                            }
+
+                        ]
+                    },
+                    {
+                        "name": "EPMSignoffProfile",
+                        "properties":
+                        [
+                            {
+                                "name": "number_of_signoffs"
+                            },
+                            {
+                                "name": "allow_subgroups"
+                            },
+                            {
+                                "name": "group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        },
+                        {
+                            "name": "object_string"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "Signoff",
+                        "properties":
+                        [
+                            {
+                                "name": "fnd0DecisionRequired"
+                            },
+                            {
+                                "name": "group_member",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "resource_pool",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "epmTask.taskPropertiesLoaded"
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0EPMRouteTaskPerform"
+
+        },
+
+        "completeDS":
+        {
+            "actionType": "JSFunction",
+            "method": "performTaskDS",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "actionableObject": "{{ctx.task_to_perform.task[0]}}",
+                "action": "SOA_EPM_complete_action",
+                "supportingValue": "SOA_EPM_completed",
+                "supportingObject": ""
+            },
+            "deps": "js/Awp0PerformTask"
+        },
+
+        "complete":
+        {
+            "actionType": "JSFunction",
+            "method": "performTask",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "actionableObject": "{{ctx.task_to_perform.task[0]}}",
+                "action": "SOA_EPM_complete_action",
+                "supportingValue": "SOA_EPM_completed",
+                "supportingObject": ""
+            },
+            "deps": "js/Awp0PerformTask"
+        },
+
+        "populatePanelData":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "cmdContext": "{{commandContext}}",
+                "selection": "{{ctx.task_to_perform.task[0]}}"
+            },
+            "deps": "js/Awp0EPMRouteTaskPerform"
+        },
+
+        "navigateToMainPage":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "Awp0EPMRouteTaskPerformSub"
+                        }
+                    }
+                ]
+            }
+        },
+
+        "addSignoffs":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "addSignoffs",
+            "inputData":
+            {
+                "signoffs": [ {
+                    "task": "{{ctx.task_to_perform.task[0]}}",
+                    "signoffInfo": "{{function:getsignoffInfo}}"
+
+                } ]
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Signoff",
+                        "properties":
+                        [
+                            {
+                                "name": "fnd0DecisionRequired"
+                            },
+                            {
+                                "name": "group_member",
+                                "modifiers": [{
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }]
+                            },
+                            {
+                                "name": "resource_pool",
+                                "modifiers": [{
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "createdSignoffUids": "created"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name":"workflow.updateAssigneeOrigin",
+                        "eventData": {
+                            "createdSignoffUids": "{{data.createdSignoffUids}}",
+                            "selectedObjects": "{{data.selectedObjects}}"
+                        },
+                        "condition": "data.createdSignoffUids && (ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion > 0 ) )"
+                    },
+                    {
+                        "name" : "epmTask.updateSubPanel"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name":"workflow.updateAssigneeOrigin",
+                        "eventData": {
+                            "createdSignoffUids": "{{data.createdSignoffUids}}",
+                            "selectedObjects": "{{data.selectedObjects}}"
+                        },
+                        "condition": "data.createdSignoffUids && (ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion > 0 ) )"
+                    },
+                    {
+                        "name" : "epmTask.updateSubPanel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0InboxUtils",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "serverError"
+                    }
+                ]
+            }
+        },
+
+        "removeProfileSignoffObjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "removeSignoffs",
+            "inputData":
+            {
+                "signoffs": "{{function:getRemoveProfileSignoffsInputData}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name" : "epmTask.updateSubPanel"
+                    }
+                ]
+            },
+            "deps":"js/Awp0EPMRouteTaskPerform"
+        },
+
+        "removeAdhocSignoffObjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "removeSignoffs",
+            "inputData":
+            {
+                "signoffs": "{{function:getRemoveAdhocSignoffsInputData}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name" : "epmTask.updateSubPanel"
+                    }
+                ]
+            },
+            "deps":"js/Awp0EPMRouteTaskPerform"
+        },
+
+        "removeAcknowledgeAdhocSignoffObjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "removeSignoffs",
+            "inputData":
+            {
+                "signoffs": "{{function:getRemoveAcknowledgeAdhocSignoffsInputData}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name" : "epmTask.updateSubPanel"
+                    }
+                ]
+            },
+            "deps":"js/Awp0EPMRouteTaskPerform"
+        },
+
+        "removeNotifyAdhocSignoffObjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "removeSignoffs",
+            "inputData":
+            {
+                "signoffs": "{{function:getRemoveNotifyAdhocSignoffsInputData}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name" : "epmTask.updateSubPanel"
+                    }
+                ]
+            },
+            "deps":"js/Awp0EPMRouteTaskPerform"
+        },
+
+        "openUserPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "openUserPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selection": "{{data.eventData.selectedProfile}}"
+            },
+
+            "deps": "js/Awp0EPMRouteTaskPerform"
+        },
+
+
+        "evaluateProfileSelections":
+        {
+            "actionType": "JSFunction",
+            "method": "evaluateSelections",
+            "inputData":
+            {
+                "selection": "{{data.dataProviders.reviewProfileSignoffProvider.selectedObjects}}"
+            },
+            "outputData":
+            {
+                "isProfileRemoveVisible": ""
+            },
+
+            "deps": "js/Awp0EPMRouteTaskPerform"
+        },
+
+        "evaluateAdhocReviewerSelections":
+        {
+            "actionType": "JSFunction",
+            "method": "evaluateSelections",
+            "inputData":
+            {
+                "selection": "{{data.dataProviders.reviewAdhocSignoffProvider.selectedObjects}}"
+            },
+            "outputData":
+            {
+                "isReviewAdhocRemoveVisible": ""
+            },
+
+            "deps": "js/Awp0EPMRouteTaskPerform"
+        },
+
+        "evaluateAcknowledgeReviewerSelections":
+        {
+            "actionType": "JSFunction",
+            "method": "evaluateSelections",
+            "inputData":
+            {
+                "selection": "{{data.dataProviders.acknowledgeSignoffProvider.selectedObjects}}"
+            },
+            "outputData":
+            {
+                "isAcknowledgeAdhocRemoveVisible": ""
+            },
+
+            "deps": "js/Awp0EPMRouteTaskPerform"
+        },
+
+        "evaluateNotifyReviewerSelections":
+        {
+            "actionType": "JSFunction",
+            "method": "evaluateSelections",
+            "inputData":
+            {
+                "selection": "{{data.dataProviders.notifySignoffProvider.selectedObjects}}"
+            },
+            "outputData":
+            {
+                "isNotifyAdhocRemoveVisible": ""
+            },
+
+            "deps": "js/Awp0EPMRouteTaskPerform"
+        },
+        "verifyComplete": {
+            "actionType": "JSFunction",
+            "method": "getSelectedPath",
+            "inputData":
+            {
+                "taskResult": "{{i18n.complete}}",
+                "data": "{{data}}"
+            },
+            "outputData":
+            {
+                "taskResultSelected": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "checkRequireConfirmationEvent",
+                        "condition": "ctx.task_to_perform.task[0].props.fnd0RequireCompleteConfirm && ctx.task_to_perform.task[0].props.fnd0RequireCompleteConfirm.dbValues[0] === '1'"
+                    },
+                    {
+                        "name": "completeActionEvent",
+                        "condition": "ctx.task_to_perform.task[0].props.fnd0RequireCompleteConfirm.dbValues[0] !== '1'"
+                    }
+                ]
+            },
+            "deps": "js/Awp0EPMTaskPerform"
+        },
+        "verifyCompleteDS": {
+            "actionType": "JSFunction",
+            "method": "getSelectedPath",
+            "inputData":
+            {
+                "taskResult": "{{i18n.complete}}",
+                "data": "{{data}}"
+            },
+            "outputData":
+            {
+                "taskResultSelected": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "checkDSRequireConfirmationEvent",
+                        "condition": "ctx.task_to_perform.task[0].props.fnd0RequireCompleteConfirm && ctx.task_to_perform.task[0].props.fnd0RequireCompleteConfirm.dbValues[0] === '1'"
+                    },
+                    {
+                        "name": "completeActionDSEvent",
+                        "condition": "ctx.task_to_perform.task[0].props.fnd0RequireCompleteConfirm.dbValues[0] !== '1'"
+                    }
+                ]
+            },
+            "deps": "js/Awp0EPMTaskPerform"
+        },
+        "registerPerformPanelProps": {
+            "actionType": "JSFunction",
+            "method": "registerPerformPanelProps",
+            "deps": "js/Awp0PerformTask"
+        },
+        "unregisterPerformPanelProp": {
+            "actionType": "JSFunction",
+            "method": "unregisterPerformPanelProp",
+            "deps": "js/Awp0PerformTask"
+        },
+        "updateAssigneeOrigin": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2014-06-Workflow",
+            "method": "performAction3",
+            "inputData": {
+                "input": "{{function:getAssigeeOriginUpdateData}}"
+            },
+            "deps": "js/Awp0InboxUtils"
+        }
+    },
+
+    "data":
+    {
+        "taskName":
+        {
+            "displayName": "{{i18n.taskName}}",
+            "type": "STRING",
+            "isEditable" : "false",
+            "dbValue":"",
+            "uiValue":""
+        },
+
+        "description":
+        {
+            "displayName": "{{i18n.object_desc}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "isRequired": "false",
+            "uiValue":"",
+            "dbValue":""
+        },
+
+        "comments":
+        {
+            "displayName": "{{i18n.comments}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "numberOfLines": 3,
+            "maxLength": 4000,
+            "dbValue": "",
+            "uiValue":""
+        },
+
+        "password":
+        {
+            "displayName": "{{i18n.password}}",
+            "type": "STRING",
+            "isEditable": "true",
+            "isRequired": "true",
+            "dispValue":"",
+            "dbValue":""
+        },
+
+        "isSecureTask":
+        {
+            "displayName": "",
+            "isRequired": "false",
+            "isEditable": "false",
+            "type": "STRING",
+            "dbValue":"",
+            "dispValue":""
+        },
+
+        "hasFailurePaths":
+        {
+            "displayName": "",
+            "isRequired": "false",
+            "isEditable": "false",
+            "type": "STRING",
+            "dbValue":"",
+            "dispValue":""
+        },
+
+        "workflowDescription":
+        {
+            "displayName": "{{i18n.workflowDescription}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "isRequired": "false",
+            "uiValue":"",
+            "dbValue":""
+        },
+
+        "reviewAdhocCommands":"aw_taskAdhocSignoffCommand",
+        "reviewProfileCommands":"aw_taskProfileSignoffCommand",
+        "acknowledgeSectionCommands":"aw_ackTaskAdhocSignoffCommand",
+        "notifySectionCommands":"aw_notifyTaskAdhocSignoffCommand"
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "epmTask.taskPropertiesLoaded",
+            "action": "populatePanelData"
+        },
+
+        {
+            "eventId": "epmTask.updateSubPanel",
+            "action": "populateTaskSubPanel"
+        },
+        {
+            "eventId": "Awp0EPMRouteTaskPerformSecondary.contentLoaded",
+            "action": "initializeDataProvider"
+        },
+        {
+            "eventId": "Awp0EPMRouteTaskPerformSecondary.contentLoaded",
+            "action": "populateTaskSubPanel"
+        },
+        {
+            "eventId": "Awp0EPMRouteTaskPerformSecondary.contentLoaded",
+             "action": "registerPerformPanelProps"
+        },
+        {
+             "eventId": "Awp0EPMRouteTaskPerformSecondary.contentUnloaded",
+             "action": "unregisterPerformPanelProp"
+        },
+        {
+            "eventId": "reviewProfileSignoffProvider.selectionChangeEvent",
+            "action": "evaluateProfileSelections"
+        },
+        {
+            "eventId": "reviewAdhocSignoffProvider.selectionChangeEvent",
+            "action": "evaluateAdhocReviewerSelections"
+        },
+        {
+            "eventId": "acknowledgeSignoffProvider.selectionChangeEvent",
+            "action": "evaluateAcknowledgeReviewerSelections"
+        },
+        {
+            "eventId": "notifySignoffProvider.selectionChangeEvent",
+            "action": "evaluateNotifyReviewerSelections"
+        },
+        {
+            "eventId": "Awp0AddSignoff.addSignoffData",
+            "action": "openUserPanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Awp0ReviewProfileSignoff.removeSignoffData",
+            "action": "removeProfileSignoffObjects"
+        },
+        {
+            "eventId": "Awp0ReviewAdhocSignoff.removeSignoffData",
+            "action": "removeAdhocSignoffObjects"
+        },
+        {
+            "eventId": "epmTask.addSignoffObject",
+            "action": "addSignoffs"
+        },
+        {
+            "eventId": "Awp0AcknowledgeAdhocSignoff.removeSignoffData",
+            "action": "removeAcknowledgeAdhocSignoffObjects"
+        },
+        {
+            "eventId": "Awp0NotifyAdhocSignoff.removeSignoffData",
+            "action": "removeNotifyAdhocSignoffObjects"
+        },
+        {
+            "eventId": "checkRequireConfirmationEvent",
+            "message": "checkRequireConfirmationMessage"
+        },
+        {
+            "eventId": "checkDSRequireConfirmationEvent",
+            "message": "checkDSRequireConfirmationEventMessage"
+        },
+        {
+            "eventId": "completeActionEvent",
+            "action": "complete"
+        },
+        {
+            "eventId": "completeActionDSEvent",
+            "action": "completeDS"
+        },
+        {
+            "eventId": "workflow.updateAssigneeOrigin",
+            "cacheEventData": true,
+            "action":  "updateAssigneeOrigin"
+        }
+    ],
+
+    "functions":
+    {
+        "getComments":
+        {
+            "functionName": "getComments",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "getRemoveProfileSignoffsInputData": {
+            "functionName": "getRemoveSignoffsInputData",
+            "parameters":
+            [
+                "{{ctx.task_to_perform.task[0]}}",
+                "{{data.dataProviders.reviewProfileSignoffProvider.selectedObjects}}"
+            ]
+        },
+        "getRemoveAdhocSignoffsInputData": {
+            "functionName": "getRemoveSignoffsInputData",
+            "parameters":
+            [
+                "{{ctx.task_to_perform.task[0]}}",
+                "{{data.dataProviders.reviewAdhocSignoffProvider.selectedObjects}}"
+            ]
+        },
+        "getAddSignoffsInputData": {
+            "functionName": "getAddSignoffsInputData",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx.task_to_perform.task[0]}}"
+            ]
+        },
+        "getRemoveAcknowledgeAdhocSignoffsInputData": {
+            "functionName": "getRemoveSignoffsInputData",
+            "parameters":
+            [
+                "{{ctx.task_to_perform.task[0]}}",
+                "{{data.dataProviders.acknowledgeSignoffProvider.selectedObjects}}"
+            ]
+        },
+        "getRemoveNotifyAdhocSignoffsInputData": {
+            "functionName": "getRemoveSignoffsInputData",
+            "parameters":
+            [
+                "{{ctx.task_to_perform.task[0]}}",
+                "{{data.dataProviders.notifySignoffProvider.selectedObjects}}"
+            ]
+        },
+        "getsignoffInfo":
+        {
+            "functionName": "getsignoffInfo",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getAssigeeOriginUpdateData": {
+            "functionName": "getAssigeeOriginUpdateData",
+            "parameters":
+            [
+                "{{data.eventMap['workflow.updateAssigneeOrigin'].createdSignoffUids}}",
+                "{{data.eventMap['workflow.updateAssigneeOrigin'].selectedObjects}}"
+            ]
+        }
+    },
+
+    "messages":
+    {
+        "displayError":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.displayError}}",
+            "messageTextParams":
+            [
+                "{{data.taskName.uiValue}}",
+                "{{data.errorMessage}}"
+            ]
+        },
+        "checkRequireConfirmationMessage":
+        {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.requireConfirmationSetTaskResult}}",
+            "messageTextParams": [
+                "{{data.taskName.uiValue}}",
+                "{{data.taskResultSelected}}"
+            ],
+            "navigationOptions":
+            [
+                {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": "cancelAction"
+                },
+                {
+                    "option": "Complete",
+                    "text": "{{i18n.complete}}",
+                    "action": "complete"
+                }
+
+            ]
+        },
+        "checkDSRequireConfirmationEventMessage":
+        {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.requireConfirmationSetTaskResult}}",
+            "messageTextParams": [
+                "{{data.taskName.uiValue}}",
+                "{{data.taskResultSelected}}"
+            ],
+            "navigationOptions":
+            [
+                {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": "cancelAction"
+                },
+                {
+                    "option": "Complete",
+                    "text": "{{i18n.complete}}",
+                    "action": "completeDS"
+                }
+
+            ]
+        },
+        "serverError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "preferences":
+    [
+        "WRKFLW_hide_subsequent_task_errors"
+    ],
+
+    "conditions":
+    {
+        "showUnableToComplete":
+        {
+            "expression": "data.hasFailurePaths && data.hasFailurePaths.dbValue==true && !data.isDSConfigured"
+        },
+
+        "isSecureTask":
+        {
+            "expression": "data.isSecureTask.dbValue==true"
+        },
+
+        "showInstructions":
+        {
+            "expression": "data.description.dbValue && data.description.dbValue.length>0"
+        },
+
+        "isValidToComplete":
+        {
+            "expression": "((data.isSecureTask && data.isSecureTask.dbValue==true && data.password.dbValue && data.password.dbValue.length>0 && data.is_allow_complete == 'true' ) || (data.isSecureTask && data.isSecureTask.dbValue==false && data.is_allow_complete == 'true' ))"
+        },
+        "isDSConfigured":
+        {
+            "expression": "data.isDSConfigured"
+        },
+        "showUnableToCompleteDS":
+        {
+            "expression": "data.hasFailurePaths && data.hasFailurePaths.dbValue==true && data.isDSConfigured"
+        },
+        "isProfileExistOnTask":
+        {
+            "expression": "data.reviewSignoffProfileObjects && data.reviewSignoffProfileObjects.length > 0"
+        },
+        "isRouteTaskSubTasksCompleted":
+        {
+            "expression": "data.is_all_child_complete == 'true'"
+        },
+        "showWorkflowDescription":
+        {
+            "expression": "data.workflowDescription.dbValue && data.workflowDescription.dbValue.length>0"
+        }
+
+    },
+
+    "i18n":
+    {
+        "taskName":  [ "InboxMessages"],
+        "taskInstructions":  [ "InboxMessages" ],
+        "comments": [ "InboxMessages" ],
+        "complete": [ "InboxMessages" ],
+        "unableToComplete": [ "InboxMessages" ],
+        "password": [ "InboxMessages" ],
+        "displayError": [ "InboxMessages" ],
+        "object_desc": [ "InboxMessages" ],
+        "reviewers": [ "InboxMessages" ],
+        "additionalReviewers": [ "InboxMessages" ],
+        "addCommandTitle": [ "InboxMessages" ],
+        "requiredLabel": [ "InboxMessages" ],
+        "Acknowledgers": [ "WorkflowCommandPanelsMessages" ],
+        "Notifyees": [ "WorkflowCommandPanelsMessages" ],
+        "required": [ "InboxMessages" ],
+        "decisionRequired": [ "InboxMessages" ],
+        "confirm":
+        [
+            "InboxMessages"
+        ],
+        "cancel":
+        [
+            "InboxMessages"
+        ],
+        "requireConfirmationSetTaskResult":
+        [
+            "InboxMessages"
+        ],
+        "any": ["WorkflowCommandPanelsMessages"],
+        "workflowDescription":
+        [
+            "InboxMessages"
+        ]
+    },
+
+    "dataProviders": {
+        "reviewProfileSignoffProvider": {
+            "response": "{{data.reviewSignoffProfileObjects}}",
+            "totalFound": "{{data.reviewSignoffProfileObjects.length}}",
+            "totalLoaded": "{{data.reviewSignoffProfileObjects.length}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor"  : "aw_taskProfileCellCommand"
+        },
+        "reviewAdhocSignoffProvider": {
+            "response": "{{data.reviewAdhocSignoffs}}",
+            "totalFound": "{{data.reviewAdhocSignoffObjects.length}}",
+            "totalLoaded": "{{data.reviewAdhocSignoffObjects.length}}",
+            "selectionModelMode": "multiple"
+        },
+        "acknowledgeSignoffProvider": {
+            "response": "{{data.acknowledgeSignoffs}}",
+            "totalFound": "{{data.acknowledgeSignoffObjects.length}}",
+            "totalLoaded": "{{data.acknowledgeSignoffObjects.length}}",
+            "selectionModelMode": "multiple"
+        },
+        "notifySignoffProvider": {
+            "response": "{{data.notifySignoffs}}",
+            "totalFound": "{{data.notifySignoffObjects.length}}",
+            "totalLoaded": "{{data.notifySignoffObjects.length}}",
+            "selectionModelMode": "multiple"
+        }
+
+    }
+
+
+}

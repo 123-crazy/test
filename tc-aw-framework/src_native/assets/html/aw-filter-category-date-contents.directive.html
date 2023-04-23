@@ -1,0 +1,63 @@
+<div class="aw-base-normal aw-layout-flexRow aw-ui-filterCategoryCell" ng-if="category.showDateFilter && !filter.showDrilldown"
+     ng-class="{'aw-ui-filterNameLabelSelected': filter.selected,
+                'aw-ui-filterNameLabel': !filter.selected}"
+     title="{{filter.name}}">
+     <div class="aw-ui-filterNameCheckbox afx-checkbox" ng-class="{
+        'afx-checkbox-label-side': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_SIDE',
+        'afx-checkbox-label-right': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_RIGHT',
+        'afx-checkbox-label-top': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_TOP' }">
+        <label class="aw-jswidgets-checkboxWrapper">
+            <span class="hidden">{{filter.name}}</span>
+            <input aria-label="{{category.displayName + '-' +  filter.name}}"  type="checkbox" id="{{category.displayName + '-' +  filter.name}}" class="aw-jswidgets-checkboxButton"
+            ng-model="filter.selected" ng-keydown="selectionKeyPress(category, filter, $event)" ng-click="select(category, filter, $event)"/>
+            <span class="afx-checkbox-md-style">
+                <span class="check"></span>
+            </span>
+        </label>
+    </div>
+     <span filterNameColorBlockId="filterLabelColorBlock1"
+           class="aw-ui-filterNameColorBlock {{filter.color}}"
+           visible-when="filter.showColor"
+           ng-click="select(category, filter, $event)">&nbsp;
+      </span>
+      <div class="aw-ui-filterCategoryNameAndCountContainer aw-layout-flexRow"
+      ng-click="select(category, filter, $event)">
+            <span class="aw-ui-filterCategoryName">{{filter.name}}&nbsp;</span>
+            <span class="aw-layout-flexRow aw-ui-filterCategoryCountContainer">{{filter.showCount ? '(' +  filter.count + ')' : ''}}</span>
+      </div>
+</div>
+<!-- drilldown date filters -->
+<div class="aw-base-normal aw-layout-flexRow aw-ui-filterCategoryCell" ng-if="filter.showDrilldown"
+     ng-class="{'aw-ui-filterNameLabelSelectedDrilldown1': filter.selected  && filter.drilldown==1,
+                'aw-ui-filterNameLabelSelectedDrilldown2': filter.selected  && filter.drilldown==2,
+                'aw-ui-filterNameLabelSelectedDrilldown3': filter.selected  && filter.drilldown==3,
+                'aw-ui-filterNameLabelSelectedDrilldown4': filter.selected  && filter.drilldown==4,
+                'aw-ui-filterNameLabelDrilldown1': !filter.selected  && filter.drilldown==1,
+                'aw-ui-filterNameLabelDrilldown2': !filter.selected  && filter.drilldown==2,
+                'aw-ui-filterNameLabelDrilldown3': !filter.selected  && filter.drilldown==3,
+                'aw-ui-filterNameLabelDrilldown4': !filter.selected  && filter.drilldown==4
+                }"
+     title="{{filter.name}}">
+     <div class="aw-ui-filterNameCheckbox afx-checkbox" ng-class="{
+        'afx-checkbox-label-side': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_SIDE',
+        'afx-checkbox-label-right': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_RIGHT',
+        'afx-checkbox-label-top': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_TOP' }">
+        <label>
+            <input type="checkbox" id="{{category.displayName + '-' +  filter.name}}" class="aw-jswidgets-checkboxButton"
+            ng-model="filter.selected" ng-click="select(category, filter, $event)"/>
+            <span class="afx-checkbox-md-style">
+                <span class="check"></span>
+            </span>
+        </label>
+    </div>
+     <span filterNameColorBlockId="filterLabelColorBlock1"
+           class="aw-ui-filterNameColorBlock {{filter.color}}"
+           visible-when="filter.showColor"
+           ng-click="select(category, filter)">&nbsp;
+      </span>
+      <div class="aw-ui-filterCategoryNameAndCountContainer aw-layout-flexRow"
+      ng-click="select(category, filter)">
+            <span class="aw-ui-filterCategoryName">{{filter.name}}&nbsp;</span>
+            <span class="aw-layout-flexRow aw-ui-filterCategoryCountContainer">{{filter.showCount ? '(' +  filter.count + ')' : ''}}</span>
+      </div>
+</div>

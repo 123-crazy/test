@@ -1,0 +1,92 @@
+
+<div class="aw-tcWidgets-inContextSearchRecipeContainer aw-subset-subsetRecipeContainer" id={{data.tooltip}}>
+
+    <!-- Draw the Recipe Operator Logic icons if show filter icon is true -->
+    <aw-icon-button id="miscFilter{{$parent.$parent.subPanelContext.index}}" class="aw-commands-commandIconButton aw-subset-recipeLogicButton" command="data.operatorCommandFilter" exist-when="!$parent.$parent.$parent.$first && $parent.$parent.subPanelContext.recipeItem.criteriaOperatorType == 'Filter' && $parent.$parent.subPanelContext.showfilteroperator.dbValue" extended-tooltip='{"extendedTooltipContent": "{{data.filterOperatorText.propertyDisplayName}}"}'></aw-icon-button>
+    <aw-icon-button id="miscFilterInclude{{$parent.$parent.subPanelContext.index}}" class="aw-commands-commandIconButton aw-subset-recipeLogicButton" command="data.operatorCommandInclude" exist-when="!$parent.$parent.$parent.$first && $parent.$parent.subPanelContext.recipeItem.criteriaOperatorType == 'Include' && $parent.$parent.subPanelContext.showfilteroperator.dbValue" extended-tooltip='{"extendedTooltipContent": "{{data.includeOperatorText.propertyDisplayName}}"}'></aw-icon-button>
+    <aw-icon-button id="miscFilterExclude{{$parent.$parent.subPanelContext.index}}" class="aw-commands-commandIconButton aw-subset-recipeLogicButton" command="data.operatorCommandExclude" exist-when="!$parent.$parent.$parent.$first && $parent.$parent.subPanelContext.recipeItem.criteriaOperatorType == 'Exclude' && $parent.$parent.subPanelContext.showfilteroperator.dbValue" extended-tooltip='{"extendedTooltipContent": "{{data.excludeOperatorText.propertyDisplayName}}"}'></aw-icon-button>
+
+    <!-- Place a hidden icon if show filter icon is false -->
+    <aw-icon class="aw-commands-commandIconButton aw-subset-recipeLogicButton aw-subset-recipeLogicHidden" exist-when="!$parent.$parent.$parent.$first && $parent.$parent.subPanelContext.recipeItem.criteriaOperatorType == 'Filter' && !$parent.$parent.subPanelContext.showfilteroperator.dbValue"  icon-id="miscFilter"></aw-icon>
+    <aw-icon class="aw-commands-commandIconButton aw-subset-recipeLogicButton aw-subset-recipeLogicHidden" exist-when="!$parent.$parent.$parent.$first && $parent.$parent.subPanelContext.recipeItem.criteriaOperatorType == 'Include' && !$parent.$parent.subPanelContext.showfilteroperator.dbValue" icon-id="miscFilterInclude"></aw-icon>
+    <aw-icon class="aw-commands-commandIconButton aw-subset-recipeLogicButton aw-subset-recipeLogicHidden" exist-when="!$parent.$parent.$parent.$first && $parent.$parent.subPanelContext.recipeItem.criteriaOperatorType == 'Exclude' && !$parent.$parent.subPanelContext.showfilteroperator.dbValue" icon-id="miscFilterExclude"></aw-icon>
+
+    <!-- Hidden icon for first term -->
+    <aw-icon class="aw-commands-commandIconButton aw-subset-recipeLogicButton aw-subset-recipeLogicHidden" exist-when="$parent.$parent.$parent.$first" icon-id="miscFilterInclude"></aw-icon>
+
+    <!-- Delete icon -->
+    <aw-icon-button class="aw-commands-commandIconButton aw-subset-deleteButton" command="data.deleteRecipeCommand" exist-when="$parent.$parent.subPanelContext.isEditable" extended-tooltip='{"extendedTooltipContent": "{{data.deleteText.propertyDisplayName}}"}'></aw-icon-button>
+
+    <div extended-tooltip='{"extendedTooltipContent": "{{data.tooltip}}"}'  extended-tooltip-options="{'placement' : 'right'}">
+    <!-- Draw a recipe term that contains multiple attributes in one line-->
+    <div exist-when="data.showMultipleAttrInRecipeTerm" class="aw-subset-inSubsetRecipeLabelValueContainer" >
+        <div class="aw-subset-subsetRecipeLink">
+            <aw-link prop="data.recipeTermProp" action="expandMultipleAttributes">
+            </aw-link>
+        </div>
+    </div>
+    <div class="aw-subset-multipleRecipeTermContainer"  exist-when="data.showMultiAttributeTerm" >
+        <div aw-repeat="eachAttr : data.allAttrFromRecipeTerm" class="aw-occmgmt-awRepeat" >
+            <div class="aw-subset-subsetRecipeLabelValueContainer" id='{{data.allAttrIds[eachAttr]}}' title='{{data.allAttrIds[eachAttr]}}'>
+                <div class="aw-subset-subsetRecipeLabel inactive">{{data.allAttrLabels[eachAttr]}}:</div>
+                <div class="aw-subset-subsetRecipeValue">{{data.allAttrValues[eachAttr]}}</div>
+            </div>
+        </div>
+    </div>
+    <!-- Draw recipe terms for all other cases here-->
+    <div exist-when="!data.showMultipleAttrInRecipeTerm" class="aw-subset-inSubsetRecipeLabelValueContainer">
+        <!-- Recipe Label-->
+        <div  exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType != 'Group' && $parent.$parent.subPanelContext.recipeItem.criteriaType != 'Proximity'" aw-class="{'aw-subset-subsetRecipeLabel inactive': true, 'aw-subset-subsetRecipeLabelOnly':'{{data.index}}'.includes('.') == true && data.recipeTermValue.displayName == ''}">{{data.recipeTermLabel.displayName}}</div>
+        <div class="aw-subset-connector" exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType != 'Group' && $parent.$parent.subPanelContext.recipeItem.criteriaType != 'Proximity' && $parent.$parent.subPanelContext.recipeItem.criteriaType != 'BoxZone' && $parent.$parent.subPanelContext.recipeItem.criteriaType != 'PlaneZone' "  aw-class="{ 'inactive': true,'hidden': data.recipeTermValue.displayName == undefined || data.recipeTermValue.displayName == ''}">:</div>
+
+        <!-- Group Link-->
+        <div class="aw-subset-subsetRecipeLink" exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType == 'Group'">
+            <aw-link prop="data.recipeTermProp" action="expandGroup">
+            </aw-link>
+        </div>
+
+        <!-- Recipe Value-->
+        <div   exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType != 'Proximity' && $parent.$parent.subPanelContext.recipeItem.criteriaType != 'BoxZone' && $parent.$parent.subPanelContext.recipeItem.criteriaType != 'PlaneZone' && data.selectedTerms.length <= 1" class="aw-subset-subsetRecipeValue">{{data.recipeTermValue.displayName}}
+        </div>
+
+         <!-- 'n selected' Link-->
+        <div class="aw-subset-subsetRecipeLink" exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType != 'Proximity'&& data.selectedTerms.length > 1"
+            title="{{data.selectedTerms[0]}}">
+            <aw-link prop="data.recipeTermProp" action="expandSelectedPartitionScheme" >
+            </aw-link>
+        </div>
+
+        <!-- Proximity term -->
+        <div  class="aw-subset-subsetProximityRecipeLink" exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType == 'Proximity'" >
+            <aw-link-with-popup prop="data.recipeTermProp">
+                <aw-property-double-val prop="data.proximityDistanceProp" visible-when="!ctx.aceActiveContext.context.updatedRecipe" aw-enter-key="updateProximityValue"></aw-property-double-val>
+            </aw-link-with-popup>
+        </div>
+        <!-- End Proximity term -->
+
+    </div>
+
+    <!-- Expand group link-->
+    <div exist-when="$parent.$parent.subPanelContext.recipeItem.criteriaType == 'Group' && data.showGroupTerms">
+        <div exist-when="$parent.$parent.subPanelContext.recipeItem.subCriteria.length > 0" class="aw-subset-subsetRecipeGroup">
+            <!-- Create a new recipe term for each recipe -->
+            <div aw-repeat="groupRecipeItem : $parent.$parent.subPanelContext.recipeItem.subCriteria">
+                <aw-include name="RecipeTerm" sub-panel-context="{'recipeItem': groupRecipeItem,'parentIndex': data.index, 'index':$index, 'isEditable': $parent.$parent.subPanelContext.isEditable}"></aw-include>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expand n-selected link -->
+    <div exist-when="data.doShowInnerRecipeElements">
+        <div class="aw-subset-multipleRecipeTermContainer">
+            <div aw-repeat="innerRecipeTermValue : data.selectedTerms" class="aw-occmgmt-awRepeat">
+                <div class="aw-subset-subsetRecipeLabelValueContainer">
+                    <div class="aw-subset-subsetInnerRecipeValue" id={{innerRecipeTermValue}} extended-tooltip='{"extendedTooltipContent":"{{innerRecipeTermValue}}"}'>{{innerRecipeTermValue}}</div>
+                </div>
+                <aw-icon class="aw-commands-commandIconButton aw-subset-deleteButton"  icon-id="miscRemoveBreadcrumb" aw-click="data.deleteRecipeInInnerRecipeList(innerRecipeTermValue, $parent.$parent.$parent.subPanelContext.recipeItem, $parent.$parent.$parent.subPanelContext.index)" exist-when="$parent.$parent.subPanelContext.isEditable" extended-tooltip='{"extendedTooltipContent": "{{data.deleteText.propertyDisplayName}}"}'></aw-icon>
+            </div>
+        </div>
+    </div>
+    <!-- end of inner recipe terms -->
+    </div>
+</div>

@@ -1,0 +1,127 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "newCommandId": {
+            "displayName": "{{i18n.commandId}}",
+            "type": "STRING",
+            "isEditable": true,
+            "dispValue": "",
+            "dbValue": "",
+            "autofocus": "true"
+        }
+    },
+    "actions": {
+        "saveas": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($newId:ID!,$oldId:ID!){ saveAsCommand(input:{newId:$newId,oldId:$oldId}){id} }",
+                    "variables": {
+                        "newId": "{{data.newCommandId.dbValue}}",
+                        "oldId": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "saveAsCommand": "data.saveAsCommand",
+                "saveAsErrorMsg": "errors[0].message"
+            },
+            "events": {
+                "success": [
+                    {
+                        "condition": "conditions.isSaveAsSucceed",
+                        "name": "saveasCommand.focusCommand"
+                    },
+                    {
+                        "condition": "conditions.isSaveAsSucceed",
+                        "name": "saveasCommand.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "conditions.isSaveAsFailed",
+                        "message": "saveAsCommandFailure"
+                    }
+                ]
+            }
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "focusCommand": {
+            "actionType": "Navigate",
+            "navigateTo": "commandBuilder",
+            "navigationParams": {
+                "s_uid": "{{data.newCommandId.dbValue}}"
+            }
+        }
+    },
+    "dataProviders": {},
+    "onEvent": [
+        {
+            "eventId": "saveasCommand.notifyConfigChange",
+            "action": "notifyConfigChange"
+        },
+        {
+            "eventId": "saveasCommand.focusCommand",
+            "action": "focusCommand"
+        }
+    ],
+    "conditions": {
+        "isValidToSaveAs": {
+            "expression": "data.newCommandId.dbValue && data.newCommandId.dbValue !='' && data.newCommandId.dbValue !== ctx.selected.uid"
+        },
+        "isSaveAsFailed": {
+            "expression": "data.saveAsErrorMsg"
+        },
+        "isSaveAsSucceed": {
+            "expression": "data.saveAsCommand"
+        }
+    },
+    "messages": {
+        "saveAsCommandFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.saveAsCommandFailure}}",
+            "messageTextParams": [
+                "{{data.saveAsErrorMsg}}"
+            ]
+        }
+    },
+    "i18n": {
+        "saveasCommand": [
+            "CommandBuilderMessages"
+        ],
+        "commandId": [
+            "CommandBuilderMessages"
+        ],
+        "saveAsCommandFailure": [
+            "CommandBuilderMessages"
+        ],
+        "save": [
+            "XRTMessages"
+        ]
+    }
+}

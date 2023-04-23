@@ -1,0 +1,82 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-form.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "setParentData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Ac0ConversationService"
+        },
+        "addSourceObjects": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "createNewConv.addSourceObject",
+                        "eventData": {
+                            "selectedObjects": "{{data.sourceObjects}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "Ac0ConvCreateNewConvPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "{{ctx.Ac0ConvCtx.invokingPanel}}",
+                            "data": "{{data}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isPaletteTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "createNewConv.addSourceObject",
+            "action": "Ac0ConvCreateNewConvPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Ac0AddSourceObjectsSub"
+            },
+            "action": "reveal"
+        }
+    ],
+    "i18n": {
+        "add": [ "ActiveCollabDeclarativeMessages" ]
+    }
+}

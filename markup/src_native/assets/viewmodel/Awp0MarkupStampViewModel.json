@@ -1,0 +1,106 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-markup-stamp.directive"
+    ],
+    "actions":
+    {
+        "showStampPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "showStampPanel",
+            "deps": "js/Awp0MarkupService"
+        },
+        "hideStampPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "hideStampPanel",
+            "deps": "js/Awp0MarkupService"
+        },
+        "callStampDataProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "visibleStamps"
+        },
+        "getVisibleStamps":
+        {
+            "actionType": "JSFunction",
+            "method": "filterStamps",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData":
+            {
+                "visibleStampList": []
+            },
+            "deps": "js/Awp0MarkupService"
+        },
+        "stampSelected":
+        {
+            "actionType": "JSFunction",
+            "method": "stampSelected",
+            "inputData": { "eventData": "{{data.eventData}}" },
+            "deps": "js/Awp0MarkupService"
+        }
+    },
+
+    "data":
+    {
+        "filterStamp":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "i18n":
+    {
+        "stamp": [ "MarkupMessages" ],
+        "myStamps": [ "MarkupMessages" ],
+        "sharedStamps": [ "MarkupMessages" ]
+    },
+
+    "dataProviders":
+    {
+        "visibleStamps":
+        {
+            "action": "getVisibleStamps",
+            "response": "{{data.stampList}}",
+            "totalFound": "{{data.stampList.length}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_markup_stamp_commands"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "showStampPanel",
+            "criteria": { "panelId": "Awp0MarkupStamp" }
+        },
+        {
+            "eventId": "awp0Markup.callStampDataProvider",
+            "action": "callStampDataProvider"
+        },
+        {
+            "eventId": "visibleStamps.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "stampSelected"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "action": "hideStampPanel",
+            "criteria": { "destPanelId": "Awp0Markup" }
+        }, 
+        {
+            "eventId": "Awp0MarkupStampMain.contentUnloaded",
+            "action": "hideStampPanel"
+        }
+    ]
+}

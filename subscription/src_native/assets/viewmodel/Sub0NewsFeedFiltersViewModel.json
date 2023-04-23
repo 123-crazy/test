@@ -1,0 +1,163 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-filter-category.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/visible-when.directive",
+        "js/aw-repeat.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+
+    "actions":
+    {
+        "updateCategoryResults":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategoryResults",
+            "inputData":
+            {
+                "category":"{{ctx.search.valueCategory}}"
+            },
+            "deps":"js/filterPanelService"
+        },
+        "update":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategories",
+            "inputData":
+            {
+                "categories": "{{ctx.searchResponseInfo.searchFilterCategories}}",
+                "categoryValues": "{{ctx.searchResponseInfo.searchFilterMap}}",
+                "groupProperty": "{{ctx.searchResponseInfo.objectsGroupedByProperty}}",
+                "colorToggle": true,
+                "currentCategories": "{{ctx.searchResponseInfo.searchCurrentFilterCategories}}",
+                "showRange"  : false
+            },
+
+            "outputData":
+            {
+                "categories": ""
+            },
+
+            "deps": "js/filterPanelService"
+        },
+
+        "selectCategory":
+        {
+            "actionType": "JSFunction",
+            "method": "selectCategory",
+            "inputData":
+            {
+                "category": "{{category}}"
+            },
+
+            "outputData":
+            {
+                "categories": ""
+            },
+
+            "deps": "js/filterPanelEvents"
+        },
+
+        "selectFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "selectFilter",
+            "inputData":
+            {
+                "category": "{{category}}",
+                "filter": "{{filter}}"
+            },
+            "deps": "js/filterPanelEvents"
+        },
+
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "getCategories2",
+            "inputData": {
+                "categories": "{{ctx.searchResponseInfo.searchFilterCategories}}",
+                "categoryValues": "{{ctx.searchResponseInfo.searchFilterMap}}",
+                "groupProperty": "{{ctx.searchResponseInfo.objectsGroupedByProperty}}",
+                "colorToggle": true,
+                "showRange": false
+            },
+            "outputData": {
+                "categories": ""
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "addWatchToActiveFilters"
+                    }
+                ]
+            },
+            "deps": "js/filterPanelService"
+        },
+        "saveFilterSelection":{
+            "actionType": "JSFunction",
+            "method": "updateNewsFeedFilterPreference",
+            "inputData":
+            {
+                "ctx": "{{ctx}}"
+            },
+            "deps":"js/awMessageService"
+        },
+        "addWatchToActiveFilters":
+        {
+            "actionType": "JSFunction",
+            "method": "addWatchToActiveFilters",
+            "inputData":
+            {
+            },
+            "deps":"js/awMessageService"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "updateFilterPanel",
+            "action": "update"
+        },
+        {
+            "eventId": "addWatchToActiveFilters",
+            "action": "addWatchToActiveFilters"
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action":"updateCategoryResults"
+        }
+    ],
+
+    "data":
+    {
+    },
+
+    "messages":
+    {
+    },
+
+    "conditions":
+    {
+
+    },
+
+    "i18n":
+    {
+        "filterString":
+        [
+            "SearchMessages"
+        ],
+        "saveFilterSelection":
+        [
+            "SubscriptionMessages"
+        ]
+    }
+}

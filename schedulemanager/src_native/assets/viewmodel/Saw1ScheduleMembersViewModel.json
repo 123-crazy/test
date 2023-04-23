@@ -1,0 +1,434 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-listbox.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/aw-row.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "assignedScheduleMemberList",
+                "userPerformSearch"
+            ]
+        },
+        "assignResources": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2015-07-ScheduleManagement",
+            "method": "assignResources",
+            "inputData": {
+                "schedule": "{{function:getScheduleUidFromCtx}}",
+                "createAssignments": "{{function:getAssignContainerUsers}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{function:getUIDToRefresh}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.unassignUsersFlag !== true",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages":{
+                "failure":[
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "unAssignResources": {
+            "actionType": "JSFunction",
+            "method": "unAssignResourcesfromTask",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "data": "{{data.AssignedScheduleMembers}}",
+                "dataProvider": "{{data.dataProviders.assignedScheduleMemberList.viewModelCollection.loadedVMObjects}}",
+                "schedule": {
+                    "uid": "{{function:getScheduleUid}}",
+                    "type": "Schedule"
+                },
+                "response": "{{data.response.output}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{function:getUIDToRefresh}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },
+        "getResourceAssignmentsForScheduleMember": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForPrimary",
+            "inputData": {
+                "primaryObjects": "{{ctx.mselected}}",
+                "pref": {
+                    "expItemRev": false,
+                    "returnRelations": true,
+                    "info": [ {
+                        "relationTypeName": "ResourceAssignment"
+                    } ]
+                }
+            },
+            "policy": {
+                "types": [ {
+                        "name": "ResourceAssignment",
+                        "properties": [ {
+                                "name": "primary_object"
+                            },
+                            {
+                                "name": "discipline"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "unAssignResources"
+                } ]
+            },
+            "actionMessages":{
+                "failure":[
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            }
+        },
+        "getScheduleMembers": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": [ "{{function:getScheduleUidFromCtx}}" ],
+                "attributes": [ "saw1ScheduleMembers" ]
+            },
+            "policy": {
+                "types": [ {
+                        "name": "ScheduleMember",
+                        "properties": [ {
+                                "name": "resource_tag",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "scheduleMembers": "{{function:getScheduleMembers}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "getAssignedMembers": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": "{{ctx.mselected}}",
+                "attributes": [ "ResourceAssignment" ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "ScheduleTask",
+                    "properties": [ {
+                        "name": "ResourceAssignment"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "assignedUsers": "{{function:getAssignedScheduleTaskMembers}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "addScheduleMember": {
+            "actionType": "JSFunction",
+            "method": "addScheduleMember",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1AddUserCommandHandler"
+        },
+        "removeUser": {
+            "actionType": "JSFunction",
+            "method": "removeScheduleMember",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1RemoveUserCommandHandler"
+        },
+        "saveUsers": {
+            "actionType": "JSFunction",
+            "method": "userSaveAction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                        "condition": "data.unassignUsersFlag === true || data.assignUsersFlag === true",
+                        "name": "unAssignUserMsg"
+                    },
+                    {
+                        "condition": "data.unassignUsersFlag === false && data.assignUsersFlag === false && data.Users.length === data.dataProviders.assignedScheduleMemberList.viewModelCollection.loadedVMObjects.length",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode=='diffScheduleErrorMsg'",
+                        "message": "diffScheduleErrorMsg"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "assignAndUnassignSoaCall": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "getResourceAssignmentsForScheduleMember",
+                        "condition": "data.unassignUsersFlag === true"
+                    },
+                    {
+                        "name": "assignResources.callSoa",
+                        "condition": "data.assignUsersFlag === true"
+                    }
+                ]
+            }
+        },
+        "unregisterEvent": {
+            "actionType": "JSFunction",
+            "method": "unregisterEvent",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name" : "unregisterEvent"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "ScheduleMembers": []
+    },
+    "dataProviders": {
+        "assignedScheduleMemberList": {
+            "action": "getAssignedMembers",
+            "response": "{{data.AssignedScheduleMembers}}",
+            "commandsAnchor": "aw_removeUserCellCommand"
+        },
+        "userPerformSearch": {
+            "action": "getScheduleMembers",
+            "response": "{{data.ScheduleMembers}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_addUserCellCommand"
+        }
+    },
+    "functions": {
+        "getAssignContainerUsers": {
+            "functionName": "getAssignContainerUsers",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getScheduleUidFromCtx": {
+            "functionName": "getScheduleUidFromCtx",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getUIDToRefresh": {
+            "functionName": "getUIDToRefresh",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getScheduleUid": {
+            "functionName": "ScheduleUid",
+            "parameters": []
+        },
+        "getScheduleMembers": {
+            "functionName": "getScheduleMembers",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "getAssignedScheduleTaskMembers": {
+            "functionName": "getAssignedScheduleTaskMembers",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "messages": {
+        "diffScheduleErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorMsgForDiffSch}}",
+            "messageTextParams": []
+        },
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "preferences": [
+        "WRKFLW_allow_resourcepool_assignments",
+        "WRKFLW_show_user_assignment_options"
+    ],
+    "onEvent": [ {
+            "eventId": "Saw1AddUserCommand.addUser",
+            "action": "addScheduleMember"
+        },
+        {
+            "eventId": "Saw1RemoveUserCommand.removeUser",
+            "action": "removeUser"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1ScheduleMembers"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "getResourceAssignmentsForScheduleMember",
+            "action": "getResourceAssignmentsForScheduleMember"
+        },
+        {
+            "eventId": "assignResources.callSoa",
+            "action": "assignResources"
+        },
+        {
+            "eventId": "unAssignUserMsg",
+            "action": "assignAndUnassignSoaCall"
+        },
+        {
+            "eventId": "unAssignResources",
+            "action": "unAssignResources"
+        },
+        {
+            "eventId": "Saw1ScheduleMembersEvent",
+            "action": "saveUsers"
+        },
+        {
+            "eventId": "syncGanttSplitSelectionDone",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "unregisterEvent",
+            "action": "unregisterEvent"
+        }
+    ],
+    "i18n": {
+        "assignResourceCommandTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "saw1remove": [
+            "ScheduleManagerMessages"
+        ],
+        "add": [
+            "ScheduleManagerMessages"
+        ],
+        "CancelText": [
+            "ScheduleManagerMessages"
+        ],
+        "project": [
+            "ScheduleManagerMessages"
+        ],
+        "none": [
+            "ScheduleManagerMessages"
+        ],
+        "users": [
+            "ScheduleManagerMessages"
+        ],
+        "assignedSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "availableSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "errorMsgForDiffSch": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

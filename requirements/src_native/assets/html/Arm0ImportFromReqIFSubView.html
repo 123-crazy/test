@@ -1,0 +1,36 @@
+<aw-panel-body class="aw-requirement-importPanel" aw-init="data.activeView='Arm0ImportFromOfficeSub'">
+    <aw-command-panel-section anchor="data.importFromReqIFMappingSubCommands" caption="i18n.mapping" visible-when="conditions.isValidFile">
+        <aw-listbox prop="data.savedMappings" list="data.savedMappingsListBoxValues" action="importReqIFSavedMappingsSelectionChange"></aw-listbox>
+
+        <aw-panel-section caption="i18n.mapTypes" collapsed="false" visible-when="conditions.isValidFile && conditions.isReqIFTypes">
+            <div class="aw-requirement-reqIFTypeContainer" aw-repeat="reqIFTypes : data.viewModelPropForReqIFTypes">
+                <aw-requirements-excelimport-header prop="reqIFTypes" event="importReqIFMapProp.{{reqIFTypes.propertyName}}" ></aw-requirements-excelimport-header>
+                <div class="aw-requirement-reqIFPropertyContainer" aw-repeat="reqIFProperty : data.viewModelPropForReqIFProperties[reqIFTypes.propertyName]">
+                    <aw-requirements-excelimport-header prop="reqIFProperty" event="importReqIFMapProp.{{reqIFTypes.dbValue}}.{{reqIFProperty.propertyDisplayName}}" ></aw-requirements-excelimport-header>
+                    <div class="aw-requirement-reqIFLovContainer" aw-repeat="reqIFLOVPropertyValue : reqIFProperty.viewModelPropForReqIFLOVPropertyValues[reqIFProperty.propertyDisplayName]">
+                        <aw-requirements-excelimport-header prop="reqIFLOVPropertyValue" ></aw-requirements-excelimport-header>
+                    </div>
+                </div>
+            </div>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.mapTraceLinks" collapsed="false" visible-when="conditions.isValidFile && conditions.isReqIFTraceLinks">
+            <div class="aw-requirement-reqIFTypeContainer" aw-repeat="reqIFTraceLinks : data.viewModelPropForReqIFTraceLinks ">
+                <aw-requirements-excelimport-header prop="reqIFTraceLinks" event="importReqIFMapProp.{{reqIFTraceLinks.propertyName}}" ></aw-requirements-excelimport-header>
+                <div class="aw-requirement-reqIFPropertyContainer" aw-repeat="reqIFTraceLinkProperty : data.viewModelPropForReqIFProperties[reqIFTraceLinks.propertyName]">
+                    <aw-requirements-excelimport-header prop="reqIFTraceLinkProperty" event="importReqIFMapProp.{{reqIFTraceLinks.dbValue}}.{{reqIFTraceLinkProperty.propertyDisplayName}}" ></aw-requirements-excelimport-header>
+                    <div class="aw-requirement-reqIFLovContainer" aw-repeat="reqIFTraceLinkLOVPropertyValue : reqIFTraceLinkProperty.viewModelPropForReqIFLOVPropertyValues[reqIFTraceLinkProperty.propertyDisplayName]">
+                        <aw-requirements-excelimport-header prop="reqIFTraceLinkLOVPropertyValue" ></aw-requirements-excelimport-header>
+                    </div>
+                </div>
+            </div>
+        </aw-panel-section>
+    </aw-command-panel-section>
+
+</aw-panel-body>
+
+<aw-panel-footer>
+    <aw-checkbox prop="data.runInBackgroundReqIF" visible-when="conditions.isReqIFImportAllowed"></aw-checkbox>
+    <aw-button enable-when="!data.importFromReqIFProgressing" action="getNewReqIFImportInput" visible-when="conditions.isReqIFImportAllowed">
+        <aw-i18n>i18n.importTitle</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

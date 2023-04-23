@@ -1,0 +1,237 @@
+{
+  "name": "prgplanningeventchange",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "Pec0SetPin": {
+        "iconId": "cmdPin",
+        "isGroup": false,
+        "title": "{{i18n.Pec0PinButtonToolTip}}",
+        "description": "{{i18n.panelPinButtonDesc}}"
+      },
+      "Pec0SetUnPin": {
+        "iconId": "cmdUnpin",
+        "isGroup": false,
+        "title": "{{i18n.Pec0UnpinButtonToolTip}}",
+        "description": "{{i18n.panelUnPinButtonDesc}}"
+      },
+      "Pec0RemoveChange": {
+        "iconId": "cmdRemove",
+        "title": "{{i18n.RemoveChangeCommandTitle}}",
+        "description": "{{i18n.Pec0RemoveChangeDesc}}"
+      },
+      "Pec0RelateChange": {
+        "iconId": "cmdAdd",
+        "title": "{{i18n.RelateChangeTitle}}",
+        "description": "{{i18n.Pec0RelateChangeDesc}}"
+      },
+      "Pec0AddEvent": {
+        "iconId": "cmdAdd",
+        "title": "{{i18n.Awp0AddObjectTitle}}",
+        "description": "{{i18n.Pec0AddEvent}}"
+      }
+    },
+    "commandHandlers": {
+      "SetPinCommandHandler": {
+        "id": "Pec0SetPin",
+        "action": "Pec0SetPin",
+        "activeWhen": {
+          "condition": "conditions.isPec0PanelPinned"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isPec0PanelPinned"
+        }
+      },
+      "SetUnPinCommandHandler": {
+        "id": "Pec0SetUnPin",
+        "action": "Pec0SetUnPin",
+        "activeWhen": {
+          "condition": "conditions.isPec0PanelUnPinned"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isPec0PanelUnPinned"
+        }
+      },
+      "RemoveChangeCommandHandler": {
+        "id": "Pec0RemoveChange",
+        "action": "Pec0RemoveEventChangeOperation",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.removeChangeVisibility"
+        }
+      },
+      "RelateChangeCommandHandler": {
+        "id": "Pec0RelateChange",
+        "action": "Pec0AddEventChangeOperation",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.relateChangeVisibility"
+        }
+      },
+      "Pec0AddEventCommandHandler": {
+        "id": "Pec0AddEvent",
+        "action": "Pec0AddEventCommandAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.addEventCommandVisibility"
+        }
+      }
+    },
+    "commandPlacements": {
+      "Pec0SetPinPlacement": {
+        "id": "Pec0SetPin",
+        "uiAnchor": "pec0_oneStepPinCommands",
+        "priority": 100
+      },
+      "Pec0SetUnPinPlacement": {
+        "id": "Pec0SetUnPin",
+        "uiAnchor": "pec0_oneStepPinCommands",
+        "priority": 100
+      },
+      "Pec0RemoveChange": {
+        "id": "Pec0RemoveChange",
+        "uiAnchor": "aw_rightWall",
+        "priority": 312,
+        "parentGroupId": "Awp0EditGroup"
+      }
+    },
+    "actions": {
+      "Pec0SetPin": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "addChange.pec0SetPin",
+              "eventData": {
+                "data": "{{commandContext}}"
+              }
+            }
+          ]
+        }
+      },
+      "Pec0SetUnPin": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "addChange.pec0SetUnPin",
+              "eventData": {
+                "data": "{{commandContext}}"
+              }
+            }
+          ]
+        }
+      },
+      "Pec0RemoveEventChangeOperation": {
+        "actionType": "TcSoaService",
+        "serviceName": "Core-2006-03-DataManagement",
+        "method": "deleteRelations",
+        "inputData": {
+          "input": "{{function:removeEventChangeOperation}}"
+        },
+        "events": {
+          "success": [
+            {
+              "name": "cdm.relatedModified",
+              "eventData": {
+                "relatedModified": [
+                  "{{ctx.pselected}}"
+                ]
+              }
+            }
+          ]
+        },
+        "actionMessages": {
+          "failure": [
+            {
+              "message": "SOAFailureMessage"
+            }
+          ]
+        },
+        "deps": "js/prgPlanningEventChangeService"
+      },
+      "Pec0AddEventChangeOperation": {
+        "actionType": "JSFunction",
+        "method": "relateChangePanel",
+        "deps": "js/prgPlanningEventChangeService",
+        "inputData": {
+          "commandId": "Pec0RelateChange",
+          "location": "aw_toolsAndInfo"
+        }
+      },
+      "Pec0AddEventCommandAction": {
+        "actionType": "JSFunction",
+        "method": "activateCommandPanel",
+        "deps": "js/commandPanel.service",
+        "inputData": {
+          "commandId": "Pec0AddEvent",
+          "location": "aw_toolsAndInfo",
+          "context": "{{commandContext}}"
+        }
+      }
+    },
+    "functions": {
+      "removeEventChangeOperation": {
+        "functionName": "removeEventChangeOperation",
+        "parameters": []
+      }
+    },
+    "conditions": {
+      "isPec0PanelPinned": {
+        "expression": "commandContext.pinnedToForm.dbValue"
+      },
+      "isPec0PanelUnPinned": {
+        "expression": "commandContext.unpinnedToForm.dbValue"
+      },
+      "removeChangeVisibility": {
+        "expression": "ctx.selected.modelType.typeHierarchyArray.indexOf('ChangeItemRevision') > -1 && ( ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Timeline' && ctx.pselected.modelType.typeHierarchyArray.indexOf('Prg0AbsEvent') > -1 ) || ( ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf('Prg0AbsEvent') > -1 && ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Changes')"
+      },
+      "relateChangeVisibility": {
+        "expression": "ctx.selected.modelType.typeHierarchyArray.indexOf('Prg0AbsEvent') > -1 && ( ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Changes' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Changes' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Timeline' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Timeline' ) && !ctx.editInProgress"
+      },
+      "addEventCommandVisibility": {
+        "expression": "(ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_ReferenceItems' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_ReferenceItems') && (commandContext.objectSetSource === 'S2P:Pec0EventChangeRelation.Prg0AbsEvent')"
+      }
+    },
+    "messages": {
+      "SOAFailureMessage": {
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+      }
+    },
+    "i18n": {
+      "RemoveChangeCommandTitle": [
+        "PrgPlanningEventChangeConstants"
+      ],
+      "RelateChangeTitle": [
+        "PrgPlanningEventChangeConstants"
+      ],
+      "Pec0PinButtonToolTip": [
+        "PrgPlanningEventChangeConstants"
+      ],
+      "Pec0AddEventChangeCommandDesc": [
+        "PrgPlanningEventChangeConstants"
+      ],
+      "Pec0UnpinButtonToolTip": [
+        "PrgPlanningEventChangeConstants"
+      ],
+      "Pec0RemoveChangeDesc": [
+        "PrgPlanningEventChangeConstants"
+      ],
+      "Pec0RelateChangeDesc": [
+        "PrgPlanningEventChangeConstants"
+      ]
+    }
+  }
+}

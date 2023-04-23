@@ -1,0 +1,153 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "getSystemEleSpecs": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "inflateProperties": false,
+                "saveColumnConfigData": {},
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Aqc0QualityBaseProvider",
+                    "searchFilterMap6": {
+                        "WorkspaceObject.object_type": [
+                            {
+                                "searchFilterType": "StringFilter",
+                                "stringValue": "Qc0Failure"
+                            },
+                            {
+                                "searchFilterType": "StringFilter",
+                                "stringValue": "Qfm0FunctionEleSpec"
+                            },
+                            {
+                                "searchFilterType": "StringFilter",
+                                "stringValue": "Qfm0SystemEleSpec"
+                            }
+                        ]
+                    },
+                    "searchCriteria": {
+                        "parentGUID": "",
+                        "searchStatus":"{{(!ctx.systemEleSpecManagerContext.showInactive).toString()}}",
+                        "catalogueObjectType": "Qfm0SystemEleSpec"
+                    },
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}",
+                    "searchSortCriteria": [
+                        {
+                            "fieldName": "object_name",
+                            "sortDirection": "ASC"
+                        }
+                    ]
+                }
+            },
+            "policy":
+            {
+                "types": [
+                    {
+                        "name": "Qfm0SystemEleSpec",
+                        "properties": [
+                            {
+                                "name": "qfm0Status"
+                            },
+                            {
+                                "name": "qc0Status"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "systemEleSpecList": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "processPWASelection"
+                    }
+
+                ]
+            }
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}"
+            },
+            "deps": "js/qfm0SystemEleSpecManagerUtils"
+        },
+        "selectionChanged": {
+            "actionType": "JSFunction",
+            "method": "selectionChanged",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}"
+            },
+            "deps": "js/qfm0SystemEleSpecManagerUtils"
+        }
+    },
+    "data": {},
+    "dataProviders": {
+        "listDataProvider": {
+            "action": "getSystemEleSpecs",
+            "response": "{{data.systemEleSpecList}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [
+                        "aw_oneStep"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    },
+    "onEvent": [
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "selectionChanged"
+        },
+        {
+            "eventId": "processPWASelection",
+            "cacheEventData": true,
+            "action": "updateSelectionInPWA"
+        }
+    ]
+}

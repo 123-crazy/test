@@ -1,0 +1,663 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-include.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-column.directive"
+    ],
+    "actions": {
+        "loadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ProjectManagementAw-2019-12-ScheduleManagementAw",
+            "method": "manageProgramView",
+            "inputData": {
+                "programViewInfo": {
+                    "programView": "{{function:getProgramViewObject}}",
+                    "operationType": "load",
+                    "contextNodeId" : "{{function:getParentTaskUid}}",
+                    "referenceNodeId": "{{function:getReferenceTaskUid}}",
+                    "inputOptions" : [
+                        {
+                            "name": "returnProgramViewConfig",
+                            "stringValue" : "true"
+                        }
+                    ],
+                    "programViewConfiguration": {}
+                }
+            },
+            "outputData": {
+                "searchResults": "{{function:parseManagePrgViewSOAResponse}}",
+                "totalFound": "{{function:getTotalFoundCount}}"
+
+
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Saw1ProgramViewDataSource"
+        },
+
+        "loadColumns": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [
+                    {
+                        "scope": "LoginUser",
+                        "scopeName": "",
+                        "clientName": "AWClient",
+                        "resetColumnConfig": false,
+                        "columnConfigQueryInfos": [
+                            {
+                                "clientScopeURI": "Saw1ProgramViewColumns",
+                                "operationType": "configured",
+                                "typeNames": [
+                                    "WorkspaceObject"
+                                ],
+                                "columnsToExclude": []
+                            }
+                        ],
+                        "businessObjects": [
+                            {}
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "columns": "{{function:getAWColumnInfoList}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Saw1ProgramViewDataProcessor"
+        },
+
+        "saw1ProgramCallViewPaginateSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ProjectManagementAw-2019-12-ScheduleManagementAw",
+            "method": "manageProgramView",
+            "inputData": {
+                "programViewInfo": {
+                    "programView": "{{function:getProgramViewObject}}",
+                    "operationType": "{{function:getOperationType}}",
+                    "contextNodeId" : "{{function:getParentTaskUid}}",
+                    "referenceNodeId": "{{function:getReferenceTaskUid}}",
+                    "inputOptions" : [],
+                    "programViewConfiguration": "{{function:getProgramViewConfig}}"
+                }
+            },
+            "outputData": {
+                "programViewPaginationResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "saw1ProgramView.paginationSOASuccess"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Saw1ProgramViewDataSource"
+        },
+        "parsePaginationSOAOutput": {
+            "actionType": "JSFunction",
+            "method": "parseManagePrgViewSOAResponse",
+            "inputData": {
+                "programViewPaginationResponse": "{{data.programViewPaginationResponse}}",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1ProgramViewDataSource",
+            "outputData": {
+                "paginationData": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "Saw1ProgramView.paginationComplete",
+                        "eventData":
+                        {
+                            "saw1ProgramViewPaginationData": "{{data.paginationData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "doArrangeEvent": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "saveUIColumnConfigEvent",
+                        "condition": "data.eventMap['columnArrange'].arrangeType==='saveColumnAndLoadAction'"
+                    },
+
+                        {
+                            "name": "resetColumnConfigEvent",
+                            "condition": "data.eventMap['columnArrange'].arrangeType==='reset'"
+                        }
+                ]
+            }
+        },
+         "saveUIColumnConfigAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [
+                    {
+                        "clientScopeURI": "Saw1ProgramViewColumns",
+                        "columnConfigId": "Saw1ProgramViewColumns",
+                        "columns": "{{function:getArrangeCols}}",
+                        "scope": "LoginUser",
+                        "scopeName": ""
+                    }
+                ]
+            },
+            "outputData": {
+                "SaveUIConfigResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{function:getProgramViewObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+          "deps": "js/Saw1ProgramViewDataSource"
+        },
+        "resetColumnConfigAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [
+                    {
+                        "scope": "LoginUser",
+                        "scopeName": "",
+                        "clientName": "AWClient",
+                        "resetColumnConfig": true,
+                        "columnConfigQueryInfos": [
+                            {
+                                "clientScopeURI": "Saw1ProgramViewColumns",
+                                "operationType": "configured",
+                                "typeNames": [
+                                    "WorkspaceObject"
+                                ],
+                                "columnsToExclude": []
+                            }
+                        ],
+                        "businessObjects": [
+                            {}
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "columnSOAResponse": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{function:getProgramViewObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Saw1ProgramViewDataSource"
+        },
+
+        "clearAndReInitGanttAction": {
+            "actionType": "JSFunction",
+            "method": "clearAndReInitGantt",
+            "inputData": {
+                "prgViewColumnChangeResponse": "{{data.prgViewColumnChangeResponse}}",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "optionType": "loadUsingInputConfig",
+                "isToSetColumns" : "true"
+            },
+            "deps": "js/Saw1ProgramViewDataProcessor"
+        },
+        "updateProgramViewData": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "ProgramView.updateTasks",
+                        "eventData": {
+                            "updatedTasks": "{{data.eventData.updatedObjects}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "grids": {
+        "ProgramView": {
+            "dataProvider": "Saw1ProgramViewDataProvider",
+            "columnProvider": "Saw1ProgramViewColumnProvider",
+            "gridOptions": {
+                "dataProcessorClass": "Saw1ProgramViewDataProcessor",
+                "delayLoadProperties": true,
+                "isBranchPagination": true,
+                "columnsReturnedByDataProvider": true
+            }
+        }
+    },
+    "dataProviders": {
+        "Saw1ProgramViewDataProvider": {
+            "initializeAction": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "functions": {
+        "resetColumns": {
+            "functionName": "resetColumns",
+            "parameters": [
+                "{{data.eventData}}"
+            ]
+        },
+        "getArrangeCols":
+        {
+            "functionName": "getArrangeCols",
+            "parameters": [
+                "{{data.eventData}}"
+            ]
+        },
+        "getAWColumnInfoList":
+        {
+            "functionName": "getAWColumnInfoList",
+            "parameters": ["{{data.dataProviders.Saw1ProgramViewDataProvider}}"]
+        },
+        "parseManagePrgViewSOAResponse": {
+            "functionName": "parseManagePrgViewSOAResponse",
+            "parameters":
+            [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "getTotalFoundCount": {
+            "functionName": "getTotalFoundCount"
+        },
+        "getReferenceTaskUid": {
+            "functionName": "getReferenceTaskUid",
+            "parameters": [
+                "{{data.eventData}}"
+            ]
+        },
+        "getParentTaskUid": {
+            "functionName": "getParentTaskUid",
+            "parameters": [
+                "{{data.eventData}}",
+                "{{ctx}}"
+            ]
+        },
+        "getOperationType": {
+            "functionName": "getOperationType",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getProgramViewConfig": {
+            "functionName": "getProgramViewConfig",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getPrgViewConfigWithNewCols": {
+            "functionName": "getPrgViewConfigWithNewCols",
+            "parameters": [
+                "{{ctx}}",
+                "{{data.eventData}}"
+            ]
+        },
+        "getProgramViewObject": {
+            "functionName": "getProgramViewObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "columnProviders": {
+        "Saw1ProgramViewColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "soaEnabled": false,
+            "sortCriteria": []
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "saw1ProgramView.paginate",
+            "cacheEventData": true,
+            "action": "saw1ProgramCallViewPaginateSOA"
+        },
+        {
+            "eventId": "saw1ProgramView.paginationSOASuccess",
+            "action": "parsePaginationSOAOutput"
+        },
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "resetColumnConfigEvent",
+            "action": "resetColumnConfigAction"
+        },
+        {
+            "eventId": "saveUIColumnConfigEvent",
+            "action": "saveUIColumnConfigAction"
+        },
+        {
+            "eventId": "Saw1ProgramView.clearAndReInitGantt",
+            "action": "clearAndReInitGanttAction"
+        },
+        {
+            "eventId": "cdm.updated",
+            "cacheEventData": true,
+            "action": "updateProgramViewData"
+        }
+    ],
+    "messages": {
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "data":
+    {
+        "ganttid": "ProgramView",
+        "viewModelId": "Saw1ProgramViewXRT"
+    },
+    "i18n": {
+        "gantt_month_January": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_February": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_March": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_April": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_May": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_June": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_July": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_August": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_September": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_October": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_November": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_December": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Jan": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Feb": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Mar": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Apr": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_May_short": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Jun": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Jul": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Aug": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Sep": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Oct": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Nov": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_month_Dec": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Sunday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Monday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Tuesday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Wednesday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Thursday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Friday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_Saturday": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_sun": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_mon": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_tue": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_wed": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_thu": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_fri": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_day_sat": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_new_task": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_save": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_cancel": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_details": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_edit": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_icon_delete": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_confirm_deleting": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_section_description": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_section_time": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_section_type": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_column_text": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_tooltip_label_text": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_column_start_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_tooltip_start_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_column_duration": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_link": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_link_start": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_link_end": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_type_task": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_type_project": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_type_milestone": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_minutes": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_hours": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_days": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_weeks": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_months": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_years": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_today": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_column_name": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_column_start_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_column_finish_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_tooltip_finish_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_column_work_estimate": [
+            "GanttInterfaceConstants"
+        ],
+        "removeSchDependencyMessageConfirmation": [
+            "ScheduleManagerMessages"
+        ],
+        "delete": [
+            "ScheduleManagerMessages"
+        ],
+        "CancelText": [
+            "ScheduleManagerMessages"
+        ],
+        "moveTaskAcrossSchedulesMessageConfirmation": [
+            "ScheduleManagerMessages"
+        ],
+        "move": [
+            "ScheduleManagerMessages"
+        ],
+        "errMsgForSchSummaryTask": [
+            "ScheduleManagerMessages"
+        ],
+        "errMsgForDragDropProxyTask": [
+            "ScheduleManagerMessages"
+        ],
+        "gantt_label_date": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_deliverables": [
+            "GanttInterfaceConstants"
+        ],
+        "gantt_label_members": [
+            "GanttInterfaceConstants"
+        ]
+    }
+}

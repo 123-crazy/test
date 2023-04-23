@@ -1,0 +1,138 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": 
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",  
+        "js/aw-search-box.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-i18n.directive"
+    ],
+    
+    "actions": 
+    { 
+        "parentUpdate":
+        {
+            "actionType": "dataProvider",
+            "method": "parentListProvider"
+        },
+            
+        "parentSearch":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "columnConfigInput":
+                {
+                    "clientName": "AWClient",
+                    "clientScopeURI":"Awp0SearchResults",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": "intersection"
+                },
+                "saveColumnConfigData":
+                {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput":
+                {
+                    "attributesToInflate": [ "object_name", "object_desc", "fnd0RootTypeName", "parent_types", "type_name" ],
+                    "internalPropertyName": "",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,                   
+                    "providerName": "Fnd0TypeSearchProvider",
+                    "searchCriteria":
+                    {
+                        "searchString": "{{data.parentBox.dbValue}}",
+                        "category": "Logical",
+                        "root": "{{data.rootSet[0].props.type_name.dbValue}}",
+                        "parentLO": ""
+                    },
+                    "searchFilterFieldSortType": "Priority",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.parentListProvider.startIndex}}"
+                }
+            },
+            "outputData":
+            {
+                "parentFound": "totalFound",
+                "parentResults": "searchResults"
+            }
+        },
+                    
+        "parentAdd": 
+        {
+            "actionType": "JSFunction",
+            "method": "setParentObject",
+            "inputData": 
+            {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.parentListProvider.selectedObjects}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        },
+        
+        "selectDefault":
+        {
+            "actionType": "JSFunction",
+            "method": "selectDefault",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        }
+    },
+
+    "data": 
+    {
+        "parentBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": ""
+        }
+    },
+          
+    "dataProviders":
+    {
+        "parentListProvider":
+        {
+            "action": "parentSearch",
+            "response": "{{data.parentResults}}",
+            "totalFound": "{{data.parentFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    
+    "conditions": 
+    {
+        "parentValid": 
+        {
+            "expression": "data.dataProviders.parentListProvider.selectedObjects.length > 0"
+        }
+    },
+    
+    "onEvent": 
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "parentUpdate",
+            "criteria": { "panelId": "Awp0ParentObjectSub" }
+        },
+        {
+            "eventId": "parentListProvider.modelObjectsUpdated",
+            "action": "selectDefault"
+        }
+    ]   
+}

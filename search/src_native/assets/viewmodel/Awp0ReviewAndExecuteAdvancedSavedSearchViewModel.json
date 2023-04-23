@@ -1,0 +1,108 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-property-lov-val.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox-multiselect.directive",
+        "js/aw-repeat.directive",
+        "js/aw-link.directive"
+    ],
+    "data": {
+        "savedQuery": {
+            "displayName":"{{i18n.savedQuery}}",
+            "type":"STRING",
+            "isRequired":"false",
+            "isEditable":"false",
+            "dispValue":"{{ctx.savedQuery}}"
+        },
+        "advancedSearchClearAll": {
+            "displayName": "{{i18n.advancedSearchClearAll}}",
+            "type": "STRING"
+        },
+        "awp0AdvancedQueryName": "{{ctx.advancedSavedSearch.awp0AdvancedQueryName}}",
+        "awp0AdvancedQueryAttributes": "{{ctx.advancedSavedSearch.awp0AdvancedQueryAttributes}}"
+    },
+    "actions":
+    {
+        "reviewAndExecuteAdvancedSavedSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "reviewAndExecuteAdvancedSavedSearch",
+            "inputData":
+            {
+                "data":"{{ctx}}"
+            },
+            "deps": "js/Awp0SaveSearchService"
+        },
+        "updateSavedSearchContext":
+        {
+            "actionType": "JSFunction",
+            "method": "updateSavedSearchContext",
+            "inputData":
+            {
+                "savedSearchObject": "{{ctx.selected}}",
+                "data" : "{{data}}"
+            },
+            "deps": "js/Awp0SaveSearchService"
+        },
+        "closeAdvancedPanelNarrow":
+        {
+            "actionType": "JSFunction",
+            "method": "closeAdvancedPanelNarrow",
+            "deps": "js/advancedSearchUtils",
+            "inputData":
+            {
+                "source": "navigationPanel"
+            }
+        },
+        "clearAllAction":
+        {
+            "actionType": "JSFunction",
+            "method": "clearAllAction",
+            "inputData":
+            {
+                "data" : "{{ctx.advancedSavedSearch}}"
+            },
+            "deps": "js/advancedSearchService"
+        }
+     },
+
+    "onEvent":
+    [
+        {
+            "eventId": "checkAdvancedPanelClose",
+            "action": "closeAdvancedPanelNarrow"
+        }
+    ],
+
+     "conditions":
+    {
+        "showExecuteAdvancedSavedSearchButton":{
+            "expression": "data.awp0AdvancedQueryName && data.awp0AdvancedQueryName.dbValue"
+        },
+        "showAdvancedSavedSearchAttributes":{
+            "expression": "ctx.advancedSavedSearch.awp0AdvancedQueryName.dbValue && ctx.advancedSavedSearch.awp0AdvancedQueryAttributes"
+        },
+        "showClearAll":{
+            "expression": "ctx.advancedSavedSearch.awp0AdvancedQueryAttributes"
+        }
+    },
+
+    "i18n":
+    {
+        "advancedSearch": ["SearchMessages"],
+        "reviewAndExecuteAdvancedSavedSearch": ["SearchMessages"],
+        "executeBtn": ["SearchMessages"],
+        "searchString": ["SearchMessages"],
+        "advancedSearchClearAll": ["SearchMessages"],
+        "savedQuery": ["SearchMessages"]
+    }
+
+}

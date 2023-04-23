@@ -1,0 +1,19 @@
+<div class="aw-jswidget-tabContainer" >
+    <div  class="aw-jswidget-tabBar">
+    <ul role="tablist" class="aw-jswidget-tabBarContent" ng-style="{'width': scope.tabBarWidth}" ng-transclude></ul>
+    </div>
+    <div ng-show="showArrow">
+        <aw-property-image tabindex="0" ng-click="openOverflowPopup( $event )" ng-keydown="onKeyOverflow( $event )" class="{{ isClicked ? 'aw-jswidget-controlArrow aw-jswidget-controlArrowRotateRight aw-layoutjs-tabsContainerChevron' : 'aw-jswidget-controlArrow aw-layoutjs-tabsContainerChevron' }}" name=miscSmallChevronRight></aw-property-image>
+    </div>
+</div>
+<div class="{{ isClicked ? 'aw-layout-overflowPopupCellist aw-layout-popup aw-base-scrollPanel afx-content-background' : 'hidden'}}" ng-style="{'left': leftPosition, 'margin-top': '30px', 'max-height':popupHeight, 'max-width':'193px'}">
+    <div class="popupContent">
+        <div ng-style="{'max-width':'170px', 'max-height': popupHeight}">
+        <ul class="aw-widgets-cellListWidget ng-scope">
+            <li name="{{tabModel.pageId}}" title="{{tabModel.name}}"  ng-style="{'width': '150px', 'overflow':'hidden', 'text-overflow':'ellipsis','white-space':'nowrap', 'padding': '10px 0px 10px 10px'}" href="javascript:;" ng-click="selectOverflownTab()" class="aw-aria-border aw-widgets-cellListItem aw-widgets-cellTop ng-isolate-scope" ng-repeat="tabModel in tabsModel | filter:{displayTab:false}" tabindex="0" ng-keydown="onKeyOverflowTab( $event )">
+                {{tabModel.name}}
+            </li>
+        </ul>
+        </div>
+    </div>
+</div>

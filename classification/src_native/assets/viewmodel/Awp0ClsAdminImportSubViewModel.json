@@ -1,0 +1,395 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-button.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-file-upload.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-i18n.directive",
+        "js/aw-label.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-repeat.directive",
+        "js/aw-chip.directive",
+        "js/extended-tooltip.directive"
+    ],
+    "actions":
+    {
+        "updateFormData1": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": {
+                    "success":
+                        {
+                            "name": "classifyAdmin.clearData",
+                            "condition":"data.fileName.length>0"
+                        }
+                }
+            }
+        },
+        "clearData":{
+            "actionType": "JSFunction",
+            "method": "clearData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "classifyAdmin.getTransientFileTicketsForUpload",
+                        "condition": "data.fileExt == 'json'"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                    "condition": "data.fileExt!='json'",
+                    "message": "notJsonFileErrorInfo"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "getTransientFileTicketsForUpload":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-FileManagement",
+            "method": "getTransientFileTicketsForUpload",
+            "inputData": {
+                "transientFileInfos": [
+                    {
+                        "fileName": "{{data.fileName}}",
+                        "isBinary": false,
+                        "deleteFlag": true
+                    }
+                ]
+            },
+            "outputData": {
+                "fmsTicket": "transientFileTicketInfos[0].ticket"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "classifyAdmin.updateFormData"
+                    }
+                ]
+            }
+
+        },
+        "updateFormData":
+        {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData":
+            {
+                "fileData":
+                {
+                    "key"  : "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+
+                    {
+                        "name": "classifyAdmin.uploadFile"
+                    }
+                ]
+            },
+            "deps": "js/declUtils"
+        },
+        "uploadFile":
+        {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData":
+            {
+                "request":
+                {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers":
+                    {
+                        "Content-type": "undefined"
+                    },
+
+                    "data": "{{data.formData}}"
+                }
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "classifyAdmin.validateFile",
+                        "condition": "data.fmsTicket !== '' && !data.clickedOnImport"
+                    },
+                    {
+                        "name": "classifyAdmin.importFile",
+                        "condition": "data.clickedOnImport === true"
+                    }
+                ]
+            }
+        },
+        "validateFile":{
+            "actionType": "TcSoaService",
+            "serviceName": "ClassificationCommon-2020-12-Classification",
+            "method": "importClassificationDefinitions",
+            "inputData": {
+                "fileTicket":"{{data.fmsTicket}}",
+                "dryRun": true
+            },
+            "outputData": {
+                "fileNamesAndErrorStatus": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "classifyAdmin.getObjectNames"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "getObjectNames": {
+            "actionType": "JSFunction",
+            "method": "getObjectNames",
+            "inputData":
+            {
+                "fileNamesAndErrorStatus":"{{data.fileNamesAndErrorStatus}}",
+                "data": "{{data}}"
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.systemError== true",
+                        "message": "errorInJsonFileInfo"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminService"
+
+        },
+        "import":{
+            "actionType": "TcSoaService",
+            "serviceName": "ClassificationCommon-2020-12-Classification",
+            "method": "importClassificationDefinitions",
+            "inputData": {
+                "fileTicket":"{{data.fmsTicket}}",
+                "dryRun": false
+            },
+            "outputData": {
+                "fileNamesAndErrorStatus": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "clsAdmin.refresh",
+                        "excludeLocalDataCtx": true
+                    },
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "classifyAdmin.fileImported",
+                        "condition": "data.clickedOnImport === true"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "classifyAdmin.fileImported",
+                        "condition": "data.clickedOnImport === true"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "importSuccessMessage"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "uploadAndImport": {
+            "actionType": "JSFunction",
+            "method": "uploadAndImport",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyAdminService"
+
+        },
+        "fileImported": {
+            "actionType": "JSFunction",
+            "method": "fileImported",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyAdminService"
+
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "classifyAdmin.importFile",
+            "action": "import"
+
+        },
+        {
+            "eventId": "classifyAdmin.fileImported",
+            "action": "fileImported"
+
+        },
+        {
+            "eventId": "classifyAdmin.validateFile",
+            "action": "validateFile"
+
+        },
+        {
+            "eventId": "classifyAdmin.updateFormData",
+            "action": "updateFormData"
+
+        },
+        {
+            "eventId": "classifyAdmin.uploadFile",
+            "action": "uploadFile"
+
+        },
+        {
+            "eventId": "classifyAdmin.getObjectNames",
+            "action": "getObjectNames"
+        },
+        {
+            "eventId": "classifyAdmin.getTransientFileTicketsForUpload",
+            "action": "getTransientFileTicketsForUpload"
+        },
+        {
+            "eventId": "classifyAdmin.clearData",
+            "action": "clearData"
+        }
+    ],
+    "data":
+    {
+        "errorIcon":{
+            "chipType": "BUTTON",
+            "iconId": "indicatorError",
+            "buttonType": "negative",
+            "labelDisplayName": "Base",
+            "labelInternalName": "base",
+            "showLabel": false
+
+        },
+        "classifyAddCommand" : "classify_addCommand",
+        "selectFile" : {
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "unitSystem":
+        {
+            "displayName": "{{i18n.unitSystemLabel}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.unitSystemMetric}}",
+            "propertyRadioFalseText": "{{i18n.unitSystemNonMetric}}",
+            "dbValue": "{{data.unitSystem.dbValue}}"
+         },
+         "cellTooltip": {
+            "view": "clsCellTooltip"
+        }
+    },
+
+    "i18n":
+    {
+        "classesTitle":         [ "ClassificationAdminMessages"],
+        "continue":             [ "ClassificationAdminMessages"],
+        "systemErrorInfo":      [ "ClassificationAdminMessages"],
+        "keylovTitle":          [ "ClassificationAdminMessages"],
+        "nodesTitle" :          [ "ClassificationAdminMessages"],
+        "import":               [ "ClassificationAdminMessages" ],
+        "importing":            [ "ClassificationAdminMessages"],
+        "importAppropriateFile":["ClassificationAdminMessages"],
+        "importSuccess":        [ "ClassificationAdminMessages"],
+        "partialErrors":        ["ClassificationAdminMessages"],
+        "propertiesTitle":      [ "ClassificationAdminMessages"],
+        "validate":             [ "ClassificationAdminMessages" ],
+        "notJsonFileError":     ["ClassificationAdminMessages"]
+
+    },
+
+    "messages":
+    {
+        "errorInJsonFileInfo": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.systemErrorInfo}}",
+            "messageTextParams": [
+                "{{data.fileName}}"
+            ]
+        },
+        "importAppropriateFileInfo":{
+            "messageType": "INFO",
+            "messageText": "{{i18n.importAppropriateFile}}",
+            "messageTextParams": [
+                "{{data.fileName}}",
+                "{{data.jsonFileType}}"
+            ]
+        },
+        "notJsonFileErrorInfo":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.notJsonFileError}}",
+            "messageTextParams": [
+                "{{data.fileName}}"
+            ]
+        },
+        "importSuccessMessage":{
+            "messageType": "INFO",
+            "messageText": "{{i18n.importSuccess}}",
+            "messageTextParams": [
+                "{{data.fileName}}"
+            ]
+        }
+    },
+    "conditions": {
+        "importButtonDisplay": {
+            "expression": "data.objectNames!='' && conditions.validFile && data.errorsExist === false"
+        },
+        "validFile": {
+            "expression": "data.fileName.length > 0 && data.fileExt==='json'"
+        }
+    },
+    "dataProviders":
+    {
+        "errorMessageDataProvider": {
+            "type": "STRING",
+            "response": "{{data.errorMessages}}"
+        }
+    },
+     "functions":
+    {
+    }
+}

@@ -1,0 +1,76 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-list.directive"
+    ],
+
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "setColumns",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "exportExcelColumns.refreshDataProviderForProperties"
+                } ]
+            },
+            "deps": "js/exportToFile"
+        },
+        "refreshDataProviderForProperties": {
+            "actionType": "dataProvider",
+            "method": "dataProviderForProperties"
+        },
+        "addNewPropertiesAsColumn":{
+            "actionType": "JSFunction",
+            "method": "addColumns",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "exportExcelColumns.refreshDataProviderForProperties"
+                } ]
+            },
+            "deps": "js/exportToFile"
+        }
+    },
+
+    "data": {
+        "allProperties":""
+    },
+
+    "dataProviders": {
+        "dataProviderForProperties": {
+            "response": "{{data.allProperties}}",
+            "totalFound": "{{data.allProperties.length}}"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "exportExcelColumns.refreshDataProviderForProperties",
+            "action": "refreshDataProviderForProperties"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        }
+    ],
+
+    "conditions": {
+
+    },
+
+    "i18n": {
+        "Add": [
+            "Awp0ExportToExcelMessages"
+        ]
+    }
+}

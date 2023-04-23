@@ -1,0 +1,96 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-occmgmt-sublocation.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "_sublocation": {
+            "name": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+            "label": {
+                "source": "/i18n/OccurrenceManagementConstants",
+                "key": "occMgmtTitle"
+            },
+            "clientScopeURI": "Awb0OccurrenceManagement",
+            "enableOccMgmtCommands": true,
+            "nameToken": "com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation",
+            "policy": "/policies/occMgmtPropertyPolicy.json",
+            "viewBase": "occMgmt",
+            "selectionQueryParamKey": "c_uid",
+            "editSupportParamKeys": [ "c_uid", "o_uid", "spageId", "pci_uid" ],
+            "breadcrumbConfig": {
+                "type": "navigate",
+                "vm": "occMgmtBreadcrumb",
+                "chevronDataProvider": "breadCrumbDataProvider",
+                "crumbDataProvider": "aceBreadCrumbDataProvider",
+                "noUpdate": true,
+                "popuplist": "/html/occMgmtBreadcrumblist.html",
+                "id": "occmgmtContext",
+                "displayProperty": "object_string"
+            },
+            "viewModes": {
+                "TreeView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": false
+                },
+                "TreeSummaryView": {
+                    "primaryWorkArea": "tree",
+                    "secondaryWorkArea": true
+                }
+            },
+            "context": {
+                "commandContextParameters": [ "filter", "recipe" ]
+            }
+        }
+    },
+
+    "onEvent": [ {
+        "eventId": "occDataLoadedEvent",
+        "action": "refreshSelectedObjectInPWA",
+        "condition": "conditions.isRefreshSelectedObjectInPWA"
+    } ],
+
+    "actions": {
+
+        "refreshSelectedObjectInPWA": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.refreshSelectedObjectInPWA",
+                "value": false
+            },
+            "events": {
+                "success": [ {
+                    "name": "cdm.relatedModified",
+                    "eventData": {
+                        "relations": "",
+                        "refreshLocationFlag": true,
+                        "relatedModified": [ "{{ctx.selected}}" ]
+                    }
+                } ]
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+
+    "conditions": {
+        "isStructureFilterSupported": {
+            "expression": "ctx.aceActiveContext.context.supportedFeatures.Awb0StructureFilterFeature === true"
+        },
+        "isNavigationSupportedInWorkingContext": {
+            "expression": "ctx.aceActiveContext.context.isOpenedUnderAContext && (ctx.aceActiveContext.context.supportedFeaturesInWC.Awb0FullTextSearchFeature === true || ctx.aceActiveContext.context.supportedFeaturesInWC.Awb0FindInStructure === true)"
+        },
+        "isNavigationSupportedInProduct": {
+            "expression": "!ctx.aceActiveContext.context.isOpenedUnderAContext && (ctx.aceActiveContext.context.supportedFeatures.Awb0FullTextSearchFeature === true || ctx.aceActiveContext.context.supportedFeatures.Awb0FindInStructure === true)"
+        },
+        "isNavigationSupported": {
+            "expression": "conditions.isNavigationSupportedInWorkingContext || conditions.isNavigationSupportedInProduct"
+        },
+        "isColorFilterSuported": {
+            "expression": "ctx.aceActiveContext.context.supportedFeatures.Awb0EnableColorFilterFeature === true && (conditions.isNavigationSupported || conditions.isStructureFilterSupported) && !ctx.hiddenCommands.Awp0ShowColor"
+        },
+        "isRefreshSelectedObjectInPWA": {
+            "expression": "ctx.aceActiveContext.context.refreshSelectedObjectInPWA === true"
+        }
+    }
+}

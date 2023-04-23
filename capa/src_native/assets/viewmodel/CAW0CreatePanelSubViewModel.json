@@ -1,0 +1,213 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports":[
+      "js/aw-xrt.directive",
+      "js/aw-panel-section.directive",
+      "js/aw-command-panel-section.directive",
+      "js/aw-panel-body.directive",
+      "js/visible-when.directive",
+      "js/aw-list.directive",
+      "js/aw-type-cell.directive",
+      "js/aw-type-selector.directive",
+      "js/aw-default-cell.directive",
+      "js/exist-when.directive",
+      "js/aw-widget.directive",
+      "js/aw-form.directive"
+   ],
+   "actions":{
+      "addSelection":{
+         "actionType":"JSFunction",
+         "method":"addSelectedObject",
+         "inputData":{
+            "data":"{{data}}",
+            "selection":"{{data.dataProviders.awTypeSelector.selectedObjects}}"
+         },
+         "deps":"js/CAW0CreatePanelService"
+      },
+      "autoSelectType":{
+        "actionType":"JSFunction",
+        "method":"autoSelectType",
+        "inputData":{
+           "data":"{{data}}"
+        },
+        "deps":"js/CAW0CreatePanelService"
+      },
+      "navigateToNewTabPage":{
+         "actionType":"Event",
+         "method":"Event",
+         "inputData":{
+            "events":[
+               {
+                  "name":"awPanel.navigate",
+                  "eventData":{
+                     "destPanelId":"CAW0CreatePanelSub"
+                  }
+               }
+            ]
+         }
+      },
+      "getSchOwningProjectsAct":
+        {
+            "actionType": "JSFunction",
+            "method": "createViewModelObjectById",
+            "inputData":
+            {
+                "uid": "{{ctx.userSession.props.project.dbValues[0]}}",
+                "operationName": "CREATE"
+            },
+
+            "outputData":
+            {
+                "owningProjects":""
+            },
+
+            "deps": "js/tcViewModelObjectService"
+        },
+        "loadUserProjects":
+        {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "inputData":
+            {
+                "data": ["{{ctx.userSession.props.project.dbValues[0]}}"]
+            },
+             "events":
+            {
+                "success":
+                [
+                    {
+                        "condition": "ctx.userSession.props.project.dbValues[0] !== ''",
+                        "name": "init.assignedSchProjectsProvider"
+                    }
+                ]
+             },
+            "deps": "soa/dataManagementService"
+        },
+        "populateDefaultValuesForSchedule":
+        {
+            "actionType": "JSFunction",
+            "method": "populateDefaultValuesForSchedule",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "deps": "js/CAW0CreatePanelService"
+        }
+   },
+   "data":{
+      "filterBox":{
+         "displayName":"",
+         "type":"STRING",
+         "dbValue":""
+      },
+      "projectSectionCommands":"saw1_projectSectionCommands",
+      "isOpenOnCreate":
+      {
+        "displayName": "{{i18n.openOnCreate}}",
+        "type": "BOOLEAN"
+      }
+   },
+   "dataProviders":{
+      "getAssignedProjectsProvider":{
+         "response":"{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+         "totalFound":"{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+         "selectionModelMode":"single",
+         "commands":{
+            "Awp0RemoveProjectsCell":{
+               "id":"cmdRemove",
+               "areas":[
+                  "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+               ],
+               "priorities":[
+                  300
+               ],
+               "dependencies":[
+                  "js/removeObjectCellCommandHandler"
+               ],
+               "displayOption":"ON_HOVER_AND_SELECTION",
+               "position":"TOP_RIGHT"
+            }
+         }
+      },
+      "getSchOwningProjectsProvider":
+        {
+            "action": "getSchOwningProjectsAct",
+            "response": ["{{data.owningProjects}}"],
+            "totalFound": "{{data.owningProjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commands":
+            {
+                "Awp0ShowObjectCell":
+                {
+                    "id": "cmdOpen",
+                    "areas":
+                    [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities":
+                    [
+                        300
+                    ],
+
+                    "dependencies":
+                    [
+                        "js/showObjectCommandHandler"
+                    ],
+
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+   },
+   "onEvent":[
+      {
+         "eventId": "awTypeSelector.selectionChangeEvent",
+         "action": "addSelection"
+      },
+      {
+        "eventId": "awTypeSelector.modelObjectsUpdated",
+        "action": "autoSelectType"
+      },
+      {
+         "eventId": "awPanel.reveal",
+         "action": "loadUserProjects"
+      },
+      {
+         "eventId": "userProjects.assignProjects",
+         "action": "getAssignedProjectsProvider"
+      },
+      {
+         "eventId": "userProjects.assignProjects",
+         "action": "navigateToNewTabPage"
+      },
+      {
+         "eventId": "init.assignedSchProjectsProvider",
+         "action": "getSchOwningProjectsProvider"
+      },
+      {
+        "eventId": "awXRT.contentLoaded",
+        "action": "populateDefaultValuesForSchedule"
+      }
+   ],
+   "preferences": [
+    "SiteTimeZone",
+    "AWC_SM_Unit_Of_Time_Measure"
+   ],
+   "i18n":{
+      "objectTypes":[
+         "CAW0CapaMessages"
+      ],
+      "ownProjectSectionTitle":[
+         "awAddDirectiveMessages"
+      ],
+      "projectsSectionTitle":[
+         "awAddDirectiveMessages"
+      ],
+      "openOnCreate":[
+        "CAW0CapaMessages"
+     ]
+   }
+}

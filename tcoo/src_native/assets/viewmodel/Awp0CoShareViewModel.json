@@ -1,0 +1,413 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-i18n.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "search":
+        {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}",
+                "participantType":"{{ctx.workflow.participantType}}"
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Group",
+                        "properties":
+                        [
+                            {
+                                "name": "object_full_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Role",
+                        "properties":
+                        [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "POM_member",
+                        "properties":
+                        [
+                            {
+                                "name": "user",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+
+                            {
+                                "name": "role",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "userName"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "User",
+                        "properties":
+                        [
+                            {
+                                "name": "person",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            },
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "default_group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Person",
+                        "properties":
+                        [
+                            {
+                                "name": "user_name"
+                            },
+
+                            {
+                                "name": "PA9"
+                            },
+
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+
+            "deps": "js/tcooUserPanelService"
+        },
+        "showInbox":
+        {
+            "actionType": "JSFunction",
+            "method": "navigate",
+            "deps": "js/tcooUserPanelService"
+        },
+
+        "addSelectedUsers":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectedUsers",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/tcooUserPanelService"
+        },
+        "coSubmit":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "createInstance",
+            "inputData":
+            {
+                "startImmediately": true,
+                "observerKey": "",
+                "name": "{{function:getDocumentName}}",
+                "subject": "",
+                "description": "",
+                "contextData":
+                {
+                    "processTemplate": "DocumentSharingtask",
+                    "attachmentCount": "{{ctx.mselected.length}}",
+                    "attachments": "{{function:getAttachments}}",
+                    "attachmentTypes": "{{function:getAttachmentTypes}}",
+                    "processAssignmentList": ""
+                }
+            },
+
+            "deps": "js/tcooUserPanelService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "AssignmentSuccessMessage"
+                    }
+                ]
+            }
+        },
+
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "functions":
+    {
+        "getDocumentName":
+        {
+            "functionName": "getDocumentName",
+            "parameters":
+            [
+                "{{ctx.selected}}"
+            ]
+        },
+        "getAttachments":
+        {
+            "functionName": "getAttachments",
+            "parameters":
+            [
+                "{{ctx.selected}}",
+                "{{ctx.viewerContext.vmo}}",
+                "{{data.users}}",
+                "{{ctx.userSession.props.fnd0groupmember.dbValue}}"
+            ]
+        },
+        "getAttachmentTypes":
+        {
+            "functionName": "getAttachmentTypes",
+            "parameters":
+            [
+                "{{ctx.selected}}"
+            ]
+        }
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },
+
+        {
+            "eventId": "showInbox",
+            "action": "showInbox"
+        }
+
+    ],
+
+    "conditions":
+    {
+        "checkSelectionChange":
+        {
+            "expression": "name == 'selected'"
+        },
+        "isValidToAdd":
+        {
+            "expression": "data.dataProviders.userPerformSearch.selectedObjects != null && data.dataProviders.userPerformSearch.selectedObjects.length > 0"
+        },
+        "isShowNoResultMessage":
+        {
+           "expression": "data.dataProviders.userPerformSearch.noResults"
+        },
+        "isValidToAssign":
+        {
+            "expression": "data.users != null && data.users.length > 0"
+        }
+    },
+
+    "data":
+    {
+        "filterBox":
+        {
+            "displayName": "MyFilter",
+            "type": "STRING",
+            "dbValue": ""
+        },
+
+        "tcooAddUsersCmdAnchor": "awp0_tcooAddUsersCmdAnchor",
+        "tcooRemoveUsersCmdAnchor": "awp0_tcooRemoveUsersCmdAnchor"
+    },
+
+    "dataProviders": {
+        "userPerformSearch":
+        {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode":"multiple",
+            "commands": {
+               "Awp0ShowObjectCell":
+               {
+                   "id": "cmdOpen",
+                   "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                   "priorities": [ 300 ],
+                   "dependencies": [ "js/showObjectCommandHandler" ],
+                   "displayOption": "ON_HOVER_AND_SELECTION",
+                   "position": "TOP_RIGHT"
+               }
+           },
+           "noResultsFound" : "{{i18n.noResultsFound}}"
+        },
+
+        "getUsers": {
+            "response": "{{data.users}}",
+            "totalFound": "{{data.users.length}}",
+            "selectionModelMode": "multiple",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [300],
+                    "dependencies": ["js/showObjectCommandHandler"],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+
+    "messages":
+    {
+        "AssignmentSuccessMessage":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.assignSuccessMsg}}",
+            "messageTextParams":
+            [
+                "{{ctx.selected}}"
+            ]
+        }
+    },
+
+    "i18n":
+    {
+        "coShareCommandTitle": [ "tcooMessages"],
+        "selectedUserTitle" : ["tcooMessages"],
+        "coShare": [ "tcooMessages" ],
+        "noResultsFound": [ "tcooMessages" ],
+        "assignSuccessMsg": [ "tcooMessages" ],
+        "availableUsersTitle" : ["tcooMessages"]
+    }
+
+}

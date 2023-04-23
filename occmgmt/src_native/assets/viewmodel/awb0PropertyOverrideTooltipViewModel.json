@@ -1,0 +1,58 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-break.directive",
+        "js/aw-icon-button.directive"
+    ],
+    "data": {
+        "removeOverride": {
+            "action": "removePropertyOverride",
+            "iconName": "Delete",
+            "tooltip": "{{i18n.RemoveOverride}}"
+        }
+    },
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.removeOverrideInputData.removeInContextOverridesInfo",
+                "value": {
+                    "element": "{{subPanelContext.vmoHovered}}",
+                    "propertyName": "{{subPanelContext.propHovered}}"
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "removePropertyOverride": {
+            "actionType": "JSFunction",
+            "method": "removePropertyOverride",
+            "outputData": {
+                "removeOverrideResponse": ""
+            },
+            "deps": "js/aceInContextOverrideService",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "removePropertyOverrideFailure"
+                    }
+                ]
+            }
+        }
+    },
+    "i18n": {
+        "RemoveOverride": [
+            "OccurrenceManagementConstants"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    },
+    "messages": {
+        "removePropertyOverrideFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    }
+}

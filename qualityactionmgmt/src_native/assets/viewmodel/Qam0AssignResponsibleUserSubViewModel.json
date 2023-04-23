@@ -1,0 +1,445 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-listbox.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "checkVersionSupportForProject",
+            "inputData": {
+                "major": "11",
+                "minor": "2",
+                "qrm": "4"
+            },
+            "outputData": {
+                "isVersionSupported": ""
+            },
+            "events": {
+                "success": [ {
+                        "condition": "data.isVersionSupported === true",
+                        "name": "revealWithProject"
+
+                    },
+                    {
+                        "condition": "data.isVersionSupported === false",
+                        "name": "revealWithoutProject"
+                    }
+                ]
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "revealWithoutProjectPanel": {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "revealWithProjectPanel": {
+            "actionType": "dataProvider",
+            "method": "getPropertiesProvider"
+        },
+        "assign": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-DataManagement",
+            "method": "saveViewModelEditAndSubmitWorkflow2",
+            "inputData": {
+                "inputs": "{{function:qamAssignResponsibleUser}}"
+            },
+            "outputData": {
+                "serviceData": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "responsibleUserAssignmentDateEvent"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "POM_member",
+                        "properties": [ {
+                            "name": "user",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        } ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [ {
+                                "name": "person",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties": [ {
+                                "name": "user_name"
+                            },
+                            {
+                                "name": "PA9"
+                            },
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "addSelection": {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "getProjects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2017-05-ProjectLevelSecurity",
+            "method": "getProjectsForAssignOrRemove",
+            "inputData": {
+                "projectsInput": [ {
+                    "user": {
+                        "uid": "{{ctx.user.uid}}",
+                        "type": "{{ctx.user.type}}"
+                    },
+                    "selectedObjects": "{{function:processSelectedObjects}}",
+                    "assignedObjects": [],
+                    "filterText": "",
+                    "isAceContext": false,
+                    "paginationInfo": {
+                        "startIndexForAvailableProjects": 0,
+                        "maxToReturnForAvailableProjects": 50
+                    }
+                } ]
+            },
+            "outputData": {
+                "availableProjectsList": "ServiceData.modelObjects",
+                "commonProjectList": "projectOutput.assignedProjectsList"
+            },
+            "policy": {
+                "types": [ {
+
+                    "name": "TC_Project",
+                    "properties": [ {
+                            "name": "object_string"
+                        },
+                        {
+                            "name": "project_id"
+                        }
+                    ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "getProperties"
+                } ]
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "populateProjectData": {
+            "actionType": "JSFunction",
+            "method": "populateProjectData",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedArray": "{{ctx.mselected}}"
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "getProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": "{{ctx.mselected}}",
+                "attributes": [
+                    "project_list"
+                ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Qam0QualityAction",
+                    "properties": [ {
+                        "name": "project_list"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "objectsWithProjectList": "modelObjects"
+            },
+            "events": {
+                "success": [ {
+                    "name": "projectPropertiesLoaded"
+                } ]
+            }
+        },
+        "responsibleUserAssignmentDate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:setResponsibleUserAssignmentDate}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "cdm.relatedModified",
+                    "eventData": {
+                        "relatedModified": [ "{{ctx.selected}}" ],
+                        "refreshLocationFlag": true
+                    }
+                },
+                {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "deps": "js/Qam0AssignResponsibleUserService"
+        },
+        "addToResponsibleUserList" :{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "optimizationAction.assignResponsibleUser",
+                        "eventData": {
+                            "selectedProjects": "{{data.dataProviders.getParentSpecificationList.selectedObjects}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "navigateToAddOptimzationAction" :{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "qfm0AddOptimizationActionSub",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "userProjectObject": {
+            "displayName": "{{i18n.project}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true
+        },
+        "showProjectList": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "true"
+        }
+    },
+    "dataProviders": {
+        "userPerformSearch": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "getPropertiesProvider": {
+            "action": "getProjects"
+        }
+    },
+    "functions": {
+        "processSelectedObjects": {
+            "functionName": "processSelectedObjects",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "qamAssignResponsibleUser": {
+            "functionName": "qamAssignResponsibleUser",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "setResponsibleUserAssignmentDate": {
+            "functionName": "setResponsibleUserAssignmentDate",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isSelectedObjectListEmpty": {
+            "expression": "data.dataProviders.userPerformSearch.selectedObjects.length > 0"
+        },
+        "isProjectObjectListEmpty": {
+            "expression": "data.projectObjectList.length <= 0"
+        },
+        "isCommandQam0AssignResponsibleUser" :{
+            "expression" :"ctx.activeToolsAndInfoCommand.commandId === 'Qam0AssignResponsibleUser'"
+        },
+        "isFmeaSubLocation" :{
+            "expression" : "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation' || ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualitySystemElementManagerSublocation'"
+        },
+        "isOptimizationTab" :{
+            "expression" : "(ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Optimization' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Optimization' ) && ctx.locationContext.modelObject.type === 'Qfm0FailureElement'"
+        },
+        "isFormsheetTab" :{
+            "expression" : "ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_FormSheet' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_FormSheet'"
+        }
+    },
+    "i18n": {
+        "qamAssignResponsibleUser": [
+            "QualityActionMgmtMessages"
+        ],
+        "assign": [
+            "QualityActionMgmtMessages"
+        ],
+        "project": [
+            "QualityActionMgmtMessages"
+        ],
+        "filter": [
+            "QualityActionMgmtMessages"
+        ],
+        "none": [
+            "QualityActionMgmtMessages"
+        ]
+    },
+    "onEvent": [ {
+            "eventId": "userPerformSearch.selectionChangeEvent",
+            "action": "addSelection"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Qam0AssignResponsibleUserSub"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "revealWithProject",
+            "action": "revealWithProjectPanel"
+        },
+        {
+            "eventId": "revealWithoutProject",
+            "action": "revealWithoutProjectPanel"
+        },
+        {
+            "eventId": "projectPropertiesLoaded",
+            "action": "populateProjectData"
+        },
+        {
+            "eventId": "getProperties",
+            "action": "getProperties"
+        },
+        {
+            "eventId": "responsibleUserAssignmentDateEvent",
+            "action": "responsibleUserAssignmentDate"
+        },
+        {
+            "eventId": "optimizationAction.assignResponsibleUser",
+            "action" : "navigateToAddOptimzationAction"
+        }
+    ]
+}

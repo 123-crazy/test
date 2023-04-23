@@ -1,0 +1,186 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-textbox.directive",
+        "js/visible-when.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "getAndUpdateReportId",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addNewReportService"
+        },
+        "addNewReportAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [ {
+                    "clientId": "1",
+                    "data": {
+                        "boName": "ReportDefinition",
+                        "stringProps": {
+                            "rd_name": "{{data.reportName.uiValue}}",
+                            "rd_source": "Active Workspace",
+                            "rd_folder_name": "CrfHome",
+                            "rd_class": "",
+                            "rd_id": "{{data.reportId.uiValue}}",
+                            "rd_description": "{{data.reportDesc.uiValue}}"
+                        },
+                        "intProps": {
+                            "rd_state": 0,
+                            "rd_type": "{{function:getReportType}}"
+                        }
+                    }
+                } ]
+            },
+            "outputData": {
+                "createdReportDefObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [ {
+                        "name": "gwt.CreateOrAddObjectCompleteEvent",
+                        "eventData": {
+                            "createdObjs": [
+                                "{{data.createdReportDefObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "addnewreportpanel.openNewReportToConfigure"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "showReportCreateErrorMessage",
+                    "condition": "errorCode.code === 515106"
+                } ]
+            },
+            "deps": "js/addNewReportService"
+        },
+        "openNewReportObject": {
+            "actionType": "JSFunction",
+            "method": "openNewReportObject",
+            "inputData": {
+                "input": [
+                    "{{data.createdReportDefObject}}"
+                ]
+            },
+            "deps": "js/addNewReportService"
+        }
+    },
+    "data": {
+        "reportId": {
+            "displayName": "{{i18n.reportId}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "reportName": {
+            "displayName": "{{i18n.reportName}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "reportDesc": {
+            "displayName": "{{i18n.reportDesc}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "uiValue": ""
+        },
+        "reportType":
+        {
+            "displayName": "{{i18n.reportType}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "reportTypeList":[
+            {
+                "hasChildren": false,
+                "propDisplayDescription": "{{i18n.advSummReportDesc}}",
+                "propDisplayValue": "{{i18n.advSummReport}}",
+                "propInternalValue": "AdvanceSummaryReport",
+                "sel": false
+            },
+            {
+                "hasChildren": false,
+                "propDisplayDescription": "{{i18n.advItemReportDesc}}",
+                "propDisplayValue": "{{i18n.advItemReport}}",
+                "propInternalValue": "AdvanceItemReport",
+                "sel": false
+            }
+        ]
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "AddNewReportTabPage"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "addnewreportpanel.openNewReportToConfigure",
+            "action": "openNewReportObject"
+        }
+    ],
+    "functions": {
+        "getReportType": {
+            "functionName": "getReportType",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "messages": {
+        "showReportCreateErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.reportCreateErrorMessageTest}}",
+            "messageTextParams": [
+                "{{data.reportName.uiValue}}",
+                "{{data.reportId.uiValue}}"
+            ]
+        }
+    },
+    "i18n": {
+        "reportProps": [
+            "ReportChartMessages"
+        ],
+        "addNewReport": [
+            "ReportChartMessages"
+        ],
+        "reportId": [
+            "ReportChartMessages"
+        ],
+        "reportName": [
+            "ReportChartMessages"
+        ],
+        "reportDesc": [
+            "ReportChartMessages"
+        ],
+        "reportCreateErrorMessageTest":[
+            "ReportChartMessages"
+        ],
+        "reportType": ["ReportChartMessages"],
+        "advSummReport": ["ReportChartMessages"],
+        "advItemReport": ["ReportChartMessages"],
+        "advSummReportDesc": ["ReportChartMessages"],
+        "advItemReportDesc": ["ReportChartMessages"]
+    }
+}

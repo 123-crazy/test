@@ -1,0 +1,107 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-add.directive"
+    ],
+    "actions": {
+        "getInsertScheduleContainer": {
+            "actionType": "JSFunction",
+            "method": "getInsertContainer",
+            "inputData": {
+                "masterScheduleTask": "{{ctx.object.masterScheduleTask}}",
+                "masterSchedule": "{{ctx.object.masterSchedule}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "insertSchedule.callSoa"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode=='sameSubScheduleErrorMsg'",
+                    "message": "sameSubScheduleErrorMsg"
+                } ]
+            },
+            "deps": "js/Saw1InsertSubScheduleService"
+        },
+        "insertSchedules": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2014-10-ScheduleManagement",
+            "method": "insertSchedule",
+            "inputData": {
+                "insertScheduleContainer": "{{function:getInsertContainer}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [ "{{ctx.object.masterSchedule}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "soaFailureMessage"
+                } ]
+            },
+            "deps": "js/Saw1InsertSubScheduleService"
+        }
+    },
+    "messages": {
+        "sameSubScheduleErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.sameSubScheduleErrorMsg}}",
+            "messageTextParams": [
+                "{{ctx.object.masterSchedule}}"
+            ]
+        },
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [ {
+        "eventId": "insertSchedule.callSoa",
+        "action": "insertSchedules"
+    } ],
+    "conditions": {
+        "isPaletteTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+
+    "functions": {
+        "getInsertContainer": {
+            "functionName": "getInsertContainer",
+            "parameters": [
+                "{{ctx.object.masterScheduleTask}}",
+                "{{ctx.object.masterSchedule}}",
+                "{{data}}"
+            ]
+        }
+
+    },
+    "i18n": {
+        "insertSubSchedule": [ "ScheduleManagerMessages" ],
+        "insert": [ "ScheduleManagerMessages" ],
+        "sameSubScheduleErrorMsg": [ "ScheduleManagerMessages" ]
+    }
+}

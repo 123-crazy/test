@@ -1,0 +1,569 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-widget.directive",
+        "js/aw-break.directive"
+    ],
+    "actions":
+    {
+        "loadUsers":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "responseType": "",
+                        "searchString": "{{function:getSearchStringValueForUser}}",
+                        "resourceProviderContentType": "UniqueUsers"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.usersListProvider.startIndex}}"
+                }
+            },
+
+            "outputData":
+            {
+                "userList": "{{function:getUsersList}}",
+                "totalUsers": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "loadGroups":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "responseType": "",
+                        "searchString": "{{function:getSearchStringValueForGroup}}",
+                        "resourceProviderContentType": "Group"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.groupsListProvider.startIndex}}"
+                }
+            },
+
+            "outputData":
+            {
+                "groupList": "{{function:getGroupsList}}",
+                "totalGroups": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "loadStatus":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2012-10-Finder",
+            "method": "findObjectsByClassAndAttributes2",
+            "inputData":
+            {
+                "input":
+                {
+                    "clientId": "GWT_THIN_CLIENT",
+                    "startIndex": "{{data.dataProviders.statusListProvider.startIndex}}",
+                    "maxLoad": 2000,
+                    "maxToReturn": 2000,
+                    "searchCriteria":
+                    [
+                        {
+                            "className": "TaskType",
+                            "searchAttributes":
+                            {
+                                "tasktype_name": "{{function:getSearchStringValueForStatus}}"
+                            }
+                        }
+                    ],
+
+                    "searchMode": "GeneralQuery",
+                    "uids":
+                    [
+
+                    ],
+
+                    "attributes":
+                    [
+
+                    ]
+                }
+            },
+            "policy": {
+                "types": [ {
+                    "name": "ImanType",
+                    "properties": [
+                        { "name": "type_name" }
+                    ]
+                } ]
+            },
+
+            "outputData":
+            {
+                "statusList": "{{function:getStatusList}}",
+                "totalStatus": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "validateUserEntry": {
+            "actionType": "JSFunction",
+            "method": "validateUserWidgetValue",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "validateGroupEntry":{
+            "actionType": "JSFunction",
+            "method": "validateGroupWidgetValue",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "validateStatusEntry":{
+            "actionType": "JSFunction",
+            "method": "validateStatusWidgetValue",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "updateUserWidgetText":{
+            "actionType": "JSFunction",
+            "method": "updateWidgetTextForClauseProperty",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "clausePropertyName": "User"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "updateGroupWidgetText":{
+            "actionType": "JSFunction",
+            "method": "updateWidgetTextForClauseProperty",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "clausePropertyName": "Group"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "usersListSelectionChanged":
+        {
+            "actionType": "JSFunction",
+            "method": "usersListSelectionChanged",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "groupsListSelectionChanged":
+        {
+            "actionType": "JSFunction",
+            "method": "groupsListSelectionChanged",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "clausePropertyValueInitialized":
+        {
+            "actionType": "JSFunction",
+            "method": "clausePropertyValueInitialized",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "initilialiseClauseProperties":
+        {
+            "actionType": "JSFunction",
+            "method": "initilialiseClauseProperties",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "updateStatusConfigType":
+        {
+            "actionType": "JSFunction",
+            "method": "updateStatusConfigType",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "isUpdatedFromWidget": true
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        },
+        "statusListSelectionChanged":
+        {
+            "actionType": "JSFunction",
+            "method": "statusListSelectionChanged",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/addRevRuleClausePropertyService"
+        }
+    },
+
+    "data" : {
+        "currentUser":
+        {
+            "displayName": "{{i18n.currentUser}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "user":
+        {
+            "type": "STRING",
+            "dataProvider": "usersListProvider",
+            "dbValue": "",
+            "isRequired": "false",
+            "displayName": "{{i18n.user}}"
+        },
+        "currentGroup":
+        {
+            "displayName": "{{i18n.currentGroup}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "group":
+        {
+            "type": "STRING",
+            "dataProvider": "groupsListProvider",
+            "isRequired": "false",
+            "dbValue": "",
+            "displayName": "{{i18n.userGroup}}"
+        },
+        "status":
+        {
+            "type": "STRING",
+            "dataProvider": "statusListProvider",
+            "isRequired": "true",
+            "dbValue": "Any",
+            "dispValue": "{{i18n.any}}",
+            "displayName": "{{i18n.status}}",
+            "emptyLOVEntry": false
+        },
+        "statusConfigType":
+        {
+            "displayName": "{{i18n.statusConfigType}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dataProvider": "statusConfigValuesProvider",
+            "dbValue": "0",
+            "dispValue": "{{i18n.releasedDate}}",
+            "isSelectOnly": true,
+            "hasLov": true,
+            "emptyLOVEntry": false
+        },
+        "statusConfigTypeForRevOcc":
+        {
+            "displayName": "{{i18n.statusConfigType}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dataProvider": "statusConfigValuesProviderForRevOcc",
+            "dbValue": "0",
+            "dispValue": "{{i18n.releasedDate}}",
+            "isSelectOnly": true,
+            "hasLov": true,
+            "emptyLOVEntry": false
+        },
+        "moreValuesExist": {
+            "dbValue": false,
+            "type": "BOOLEAN"
+        },
+        "statusConfigTypeValues":
+        [
+            {
+                "propDisplayValue": "{{i18n.releasedDate}}",
+                "propInternalValue": "0"
+            },
+            {
+                "propDisplayValue": "{{i18n.effectiveDate}}",
+                "propInternalValue": "1"
+            },
+            {
+                "propDisplayValue": "{{i18n.unit}}",
+                "propInternalValue": "2"
+            }
+        ],
+        "statusConfigTypeValuesForRevOcc":
+        [
+            {
+                "propDisplayValue": "{{i18n.releasedDate}}",
+                "propInternalValue": "0"
+            }
+        ]
+    },
+    "dataProviders":
+    {
+        "usersListProvider":
+        {
+            "initializeAction": "loadUsers",
+            "nextAction": "loadUsers",
+            "response": "{{data.userList}}",
+            "totalFound": "{{data.totalUsers}}",
+            "selectionModelMode": "single",
+            "moreValuesExist": "{{data.moreValuesExist}}",
+            "validateAction": "validateUserEntry",
+            "valid": "{{data.validUser}}",
+            "message": "{{data.messageForUserEntry}}"
+        },
+        "groupsListProvider":
+        {
+            "initializeAction": "loadGroups",
+            "nextAction": "loadGroups",
+            "totalFound": "{{data.totalGroups}}",
+            "response": "{{data.groupList}}",
+            "selectionModelMode": "single",
+            "moreValuesExist": "{{data.moreValuesExist}}",
+            "validateAction": "validateGroupEntry",
+            "valid": "{{data.validGroup}}",
+            "message": "{{data.messageForGroupEntry}}"
+        },
+        "statusListProvider":
+        {
+            "initializeAction": "loadStatus",
+            "nextAction": "loadStatus",
+            "totalFound": "{{data.totalStatus}}",
+            "selectionModelMode": "single",
+            "response": "{{data.statusList}}",
+            "moreValuesExist": "{{data.moreValuesExist}}",
+            "validateAction": "validateStatusEntry",
+            "valid": "{{data.validStatus}}",
+            "message": "{{data.messageForStatusEntry}}"
+        },
+        "statusConfigValuesProvider":
+        {
+            "response": "{{data.statusConfigTypeValues}}"
+        },
+        "statusConfigValuesProviderForRevOcc":
+        {
+            "response": "{{data.statusConfigTypeValuesForRevOcc}}"
+        }
+    },
+    "functions":
+    {
+        "getSearchStringValueForUser":
+        {
+            "functionName": "getSearchStringValue",
+            "parameters":
+            [
+                "{{data}}",
+                "User"
+            ]
+        },
+        "getSearchStringValueForGroup":
+        {
+            "functionName": "getSearchStringValue",
+            "parameters":
+            [
+                "{{data}}",
+                "Group"
+            ]
+        },
+        "getSearchStringValueForStatus":
+        {
+            "functionName": "getSearchStringValue",
+            "parameters":
+            [
+                "{{data}}",
+                "Status"
+            ]
+        },
+        "getUsersList":
+        {
+            "functionName": "processSearchResults",
+            "parameters":
+            [
+                "{{data}}",
+                "User"
+            ]
+        },
+        "getGroupsList":
+        {
+            "functionName": "processSearchResults",
+            "parameters":
+            [
+                "{{data}}",
+                "Group"
+            ]
+        },
+        "getStatusList":
+        {
+            "functionName": "processSearchResults",
+            "parameters":
+            [
+                "{{data}}",
+                "Status"
+            ]
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "updateUserWidgetText",
+            "criteria": {
+                "condition": "conditions.isCurrentUserChanged"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "updateGroupWidgetText",
+            "criteria": {
+                "condition": "conditions.isCurrentGroupChanged"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "user.lovValueChanged",
+            "action": "usersListSelectionChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "group.lovValueChanged",
+            "action": "groupsListSelectionChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "RevisionRuleAdminClauseProperties.clausePropertyValueInitialized",
+            "action": "clausePropertyValueInitialized",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "RevisionRuleAdminClauseProperties.contentLoaded",
+            "action": "initilialiseClauseProperties"
+        },
+        {
+            "eventId": "statusConfigType.lovValueChanged",
+            "action": "updateStatusConfigType",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "status.lovValueChanged",
+            "action": "statusListSelectionChanged",
+            "cacheEventData": true
+        }
+    ],
+
+    "conditions":
+    {
+        "isCurrentUserUnchecked":
+        {
+            "expression": "!data.currentUser.dbValue"
+        },
+        "isCurrentGroupUnchecked":
+        {
+            "expression": "!data.currentGroup.dbValue"
+        },
+        "isCurrentUserChanged":
+        {
+            "expression": "data.currentUser.dbValue",
+            "trackValues": true
+        },
+        "isCurrentGroupChanged":
+        {
+            "expression": "data.currentGroup.dbValue",
+            "trackValues": true
+        },
+        "isTcReleaseAtLeast123": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion >= 3) || ctx.tcSessionData.tcMajorVersion > 12"
+        },
+        "isBranchClauseNotPresent":{
+            "expression": "ctx.RevisionRuleAdmin.isBranchClausePresent !== undefined && ctx.RevisionRuleAdmin.isBranchClausePresent === false"
+        },
+        "isRevisionRuleEditable": {
+            "expression": "conditions.isTcReleaseAtLeast123 && conditions.isBranchClauseNotPresent"
+        }
+    },
+
+    "i18n":
+    {
+        "currentUser":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "currentGroup":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "user":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "userGroup":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "status":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "statusConfigType":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "releasedDate":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "effectiveDate":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "unit":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "invalid":
+        [
+            "RevisionRuleAdminConstants"
+        ],
+        "any":
+        [
+            "RevisionRuleAdminConstants"
+        ]
+    }
+}

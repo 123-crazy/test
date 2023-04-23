@@ -1,0 +1,343 @@
+/* Copyright (c) 2020 Siemens */
+
+/********************************* Header ************************************/
+
+.aw-splm-tableHeaderRow {
+    /* LCS-122428, LCS-124823 - Column Resize is causing a change in column header misalignment in IE */
+    /* Hard code width here is not good, but can't find other approach for now */
+    /* LCS-124823 - pinContainer Header and scrollContainer Header is not aligned in chrome when login with test/tester */
+    /* LCS-143208 - Scroll shadow */
+    border-bottom-width: 0;
+    -webkit-transition: box-shadow 0.3s ease-in-out;
+    -moz-transition: box-shadow 0.3s ease-in-out;
+    -o-transition: box-shadow 0.3s ease-in-out;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+aw-splm-table .aw-splm-tableCellContents.aw-splm-tableHeaderCellContents {
+    font-size: $fontsize_normal;
+    /* LCS-124823 Hard code height to resolve header misalignment in IE and when rows are not present*/
+    /* If changing this value ensure testing is done across IE, Chrome, Edge, and FF for header misalignment*/
+    height: inherit;
+}
+
+.aw-splm-tableHeaderCellSplitter {
+    border-right-width: 1px;
+    width: 4px;
+}
+
+.aw-jswidgets-grid .aw-splm-tablePinnedContainerLeft .aw-splm-tableHeaderCell:last-child:focus .aw-splm-tableHeaderCellSplitter {
+    width: 3px;
+}
+
+.aw-splm-table .aw-splm-tableContainer .aw-splm-tableRow .ui-grid-cell:focus {
+    border-right-width: 2px;
+    border-right-style: solid;
+}
+
+//LCS-320923 - IE specific - Icon column shows scroll bar for Compact mode in IE browser
+@media all and (-ms-high-contrast: none),
+    (-ms-high-contrast: active) {
+    .aw-splm-table .ui-grid-row aw-icon {
+        overflow: hidden;
+    }
+}
+
+.aw-splm-tableHeaderCellLabel {
+    font-size: $fontsize_normal;
+    font-weight: 600;
+}
+
+.aw-splm-tableHeaderCell {
+    /* LCS-124823 Hard code height to resolve header misalignment in IE and when rows are not present*/
+    /* If changing this value ensure testing is done across IE, Chrome, Edge, and FF for header misalignment*/
+    height: inherit;
+}
+
+/********************************* Sort Icons ********************************/
+
+i.aw-splm-tableHeaderCellSortIcon::before {
+    width: 0.8em;
+    margin-left: 8px;
+}
+
+.aw-splm-tableIconUpDir:before {
+    content: url('image/miscSortedAscending10.svg');
+}
+
+.aw-splm-tableIconDownDir:before {
+    content: url('image/miscSortedDescending10.svg');
+}
+
+.aw-splm-tableIconSortable::before {
+    content: url('image/miscUnSorted10.svg');
+}
+
+/*********************************  Hide Icon  ********************************/
+
+.aw-splm-tableIconHide::before {
+    width: 0.8em;
+    margin-left: 8px;
+    content: url('image/cmdHide16.svg');
+}
+
+/********************************* Freeze Icon ********************************/
+
+.aw-splm-tableIconFreeze::before {
+    width: 0.8em;
+    margin-left: 8px;
+    content: url('image/uiFreeze12.svg');
+}
+
+/*********************************   Filter   *********************************/
+
+.aw-splm-tableMenu .facets-container {
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding-top: 16px;
+}
+
+.aw-splm-tableMenu .facet-filter {
+    max-height: 165px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+
+    // w-a an IE11 rendering bug
+    aw-checkbox {
+        min-height: 33px;
+    }
+}
+
+/********************************* Filter Icon ********************************/
+
+.aw-splm-tableHeaderCellFilterAppliedIcon::before {
+    content: url('image/uiFilter10.svg');
+}
+
+.aw-splm-tableHeaderCellFilterAppliedIcon {
+    flex-grow: 0;
+    flex-basis: 0.8em;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/********************************* Cells *************************************/
+
+aw-splm-table .ui-grid-cell {
+    // aw-splm-table .aw-splm-tablePinnedContainer .ui-grid-cell
+    /* NOTE: will enable this after we make column height in infinite scroll to be dynamic */
+    height: 32px;
+}
+
+aw-splm-table .ui-grid-cell.ui-grid-cellDynamic {
+    height: auto;
+}
+
+// UxRefresh uses fontsize as 12 [$fontsize_normal] in both compact and comfortable views.
+// For the classic view, font size is 14 for comfortable and 12 for compact. So this change is only specific to uxRefresh.
+aw-splm-table .aw-splm-tableCellTop,
+aw-splm-table .aw-splm-tableCellTop .aw-splm-tableCellText {
+    font-size: $fontsize_normal;
+    align-self: auto;
+}
+
+aw-splm-table .aw-splm-tableCellTop.aw-jswidgets-editableGridCell .aw-splm-tableCellText {
+    align-self: center;
+}
+
+.aw-splm-tableRow .aw-splm-tableCellTop {
+    height: calc(100% - 4px);
+    width: calc(100% - 4px);
+    margin: 2px 4px;
+    // below configurations added to handle multi-line text within a table cell (LCS-238731 )
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 100px;
+    display: flex;
+}
+
+.ui-grid-cell .aw-splm-tableCellTop.aw-splm-tableCellTopDynamic {
+    max-height: none;
+    overflow-y: hidden;
+    align-content: center;
+}
+
+.aw-splm-tableCellText {
+    font-size: $fontsize_normal;
+    padding-left: 4px;
+}
+
+.aw-splm-table .aw-splm-tableCellText.aw-jswidgets-oldText {
+    padding-left: 4px;
+    text-indent: 0;
+}
+
+.aw-splm-table .aw-splm-tableCellText.aw-jswidgets-change {
+    padding-left: 0;
+}
+
+.aw-splm-tableCellText .aw-splm-tablePropertyValueLinksDisabled.aw-jswidgets-oldText,
+.aw-splm-tableCellText .aw-splm-tablePropertyValueLinks.aw-jswidgets-oldText {
+    padding-left: 4px;
+}
+
+.aw-splm-tableCellContents {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 8px;
+    align-items: center;
+}
+
+/********************************* Non Edit Cells ****************************/
+
+aw-splm-table ul.aw-jswidgets-arrayNonEditValueCellList li.aw-jswidgets-arrayValueCellListItem {
+    padding: 0;
+    display: inline-flex;
+}
+
+.ui-grid-cell ul.aw-jswidgets-arrayNonEditValueCellList {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    height: 100%;
+    padding-left: 4px;
+    // Firefox does not behave the same as other browsers with overflow-y: auto, needed to show scrollbars
+    scrollbar-width: thin;
+}
+
+/********************************* Edit Cells ********************************/
+
+.aw-splm-tableEditCellTop aw-property-lov-val input {
+    height: 100%;
+}
+
+.aw-splm-tableEditCellTop .aw-jswidgets-tableEditContainer aw-property-array-val aw-property-string-val textarea,
+.aw-splm-tableEditCellTop aw-property-array-val aw-property-lov-val input,
+.aw-splm-tableEditCellTop aw-property-array-val aw-property-integer-val input[type="text"].aw-widgets-propertyEditValue,
+.aw-splm-table .aw-widgets-propertyEditValue {
+    height: 24px;
+}
+
+.aw-splm-tableEditCellTop aw-checkbox-list {
+    height: 26px;
+}
+
+// Fixes cell height issue for reference array cell in Edge and IE
+.aw-splm-tableEditCellTop aw-property-array-val aw-property-array-edit-val {
+    height: 24px;
+}
+
+// Fixes lov popup height
+.aw-splm-tableEditCellTop aw-property-array-val aw-property-lov-val .aw-layout-popup {
+    height: auto;
+}
+
+// Fixes lov text overlapping dropdown icon in edit mode
+.aw-splm-tableEditCellTop aw-property-lov-val input.aw-jswidgets-choice {
+    padding-right: 30px;
+}
+
+.aw-splm-tableEditCellTop {
+    padding-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    height: 100%;
+}
+
+.compact .aw-splm-tableEditCellTop aw-property-time-val .aw-jswidgets-timepicker .aw-widget-icon,
+.compact .aw-splm-tableEditCellTop aw-property-date-val .aw-widget-icon,
+.compact .aw-splm-tableEditCellTop aw-property-lov-val .aw-widget-icon {
+    top: -4px;
+}
+
+.aw-splm-tableEditCellTop .aw-jswidgets-tableEditContainer aw-property-date-val .aw-jswidgets-dateInputbox input,
+.aw-splm-tableEditCellTop .aw-jswidgets-tableEditContainer aw-property-time-val .aw-jswidgets-timepicker input {
+    min-width: $splm_table_edit_date_calender_icon_min_width;
+
+    &:hover+.aw-widget-icon {
+        visibility: visible;
+    }
+}
+
+.aw-splm-tableEditCellTop .aw-jswidgets-tableEditContainer aw-property-date-val .aw-jswidgets-dateInputbox .aw-widget-icon,
+.aw-splm-tableEditCellTop .aw-jswidgets-tableEditContainer aw-property-time-val .aw-jswidgets-timepicker .aw-widget-icon {
+    top: $splm_table_edit_date_calender_icon_top;
+    right: $splm_table_edit_date_calender_icon_right;
+    padding: $splm_table_edit_date_calender_icon_padding;
+    visibility: hidden;
+}
+
+/********************************* Menu *********************************/
+
+.aw-splm-tableMenuButton {
+    height: 24px;
+    width: 24px;
+}
+
+.aw-splm-tableMenuButton .aw-commands-svg {
+    margin-top: 2px;
+    padding: 0 3px;
+}
+
+/********************************* Property Value Links **********************/
+
+.aw-splm-tablePropertyValueLinks {
+    // Do not add padding here. It is needed for object array links to be aligned properly.
+    font-size: $fontsize_normal;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
+.aw-splm-table {
+    .grid-menu-command {
+        cursor: pointer;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 3;
+        width: 24px;
+
+        .aw-commands-wrapper {
+            padding: 0;
+
+            button {
+                height: 24px;
+                width: 24px;
+                margin: 0;
+                padding: 0px 5px 0px 5px;
+            }
+        }
+    }
+
+    .aw-splm-tableCellTop {
+
+        &.large,
+        &.small.oversize {
+            height: calc(100% - 30px);
+            width: calc(100% - 4px);
+            margin: 4px;
+        }
+
+        &.xlarge,
+        &.medium.oversize {
+            height: calc(100% - 45px);
+            width: calc(100% - 4px);
+            margin: 4px;
+        }
+
+        &.xxlarge,
+        &.large.oversize {
+            height: calc(100% - 62px);
+            width: calc(100% - 4px);
+            margin: 4px;
+        }
+    }
+}

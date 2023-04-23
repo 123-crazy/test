@@ -1,0 +1,172 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "objectNavBreadcrumbDataProvider"
+        },
+        "buildCrumbs": {
+            "actionType": "JSFunction",
+            "method": "buildNavigateBreadcrumb",
+            "inputData": {
+                "totalFound": "{{ctx.search.totalFound}}",
+                "selectedObjects": "{{ctx.mselected}}"
+            },
+            "outputData": {
+                "crumbs": "crumbs"
+            },
+            "deps": "js/aw.navigateBreadCrumbService"
+        },
+        "onSelect": {
+            "actionType": "JSFunction",
+            "method": "onSelectCrumb",
+            "inputData": {
+                "crumb": "{{data.eventData}}"
+            },
+            "deps": "js/aw.navigateBreadCrumbService"
+        },
+        "onChevronClick": {
+            "actionType": "dataProvider",
+            "method": "objectNavBreadcrumbChevronDataProvider"
+        },
+        "getChildren": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "Awp0ObjectNavigation",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": ""
+                },
+                "saveColumnConfigData": {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "attributesToInflate": [],
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "objectSet": "contents.Folder",
+                        "parentUid": "{{ctx.d_uidsChevron.scopedUid}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "startIndex": 0
+                }
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "BusinessObject",
+                        "properties": [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "breadcrumb.popUpLoading"
+                    }
+                ]
+            }
+        },
+        "onChevronPopupObjSelected": {
+            "actionType": "JSFunction",
+            "method": "navigateToFolder",
+            "inputData": {
+                "data": "{{data}}",
+                "id": "d_uids",
+                "selected": "{{data.dataProviders.objectNavBreadcrumbChevronDataProvider.selectedObjects[0]}}",
+                "currentCrumb": "{{ctx.d_uidsChevron}}",
+                "uid": "{{ctx.state.params.uid}}",
+                "d_uids": "{{ctx.state.params.d_uids}}"
+            },
+            "deps": "js/breadcrumbUtils"
+        },
+        "popUpLoading": {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData": {
+                "id": "d_uids",
+                "data": "{{data}}",
+                "key": "loading",
+                "value": false,
+                "unRegister": false
+            },
+            "deps": "js/breadcrumbUtils"
+        },
+        "closePopUp": {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData": {
+                "id": "d_uids",
+                "data": "{{data}}",
+                "key": "showPopup",
+                "value": false,
+                "unRegister": true
+            },
+            "deps": "js/breadcrumbUtils"
+        }
+    },
+    "dataProviders": {
+        "objectNavBreadcrumbChevronDataProvider": {
+            "action": "getChildren",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectNavigationBreadCrumbCellListActionCommands"
+        },
+        "objectNavBreadcrumbDataProvider": {
+            "action": "buildCrumbs",
+            "response": "{{data.crumbs}}",
+            "totalFound": "{{data.crumbs.length}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "d_uids.chevronClicked",
+            "action": "onChevronClick"
+        },
+        {
+            "eventId": "breadcrumb.popUpLoading",
+            "action": "popUpLoading"
+        },
+        {
+            "eventId": "objectNavBreadcrumbChevronDataProvider.selectionChangeEvent",
+            "action": "onChevronPopupObjSelected"
+        },
+        {
+            "eventId": "breadcrumb.update",
+            "action": "closePopUp"
+        },
+        {
+            "eventId": "objectNavigationBreadcrumb.selectCrumb",
+            "action": "onSelect",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "objectNavigationBreadcrumb.refresh",
+            "action": "reveal"
+        }
+    ],
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    }
+}

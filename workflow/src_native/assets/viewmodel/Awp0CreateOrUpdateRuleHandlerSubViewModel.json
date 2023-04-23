@@ -1,0 +1,265 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-listbox.directive",
+        "js/aw-break.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-workflow-handler-table.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-textbox.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-label.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive"
+    ],
+    "actions": {
+        "loadHandlerTableColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadHandlerTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.argumentsDataProvider}}",
+                "data": "{{data}}",
+                "ctx" : "{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "getRuleHandlerInfo": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2020-01-Workflow",
+            "method": "getSupportedHandlerArguments",
+            "inputData": {
+                "input":
+                [
+                    {
+                        "clientId": "supportedHandlerArgumentsId",
+                        "handlerName": "{{data.ruleHandlersLOV.dbValue}}"
+                    }
+                ]
+            },
+            "outputData": {
+                "handlerData": "output['0'].handlerData"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "populateHandlerInfo"
+                    }
+                ]
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "populateHandlerInfo" : {
+            "actionType": "JSFunction",
+            "method": "populateHandlerInfo",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "createOrUpdateHandler" : {
+            "actionType": "JSFunction",
+            "method": "createOrUpdateRuleHandler",
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}"
+            }
+        },
+        "closeCurrentOpenedPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "functions": {
+    },
+    "dataProviders": {
+        "argumentsDataProvider": {
+            "action": "",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "searchIndex": "{{data.searchIndex}}"
+        }
+    },
+    "columnProviders": {
+        "handlersArgumentsColumnProvider": {
+            "loadColumnAction": "loadHandlerTableColumns",
+            "columns": "{{data.columns}}",
+            "sortCriteria": [],
+            "frozenColumnIndex": -1
+        }
+    },
+    "grids": {
+        "argumentsAndValuesTableinPanel": {
+            "dataProvider": "argumentsDataProvider",
+            "columnProvider": "handlersArgumentsColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        }
+    },
+    "data": {
+        "addArguments":"aw_HandlerArgumentPanelSectionCommands",
+        "actionTypeLOV":
+        {
+            "displayName": "{{i18n.action_type}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isEditable": "true"
+        },
+        "ruleHandlersLOV":
+        {
+            "displayName": "{{i18n.handler}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isEditable": "true",
+            "labelPosition": "NO_PROPERTY_LABEL"
+        },
+        "handlersLabel": {
+            "displayName": "{{i18n.handler}}",
+            "type": "STRING"
+        },
+        "actionTypeValues": [
+            {
+                "propDisplayValue": "{{i18n.start_action}}",
+                "propInternalValue": "2"
+            },
+            {
+                "propDisplayValue": "{{i18n.complete_action}}",
+                "propInternalValue": "4"
+            },
+            {
+                "propDisplayValue": "{{i18n.assign_action}}",
+                "propInternalValue": "1"
+            },
+            {
+                "propDisplayValue": "{{i18n.perform_action}}",
+                "propInternalValue": "100"
+            },
+            {
+                "propDisplayValue": "{{i18n.skip_action}}",
+                "propInternalValue": "5"
+            },
+            {
+                "propDisplayValue": "{{i18n.suspend_action}}",
+                "propInternalValue": "6"
+            },
+            {
+                "propDisplayValue": "{{i18n.resume_action}}",
+                "propInternalValue": "7"
+            },
+            {
+                "propDisplayValue": "{{i18n.undo_action}}",
+                "propInternalValue": "8"
+            },
+            {
+                "propDisplayValue": "{{i18n.abort_action}}",
+                "propInternalValue": "9"
+            }
+        ],
+        "argumentTableColumns" : [
+            {
+                "propName": "argument_name",
+                "propDisplayName": "{{i18n.argumentName}}",
+                "width": 220,
+                "enableCellEdit" : true,
+                "isTreeNavigation": false,
+                "isTableCommand" : false,
+                "minWidth" : 80,
+                "type":"String"
+            },
+            {
+                "propName": "argument_value",
+                "propDisplayName": "{{i18n.argumentValue}}",
+                "width": 220,
+                "isTreeNavigation": false,
+                "isTableCommand" : false,
+                "minWidth" : 80,
+                "type":"String"
+            }
+        ],
+        "hint":
+        {
+            "displayName": "{{i18n.hint}}",
+            "type": "STRING",
+            "isEditable": "false"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "populateHandlerInfo",
+            "action": "populateHandlerInfo"
+        },
+        {
+            "eventId": "ruleHandlerDataProvider.selectionChangeEvent",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "awTab.selected",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "workflowDesigner.saveEdit",
+            "action": "closeCurrentOpenedPanel"
+        }
+    ],
+    "conditions": {
+    },
+    "i18n": {
+        "taskName": [ "InboxMessages" ],
+        "arguments": [ "WorkflowDesignerMessages" ],
+        "assign_action": [ "WorkflowDesignerMessages" ],
+        "start_action": [ "WorkflowDesignerMessages" ],
+        "perform_action": [ "WorkflowDesignerMessages" ],
+        "complete_action": [ "WorkflowDesignerMessages" ],
+        "skip_action": [ "WorkflowDesignerMessages" ],
+        "suspend_action": [ "WorkflowDesignerMessages" ],
+        "resume_action": [ "WorkflowDesignerMessages" ],
+        "abort_action": [ "WorkflowDesignerMessages" ],
+        "undo_action": [ "WorkflowDesignerMessages" ],
+        "quorumRuleLabel" : [ "WorkflowDesignerMessages" ],
+        "orRuleLabel" : [ "WorkflowDesignerMessages" ],
+        "andRuleLabel" : [ "WorkflowDesignerMessages" ],
+        "handler" : [ "WorkflowDesignerMessages" ],
+        "action_type" : [ "WorkflowDesignerMessages" ],
+        "actionHandler" : [ "WorkflowDesignerMessages" ],
+        "ruleHandler" : [ "WorkflowDesignerMessages" ],
+        "argumentName" : [ "WorkflowDesignerMessages" ],
+        "argumentValue" : [ "WorkflowDesignerMessages" ],
+        "addArguments" : [ "WorkflowDesignerMessages" ],
+        "addTitle" : [ "WorkflowDesignerMessages" ],
+        "addValue":["WorkflowDesignerMessages"],
+        "hint":["WorkflowDesignerMessages"],
+        "invalidValue":["WorkflowDesignerMessages"],
+        "hintMessage":["WorkflowDesignerMessages"]
+
+    }
+}

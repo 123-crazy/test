@@ -1,0 +1,40 @@
+<div class="aw-widgets-cellListContainer aw-widgets-droppable">
+    <div class="aw-widgets-cellListResizer" ng-show="!dataprovider.noResults"></div>
+    <div class="aw-widgets-cellListOffsetter">
+        <div class="aw-widgets-modelObjectList">
+            <ul role="listbox" tabindex="{{dataprovider.viewModelCollection.totalFound > 0 ? 0 : -1}}" class="aw-widgets-cellListWidget afx-content-background aw-layout-flexColumnContainer" ng-show="!dataprovider.noResults" aw-long-press="handlePressAndHold($event)">
+                <li role="option" tabindex="-1" aria-selected="{{item.selected}}" aria-label="{{(item.cellHeader1) ? (item.cellHeader1 + ' ' + item.cellHeader2): ' '}}" class="aw-aria-border aw-widgets-fixedCellHeight aw-widgets-cellListItem aw-widgets-cellTop" aw-virtual-repeat="item in dataprovider"
+                    aw-on-demand="" ng-class="{'aw-widgets-cellListItemSelected': item.selected, 'aw-widgets-hideCellListSelEffect': disableSelection}" id="{{$index}}"
+                    ng-style="staticRowHeight" >
+                    <div class="aw-widgets-cellListItemContainer aw-widgets-droppable {{item.cellDecoratorStyle}}"
+                         ng-class="{'aw-widgets-showCellDecorator' : $parent.dataprovider.showDecorators}"
+                         draggable="true"
+                         ng-attr-title="{{item.colorTitle}}">
+                        <div class="aw-widgets-cellListItemCell" aw-transclude></div>
+                        <!-- Cell List Commands -->
+                        <div class="aw-widgets-cellListCellCommands aw-widgets-cellInteraction">
+                            <div ng-show="dataprovider.selectionModel.multiSelectEnabled && item.selected">
+                                <a class="aw-commands-cellCommandCommon">
+                                    <div class="aw-commands-svg">
+                                        <aw-icon icon-id="cmdCheckmark"></aw-icon>
+                                    </div>
+                                </a>
+                            </div>
+                            <div ng-show="!dataprovider.selectionModel.multiSelectEnabled || !item.selected" class="aw-widgets-cellCommandsContainer">
+                                <aw-list-command ng-if="!dataprovider.json.commandsAnchor" ng-repeat="command in dataprovider.commands | filter:conditionFilter(item)" vmo="item" command="command">
+                                </aw-list-command>
+                                <aw-cell-command-bar ng-if="dataprovider.json.commandsAnchor" anchor="{{dataprovider.json.commandsAnchor}}" context="{vmo: item}"></aw-cell-command-bar>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- No Results Message -->
+            <div class="aw-widgets-noResultsLabel" ng-show="dataprovider.noResults">{{dataprovider.noResultsFound}}</div>
+
+            <!--  put an empty cell for providing a drop area -->
+            <div ng-if="showDropArea === 'true'" class="aw-widgets-emptyCell"></div>
+        </div>
+    </div>
+</div>

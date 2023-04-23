@@ -1,0 +1,92 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":{
+
+
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "updateOptionsOnLoad",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "importPreview.refreshOptions"
+                    }
+                ]
+            },
+            "deps": "js/Arm0ShowTypeChangePanel"
+        },
+        "updateOptions":
+        {
+            "actionType": "dataProvider",
+            "method": "actionsList"
+        },
+        "handleCommandSelection":{
+            "actionType": "JSFunction",
+            "method": "handleCommandSelection",
+            "inputData":
+            {
+                "data":"{{data.eventData}}"
+            },
+            "deps": "js/Arm0ShowTypeChangePanel"
+        },
+        "closeExistingBalloonPopup":
+        {
+            "actionType": "JSFunction",
+            "method": "closeExistingBalloonPopup",
+            "inputData":
+            {
+
+            },
+            "deps": "js/Arm0ShowTypeChangePanel"
+        }
+    },
+    "data": {
+
+    },
+    "messages":
+    {
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "importPreview.refreshOptions",
+            "action": "updateOptions"
+
+        },
+        {
+            "eventId": "importPreview.closeExistingBalloonPopup",
+            "cacheEventData": true,
+            "action": "closeExistingBalloonPopup"
+        },
+        {
+            "eventId": "requirements.handleCommandSelection",
+            "cacheEventData": true,
+            "action": "handleCommandSelection"
+        }
+    ],
+    "dataProviders":
+    {
+        "actionsList":
+        {
+            "response":"{{data.allowedTypesInfo}}",
+            "selectionModelMode": "single"
+         }
+    },
+    "i18n": {
+
+    }
+}

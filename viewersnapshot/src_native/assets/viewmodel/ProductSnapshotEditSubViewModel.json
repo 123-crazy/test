@@ -1,0 +1,92 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                 "js/aw-panel-body.directive",
+                 "js/aw-widget.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-i18n.directive",
+                 "js/aw-button.directive",
+                 "js/exist-when.directive"
+                 ],
+    "actions" :{
+        "updateProductSnapshotAction":{
+            "actionType": "JSFunction",
+            "method": "renameProductSnapshotAndNotify",
+            "inputData":
+            {
+                "snapshotName": "{{data.snapshotName.dbValue}}",
+                "data":"{{data}}"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+
+        "showSnapshotListViewSubPanelAction":{
+            "actionType":"Event",
+            "method":"Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name":"awPanel.navigate",
+                        "eventData":
+                        {
+                           "destPanelId": "Awv0CaptureGalleryListSub"
+                        }
+                    }
+                ]
+            }
+        },
+        "showSnapshotDiscSubPanelAction":{
+            "actionType":"Event",
+            "method":"Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name":"awPanel.navigate",
+                        "eventData":
+                        {
+                           "destPanelId": "Ac0CreateNewCollabObj"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId":"snapshot.productSnapshotRenameSuccessful",
+            "action":"showSnapshotListViewSubPanelAction"
+        },
+        {
+            "eventId":"snapshot.productSnapshotDiscRenameSuccessful",
+            "action":"showSnapshotDiscSubPanelAction"
+        }
+    ],
+
+    "data":{
+        "snapshotName":
+        {
+            "displayName": "{{i18n.newProductSnapshotNameLabel}}",
+            "type": "STRING",
+            "maxLength": 90,
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue":"{{ctx.awDefaultViewer.snapshotCtx.snapshotBeingEdit.cellHeader1}}"
+        }
+    },
+
+    "i18n":
+    {
+        "updateButtonText": [ "ViewerSnapshotMessages" ],
+        "editProductSnapshot": [ "ViewerSnapshotMessages" ],
+        "newProductSnapshotNameLabel": [ "ViewerSnapshotMessages" ],
+        "updatedProductSnapshotSuccessfully": [ "ViewerSnapshotMessages" ],
+        "failedToUpdate": [ "ViewerSnapshotMessages" ]
+    }
+}
+

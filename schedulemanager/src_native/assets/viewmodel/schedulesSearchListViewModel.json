@@ -1,0 +1,181 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-in-content-search-box.directive",
+        "js/aw-listbox.directive"
+    ],
+    "data":{
+        "privilege":
+        {
+            "type": "STRING",
+            "hasLov": true,
+            "dbValue": "",
+            "displayName":"{{i18n.role}}"
+        },
+        "searchBox": {
+            "displayName":"",
+            "type":"STRING",
+            "isRequired":"true",
+            "dbValue":"{{ctx.search.criteria.searchString}}",
+            "dispValue":"{{ctx.search.criteria.searchString}}"
+        }
+    },
+    "actions":
+    {
+        "doSearchKeepFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "simpleSearch",
+            "inputData":
+            {
+                "searchCriteria": "{{data.searchBox.dbValue}}"
+            },
+
+            "deps": "js/filterPanelService"
+        },
+        "setSelectedPrivilege":
+        {
+            "actionType": "JSFunction",
+            "method": "setSelectedPrivilege",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1SearchFilterService"
+        },
+        "populatePrivilegeList":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePrivilegeList",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1SearchFilterService"
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "loadData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": "{{ctx.search.maxToLoad}}",
+                    "maxToReturn": "{{ctx.search.maxToReturn}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{function:getSchedulesSearchCriteria}}",
+                    "searchFilterFieldSortType" : "{{ctx.search.sortType}}",
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}",
+                    "searchFilterMap": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{ctx.search.sortCriteria}}"
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "schSearchListErrorMsg"
+                    }
+                ]
+            },
+            "deps": "js/Saw1SearchFilterService"
+        }
+    },
+    "functions":
+    {
+        "getSchedulesSearchCriteria":
+        {
+            "functionName": "getSchedulesSearchCriteria",
+            "parameters":
+            [
+                "{{ctx.state.params}}",
+                "{{ctx.search.criteria}}"
+            ]
+        }
+    },
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commands":
+            {
+                "Awp0ShowObjectCell":
+                {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "onEvent": [
+        {
+        "eventId": "schedulesSearchList.contentLoaded",
+        "action": "reveal"
+        },
+        {
+            "eventId": "schedulesSearchList.contentLoaded",
+            "action": "populatePrivilegeList"
+        }
+    ],
+    "messages": {
+        "schSearchListErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "coordinator": [ "ScheduleManagerMessages" ],
+        "participant": [ "ScheduleManagerMessages" ],
+        "observer": [ "ScheduleManagerMessages" ],
+        "role":[ "ScheduleManagerMessages" ]
+    }
+}

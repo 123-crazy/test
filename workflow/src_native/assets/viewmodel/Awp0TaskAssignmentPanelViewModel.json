@@ -1,0 +1,362 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-label.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/exist-when.directive",
+        "js/aw-repeat.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-include.directive",
+        "js/aw-panel.directive"
+    ],
+
+    "data": {
+        "name":{
+            "displayName": "{{i18n.Workflow_Name}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "uiValue": ""
+         },
+        "status":{
+            "displayName": "{{i18n.status}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "uiValue": ""
+         },
+         "addUsersOnPanelAnchor": "awp0_addUsersOnPanelAnchor",
+         "addTaskParticipantAssignmentOnPanelAnchor": "awp0_addTaskParticipantAssignmentOnPanelAnchor"
+    },
+
+    "dataProviders": {
+        "assignerDataProvider":{
+            "selectionModelMode": "single"
+        },
+        "reviewersDataProvider":{
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "aw_tasksAferSubmitProfileCellCommand"
+        },
+        "acknowledgersDataProvider":{
+            "selectionModelMode": "multiple"
+        },
+        "notifyeesDataProvider":{
+            "selectionModelMode": "multiple"
+        },
+        "adhocReviewersDataProvider": {
+            "selectionModelMode": "multiple"
+        }
+    },
+
+    "actions": {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "initializeDataProvider"
+                },
+                {
+                    "action": "createParticipantDataProviderObjects"
+                },
+                {
+                    "action": "populatePanelData"
+                }
+            ]
+        },
+        "initializeDataProvider": {
+          "actionType": "dataProvider",
+          "methods": ["assignerDataProvider", "reviewersDataProvider", "acknowledgersDataProvider", "notifyeesDataProvider", "adhocReviewersDataProvider"]
+        },
+        "createParticipantDataProviderObjects": {
+            "actionType": "JSFunction",
+            "method": "createParticipantDataProviderObjects",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "selected": "{{ctx.taskAssignmentCtx.panelContext}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "populatePanelData": {
+            "actionType": "JSFunction",
+            "method": "populateTaskAssignmentPanelData",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "selected": "{{ctx.taskAssignmentCtx.selectedTaskObject}}",
+               "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "updateTaskAssignments": {
+            "actionType": "JSFunction",
+            "method": "updateTaskAssignmentData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "palDataMap": "{{ctx.taskAssignmentCtx.panelContext}}",
+                "selectedTask": "{{ctx.taskAssignmentCtx.selectedTaskObject}}",
+                "context": "{{ctx}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflow.closePopupPanel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "discardAssignmentChanges": {
+            "actionType": "JSFunction",
+            "method": "discardAssignmentChanges",
+            "inputData": {
+                "context": "{{ctx.taskAssignmentCtx}}",
+                "selectedObject": "{{ctx.taskAssignmentCtx.treeDataProvider.selectedObjects[0]}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflow.refreshPanel"
+                    }
+                ]
+            }
+        },
+        "evaluateSelections": {
+            "actionType": "JSFunction",
+            "method": "evaluateSelections",
+            "inputData":
+            {
+                "selectedObjects": "{{data.eventData.selectedObjects}}"
+            },
+            "outputData":
+            {
+                "ctx.taskAssignmentCtx.isRemoveVisible": ""
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+
+        },
+        "updateAssignmentTable": {
+            "actionType": "JSFunction",
+            "method": "updateAssignmentTable",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "palDataMap": "{{ctx.taskAssignmentCtx.panelContext}}",
+                "selectedTask": "{{ctx.taskAssignmentCtx.selectedTaskObject}}",
+                "context": "{{ctx}}",
+                "selectedObject": "{{ctx.taskAssignmentCtx.treeDataProvider.selectedObjects[0]}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflow.refreshPanel"
+                    }
+                ]
+            }
+        },
+        "closePopupPanel": {
+            "actionType": "JSFunction",
+            "method": "hidePopupPanel",
+            "inputData": {
+            },
+            "deps": "js/Awp0WorkflowPopupService"
+        },
+        "evaluateProfileSelections": {
+            "actionType": "JSFunction",
+            "method": "evaluateProfileSelections",
+            "inputData": {
+                "selectedObjects": "{{data.eventData.selectedObjects}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "resetPanelModification": {
+            "actionType": "JSFunction",
+            "method": "resetPanelModification",
+            "inputData": {
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "updatePasteCommandContext": {
+            "actionType": "JSFunction",
+            "method": "updatePasteCommandContext",
+            "inputData": {
+                "context": "{{ctx.taskAssignmentCtx.panelContext}}",
+                "selectedObjects": "{{data.eventMap['workflow.userPickerPanelSelection'].selectedObjects}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        }
+
+    },
+    "messages": {
+        "saveOrDiscardWarningMsg": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.panelModificationWarningMsg}}",
+            "messageTextParams": [
+                "{{data.eventMap.panelModificationWarningMsg.source}}"
+            ],
+            "navigationOptions": [
+                {
+                    "option": "Discard",
+                    "text": "{{i18n.discard}}",
+                    "action": "discardAssignmentChanges"
+                },
+                {
+                    "option": "Modify",
+                    "text": "{{i18n.modify}}",
+                    "action": "updateAssignmentTable"
+                }
+            ]
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView",
+        "onUnmount": "resetPanelModification"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0TaskAssignmentPanel"
+            },
+            "action": "initializeView"
+        },
+        {
+            "eventId": "workflow.refreshPanel",
+            "action": "initializeView"
+        },
+        {
+            "eventId": "reviewersDataProvider.selectionChangeEvent",
+            "action": "evaluateSelections",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "reviewersDataProvider.selectionChangeEvent",
+            "action": "evaluateProfileSelections",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "acknowledgersDataProvider.selectionChangeEvent",
+            "action": "evaluateSelections",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "adhocReviewersDataProvider.selectionChangeEvent",
+            "action": "evaluateSelections",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "notifyeesDataProvider.selectionChangeEvent",
+            "action": "evaluateSelections",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "assignerDataProvider.selectionChangeEvent",
+            "action": "evaluateSelections",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "panelModificationWarningMsg",
+            "cacheEventData": true,
+            "message":"saveOrDiscardWarningMsg"
+        },
+        {
+            "eventId": "closePanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "workflow.closePopupPanel",
+            "action": "closePopupPanel"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'taskAssignmentCtx'  && !ctx.taskAssignmentCtx",
+            "action": "closePopupPanel"
+        },
+        {
+            "eventId": "workflow.userPickerPanelSelection",
+            "action": "updatePasteCommandContext",
+            "cacheEventData": true
+        }
+    ],
+
+    "conditions":
+    {
+        "isValidToUpdateAssignment": {
+            "expression": "conditions.isTaskNotCompleted && data.dataProviders.assignerDataProvider.viewModelCollection.loadedVMObjects.length > 0"
+        },
+        "isTaskNotCompleted":
+        {
+            "expression": "ctx.taskAssignmentCtx.selectedTaskObject.props.state.dbValues[0] !== '8' && ctx.taskAssignmentCtx.isPrivilegedToAssign == 'true' && ctx.taskAssignmentCtx.enableModifyButton == true"
+        },
+        "isRouteTaskSelected": {
+            "expression": "ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMRouteTask') >= 0 || ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMRouteTaskTemplate') >= 0"
+        },
+        "isReviewOrAckOrRouteTaskSelected": {
+            "expression": "ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMReviewTask') >= 0 || ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMAcknowledgeTask') >= 0 || ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMRouteTask') >= 0 || conditions.isReviewOrAckOrRouteTaskTemplateSelected"
+        },
+        "isReviewOrAckOrRouteTaskTemplateSelected": {
+            "expression": "ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMReviewTaskTemplate') >= 0 || ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMAcknowledgeTaskTemplate') >= 0 || ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMRouteTaskTemplate') >= 0"
+        },
+        "isTaskObjectSelected": {
+            "expression": "ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMTask') > -1 || ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMTaskTemplate') > -1"
+        },
+        "isMultiUserTaskSelected": {
+            "expression": "conditions.isReviewOrAckOrRouteTaskSelected || conditions.isReviewOrAckOrRouteTaskTemplateSelected"
+        },
+        "isOnlyTaskObjectSelected": {
+            "expression": "ctx.taskAssignmentCtx.selectedTaskObject.modelType.typeHierarchyArray.indexOf('EPMTask') > -1"
+        }
+    },
+
+    "i18n": {
+        "taskAssignments": [ "WorkflowCommandPanelsMessages" ],
+        "modify": [ "WorkflowCommandPanelsMessages" ],
+        "task": [ "WorkflowCommandPanelsMessages" ],
+        "Workflow_Name": [ "WorkflowCommandPanelsMessages" ],
+        "status": [ "WorkflowCommandPanelsMessages" ],
+        "assignments": [ "WorkflowCommandPanelsMessages" ],
+        "Assigner": [ "WorkflowCommandPanelsMessages" ],
+        "assignee": [ "WorkflowCommandPanelsMessages" ],
+        "addReviewerLabelText": [ "InboxMessages" ],
+        "additionalReviewers": [ "InboxMessages" ],
+        "Acknowledgers": [ "WorkflowCommandPanelsMessages" ],
+        "Notifyees": [ "WorkflowCommandPanelsMessages" ],
+        "required": [ "WorkflowCommandPanelsMessages" ],
+        "duplicateReviewerMsg": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "wasNotAdded": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "multipleDuplicateMsg": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "panelModificationWarningMsg": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "save": [
+            "InboxMessages"
+        ],
+        "discard": [
+            "InboxMessages"
+        ]
+    }
+
+}
+

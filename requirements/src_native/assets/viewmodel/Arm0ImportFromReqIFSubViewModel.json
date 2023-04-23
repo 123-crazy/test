@@ -1,0 +1,682 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-requirements-excelimport-header.directive",
+        "js/aw-property-val.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-listbox.directive"
+    ],
+
+    "actions": {
+
+        "recreateReqIFPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "importSpecificationReqIF.resetReqIFImportData"
+                } ]
+            }
+        },
+
+        "startDataCreationForReqIF": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "importSpecificationReqIF.getTransientFileTicketsForReqIFUpload",
+                        "condition": "data.fileName && data.validFile"
+                    },
+                    {
+                        "name": "importSpecificationReqIF.resetReqIFImportData",
+                        "condition": "!data.fileName || !data.validFile"
+                    }
+                ]
+            }
+        },
+
+        "getTransientFileTicketsForReqIFUpload": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-FileManagement",
+            "method": "getTransientFileTicketsForUpload",
+            "inputData": {
+                "transientFileInfos": [ {
+                    "fileName": "{{data.fileName}}",
+                    "isBinary": true,
+                    "deleteFlag": true
+                } ]
+            },
+
+            "outputData": {
+                "fmsTicket": "transientFileTicketInfos[0].ticket"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "fmsTicket.updateReqIF"
+                } ]
+            }
+        },
+
+        "updateReqIFImportFormData": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.gotTransientReqIFFileTicket"
+                } ]
+            },
+
+            "deps": "js/declUtils"
+        },
+
+        "uploadReqIFFile": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+
+                    "data": "{{data.formData}}"
+                }
+            },
+
+            "events": {
+                "success": [ {
+                        "condition": "data.getSpecificationMetadataResponse === undefined",
+                        "name": "importSpecificationReqIF.getPropertiesFromReqIF"
+                    },
+                    {
+                        "condition": "data.getSpecificationMetadataResponse !== undefined",
+                        "name": "importSpecificationReqIF.importFromReqIF"
+                    }
+
+                ]
+            }
+        },
+
+        "getPropertiesFromReqIF": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AwReqMgmtSe-2019-12-SpecNavigation",
+            "method": "getSpecificationMetadata",
+            "inputData": {
+                "input": {
+                    "selectedObjects": [],
+                    "fileTicket": "{{data.fmsTicket}}",
+                    "typePropMap": {},
+                    "inputCtxt": {},
+                    "options": []
+                }
+            },
+            "outputData": {
+                "getSpecificationMetadataResponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.createTypesRelationsMap"
+                } ]
+            }
+        },
+
+        "resetReqIFImportData": {
+            "actionType": "JSFunction",
+            "method": "resetReqIFImportData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "Arm0ImportFromOffice.startDataCreationForReqIF"
+                    }
+                ]
+            },
+            
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "createTypesRelationsMap": {
+            "actionType": "JSFunction",
+            "method": "createTypesRelationsMap",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "getNewReqIFImportInput": {
+            "actionType": "JSFunction",
+            "method": "getNewReqIFImportInput",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.getTransientFileTicketsForReqIFUpload",
+                    "condition": "data.fileName && data.validFile"
+                } ]
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "importFromReqIF": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2019-12-ImportExport",
+            "method": "importFromReqIf",
+            "inputData": {
+                "inputData": [ {
+                    "selectedObject": "{{function:selectedObjectToImport}}",
+                    "reqIfFileTicket": "{{data.fmsTicket}}",
+                    "attributeMap": "{{data.reqIfAttributeMappingInfos}}",
+                    "isRunInBackground": "{{data.runInBackgroundReqIF.dbValue}}",
+                    "options": [ "{{function:getBaseURL}}" ]
+                } ]
+            },
+            "outputData": {
+                "importedObject": "reqSpecifications"
+            },
+            "events": {
+                "success": [ {
+                        "condition": "!data.runInBackgroundReqIF.dbValue",
+                        "name": "importSpecificationReqIF.reqIFDocumentImported"
+                    },
+                    {
+                        "condition": "data.runInBackgroundReqIF.dbValue",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+
+                "failure": [ {
+                    "condition": "!data.runInBackgroundReqIF.dbValue",
+                    "name": "importSpecificationReqIF.importDocumentFailed"
+                } ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "notificationForImportSpecificationMsg",
+                    "condition": "data.runInBackgroundReqIF.dbValue"
+                } ]
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "unRegisterReqIFData": {
+            "actionType": "JSFunction",
+            "method": "unRegisterReqIFData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "unRegisterReqIFDataAndShowObject": {
+            "actionType": "JSFunction",
+            "method": "unRegisterReqIFData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ 
+                    {
+                        "name": "importSpecificationReqIF.showObject",
+                        "condition": "data.importedObject !== undefined && data.importedObject.length === 1"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.importedObject !== undefined && data.importedObject.length > 1"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.importedObject === undefined"
+                    },
+                    {
+                        "condition": "data.importedObject === undefined || data.importedObject !== undefined && data.importedObject.length > 1",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "showReqIFObject": {
+            "actionType": "JSFunction",
+            "method": "go",
+            "deps": "js/locationNavigation.service",
+            "inputData": {
+                "showObject": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{data.importedObject[0].uid}}"
+                },
+                "option": {
+                    "inherit": false,
+                    "reload": true
+                }
+            }
+        },
+
+        "validateMapping": {
+            "actionType": "JSFunction",
+            "method": "validateMapping",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "clickOnSaveMappingCommand": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "importSpecificationReqIF.setCmdDimensionForBallonPopup",
+                    "condition": "!data.savedMappings.dbValue"
+                } ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "condition": "data.savedMappings.dbValue",
+                    "message": "updateImportReqIFMappingWarningMessage"
+                } ]
+            }
+        },
+
+        "setCmdDimensionForBallonPopup": {
+            "actionType": "JSFunction",
+            "method": "setCmdDimensionForBallonPopup",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.displayImportReqIFMappingPopup"
+                } ]
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "displayImportReqIFMappingPopup": {
+            "actionType": "JSFunction",
+            "method": "openBalloonPopup",
+            "inputData": {
+                "view": "Arm0ImportRulePopup",
+                "commandDimension": "{{data.saveMappingCmdDimension}}",
+                "popuporientation": "BOTTOM_LEFT",
+                "popupheight": "160px",
+                "popupwidth": "310px",
+                "popupclosebutton": "false"
+            },
+            "deps": "js/balloonPopupService"
+        },
+
+        "createSaveImportReqIFMappingInput": {
+            "actionType": "JSFunction",
+            "method": "createSaveImportReqIFMappingInput",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "updateImportReqIFMapping": {
+            "actionType": "JSFunction",
+            "method": "updateImportReqIFMapping",
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "populateAllImportReqIFMappings": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2019-12-ImportExport",
+            "method": "getRulesInfo",
+            "inputData": {
+                "input": {
+                    "ruleNames": [],
+                    "ruleObjects": [],
+                    "mappingType": "ImportReqIF"
+                }
+            },
+            "outputData": {
+                "getRulesInfoResponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.initImportReqIFMappingLovApi"
+                } ]
+            }
+        },
+
+        "initImportReqIFMappingLovApi": {
+            "actionType": "JSFunction",
+            "method": "initImportReqIFMappingLovApi",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "populateInfoForMapping": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2019-12-ImportExport",
+            "method": "getRulesInfo",
+            "inputData": {
+                "input": {
+                    "ruleNames": [ "{{data.savedMappings.dbValue}}" ],
+                    "ruleObjects": [ "{{data.selectedRule.ruleObject}}" ],
+                    "mappingType": "ImportReqIF"
+                }
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.populateRulesFromSavedMappingName"
+                } ]
+            }
+        },
+
+        "hideImportReqIFSaveMappingVisiblity": {
+            "actionType": "JSFunction",
+            "method": "hideImportReqIFSaveMappingVisiblity",
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "populateRulesFromSavedMappingName": {
+            "actionType": "JSFunction",
+            "method": "populateRulesFromSavedMappingName",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "importSpecificationReqIF.hideImportReqIFSaveMappingVisiblity"
+                } ]
+            },
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "saveImportReqIFMapping": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2019-12-ImportExport",
+            "method": "saveRulesInfo",
+            "inputData": {
+                "input": "{{data.importReqIFMappingInput}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "importSpecificationReqIF.closeImportMappingBallonPopupWindow"
+                    },
+                    {
+                        "name": "importSpecificationReqIF.populateAllImportReqIFMappings"
+                    }
+                ]
+            },
+            "outputData": {
+                "response": ""
+            }
+        },
+
+        "importReqIFcontentUnloaded": {
+            "actionType": "JSFunction",
+            "method": "importReqIFcontentUnloaded",
+            "deps": "js/Arm0ImportFromReqIF"
+        },
+
+        "importReqIFSavedMappingsSelectionChange":{
+            "actionType": "JSFunction",
+            "method": "importReqIFRuleSelectionChangeInListBox",
+            "deps": "js/Arm0ImportFromReqIF",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        }
+    },
+
+    "functions": {
+        "selectedObjectToImport": {
+            "functionName": "selectedObjectToImport",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getBaseURL": {
+            "functionName": "getBaseURL"
+        }
+
+    },
+
+    "data": {
+        "importFromReqIFMappingSubCommands": "arm0_importFromReqIFMappingSubCommands",
+        "selectFile": {
+            "displayName": "{{i18n.selectFile}}",
+            "type": "STRING"
+        },
+        "runInBackgroundReqIF": {
+            "displayName": "{{i18n.runinBG}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "savedMappings": {
+            "displayName": "{{i18n.savedMappings}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+
+    },
+
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Arm0ImportFromReqIFSub"
+            },
+            "action": "recreateReqIFPanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "importSpecificationReqIF.createTypesRelationsMap",
+            "action": "createTypesRelationsMap"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.resetReqIFImportData",
+            "action": "resetReqIFImportData"
+        },
+        {
+            "eventId": "importSpecificationReqIF.getTransientFileTicketsForReqIFUpload",
+            "action": "getTransientFileTicketsForReqIFUpload"
+        },
+        {
+            "eventId": "fmsTicket.updateReqIF",
+            "action": "updateReqIFImportFormData"
+        },
+        {
+            "eventId": "importSpecificationReqIF.gotTransientReqIFFileTicket",
+            "action": "uploadReqIFFile"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.getPropertiesFromReqIF",
+            "action": "getPropertiesFromReqIF"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.importFromReqIF",
+            "action": "importFromReqIF"
+        },
+        {
+            "eventId": "importSpecificationReqIF.reqIFDocumentImported",
+            "action": "unRegisterReqIFDataAndShowObject"
+        },
+        {
+            "eventId": "importSpecificationReqIF.showObject",
+            "action": "showReqIFObject"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.importDocumentFailed",
+            "action": "unRegisterReqIFData"
+        },
+        {
+            "eventId": "importSpecificationReqIF.validateMapping",
+            "action": "validateMapping"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.clickOnSaveMappingCommand",
+            "action": "clickOnSaveMappingCommand"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.setCmdDimensionForBallonPopup",
+            "action": "setCmdDimensionForBallonPopup"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.displayImportReqIFMappingPopup",
+            "action": "displayImportReqIFMappingPopup"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.createSaveImportReqIFMappingInput",
+            "action": "createSaveImportReqIFMappingInput"
+        },
+        {
+            "eventId": "importSpecificationReqIF.populateAllImportReqIFMappings",
+            "action": "populateAllImportReqIFMappings"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.initImportReqIFMappingLovApi",
+            "action": "initImportReqIFMappingLovApi"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.populateInfoForMapping",
+            "action": "populateInfoForMapping"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.populateRulesFromSavedMappingName",
+            "action": "populateRulesFromSavedMappingName"
+        },
+        {
+            "eventId": "importSpecificationReqIF.hideImportReqIFSaveMappingVisiblity",
+            "action": "hideImportReqIFSaveMappingVisiblity"
+        },
+
+        {
+            "eventId": "importSpecificationReqIF.saveImportReqIFMapping",
+            "action": "saveImportReqIFMapping"
+        },
+
+        {
+            "eventId": "Arm0ImportFromOffice.contentUnloaded",
+            "action": "importReqIFcontentUnloaded"
+        },
+
+        {
+            "eventId": "awTab.selected",
+            "action": "importReqIFcontentUnloaded",
+            "condition": "scope.selectedTab.panelId !== 'Arm0ImportFromReqIFSub' && data.activeView === 'Arm0ImportFromOfficeSub'"
+        },
+        {
+            "eventId": "Arm0ImportFromOffice.startDataCreationForReqIF",
+            "action": "startDataCreationForReqIF"
+        }
+
+    ],
+
+    "conditions": {
+        "isValidFile": {
+            "expression": "data.fileName && data.validFile == true"
+        },
+        "isReqIFTypes": {
+            "expression": "data.isReqIFTypes == true"
+        },
+        "isReqIFTraceLinks": {
+            "expression": "data.isReqIFTraceLinks == true"
+        },
+        "isReqIFImportAllowed": {
+            "expression": "data.fileName && data.validFile == true && data.isValidMapping == true"
+        }
+    },
+
+    "messages": {
+        "updateImportReqIFMappingWarningMessage": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.notificationForUpdateMsg}}",
+            "messageTextParams": [
+                "{{ctx.importReqIFSavedMapping}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": ""
+                },
+                {
+                    "option": "update",
+                    "text": "{{i18n.update}}",
+                    "action": "updateImportReqIFMapping"
+                }
+            ]
+        }
+    },
+
+    "i18n": {
+        "importTitle": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "mapTypes": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "mapTraceLinks": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "runinBG": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "notificationForUpdateMsg": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "savedMappings": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "mapping": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "cancel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "update": [
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

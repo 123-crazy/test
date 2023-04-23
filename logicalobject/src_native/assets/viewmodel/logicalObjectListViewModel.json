@@ -1,0 +1,109 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "allListProvider"
+        },
+        "loadData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "condition": "data.searchBox.dbValue != ''",
+                        "message": "testMessage"
+                    }
+                ]
+            },
+            "inputData":
+            {
+                "columnConfigInput":
+                {
+                    "clientName": "AWClient",
+                    "clientScopeURI":"Awp0SearchResults",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": "intersection"
+                },
+                "saveColumnConfigData":
+                {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput":
+                {
+                    "attributesToInflate": [ "object_name", "object_desc", "fnd0RootTypeName", "parent_types", "type_name" ],
+                    "internalPropertyName": "",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,                  
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType" : "{{ctx.search.sortType}}",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.allListProvider.startIndex}}"
+                }
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",           
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded"
+            },
+            "events":
+            {
+                "success": 
+                [
+                    { "name": "logicalObject.loaded" }
+                ]
+            }
+        },
+        "selectLogicalObject":
+        {
+            "actionType": "JSFunction",
+            "method": "selectLogicalObject",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0LogicalObjectService"
+        }
+    },
+    "dataProviders":
+    {
+        "allListProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModel": "single"
+        }
+    },
+    "onEvent": [{
+        "eventId": "dataProvider.reset",
+        "action": "reveal"
+    }, {
+        "eventId": "logicalObjectList.contentLoaded",
+        "action": "reveal"
+    }, {
+        "eventId": "logicalObject.loaded",
+        "action": "selectLogicalObject"
+    }]
+}

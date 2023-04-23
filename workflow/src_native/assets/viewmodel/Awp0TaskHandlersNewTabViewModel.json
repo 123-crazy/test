@@ -1,0 +1,385 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-workflow-handler-table.directive",
+        "js/aw-command-panel-section.directive"
+    ],
+    "actions": {
+        "refreshTable": {
+            "actionType": "dataProvider",
+            "methods": ["actionHandlerDataProvider", "ruleHandlerDataProvider"]
+        },
+        "revealWithTableRefresh":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects":
+                [
+                    "{{ctx.selected}}"
+                ],
+                "attributes": [
+                    "assign_action_rules", "start_action_rules", "perform_action_rules", "complete_action_rules",
+                    "skip_action_rules", "suspend_action_rules", "resume_action_rules", "abort_action_rules", "undo_action_rules",
+                    "assign_action_handlers", "start_action_handlers", "perform_action_handlers", "complete_action_handlers", "skip_action_handlers",
+                    "suspend_action_handlers", "resume_action_handlers", "abort_action_handlers", "undo_action_handlers"
+                ]
+            },
+            "policy": {
+                "types": [ {
+                        "name": "EPMTaskTemplate",
+                        "properties": [ {
+                                "name": "action_handlers",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "actions",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                               "name": "rules",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "object_string"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMAction",
+                        "properties": [ {
+                                "name": "action_handlers",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "rule_handlers",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "rules",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "actions"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMBusinessRule",
+                        "properties": [ {
+                                "name": "rule_handlers",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "rule_quorum"
+                            },
+                            {
+                                "name":"action"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMHandler",
+                        "properties": [ {
+                            "name": "arguments"
+                        },
+                        {
+                            "name": "handler_arguments"
+                        },
+                        {
+                            "name": "object_name"
+                        },
+                        {
+                            "name": "object_string"
+                        },
+                        {
+                            "name": "parent_action_type"
+                       } ]
+                    },
+                    {
+                        "name": "EPMBRHandler",
+                        "properties": [ {
+                            "name": "arguments"
+                        },
+                        {
+                            "name": "handler_arguments"
+                        },
+                        {
+                            "name": "object_name"
+                        },
+                        {
+                            "name": "object_string"
+                        },
+                        {
+                            "name": "parent_action_type"
+                       } ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+
+                    {
+                        "name": "populateActionHandlerData"
+                    },
+                    {
+                        "name": "populateRuleHandlerData"
+                    }
+                ]
+            },
+            "outputData": {
+            }
+        },
+        "loadActionHandlerTableColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadHandlerTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.actionHandlerDataProvider}}",
+                "data": "{{data}}",
+                "ctx" : "{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "loadRuleHandlerTableColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadHandlerTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.ruleHandlerDataProvider}}",
+                "data": "{{data}}",
+                "ctx" : "{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "populateActionHandlerData": {
+            "actionType": "JSFunction",
+            "method": "populateActionHandlerData",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx" : "{{ctx}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "populateRuleHandlerData": {
+            "actionType": "JSFunction",
+            "method": "populateRuleHandlerData",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx" : "{{ctx}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "getIndexOfSelectedActionHandler": {
+            "actionType": "JSFunction",
+            "method": "getIndexOfSelectedActionHandler",
+            "inputData": {
+                "ctx" : "{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "getIndexOfSelectedRuleHandler": {
+            "actionType": "JSFunction",
+            "method": "getIndexOfSelectedRuleHandler",
+            "inputData": {
+                "ctx" : "{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        },
+        "resetHandlerSelection": {
+            "actionType": "JSFunction",
+            "method": "resetHandlerSelection",
+            "inputData": {
+                "ctx" : "{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        }
+    },
+    "functions": {
+    },
+    "dataProviders": {
+        "actionHandlerDataProvider": {
+            "action": "populateActionHandlerData",
+            "response": "{{data.searchActionHandlerResults}}",
+            "totalFound": "{{data.totalActionHandlersFound}}",
+            "searchIndex": "{{data.searchIndex}}"
+        },
+        "ruleHandlerDataProvider": {
+            "action": "populateRuleHandlerData",
+            "response": "{{data.searchRuleHandlerResults}}",
+            "totalFound": "{{data.totalRuleHandlersFound}}",
+            "searchIndex": "{{data.searchIndex}}"
+        }
+    },
+    "columnProviders": {
+        "actionHandlersColumnProvider": {
+            "loadColumnAction": "loadActionHandlerTableColumns",
+            "columns": "{{data.columns}}",
+            "sortCriteria": [],
+            "frozenColumnIndex": -1
+        },
+        "ruleHandlersColumnProvider": {
+            "loadColumnAction": "loadRuleHandlerTableColumns",
+            "columns": "{{data.columns}}",
+            "sortCriteria": [],
+            "frozenColumnIndex": -1
+        }
+    },
+    "grids": {
+        "actionHandlerTable": {
+            "dataProvider": "actionHandlerDataProvider",
+            "columnProvider": "actionHandlersColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        },
+        "ruleHandlerTable": {
+            "dataProvider": "ruleHandlerDataProvider",
+            "columnProvider": "ruleHandlersColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        }
+    },
+    "data": {
+        "addActionHandler":"wd_ActionHandlerTableSectionCommands",
+        "addRuleHandler":"wd_RuleHandlerTableSectionCommands",
+        "handlerTableColumns" : [
+            {
+                "propName": "action_type",
+                "propDisplayName": "{{i18n.action_type}}",
+                "width": 300,
+                "enableCellEdit" : false,
+                "isTreeNavigation": false,
+                "isTableCommand" : false,
+                "minWidth" : 100,
+                "type":"String"
+            },
+            {
+                "propName": "object_string",
+                "propDisplayName": "{{i18n.handler}}",
+                "width": 300,
+                "isTreeNavigation": false,
+                "isTableCommand" : false,
+                "minWidth" : 100,
+                "type":"String"
+            },
+            {
+                "propName": "arguments",
+                "propDisplayName": "{{i18n.arguments}}",
+                "width": 500,
+                "isTreeNavigation": false,
+                "isTableCommand" : false,
+                "minWidth" : 100,
+                "type":"String"
+            }
+        ]
+
+    },
+    "onEvent": [
+        {
+            "eventId": "Awp0TaskHandlersNewTab.contentLoaded",
+            "action": "revealWithTableRefresh",
+            "condition": "ctx.selected"
+        },
+        {
+            "eventId": "workflowGraph.selectionChanged",
+            "action": "revealWithTableRefresh"
+        },
+        {
+            "eventId": "workflowGraph.selectionChanged",
+            "action": "resetHandlerSelection"
+        },
+        {
+            "eventId": "revealWithTableRefresh",
+            "action": "revealWithTableRefresh"
+        },
+        {
+            "eventId": "refreshHandlersTable",
+            "action": "refreshTable"
+        },
+        {
+            "eventId": "actionHandlerDataProvider.selectionChangeEvent",
+            "action": "getIndexOfSelectedActionHandler"
+        },
+        {
+            "eventId": "ruleHandlerDataProvider.selectionChangeEvent",
+            "action": "getIndexOfSelectedRuleHandler"
+        },
+        {
+            "eventId": "populateActionHandlerData",
+            "action": "populateActionHandlerData"
+        },
+        {
+            "eventId": "populateRuleHandlerData",
+            "action": "populateRuleHandlerData"
+        }
+    ],
+    "conditions": {
+    },
+     "preferences":
+    [
+        "EPM_ARG_target_user_group_list_separator"
+    ],
+    "i18n": {
+        "taskName": [ "InboxMessages" ],
+        "arguments": [ "WorkflowDesignerMessages" ],
+        "assign_action": [ "WorkflowDesignerMessages" ],
+        "start_action": [ "WorkflowDesignerMessages" ],
+        "perform_action": [ "WorkflowDesignerMessages" ],
+        "complete_action": [ "WorkflowDesignerMessages" ],
+        "skip_action": [ "WorkflowDesignerMessages" ],
+        "suspend_action": [ "WorkflowDesignerMessages" ],
+        "resume_action": [ "WorkflowDesignerMessages" ],
+        "abort_action": [ "WorkflowDesignerMessages" ],
+        "undo_action": [ "WorkflowDesignerMessages" ],
+        "quorumRuleLabel" : [ "WorkflowDesignerMessages" ],
+        "orRuleLabel" : [ "WorkflowDesignerMessages" ],
+        "andRuleLabel" : [ "WorkflowDesignerMessages" ],
+        "handler" : [ "WorkflowDesignerMessages" ],
+        "action_type" : [ "WorkflowDesignerMessages" ],
+        "actionHandler" : [ "WorkflowDesignerMessages" ],
+        "ruleHandler" : [ "WorkflowDesignerMessages" ],
+        "addValue":["WorkflowDesignerMessages"]
+    }
+}

@@ -1,0 +1,414 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-list-filter.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunctionAsync",
+            "method": "getAdaptedObjects",
+            "inputData":
+            {
+                "sourceObjects": "{{ctx.mselected}}"
+            },
+
+            "outputData":
+            {
+                "ctx.projects.adaptedObjects": ""
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "awp0AssignProjects.selectedObjectsAdapted"
+                    }
+                ]
+            },
+
+            "deps": "js/adapterService"
+        },
+
+        "getProjects":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData":
+            {
+                "objects": "{{function:processSelectedObjects}}",
+                "attributes":
+                [
+                    "assignable_projects",
+                    "project_list"
+                ]
+            },
+
+            "outputData":
+            {
+                "searchResults": "{{function:processAvailableProjects}}",
+                "filterResults":
+                [
+
+                ],
+
+                "projectList":
+                [
+
+                ]
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "awp0AssignProjects.callDataProvider"
+                    }
+                ]
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "TC_Project",
+                        "properties":
+                        [
+                            {
+                                "name": "project_id"
+                            },
+
+                            {
+                                "name": "project_name"
+                            },
+
+                            {
+                                "name": "object_string"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0AssignProjectsLegacy"
+        },
+
+        "getMemberList":
+        {
+            "actionType": "JSFunction",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "outputData":
+            {
+                "memberList": ""
+            },
+
+            "method": "getMemberProjects",
+            "deps": "js/Awp0AssignProjectsLegacy"
+        },
+
+        "getAvailableProjects":
+        {
+            "actionType": "JSFunction",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "outputData":
+            {
+                "availablememberList": ""
+            },
+
+            "method": "getAvailableProjects",
+            "deps": "js/Awp0AssignProjectsLegacy"
+        },
+
+        "submit":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData":
+            {
+                "assignedOrRemovedobjects":
+                [
+                    {
+                        "projects": "{{function:projectsToAssign}}",
+                        "objectToAssign": "{{function:objectToAssign}}",
+                        "objectToRemove":
+                        [
+
+                        ]
+                    },
+
+                    {
+                        "projects": "{{function:projectsToRemove}}",
+                        "objectToAssign":
+                        [
+
+                        ],
+
+                        "objectToRemove": "{{function:objectToRemove}}"
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0AssignProjectsLegacy",
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "condition": "ctx.AssignProject.Owning_Object.length==1",
+                        "message": "singleAssignToProjectSuccess"
+                    },
+
+                    {
+                        "condition": "ctx.AssignProject.Owning_Object.length>1",
+                        "message": "multipleAssignToProjectSuccess"
+                    }
+                ]
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+
+        "addProjects":
+        {
+            "actionType": "JSFunction",
+            "method": "addProjects",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/showAddProjectCellCommandHandlerLegacy"
+        },
+
+        "removeProjects":
+        {
+            "actionType": "JSFunction",
+            "method": "removeProjects",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/showRemoveProjectCellCommandHandlerLegacy"
+        },
+
+        "callDataProvider":
+        {
+            "actionType": "dataProvider",
+            "methods":
+            [
+                "availableProjects",
+                "memberOfProjectList"
+            ]
+        }
+    },
+
+    "messages":
+    {
+        "singleAssignToProjectSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.singleAssignToProjectSuccess}}",
+            "messageTextParams":
+            [
+                "{{ctx.AssignProject.Owning_Object}}"
+            ]
+        },
+
+        "multipleAssignToProjectSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleAssignToProjectSuccess}}",
+            "messageTextParams":
+            [
+                "{{ctx.AssignProject.Owning_Object.length}}"
+            ]
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awp0AssignProjects.addProjects",
+            "action": "addProjects"
+        },
+
+        {
+            "eventId": "awp0AssignProjects.callDataProvider",
+            "action": "callDataProvider"
+        },
+
+        {
+            "eventId": "awp0AssignProjects.removeProjects",
+            "action": "removeProjects"
+        },
+
+        {
+            "eventId": "awp0AssignProjects.selectedObjectsAdapted",
+            "action": "getProjects"
+        }
+    ],
+
+    "data":
+    {
+        "filterBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "functions":
+    {
+        "processAvailableProjects":
+        {
+            "functionName": "processAvailableProjects",
+            "parameters":
+            [
+
+            ]
+        },
+
+        "processSelectedObjects":
+        {
+            "functionName": "processSelectedObjects",
+            "parameters":
+            [
+
+            ]
+        },
+
+        "projectsToAssign":
+        {
+            "functionName": "projectsToAssign",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+
+        "objectToAssign":
+        {
+            "functionName": "objectToAssign",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+
+        "projectsToRemove":
+        {
+            "functionName": "projectsToRemove",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+
+        "objectToRemove":
+        {
+            "functionName": "objectToRemove",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+    },
+
+    "i18n":
+    {
+        "updateProjectsTitle":
+        [
+            "ProjmgmtConstants"
+        ],
+
+        "memberOfSectionTitle":
+        [
+            "ProjmgmtConstants"
+        ],
+
+        "availableSectionTitle":
+        [
+            "ProjmgmtConstants"
+        ],
+
+        "AssignButtonText":
+        [
+            "ProjmgmtConstants"
+        ],
+
+        "singleAssignToProjectSuccess":
+        [
+            "ProjmgmtConstants"
+        ],
+
+        "multipleAssignToProjectSuccess":
+        [
+            "ProjmgmtConstants"
+        ]
+    },
+
+    "conditions":
+    {
+        "isValidToShowAssignButton":
+        {
+            "expression": "data.removeProjectSoaInput.length > 0 || data.assignedProjectsUid.length > 0"
+        }
+    },
+
+    "dataProviders":
+    {
+        "availableProjects":
+        {
+            "action": "getAvailableProjects",
+            "commandsAnchor":"aw_addProjectsLegacyCellCommandAction",
+            "response": "{{data.filterResults.objs}}",
+            "totalFound": "{{data.filterResults.count}}"
+        },
+
+        "memberOfProjectList":
+        {
+           "action": "getMemberList",
+           "commandsAnchor":"aw_removeProjectsLegacyCellCommandAction",
+           "response": "{{data.memberList}}"
+        }
+    }
+}

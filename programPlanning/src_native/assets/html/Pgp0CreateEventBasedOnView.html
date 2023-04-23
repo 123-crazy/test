@@ -1,0 +1,20 @@
+<aw-form name="createEventBasedOn">
+    <aw-panel-body>
+    <aw-command-panel-section caption="i18n.addEventOnTimelineCommandTitle" anchor="data.templateSectionCommands" context="data">
+        <div visible-when="!ctx.programPlanningContext.selectedEvent" class="aw-programPlanning-required">
+            <aw-i18n>i18n.Pgp0Required</aw-i18n>
+        </div>
+        <aw-list dataprovider="data.dataProviders.selectedEventProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <aw-panel-section caption="i18n.properties" exist-when="ctx.programPlanningContext.selectedEvent">
+        <aw-xrt type="SAVEAS" vmo="data.selectedEvent"></aw-xrt>
+    </aw-panel-section>
+    </aw-panel-body>
+</aw-form>
+<aw-panel-footer>
+    <aw-button action="OOTBSaveAsAction" visible-when="ctx.programPlanningContext.selectedEvent && createEventBasedOn.$valid">
+        <aw-i18n>i18n.Pgp0CreatePlanFromTemplate</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

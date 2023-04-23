@@ -1,0 +1,301 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-changeowner-cell.directive",
+        "js/aw-changeowner-cell-content.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-default-group-cell.directive",
+        "js/aw-header-cell.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "search": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "searchInput":{
+                    "maxToLoad": 100,
+                    "maxToReturn": 25,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "searchString": "{{data.filterBox.dbValue}}",
+                        "resourceProviderContentType": "Users",
+                        "group": "",
+                        "role": "",
+                        "searchSubGroup": "true"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.userPerformSearch.startIndex}}"
+                }
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "POM_member",
+                        "properties":
+                        [
+                            {
+                                "name": "user",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "group",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties":
+                        [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Group",
+                        "properties":
+                        [
+                            {
+                                "name": "name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_user",
+                        "properties":
+                        [
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties":
+                        [
+                            {
+                                "name": "person",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties":
+                        [
+                            {
+                                "name": "user_name"
+                            },
+
+                            {
+                                "name": "PA9"
+                            },
+
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_application_object",
+                        "properties":
+                        [
+                            {
+                                "name": "owning_user"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "addFollowers":{
+            "actionType":"Event",
+            "method":"Event",
+            "inputData":{
+                "events":[
+                    {
+                        "name":"addToCustomPanel",
+                        "condition":"ctx.activeToolsAndInfoCommand.commandId === 'Sub0AddFollower'"
+                    },
+                    {
+                        "name":"addToDataProvider",
+                        "condition":"ctx.activeToolsAndInfoCommand.commandId !== 'Sub0AddFollower' && ctx.activeToolsAndInfoCommand.commandId !== 'Sub0TemporaryTransferNotification'"
+                    },
+                    {
+                        "name":"replaceInDataProvider",
+                        "condition":"ctx.activeToolsAndInfoCommand.commandId === 'Sub0TemporaryTransferNotification'"
+                    }
+                ]
+            }
+        },
+        "addFollowersToCustomPanel":{
+            "actionType":"JSFunction",
+            "method":"applyFollowerChange",
+            "deps":"js/awSubscriptionFollowerTableService",
+            "inputData":{
+               "followerObjects": "{{ctx.sub0Follower.followerObjects}}",
+                "panelContext": "{{ctx.panelContext}}",
+                "selectedObject": "{{ctx.selected}}",
+                "columnDefs":"{{ctx.sub0Follower.columnDefs}}",
+                "props": {
+                    "handler_parameters": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+                }
+            },
+            "events":{
+                "success":[
+                    {
+                        "name":"subscriptionFollowerObjects.updated"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!data._internal.isDestroyed && ( !conditions.isPanelPinned || ( conditions.isSelectionChangeEventDataPresent && ( conditions.isDeslectionDoneWhileAddPanelOpen || conditions.isPwaSelectionChangeDoneWhileAddPanelOpen)))",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "addFollowersToDataProvider":{
+            "actionType":"JSFunction",
+            "method":"addObject",
+            "inputData":{
+               "data":"{{data}}",
+               "newColor":"{{data.dataProviders.userPerformSearch.selectedObjects}}",
+               "dataProvider":"{{data.dataProviders.followers_provider}}"
+            },
+            "events":{
+               "success":[
+                  {
+                     "name":"awPanel.navigate",
+                     "eventData":{
+                        "destPanelId":"Sub0CreateSubscriptionSub"
+                     }
+                  }
+               ]
+            },
+            "deps":"js/Sub0SubscribeCommandPanelService"
+         },
+         "replaceFollowersToDataProvider": {
+             "actionType":"JSFunction",
+            "method":"relaceObject",
+            "inputData":{
+                "ctx": "{{ctx}}",
+               "newColor":"{{data.dataProviders.userPerformSearch.selectedObjects}}",
+               "dataProvider":"{{data.dataProviders.followers_provider}}"
+            },
+            "events":{
+               "success":[
+                  {
+                     "name":"awPanel.navigate",
+                     "eventData":{
+                        "destPanelId":"Sub0TemporaryTransferNotificationSub"
+                     }
+                  }
+               ]
+            },
+            "deps":"js/Sub0TempTransferNotificationService"
+         }
+    },
+    "data": {
+      "filterBox": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      }
+   },
+   "dataProviders": {
+      "userPerformSearch": {
+         "action": "search",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "single"
+      }
+   },
+   "onEvent": [
+      {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Sub0AddFollowerSub"
+            },
+
+            "action": "reveal"
+       },
+       {
+            "eventId": "addToCustomPanel",
+            "action": "addFollowersToCustomPanel"
+       },
+       {
+            "eventId": "addToDataProvider",
+            "action": "addFollowersToDataProvider"
+       },
+       {
+            "eventId": "replaceInDataProvider",
+            "action": "replaceFollowersToDataProvider"
+       }
+
+   ],
+   "i18n": {
+      "addFollower": [ "SubscriptionMessages" ],
+      "EmailAddress": [ "SubscriptionMessages" ],
+      "PhoneNumber": [ "SubscriptionMessages" ]
+   }
+}

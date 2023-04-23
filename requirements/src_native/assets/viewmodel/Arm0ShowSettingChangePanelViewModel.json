@@ -1,0 +1,186 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":{
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "updateOptionsOnLoad",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "importPreview.refreshOptions"
+                    }
+                ]
+            },
+            "deps": "js/Arm0ShowSettingChangePanel"
+        },
+        "updateOptions":
+        {
+            "actionType": "dataProvider",
+            "method": "actionsList"
+        },
+        "handleCommandSelection":{
+            "actionType": "JSFunction",
+            "method": "handleCommandSelection",
+            "inputData":
+            {
+                "data":"{{data.eventData}}"
+            },
+            "deps": "js/Arm0ShowSettingChangePanel"
+        },
+        "closeExistingBalloonPopup":
+        {
+            "actionType": "JSFunction",
+            "method": "closeExistingBalloonPopup",
+            "inputData":
+            {
+
+            },
+            "deps": "js/Arm0ShowSettingChangePanel"
+        },
+        "updateSetting": {
+            "actionType": "JSFunction",
+            "method": "changeSettingOfElement",
+            "inputData": {
+                "selectedRow": "{{data.eventData}}"
+            },
+            "deps": "js/Arm0ImportPreviewJsonHandlerService"
+        },
+        "getSetting": {
+            "actionType": "JSFunction",
+            "method": "getSetting",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx.rmselected}}"
+            },
+            "outputData": {
+                "actionItems.dbValue": ""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "importPreview.updateHeight"
+                    }
+                ]
+            },
+            "deps": "js/Arm0ImportPreviewJsonHandlerService"
+        },
+        "closeSettingChangePopupWindow": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "inputData": {
+            },
+            "deps": "js/popupService"
+        },
+        "updateHeight":{
+            "actionType": "JSFunction",
+            "method": "updateHeight",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "deps": "js/Arm0ShowSettingChangePanel"
+        }
+    },
+    "data": {
+        "actionItems":{
+            "isArray": "true",
+                "dbValue": [ {
+                        "displayName": "{{i18n.revise}}",
+                        "internalName": "Revise"
+                    },
+                    {
+                        "displayName": "{{i18n.update}}",
+                        "internalName": "Update"
+                    },
+                    {
+                        "displayName": "{{i18n.delete}}",
+                        "internalName": "Delete"
+                    },
+                    {
+                        "displayName": "{{i18n.Add}}",
+                        "internalName": "Add"
+                    },
+                    {
+                        "displayName": "{{i18n.NoChange}}",
+                        "internalName": "NoChange"
+                    }
+                ]
+            }
+    },
+    "messages":
+    {
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "importPreview.refreshOptions",
+            "action": "updateOptions"
+        },
+        {
+            "eventId": "importPreview.closeExistingBalloonPopup",
+            "cacheEventData": true,
+            "action": "closeExistingBalloonPopup"
+        },
+        {
+            "eventId": "requirements.handleCommandSelectionSetting",
+            "cacheEventData": true,
+            "action": "handleCommandSelection"
+        },
+        {
+            "eventId": "importpreview.updateSetting",
+            "cacheEventData": true,
+            "action": "updateSetting"
+        },
+        {
+            "eventId": "importPreview.closeSettingChangePopupWindow",
+            "action": "closeSettingChangePopupWindow"
+        },
+        {
+            "eventId":"importPreview.updateHeight",
+            "action":"updateHeight"
+        }
+    ],
+    "dataProviders":{
+        "actionsList":{
+            "action": "getSetting",
+            "response":"{{data.actionItems.dbValue}}",
+            "selectionModelMode": "single"
+         }
+    },
+    "i18n": {
+        "revise": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "update": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "delete": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "Add": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "NoChange": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "AcceptUpdate": [
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

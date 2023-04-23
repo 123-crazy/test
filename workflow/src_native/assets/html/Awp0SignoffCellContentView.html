@@ -1,0 +1,34 @@
+<div class="aw-layout-flexRow">
+    <!-- Cell list image -->
+    <div class="aw-widgets-cellListCellImage">
+        <aw-model-icon vmo="subPanelContext.assigneeVMO"  hideoverlay="true" exist-when="subPanelContext.assigneeVMO"></aw-model-icon>
+    </div>
+    <!-- Cell list content -->
+    <div class="aw-widgets-cellListCellContent">
+        <div class="aw-widgets-cellListCellTitleBlock" exist-when="!subPanelContext.isResoucePoolSignoff">
+            <h3 title="{{subPanelContext.props['REF(group_member,GroupMember).user'].uiValues[0]}}" class="aw-widgets-cellListCellTitle" cell-title-id="CellTitle">{{subPanelContext.props["REF(group_member,GroupMember).user"].uiValues[0]}}</h3>
+            <label class="aw-widgets-cellListCellItemType aw-base-small" title="{{subPanelContext.props['REF(group_member,GroupMember).group'].uiValues[0] + '/' + subPanelContext.props['REF(group_member,GroupMember).role'].uiValues[0]}}">{{subPanelContext.props["REF(group_member,GroupMember).group"].uiValues[0] + "/" + subPanelContext.props["REF(group_member,GroupMember).role"].uiValues[0]}}</label>
+        </div>
+        <div class="aw-widgets-cellListCellTitleBlock" exist-when="subPanelContext.isResoucePoolSignoff">
+            <h3 title="{{subPanelContext.props['REF(resource_pool,ResourcePool).group'].uiValues[0]}}" class="aw-widgets-cellListCellTitle" cell-title-id="CellTitle">{{subPanelContext.props["REF(resource_pool,ResourcePool).group"].uiValues[0]}}</h3>
+            <label class="aw-widgets-cellListCellItemType aw-base-small" title="{{subPanelContext.props['REF(resource_pool,ResourcePool).role'].uiValues[0]}}">{{subPanelContext.props["REF(resource_pool,ResourcePool).role"].uiValues[0]}}</label>
+        </div>
+        <div id="requiredModifilebleSignoffProperties" exist-when="subPanelContext.isRequiredDecisionModifiable">
+            <div class="aw-widgets-cellListCellProperties">
+                <label class="aw-widgets-propertyLabel aw-base-small">{{subPanelContext.decisionRequired}}:</label>
+                <div class="aw-widgets-propertyContainer">
+                   <aw-link prop="subPanelContext.props.fnd0DecisionRequired" action="updateDecisionRequired"></aw-link>
+                </div>
+            </div>
+        </div>
+        <div id="requiredUnModifiableSignoffProperties" exist-when="!subPanelContext.isRequiredDecisionModifiable">
+            <div class="aw-widgets-cellListCellProperties">
+                <label class="aw-widgets-propertyLabel aw-base-small">{{subPanelContext.decisionRequired}}:</label>
+                <label class="aw-widgets-propertyValue aw-base-small" title="{{subPanelContext.props.fnd0DecisionRequired.uiValues[0]}}">{{subPanelContext.props.fnd0DecisionRequired.uiValues[0]}}</label>
+            </div>
+        </div>
+        <aw-visual-indicator vmo="subPanelContext"></aw-visual-indicator>
+    </div>
+    <div aw-class="[ {'hidden': !subPanelContext.selected},{'visible': subPanelContext.selected},{'aw-widgets-cellListCellCommandBarHover':!subPanelContext.selected}]">
+    </div>
+</div>

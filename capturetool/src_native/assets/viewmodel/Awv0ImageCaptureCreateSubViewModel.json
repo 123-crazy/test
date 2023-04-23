@@ -1,0 +1,108 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                 "js/aw-panel-body.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-i18n.directive",
+                 "js/aw-textbox.directive",
+                 "js/aw-button.directive"],
+    "actions" :{
+        "createImageCapture":{
+            "actionType": "JSFunction",
+            "method": "createImageCapture",
+            "inputData":
+            {
+                "captureName": "{{data.captureName.dbValue}}",
+                "captureDescription":"{{data.captureDesc.dbValue}}"
+            },
+            "deps": "js/Awv0ImageCaptureService"
+        },
+        "showImageCaptureListSubViewPanel":
+        {
+            "actionType":"Event",
+            "method":"Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name":"awPanel.navigate",
+                        "eventData":
+                        {
+                           "destPanelId": "Awv0CaptureGalleryListSub"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId":"imageCapture.imageCaptureSubViewUpdated",
+            "action":"showImageCaptureListSubViewPanel"
+        }
+    ],
+
+    "data":{
+        "captureName":
+        {
+            "displayName": "{{i18n.newCaptureNameLabel}}",
+            "type": "STRING",
+            "maxLength": 90,
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue":"{{ctx.captureName}}"
+
+        },
+        "captureDesc":
+        {
+            "displayName": "{{i18n.newCaptureDescLabel}}",
+            "type": "STRING",
+            "maxLength": 90,
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.captureDescription}}"
+
+        }
+    },
+
+    "conditions":
+    {
+        "isValidToCreateImageCapture":
+        {
+            "expression": "data.captureName.dbValue"
+        }
+    },
+
+    "i18n":
+    {
+
+        "createCapture":
+        [
+            "ImageCaptureToolMessages"
+        ],
+        "newCaptureNameLabel":
+        [
+            "ImageCaptureToolMessages"
+        ],
+        "newCaptureDescLabel":
+        [
+            "ImageCaptureToolMessages"
+        ],
+        "createButtonText":
+        [
+            "ImageCaptureToolMessages"
+        ],
+        "defaultCatpureStringPrefix":
+        [
+            "ImageCaptureToolMessages"
+        ],
+        "captureToolPanelTitle":
+        [
+            "ImageCaptureToolMessages"
+        ]
+    }
+}
+

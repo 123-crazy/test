@@ -1,0 +1,45 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions": {
+        "initaliseRulesMainPanel": {
+            "actionType": "JSFunction",
+            "method": "loadMainRulesPanelData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0IndustryRuleService"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "Acp0SPCRulesMain.contentLoaded",
+            "action": "initaliseRulesMainPanel"
+        }
+       
+    ],
+
+    "conditions": {
+        "isCustomRulesPanelVisible": {
+            "expression": "(ctx.xrtSummaryContextObject.props.acp0IndustryRule.dbValue =='Custom' && data.isSubPanelObjectLoaded) || (ctx.xrtSummaryContextObject.props.acp0ElementIndustryRule.dbValue =='Custom' && data.isSubPanelObjectLoaded)"
+        },
+        "isStandardRulesPanelVisible": {
+            "expression": "(ctx.xrtSummaryContextObject.props.acp0IndustryRule.dbValue && ctx.xrtSummaryContextObject.props.acp0IndustryRule.dbValue !='' && ctx.xrtSummaryContextObject.props.acp0IndustryRule.dbValue !='Custom') || (ctx.xrtSummaryContextObject.props.acp0ElementIndustryRule.dbValue && ctx.xrtSummaryContextObject.props.acp0ElementIndustryRule.dbValue !='' && ctx.xrtSummaryContextObject.props.acp0ElementIndustryRule.dbValue !='Custom')"
+        }
+    },
+
+    "data": {
+    },
+
+    "functions": {
+    },
+
+    "i18n": {
+
+    }
+}

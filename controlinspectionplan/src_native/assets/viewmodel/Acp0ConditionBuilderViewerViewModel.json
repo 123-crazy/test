@@ -1,0 +1,142 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-splm-table.directive",
+        "js/exist-when.directive",
+        "js/aw-break.directive",
+        "js/aw-icon-button.directive",
+        "js/visible-when.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel-section.directive"
+    ],
+    "actions": {
+        "condExprLoadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadCondExprTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.condExprDataProvider}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "sortCriteria": "{{data.columnProviders.condExprColumnProvider.sortCriteria}}",
+                "i18nString": "{{data.i18n}}"
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "searchResults": "result.treeLoadResult.childNodes"
+            },
+
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.condExprDataProvider}}",
+                "data" : "{{data}}"
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "loadRequiredProperties":  {
+            "actionType": "JSFunction",
+            "method": "loadRequiredProperties",
+            "inputData": {
+                "selectedCondObj": "{{ctx.selected}}",
+                "data":"{{data}}",
+                "ruleBuilderPanelFlag": false
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "loadRequiredPropertiesCondExprPanel": {
+            "actionType": "JSFunction",
+            "method": "loadRequiredProperties",
+            "inputData": {
+                "selectedCondObj": "{{ctx.selected}}",
+                "data":"{{data}}",
+                "ruleBuilderPanelFlag": true
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        }
+    },
+    "dataProviders": {
+        "condExprDataProvider": {
+            "action": "condExprLoadData",
+            "initializeAction": "condExprLoadData",
+            "nextAction": "condExprLoadData",
+            "previousAction": "condExprLoadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree"
+
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}"
+        }
+    },
+    "columnProviders": {
+        "condExprColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": [
+                {
+                    "fieldName":"creation_date",
+                    "sortDirection":"DESC"
+                }
+            ]
+        }
+    },
+    "grids": {
+        "condExprGrid": {
+            "dataProvider": "condExprDataProvider",
+            "columnProvider": "condExprColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        }
+    },
+    "conditions":{
+        "gridTableHideWithNoConds": {
+            "expression":"ctx.selected.type ==='Acp0Rule' && ctx.selected.props.acp0RuleCondition.dbValues.length > 0 || ctx.pselected.type ==='Acp0Rule' && ctx.pselected.props.acp0RuleCondition.dbValues.length > 0"
+        }
+    },
+    "functions": {
+    },
+    "onEvent": [
+        {
+            "eventId": "Acp0ConditionBuilderViewer.contentLoaded",
+            "action": "loadRequiredProperties"
+        }
+    ],
+    "data": {
+        "expressiontoolbarTitle": {
+            "displayName": "{{i18n.expressiontoolbarTitle}}",
+            "type": "STRING"
+        },
+        "addCondsExprs": {
+            "action": "loadRequiredPropertiesCondExprPanel",
+            "iconName": "Add",
+            "tooltip": "{{i18n.Acp0AddExprsForCondBuildTitle}}"
+        },
+        "helpAnchor": "commandPanelhelpAnchor"
+    },
+    "i18n": {
+        "Acp0AddExprsForCondBuildTitle": ["ControlInspectionPlanMessages"],
+        "buttonToAdd": ["ControlInspectionPlanMessages"],
+        "expressiontoolbarTitle": ["ControlInspectionPlanMessages"],
+        "ifString": ["ControlInspectionPlanMessages"],
+        "noExpressionHere": ["ControlInspectionPlanMessages"],
+        "propMissingInLOV": ["ControlInspectionPlanMessages"],
+        "ruleBuilderTitle": ["ControlInspectionPlanMessages"],
+        "setNCString": ["ControlInspectionPlanMessages"]
+    }
+}

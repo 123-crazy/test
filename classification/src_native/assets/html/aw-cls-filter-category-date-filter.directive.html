@@ -1,0 +1,29 @@
+<aw-cls-filter-category-date-range-filter
+    ng-if="category.showDateRangeFilter"
+    search-action="searchAction"
+    category= "category"
+    checkbox-action="checkboxAction"
+    is-bulk-filter="isBulkFilter"
+    id="{{category.displayName}}">
+</aw-cls-filter-category-date-range-filter >
+
+<aw-cls-filter-category-date-contents
+    search-action="searchAction"
+    checkbox-action="checkboxAction"
+    is-bulk-filter="isBulkFilter"
+    filter="item"
+    category= "category"
+    ng-repeat="item in category.filterValues | limitTo: category.showMoreFilter ? category.defaultFilterValueDisplayCount+category.drilldown : category.filterValues.length">
+</aw-cls-filter-category-date-contents >
+<!-- Show More/Less if years/months > 6 -->
+<div class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled"
+    ng-class="{'aw-ui-filterNameLabelDrilldown1': category.drilldown==1,
+                'aw-ui-filterNameLabelDrilldown2': category.drilldown==2,
+                'aw-ui-filterNameLabelDrilldown3': category.drilldown==3}"
+    ng-show="category.filterValues.length > category.defaultFilterValueDisplayCount+category.drilldown"
+    title="{{category.showMoreFilter ? moreText : lessText}}" ng-click="toggleFilters()" >
+    <span filterNameColorBlockId="filterLabelColorBlock1"  class="aw-ui-filterNameColorBlock {{filter.color}}"
+        visible-when="category.showEnabled && category.showColor">&nbsp;
+        </span>
+            {{category.showMoreFilter ? moreText : lessText}}
+</div>

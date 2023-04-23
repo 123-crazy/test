@@ -1,0 +1,360 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-xrt.directive",
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "neutralPartSelected"
+        },
+        "setDataForGenerateFmeaVariantAction": {
+            "actionType": "JSFunction",
+            "method": "setDataForGenerateFmeaVariant",
+            "deps": "js/qfm0FmeaManagerUtils2",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "data": ""
+            }
+        },
+        "callAutoFillMethodForGenerateVariant": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events":
+                [
+                    {
+                        "name": "setDataForGenerateFmeaVariantEvent",
+                        "condition": "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation'"
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "setSelectedObject": {
+            "actionType": "JSFunction",
+            "method": "setSelectedObject",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "generateFmea": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2020-05-FMEADataManagement",
+            "method": "generateFMEAStructure",
+            "inputData": {
+                "input": {
+                    "sourceStructInfo": {
+                        "sourceObject": {
+                            "uid": "{{data.selectedNeutralPart.uid}}",
+                            "type": "{{data.selectedNeutralPart.type}}"
+                        },
+                        "productContext": {
+                            "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}",
+                            "type": "{{ctx.aceActiveContext.context.productContextInfo.type}}"
+                        }
+                    },
+                    "rootNodeInfo": {
+                        "stringProps": {
+                            "object_name": "{{data.object_name.dbValue}}",
+                            "qfm0Id": "{{data.qfm0Id.dbValue}}",
+                            "object_desc": "{{data.object_desc.dbValue}}"
+                        },
+                        "refObjProps": {
+                            "qfm0FMEAGuideline": {
+                                "uid": "{{data.qfm0FMEAGuideline.dbValue}}",
+                                "type": "{{data.qfm0FMEAGuideline.referenceTypeName}}"
+                            }
+                        }
+                    }
+                }
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "fmeaStructure.created"
+                    }
+                ]
+            },
+            "outputData": {
+                "rootNode": "rootNode",
+                "serviceData": "serviceData"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "GenerateFmeaFailureMessage"
+                    }
+                ]
+            }
+        },
+        "generateFmeaVariantAsync": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2021-06-FMEADataManagement",
+            "method": "createVariantFMEAStructure",
+            "inputData":
+            {
+                "inputs":
+                [
+                    {
+                        "masterFMEARootNode":"{{ctx.pselected}}",
+                        "selectedSysElements":"{{ctx.mselected}}",
+                        "variantFMEARootNodeInfo":{
+                            "stringProps": {
+                                "object_name": "{{data.object_name.dbValue}}",
+                                "qfm0Id": "{{data.qfm0Id.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}"
+                            }
+                        }
+                    }
+                ],
+                "runInBackground": true
+            },
+            "outputData": {
+                "partialErrors": "partialErrors"
+            },
+            "events": {
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cancelGenFmeaVariantAndReloadFmeaTreeEvent"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.partialErrors.length > 0",
+                        "message": "GenerateFmeaVariantFailureMessage"
+                    }
+                ],
+                "success": [
+                    {
+                        "condition": "data.partialErrors === undefined",
+                        "message": "GenerateFmeaVariantSuccessMessage"
+                    }
+                ]
+            }
+        },
+        "generateFmeaVariantSync": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2021-06-FMEADataManagement",
+            "method": "createVariantFMEAStructure",
+            "inputData":
+            {
+                "inputs":
+                [
+                    {
+                        "masterFMEARootNode":"{{ctx.pselected}}",
+                        "selectedSysElements":"{{ctx.mselected}}",
+                        "variantFMEARootNodeInfo":{
+                            "stringProps": {
+                                "object_name": "{{data.object_name.dbValue}}",
+                                "qfm0Id": "{{data.qfm0Id.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}"
+                            }
+                        }
+                    }
+                ],
+                "runInBackground": false
+            },
+            "outputData": {
+                "partialErrors": "partialErrors"
+            },
+            "events": {
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cancelGenFmeaVariantAndReloadFmeaTreeEvent"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "condition": "data.partialErrors.length > 0",
+                        "message": "GenerateFmeaVariantFailureMessage"
+                    }
+                ],
+                "success": [
+                    {
+                        "condition": "data.partialErrors === undefined",
+                        "message": "GenerateFmeaVariantSuccessMessage"
+                    }
+                ]
+            }
+        },
+        "openFmeaStructure": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{data.rootNode.uid}}"
+            }
+        },
+        "cancelGenFmeaVariantAndReloadFmeaTree": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "fmeaContext.showGenFmeaVariantView",
+                "value": false
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "fmeaTree.plTable.reload"
+                    },
+                    {
+                        "name": "primaryWorkarea.selectAction",
+                        "eventData": {
+                            "selectAll": false
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "dataProviders": {
+        "neutralPartSelected": {
+            "action": "setSelectedObject",
+            "response": "{{data.selectedNeutralPartRevisionList}}",
+            "totalFound": "{{data.selectedNeutralPartRevisionList.length}}",
+            "preSelection": false
+        }
+    },
+    "columnProviders": {},
+    "grids": {},
+    "conditions": {
+        "requiredFieldsEntered": {
+            "expression": "data.qfm0Id.dbValue !=='' && data.qfm0Id.dbValue !== undefined && data.qfm0Id.dbValue !== null && data.object_name.dbValue !=='' && data.object_name.dbValue !== undefined && data.object_name.dbValue !== null && data.qfm0FMEAGuideline.dbValue !==null && data.qfm0FMEAGuideline.dbValue !== '' &&  data.qfm0FMEAGuideline.dbValue !== undefined"
+        },
+        "requiredFieldsEnteredForGenerateFmeaVariant": {
+            "expression": "ctx.mselected[0].type === 'Qfm0SystemElement' && data.qfm0Id.dbValue !=='' && data.qfm0Id.dbValue !== undefined && data.qfm0Id.dbValue !== null && data.object_name.dbValue !=='' && data.object_name.dbValue !== undefined && data.object_name.dbValue !== null"
+        },
+        "qfm0FMEASoaSyncCallCnd":{
+            "expression": "ctx.preferences && ctx.preferences.FMEA_SOA_Sync_Call && ctx.preferences.FMEA_SOA_Sync_Call.length > 0 && ctx.preferences.FMEA_SOA_Sync_Call[0].toUpperCase() === 'TRUE'"
+        },
+        "qfm0FMEASoaAsyncCallCnd":{
+            "expression": "(ctx.preferences && ctx.preferences.FMEA_SOA_Sync_Call && ctx.preferences.FMEA_SOA_Sync_Call.length > 0 && ctx.preferences.FMEA_SOA_Sync_Call[0].toUpperCase() === 'FALSE' ) || (ctx.preferences && !(ctx.preferences.FMEA_SOA_Sync_Call))"
+        }
+
+    },
+    "functions": {},
+    "data": {},
+    "i18n": {
+        "qfm0GenerateFmea": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Generate": [
+            "qualityFmeaMessages"
+        ],
+        "PartialError": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0GenerateFmeaVariantSuccess": [
+            "qualityFmeaMessages"
+        ]
+    },
+    "messages": {
+        "GenerateFmeaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.serviceData.partialErrors[0].errorValues[0].message}}"
+            ]
+        },
+        "GenerateFmeaVariantFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.partialErrors[0].errorValues[0].message}}"
+            ]
+        },
+        "GenerateFmeaVariantSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qfm0GenerateFmeaVariantSuccess}}",
+            "messageTextParams": [
+                "{{ctx.pselected.props.object_string.dbValue}}"
+            ]
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "callAutoFillMethodForGenerateVariant"
+    },
+    "onEvent": [
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "fmeaStructure.created",
+            "action": "openFmeaStructure"
+        },
+        {
+            "eventId": "fmeaStructure.created",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "setDataForGenerateFmeaVariantEvent",
+            "action": "setDataForGenerateFmeaVariantAction"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "cancelGenFmeaVariantAndReloadFmeaTreeEvent",
+            "action": "cancelGenFmeaVariantAndReloadFmeaTree"
+        }
+    ]
+}

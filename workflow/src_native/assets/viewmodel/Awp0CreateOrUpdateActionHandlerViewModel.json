@@ -1,0 +1,67 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-command-sub-panel.directive"
+    ],
+    "actions": {
+        "populateActionOrRuleHandlers": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2019-06-Workflow",
+            "method": "getRegisteredHandlers",
+            "inputData": {
+            },
+            "outputData": {
+                "handlerResponse" : "response",
+                "actionHandlers": "actionHandlers",
+                "ruleHandlers": "ruleHandlers"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "populateHandlersLOV"
+                    }
+                ]
+            }
+        },
+        "populateHandlersLOV" : {
+            "actionType": "JSFunction",
+            "method": "populateHandlersLOV",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/Awp0CreateOrUpdateTaskHandlers"
+        }
+    },
+    "functions": {
+    },
+    "dataProviders": {
+
+    },
+    "columnProviders": {
+
+    },
+    "grids": {
+
+    },
+    "data": {
+
+    },
+    "onEvent": [
+        {
+            "eventId": "populateHandlersLOV",
+            "action": "populateHandlersLOV"
+        },
+        {
+            "eventId": "Awp0CreateOrUpdateActionHandler.contentLoaded",
+            "action": "populateActionOrRuleHandlers"
+        }
+    ],
+    "conditions": {
+    },
+    "i18n": {
+        "addTitle" : [ "WorkflowDesignerMessages" ]
+    }
+}

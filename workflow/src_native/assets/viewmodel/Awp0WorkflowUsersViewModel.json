@@ -1,0 +1,120 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-tab-set.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/userPanelService"
+        },
+        "handleTabSelectionChange":
+        {
+            "actionType": "JSFunction",
+            "method": "handleTabSelectionChange",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/userPanelService"
+        }
+    },
+
+    "data":
+    {
+        "isAddButtonVisible": true,
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "panelId": "Awp0WorkflowKeyRoles",
+                    "name": "{{i18n.keyRoles}}",
+                    "resourceProviderContentType":"keyRoles",
+                    "visibleWhen":"!ctx.workflow.showOnlyResourcePoolTab",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Awp0WorkflowResourcePoolTab",
+                    "name": "{{i18n.teamAssignment}}",
+                    "resourceProviderContentType":"ResourcePool",
+                    "visibleWhen":"data.preferences.WRKFLW_allow_resourcepool_assignments[0]=='true' && !ctx.workflow.hideResourcePoolTab",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Awp0WorkflowUserTab",
+                    "name": "{{i18n.Users}}",
+                    "resourceProviderContentType":"Users",
+                    "visibleWhen":"!ctx.workflow.showOnlyResourcePoolTab",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+    "functions":
+    {
+    },
+
+    "conditions":
+    {
+        "isValidToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        },
+        "isValidObjectToAdd":
+        {
+            "expression": "conditions.isValidToAdd && data.isAddButtonVisible"
+        },
+        "isProjectObjectListEmpty":
+        {
+            "expression": "data.projectObjectList.length<=0"
+        }
+    },
+
+    "preferences":
+    [
+        "WRKFLW_allow_resourcepool_assignments",
+        "WRKFLW_show_user_assignment_options",
+        "WRKFLW_user_panel_content_display"
+    ],
+
+    "i18n":
+    {
+        "Users": [ "WorkflowCommandPanelsMessages"],
+        "ResourcePools": [ "WorkflowCommandPanelsMessages"],
+        "project": [ "WorkflowCommandPanelsMessages"],
+        "owning": [ "WorkflowCommandPanelsMessages"],
+        "none": [ "WorkflowCommandPanelsMessages"],
+        "any": [ "WorkflowCommandPanelsMessages"],
+        "keyRoles" : [ "WorkflowDesignerMessages"],
+        "teamAssignment": [ "WorkflowDesignerMessages"]
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0WorkflowUsers"
+            },
+
+            "action": "reveal"
+        },
+        {
+            "eventId": "awTab.selected",
+            "action":  "handleTabSelectionChange"
+        }
+    ]
+}

@@ -1,0 +1,218 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-in-content-search-box.directive",
+        "js/visible-when.directive"
+    ],
+    "data":{
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING"
+        }
+    },
+    "actions":{
+        "selectEvent":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "keylov.selectKeyLov",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "selectKeyLov":{
+            "actionType": "JSFunction",
+            "method": "selectNode",
+            "inputData": {
+                "data": "{{data}}",
+                "selected":"{{ctx.selected}}",
+                "type":"Attributes"
+            },
+            "deps":"js/classifyAdminService"
+        },
+        "deselectKeyLov":{
+            "actionType": "JSFunction",
+            "method": "deselectNode",
+            "inputData": {
+                "data":"{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "doSearch":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                {
+                    "name": "primaryWorkarea.reset"
+
+                } ]
+            }
+        },
+        "parseExpansion":{
+            "actionType": "JSFunction",
+            "method": "parseExpansion",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.clsAdmin}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "classes.selectPreviousKeyLov",
+                        "condition":"ctx.clsAdmin.clsTree.selectedTreeNode !== undefined && ctx.clsAdmin.clsTree.selectedTreeNode"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadKeyLov": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "data": "{{data}}",
+                "dataProviderName": "keylov",
+                "type":"KeyLov",
+                "ctx": "{{ctx.clsAdmin}}",
+                "isSearch": "{{function:checkSearch}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "keylov.expansion"
+                    }
+                ]
+            },
+            "outputData": {
+                "response": "tableSummaries"
+
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunction",
+            "method": "loadColumns",
+            "inputData": {
+                "ctx": "{{ctx.clsAdmin}}",
+                "dataProvider": "{{data.dataProviders.keylov}}",
+                "gridoptions": "{{gridOptions}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadPropertiesActionJS": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadPropertiesJS",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProviderName": "keylov",
+                "type": "KeyLov",
+                "propertyLoadInput": "request.propertyLoadInput"
+            },
+            "outputData": {},
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "selectPreviousKeyLov":{
+            "actionType": "JSFunction",
+            "method": "selectPreviousNode",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx.clsAdmin}}"
+            },
+
+            "deps": "js/classifyAdminTreeTableService"
+        }
+    },
+    "dataProviders": {
+        "keylov": {
+            "initializeAction": "loadKeyLov",
+            "nextAction": "loadKeyLov",
+            "focusAction": "loadKeyLov",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "editContext": "TABLE_CONTEXT",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "response": "data.response",
+            "selectionModelMode": "single"
+        },
+        "getTableDetails": {
+            "action": "loadPropertiesActionJS",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "structureColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex" : -1,
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "keylovTable": {
+            "dataProvider": "keylov",
+            "propertyProvider": "getTableDetails",
+            "columnProvider": "structureColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "useStaticFirstCol": true
+            }
+        }
+    },
+    "onEvent":[
+        {
+            "eventId":"keylov.selectionChangeEvent",
+            "action":"selectEvent"
+        },
+        {
+            "eventId":"keylov.selectKeyLov",
+            "action":"selectKeyLov"
+        },
+        {
+            "eventId": "keylov.dataProvider.reset",
+            "action": "deselectKeyLov"
+        },
+        {
+            "eventId": "keylov.expansion",
+            "action":"parseExpansion"
+        },
+        {
+            "eventId": "keylov.selectPreviousKeyLov",
+            "action":"selectPreviousKeyLov"
+        },
+        {
+            "eventId": "keylov.plTable.reload",
+            "action": "doSearch"
+        },
+        {
+            "eventId":"keylov.filterChangeEvent",
+            "action":"doSearch"
+        },
+        {
+            "eventId":"clsAdmin.setRelease",
+            "action":"doSearch"
+        }
+    ],
+    "messages": {},
+    "functions": {
+        "checkSearch":
+        {
+            "functionName": "checkSearch",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+    },
+    "i18n": {
+        "keylovTitle": [ "ClassificationAdminMessages" ],
+        "noResultsFound": [ "ClassificationAdminMessages" ],
+        "and": [ "ClassificationAdminMessages" ],
+        "releases" : [ "ClassificationAdminMessages" ]
+    }
+}

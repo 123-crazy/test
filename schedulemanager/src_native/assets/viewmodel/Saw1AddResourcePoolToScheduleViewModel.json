@@ -1,0 +1,198 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getResourcePool"
+            ]
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getResourcePool}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "ResourcePool",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ScheduleTask",
+                        "properties": [ {
+                            "name": "ResourceAssignment",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        } ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "deps": "js/userListService"
+        },
+        "assignResourcePoolSOA": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2008-06-ScheduleManagement",
+            "method": "addMemberships",
+            "inputData": {
+               "membershipData": "{{function:addSelectedMembers}}"
+            },
+            "events": {
+               "success": [
+                  {
+                     "name": "cdm.relatedModified",
+                     "eventData": {
+                        "relatedModified": [
+                           "{{ctx.schedule.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                    "condition": "!data.unpinnedToForm.dbValue",
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                }
+               ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.dataProviders.getResourcePool.selectedObjects.length==1",
+                        "message": "AddMemberComplete"
+                     },
+                     {
+                        "condition": "data.dataProviders.getResourcePool.selectedObjects.length>1",
+                        "message": "AddMultipleMembersComplete"
+                     }
+                ],
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "deps": "js/userListService"
+         }
+    },
+    "dataProviders": {
+        "getResourcePool": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "multiple",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "messages": {
+        "AddMemberComplete": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addMemberSuccessful}}",
+            "messageTextParams": [
+                "{{data.dataProviders.getResourcePool.selectedObjects[0]}}"
+            ]
+        },
+        "AddMultipleMembersComplete": {
+         "messageType": "INFO",
+         "messageText": "{{i18n.addMultipleMembersSuccessful}}",
+         "messageTextParams": [
+             "{{data.dataProviders.getResourcePool.selectedObjects.length}}"
+         ]
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "functions": {
+        "addSelectedMembers": {
+            "functionName": "addSelectedMembers",
+            "parameters": [
+               "{{ctx}}",
+               "{{data}}",
+               "{{data.dataProviders.getResourcePool.selectedObjects}}"
+            ]
+         }
+    },
+    "i18n": {
+        "availableSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "addMemberSuccessful": [
+            "ScheduleManagerMessages"
+        ],
+        "addMultipleMembersSuccessful": [
+            "ScheduleManagerMessages"
+       ]
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1AddResourcePoolToSchedule"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "assignResourcePoolSOA",
+            "action": "assignResourcePoolSOA"
+        }
+    ]
+}

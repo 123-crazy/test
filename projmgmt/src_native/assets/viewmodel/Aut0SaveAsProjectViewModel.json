@@ -1,0 +1,296 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-widget.directive",
+        "js/aw-textbox.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-guidance-message.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "ProjectCategoryProvider"
+        },
+        "Aut0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Aut0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "getPanelData":{
+            "actionType": "JSFunction",
+            "method": "setSelectedProjectAndProperty",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data":"{{data}}"
+            },
+            "outputData": {
+                "sourceProject": ""
+            },
+            "deps": "js/Aut0AddProjectCommandService"
+        },
+        "loadProjectCategories":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData":
+            {
+                "initialData":
+                {
+                    "lovInput":
+                    {
+                        "boName": "TC_Project",
+                        "operationName": "Search"
+                    },
+                    "propertyName": "fnd0ProjectCategory"
+                }
+            },
+            "outputData": {
+                "projectCategories": "{{function:getProjectCategoryList}}",
+                "moreValuesExist":"moreValuesExist"
+            },
+            "deps": "js/Aut0AddProjectCommandService"
+        },
+        "saveAsProject":{
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Security-2021-12-AwProjectLevelSecurity",
+            "method": "saveAsProject",
+            "deps": "js/Aut0AddProjectCommandService",
+            "inputData":
+            {
+                "inputInfo":{
+                    "projectId": "{{data.ProjectId.dbValue}}",
+                    "projectName": "{{data.ProjectName.dbValue}}",
+                    "projectDescription": "{{data.ProjectDesc.dbValue}}",
+                    "useProgramSecurity": "{{function:isProgram}}",
+                    "projectCategory": "{{data.ProjectCategory.uiValue}}",
+                    "deepCopy": "{{data.deepCopy.dbValue}}",
+                    "propertyMap": {}
+                },
+                "sourceProject": "{{data.sourceProject}}"
+            },
+            "outputData":{
+                "createProjectResponse":"",
+                "createdProject": "{{function:getCreatedProject}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "reloadPanelData",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    },
+                    {
+                        "name":"addProject.projectCreated",
+                        "excludeLocalDataCtx": true,
+                        "condition": "data.createdProject",
+                        "eventData": {
+                            "project": "{{data.createdProject}}",
+                            "isUnPinned":"{{data.pinnedToForm.dbValue}}"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                        "condition": "data.createdProject",
+                        "message": "createProjectSuccessMessage"
+                    }
+                ],
+                "failure":[
+                    {
+                        "condition":"data.createProjectResponse.partialErrors[0].errorValues",
+                        "message":"createProjectFailureMessage"
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+
+    "data": {
+        "Aut0AddProjectPinCommands":"Aut0_oneStepPinCommands",
+        "sourceProject":"",
+        "ProjectId":{
+            "displayName": "{{i18n.projectId}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "labelPosition:": "PROPERTY_LABEL_AT_TOP",
+            "dispValue":"",
+            "maxLength":32
+        },
+        "ProjectName":{
+            "displayName": "{{i18n.projectName}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "labelPosition:": "PROPERTY_LABEL_AT_TOP",
+            "dispValue":"",
+            "maxLength":32
+        },
+        "ProjectDesc": {
+            "displayName": "{{i18n.projectDesc}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "labelPosition:": "PROPERTY_LABEL_AT_TOP",
+            "dispValue":""
+        },
+        "useProgramSecurity": {
+            "displayName": "{{i18n.useProgramSecurity}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition:": "PROPERTY_LABEL_AT_TOP",
+            "propertyRadioFalseText": "{{i18n.programRadioLabel}}",
+            "propertyRadioTrueText":"{{i18n.projectRadioLabel}}",
+            "vertical":true
+        },
+        "ProjectCategory":{
+            "displayName": "{{i18n.projectCategory}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "labelPosition:": "PROPERTY_LABEL_AT_TOP",
+            "hasLov":true,
+            "dataProvider":"ProjectCategoryProvider"
+        },
+        "deepCopy": {
+            "displayName": "{{i18n.deepCopy}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": false,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "dataProviders":{
+        "ProjectCategoryProvider":{
+            "dataProviderType": "Action",
+            "action": "loadProjectCategories",
+            "response": "{{data.projectCategories}}",
+            "moreValuesExist": "{{data.moreValuesExist}}"
+        }
+    },
+    "i18n": {
+        "projectId":[ "ProjmgmtConstants" ],
+        "projectName":[ "ProjmgmtConstants" ],
+        "projectDesc":[ "ProjmgmtConstants" ],
+        "projectCategory":[ "ProjmgmtConstants" ],
+        "useProgramSecurity":[ "ProjmgmtConstants" ],
+        "projectRadioLabel":[ "ProjmgmtConstants" ],
+        "programRadioLabel":[ "ProjmgmtConstants" ],
+        "propertiesSection":[ "ProjmgmtConstants" ],
+        "saveAsProjectTitle":[ "ProjmgmtConstants" ],
+        "saveAsButton":[ "ProjmgmtConstants" ],
+        "createProjectSuccess":[ "ProjmgmtConstants" ],
+        "deepCopy":[ "ProjmgmtConstants" ],
+        "saveAsPanelInfoMessage":[ "ProjmgmtConstants" ]
+    },
+    "functions": {
+        "getProjectCategoryList": {
+            "functionName": "getProjectCategoryList",
+            "parameters": []
+        },
+        "getCreatedProject": {
+            "functionName": "getCreatedProject",
+            "parameters": []
+        },
+        "isProgram": {
+            "functionName": "isProgram",
+            "parameters": [
+                "{{data.useProgramSecurity.dbValue}}"
+            ]
+        }
+    },
+    "messages": {
+        "createProjectSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.createProjectSuccess}}",
+            "messageTextParams": [
+                "{{data.createdProject.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "createProjectFailureMessage":{
+            "messageType": "ERROR",
+            "messageText": "{{data.createProjectResponse.partialErrors[0].errorValues[0].message}}"
+        },
+        "infoMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.saveAsPanelInfoMessage}}"
+        }
+    },
+    "onEvent":
+     [
+         {
+             "eventId": "Aut0AddProjectCommandPanel.Aut0AddProjectSetUnPin",
+             "cacheEventData": true,
+             "action": "Aut0SetUnPin"
+         },
+         {
+             "eventId": "Aut0AddProjectCommandPanel.Aut0AddProjectSetPin",
+             "cacheEventData": true,
+             "action": "Aut0SetPin"
+         },
+         {
+            "eventId": "awPanel.reveal",
+            "action": "getPanelData"
+        },
+        {
+            "eventId": "reloadPanelData",
+            "action": "getPanelData"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        }
+    ]
+}

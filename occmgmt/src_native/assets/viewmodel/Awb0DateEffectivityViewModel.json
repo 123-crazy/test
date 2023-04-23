@@ -1,0 +1,98 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                "js/aw-link-with-popup.directive",
+                "js/aw-include.directive"
+               ],
+
+    "actions":
+    {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "initializeDateEffectivityInfo"
+                }
+            ]
+        },
+        "populateContextKey":{
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "initializeDateEffectivityInfo":
+        {
+            "actionType": "JSFunction",
+            "method": "getInitialDateEffectivityConfigurationData",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/dateEffectivityConfigurationService"
+        },
+        "updateCurrentDateEffectivity": {
+            "actionType": "JSFunction",
+            "method": "updateCurrentDateEffectivity",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/dateEffectivityConfigurationService"
+        }
+    },
+    "conditions": {
+        "isUpdateApplicable": {
+            "expression": "data.viewKey === viewKey"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeDateEffectivityInfo"
+        },
+        {
+            "eventId": "awConfigPanel.effectivityDateChanged",
+            "cacheEventData": true,
+            "condition": "conditions.isUpdateApplicable",
+            "action": "updateCurrentDateEffectivity"
+        }
+    ],
+    "data":
+    {
+        "currentEffectiveDate":
+        {
+            "uiValue": "{{data.currentEffectiveDate}}",
+            "type": "DATE"
+        },
+        "occurrenceManagementTodayTitle":
+        {
+            "dbValue": "{{i18n.occurrenceManagementTodayTitle}}",
+            "uiValue": "{{i18n.occurrenceManagementTodayTitle}}",
+            "displayName": "{{i18n.occurrenceManagementTodayTitle}}",
+            "type": "STRING"
+        },
+        "isEffectiveDateFeatureReadOnly":
+        {
+            "dbValue": false,
+            "type": "BOOLEAN"
+        },
+        "multipleGroups": {
+            "uiValue": "{{i18n.multipleGroups}}",
+            "type": "STRING"
+        }
+    },
+
+    "i18n":
+    {
+        "occurrenceManagementTodayTitle": ["OccurrenceManagementConstants"],
+        "multipleGroups": ["OccurrenceManagementConstants"]
+    }
+}

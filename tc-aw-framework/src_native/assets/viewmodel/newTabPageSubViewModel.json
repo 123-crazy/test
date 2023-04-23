@@ -1,0 +1,1127 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-xrt.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-type-cell.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-listbox.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-textbox.directive",
+        "js/aw-textarea.directive",
+        "js/aw-layout-slot.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive",
+        "js/aw-title-link.directive"
+    ],
+    "data": {
+        "moreLink": {
+            "displayName": "{{i18n.MORE_LINK_TEXT}}"
+        },
+        "filterBox": {
+            "displayName": "{{i18n.FILTER_TEXT}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "widgetProjectSectionCommands": "uiwidget_projectSectionCommands",
+        "datasetName": {
+            "displayName": "{{i18n.datasetName}}",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "datasetDesc": {
+            "displayName": "{{i18n.datasetDesc}}",
+            "type": "STRING"
+        },
+        "reference": {
+            "displayName": "{{i18n.reference}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "datasetType": {
+            "displayName": "{{i18n.datasetType}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "actions": {
+        "initNewTabPageSub": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "registerNewTabPageSubCB"
+                }
+            ]
+        },
+        "registerNewTabPageSubCB": {
+            "actionType": "JSFunction",
+            "method": "registerNewTabPageSubCB",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "showMoreLinkStyles": {
+            "actionType": "JSFunction",
+            "method": "showMoreLinkStyles",
+            "inputData": {
+                "data": "{{data.showMoreLinkStyles}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data.clearSelectedType}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "loadUserProjects": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "inputData": {
+                "data": [
+                    "{{ctx.userSession.props.project.dbValues[0]}}"
+                ]
+            },
+            "deps": "soa/dataManagementService"
+        },
+        "assignUserProjects": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "condition": "ctx.userSession.props.project.dbValues[0]!=='' && ctx.hasProjects",
+                    "name": "init.assignedProjectsProvider"
+                } ]
+            }
+        },
+        "getRecentUsedTypes": {
+            "actionType": "JSFunctionAsync",
+            "method": "getRecentUsedTypes",
+            "inputData": {
+                "data": "{{data}}",
+                "filterTypesString": "{{data.includeTypes}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "getOwningProjectsAct": {
+            "actionType": "JSFunction",
+            "method": "createViewModelObjectById",
+            "inputData": {
+                "uid": "{{ctx.userSession.props.project.dbValues[0]}}",
+                "operationName": "CREATE"
+            },
+            "outputData": {
+                "owningProjects": ""
+            },
+            "deps": "js/tcViewModelObjectService"
+        },
+        "updateRecentTypes": {
+            "actionType": "JSFunction",
+            "method": "updateRecentUsedTypes",
+            "inputData": {
+                "recentTypeName": "{{data.secondaryType}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "backToTypeSelPanel": {
+            "actionType": "JSFunction",
+            "method": "backToTypeSelPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "updateRecentUsedTypes": {
+            "actionType": "JSFunction",
+            "method": "updateRecentUsedTypes",
+            "inputData": {
+                "recentTypeName": "{{data.objCreateInfo.createType}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "genericAddObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2016-09-DataManagement",
+            "method": "createAttachAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "policy": {
+                "types": [ {
+                    "name": "Item",
+                    "properties": [ {
+                        "name": "revision_list"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}",
+                "datasetInfos": "{{function:getDatasets}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "addObject.objectcreated"
+                    },
+                    {
+                        "name": "addObject.datasetCommitted.hosting",
+                        "condition": "ctx.HostedFileNameContext.filename && data.fmsTicket",
+                        "eventData": {
+                            "createdObjects": "{{data.createdObject}}",
+                            "filename": "{{data.fileName}}",
+                            "ticket": "{{data.fmsTicket}}"
+                        }
+                    },
+                    {
+                        "name": "addObject.setTarget",
+                        "condition": "!data.pasteOnTargetCondition && data.targetObject != undefined && (data.filesToBeRelated === undefined || data.filesToBeRelated && data.filesToBeRelated.length === 0)"
+                    },
+                    {
+                        "name": "addObject.toTargetSuccess",
+                        "condition": "data.pasteOnTargetCondition && data.targetObject != undefined && (data.filesToBeRelated === undefined || data.filesToBeRelated && data.filesToBeRelated.length === 0)"
+                    },
+                    {
+                        "name": "addObject.startMultiFileUpload",
+                        "condition": "data.filesToBeRelated && data.filesToBeRelated.length > 0"
+                    },
+                    {
+                        "name": "addObject.assignProjects",
+                        "condition": "data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects.length>0"
+                    }
+                ],
+                "failure": [ {
+                        "name": "addObject.setTarget",
+                        "condition": "!data.pasteOnTargetCondition && data.createdObject && data.targetObject"
+                    },
+                    {
+                        "name": "addObject.toTargetSuccess",
+                        "condition": "data.pasteOnTargetCondition && data.createdObject && data.targetObject"
+                    },
+                    {
+                        "name": "addObject.addOprfailed"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode.code===252106",
+                        "message": "addedObjectIsNotUnique"
+                    },
+                    {
+                        "condition": "errorCodes[0].code !== 252106",
+                        "message": "genericAddObjectFailure"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "getDatasetTypeInfo": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-06-DataManagement",
+            "method": "getDatasetTypeInfo",
+            "inputData": {
+                "datasetTypeNames": [
+                    "{{data.creationType.props.type_name.dbValue}}"
+                ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "DatasetType",
+                    "properties": [ {
+                        "name": "datasettype_name"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "fileExtension": "{{function:getFileExtension",
+                "datasetTypeList": "{{function:getDatasetTypeFromTypeInfo}}",
+                "references": "{{function:getReferences}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.getDefaultRelation",
+                    "condition": "data.targetObject != undefined"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "getDefaultRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-DataManagement",
+            "method": "getDefaultRelation",
+            "inputData": {
+                "input": [ {
+                    "primaryType": "{{data.targetObject.type}}",
+                    "secondaryType": "{{data.isDatasetCreate ? data.creationType.props.datasettype_name.dbValues[0]: data.creationType.props.type_name.dbValues[0]}}"
+                } ]
+            },
+            "outputData": {
+                "defaultRelation": "output[0].defaultRelation",
+                "secondaryType": "output[0].secondaryType"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.updateRelationList"
+                } ],
+                "failure": [ {
+                    "name": "relations.updateRelationList"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateRelationList": {
+            "actionType": "JSFunctionAsync",
+            "method": "updateRelationList",
+            "inputData": {
+                "data": "{{data}}",
+                "type": "{{data.eventData.selectedObjects[0].type}}",
+                "sourceObjectSet":"{{ctx.panelContext.objectSetSource}}"
+            },
+            "outputData": {
+                "relationList": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "relationList.updated"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "initiateCreation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "dataset.initDSCreateParams",
+                        "condition": "data.isDatasetCreate"
+                    },
+                    {
+                        "name": "dataset.getReferenceInfo",
+                        "condition": "data.isDatasetCreate"
+                    },
+                    {
+                        "name": "relations.getDefaultRelation",
+                        "condition": "!data.isDatasetCreate && data.targetObject != undefined && data.creationType"
+                    }
+                ]
+            }
+        },
+        "initDSCreateParams": {
+            "actionType": "JSFunction",
+            "method": "initDSCreateParams",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "getDatasetTypesWithDefaultRelationForDeliverable": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2015-10-DataManagement",
+            "method": "getDatasetTypesWithDefaultRelation",
+            "inputData": {
+                "fileExtensions": [
+                    "{{data.fileExt}}"
+                ],
+                "parent": {
+                    "type": "unknownType",
+                    "uid": "AAAAAAAAAAAAAA"
+                }
+            },
+            "policy": {
+                "types": [ {
+                    "name": "DatasetType",
+                    "properties": [ {
+                        "name": "datasettype_name"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "datasetTypesWithDefaultRelInfo": "output[0].datasetTypesWithDefaultRelInfo",
+                "fileExtension": "output[0].fileExtension",
+                "fileFormat": "output[0].datasetTypesWithDefaultRelInfo[0].refInfos.fileFormat",
+                "datasetTypeList": "{{function:getDatasetTypesFromTypesWithRelInfo}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.getDefaultRelation",
+                    "condition": "data.targetObject != undefined"
+                },
+                {
+                    "name": "addObject.updateTypeAndReferences",
+                    "condition": "data.targetObject != undefined && data.references.length>1"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "getDatasetTypesWithDefaultRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2015-10-DataManagement",
+            "method": "getDatasetTypesWithDefaultRelation",
+            "inputData": {
+                "fileExtensions": [
+                    "{{data.fileExt}}"
+                ],
+                "parent": {
+                    "type": "{{data.targetObject.type}}",
+                    "uid": "{{data.targetObject.uid}}"
+                }
+            },
+            "policy": {
+                "types": [ {
+                    "name": "DatasetType",
+                    "properties": [ {
+                        "name": "datasettype_name"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "datasetTypesWithDefaultRelInfo": "output[0].datasetTypesWithDefaultRelInfo",
+                "fileExtension": "output[0].fileExtension",
+                "fileFormat": "output[0].datasetTypesWithDefaultRelInfo[0].refInfos.fileFormat",
+                "datasetTypeList": "{{function:getDatasetTypesFromTypesWithRelInfo}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.getDefaultRelation",
+                    "condition": "data.targetObject != undefined"
+                },
+                {
+                    "name": "addObject.updateTypeAndReferences",
+                    "condition": "data.targetObject != undefined && data.references.length>1"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateTypeAndReferences": {
+            "actionType": "JSFunction",
+            "method": "updateTypeAndReferences",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "addObjectToTarget": {
+            "actionType": "JSFunctionAsync",
+            "method": "execute",
+            "inputData": {
+                "targetObject": "{{data.targetObject}}",
+                "sourceObjects": "{{data.objToRelateBasedOnConfiguredRevRule}}",
+                "relationType": "{{data.creationRelation.dbValue}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "addObject.toTargetSuccess"
+                } ],
+                "failure": [ {
+                    "name": "pasteItem.commitFailed"
+                } ]
+            },
+            "deps": "js/pasteService"
+        },
+        "addObjectToTargetSuccess": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": "{{conditions.isRefreshRequired}}",
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}",
+                            "relations": "",
+                            "relatedModified": [
+                                "{{data.targetObject}}"
+                            ],
+                            "createdObjects": [
+                                "{{data.createdObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValues",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                        "condition": "data.createdObject && !data.revision__awp0ProcessTemplates.dbValue",
+                        "message": "createObjectSuccess"
+                    },
+                    {
+                        "condition": "data.createdObject && data.revision__awp0ProcessTemplates.dbValue",
+                        "message": "submitObjectSuccess"
+                    }
+                ]
+            }
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [ {
+                    "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                    "objectToAssign": [
+                        "{{data.createdMainObject}}"
+                    ],
+                    "objectToRemove": []
+                } ]
+            }
+        },
+        "navigateToNewTabPage": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "addObjectPrimarySub"
+                    }
+                } ]
+            }
+        },
+        "generateNextValues": {
+            "actionType": "JSFunctionAsync",
+            "method": "autoAssignAllProperties",
+            "inputData": {
+                "data": "{{data}}",
+                "operationType": "CREATE"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addObject.enableAddBtnForPinnedPanel"
+                } ]
+            },
+            "deps": "js/autoAssignService"
+        },
+        "updateCtxVariableFalse": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "name": "addItemEventProgressing"
+            },
+            "deps": "js/appCtxService"
+        },
+        "startCreateObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "dataset.createObject",
+                        "condition": "data.isDatasetCreate && !data.isDSMUsable"
+                    },
+                    {
+                        "name": "plmd.createObject",
+                        "condition": "data.isDatasetCreate && data.isDSMUsable"
+                    },
+                    {
+                        "name": "generic.createObject",
+                        "condition": "!data.isDatasetCreate"
+                    }
+                ]
+            }
+        },
+
+        "uploadFileJs": {
+
+            "actionType": "JSFunction",
+            "method": "uploadFile",
+
+            "inputData": {
+
+                "dataProvider": "{{data}}"
+
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code===9184",
+                        "message": "invalidFileUpload"
+                } ]
+            },
+
+            "deps": "js/fileUploadUtils"
+
+        },
+        "fireCompleteEvent": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "gwt.CreateOrAddObjectCompleteEvent",
+                    "eventData": {
+                        "createdObjs": [
+                            "{{data.createdObject}}"
+                        ]
+                    }
+                } ]
+            }
+        },
+        "createPLMDDataset": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-04-DataManagement",
+            "method": "createDatasets",
+            "inputData": {
+                "input": [ {
+                    "clientId": "{{data.datasetName.dbValue}}",
+                    "container": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    },
+                    "relationType": "{{data.creationRelation.dbValue}}",
+                    "description": "{{data.datasetDesc.dbValue}}",
+                    "name": "{{data.datasetName.dbValue}}",
+                    "type": "{{data.datasetType.dbValue.props.object_string.dbValues[0]}}"
+                } ]
+            },
+            "outputData": {
+                "commitInfos": "datasetOutput[0].commitInfo[0]",
+                "relatedModified": "datasetOutput[0].dataset",
+                "createdObject": "datasetOutput[0].dataset"
+            },
+            "events": {
+                "success": [ {
+                    "name": "plmd.uploadPLMD"
+                } ]
+            }
+        },
+        "getUploadPLMD": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2014-10-FileManagement",
+            "method": "getPlmdFileTicketForUpload",
+            "inputData": {
+                "infos": [ {
+                    "dataset": "{{data.createdObject}}",
+                    "namedReferenceName": "{{data.reference.dbValue.referenceName}}"
+                } ]
+            },
+            "outputData": {
+                "fmsTicket": "ticket"
+            },
+            "events": {
+                "success": [ {
+                        "name": "ticket.openFile"
+                    },
+                    {
+                        "name": "addObject.setTarget",
+                        "condition": "data.targetObject != undefined"
+                    },
+                    {
+                        "name": "addObject.objectcreated"
+                    }
+                ]
+            }
+        },
+
+        "openFile": {
+            "actionType": "openFile",
+            "inputData": {
+                "fileTicket": "{{data.fmsTicket}}"
+            }
+        },
+        "startMultiFileUpload": {
+            "actionType": "JSFunction",
+            "method": "startMultiFileUpload",
+            "inputData": {
+                "data": "{{data}}",
+                "fmsUrl": "{{Constants.fmsUrl}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "initNextUpload": {
+            "actionType": "JSFunction",
+            "method": "initNextUpload",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "uploadReady": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.fileUpload"
+                } ]
+            }
+        },
+        "fileUpload": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+                    "data": "{{data.formData}}"
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "addObject.initNextUpload"
+                } ],
+                "failure": [ {
+                        "name": "addObject.commitFailed"
+                    },
+                    {
+                        "name": "addObject.initNextUpload"
+                    }
+                ]
+            }
+        },
+        "commitUploadedDataset": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-FileManagement",
+            "method": "commitDatasetFiles",
+            "inputData": {
+                "commitInput": "{{data.commitInput}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "addObject.setTarget",
+                        "condition": "!data.pasteOnTargetCondition"
+                    },
+                    {
+                        "name": "addObject.toTargetSuccess",
+                        "condition": "data.pasteOnTargetCondition"
+                    }
+                ],
+                "failure": [ {
+                        "name": "addObject.commitFailed"
+                    },
+                    {
+                        "name": "addObject.setTarget",
+                        "condition": "!data.pasteOnTargetCondition"
+                    },
+                    {
+                        "name": "addObject.toTargetSuccess",
+                        "condition": "data.pasteOnTargetCondition"
+                    }
+                ]
+            }
+        },
+        "evaluateObjsBasedOnConfiguredRevRule": {
+            "actionType": "JSFunction",
+            "method": "evaluateObjsBasedOnConfiguredRevRule",
+            "inputData": {
+                "objectToEvaluateForExactRelation": [
+                    "{{data.createdObject}}"
+                ]
+            },
+            "outputData": {
+                "objToRelateBasedOnConfiguredRevRule": ""
+            },
+            "deps": "js/awConfiguredRevService",
+            "events": {
+                "success": [ {
+                    "name": "addObject.newObjectToRelateEvaluated"
+                } ]
+            }
+        },
+        "getDatasetFileExtensions": {
+            "actionType": "JSFunctionAsync",
+            "deps": "js/addObjectUtils",
+            "method": "getDatasetFileExtensions",
+            "inputData": {
+                "0": {
+                    "relationMap": "{{data.relationMap}}"
+                }
+            },
+            "outputData": {
+                "fileExtension": ""
+            }
+        }
+    },
+    "dataProviders": {
+        "getRecentTypesProvider": {
+            "action": "getRecentUsedTypes",
+            "response": "{{data.recentUsedTypes}}",
+            "totalFound": "{{data.recentUsedTypes.length}}",
+            "selectionModelMode": "single"
+        },
+        "getAssignedProjectsProvider": {
+            "response": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+            "totalFound": "{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_removeProjectCellCommandAction"
+        },
+        "getOwningProjectsProvider": {
+            "action": "getOwningProjectsAct",
+            "response": [
+                "{{data.owningProjects}}"
+            ],
+            "totalFound": "{{data.owningProjects.length}}",
+            "preSelection": false,
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreatedObject": {
+            "functionName": "getCreatedObject",
+            "parameters": []
+        },
+        "getFileFormat": {
+            "functionName": "getFileFormat",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getDatasets": {
+            "functionName": "getDatasets",
+            "parameters": []
+        },
+        "getDatasetTypesFromTypesWithRelInfo": {
+            "functionName": "getDatasetTypesFromTypesWithRelInfo",
+            "parameters": [
+                "{{data.datasetTypeList}}",
+                "{{data.datasetType}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showFileUploadWidget": {
+            "expression": "data.selectedTab.panelId === 'newTabPageSub' && !data.isDSMUsable && ((!data.creationType && ctx.addObject.showDataSetUploadPanel) || data.isDatasetCreate)"
+        },
+        "showFileUploadInput": {
+            "expression": "!ctx.HostedFileNameContext.filename"
+        },
+        "showHostUploadInput": {
+            "expression": "ctx.HostedFileNameContext.filename"
+        },
+        "hideSearchBox": {
+            "expression": "data.dataProviders.awTypeSelector.viewModelCollection.totalFound <= 10 && !conditions.moreLinkShown && data.maxRecentTypeCount<=0"
+        },
+        "showTypeselectorPanel": {
+            "expression": "!data.creationType"
+        },
+        "showGenericCreatePanel": {
+            "expression": "data.creationType && !data.isDatasetCreate"
+        },
+        "showDatasetCreatePanel": {
+            "expression": "data.isDatasetCreate"
+        },
+        "isRefreshRequired": {
+            "expression": "ctx.addObject.refreshFlag && !data.unpinnedToForm.dbValue"
+        },
+        "moreLinkShown": {
+            "expression": "ctx.addObject.moreLinkShown && data.isMoreLinkShown && data.maxRecentTypeCount<=0"
+        }
+    },
+    "messages": {
+        "invalidObjectWarning": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.invalidObjectWarning}}",
+            "messageTextParams": [
+                "{{data.fileName}}",
+                "{{ctx.panelContext.objectSetSource}}"
+            ]
+        },
+        "createObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pasteSuccessful}}",
+            "messageTextParams": [
+                "{{data.createdObject.props.object_string.dbValues[0]}}"
+            ]
+        },
+        "genericAddObjectFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "addedObjectIsNotUnique": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.addedObjectIsNotUnique}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValues[0]}}",
+                "{{data.item_id.dbValues[0]}}"
+            ]
+        },
+        "invalidFileUpload": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "submitObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.submitSuccessful}}",
+            "messageTextParams": [
+                "{{data.createdObject.props.object_string.dbValues[0]}}"
+            ]
+
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "newTabPageSub"
+            },
+            "action": "getDatasetFileExtensions"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "newTabPageSub"
+            },
+            "action": "getRecentTypesProvider"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadUserProjects"
+        },
+        {
+            "eventId": "relationList.updated",
+            "action": "updateRecentTypes"
+        },
+        {
+            "eventId": "awTab.selected",
+            "action": "backToTypeSelPanel"
+        },
+        {
+            "eventId": "addObject.startCreateObject",
+            "action": "startCreateObject"
+        },
+        {
+            "eventId": "addObject.objectcreated",
+            "action": "fireCompleteEvent"
+        },
+        {
+            "eventId": "addObject.enableAddBtnForPinnedPanel",
+            "action": "updateCtxVariableFalse"
+        },
+        {
+            "eventId": "addObject.addOprfailed",
+            "action": "updateCtxVariableFalse"
+        },
+        {
+            "eventId": "generic.createObject",
+            "action": "genericAddObject"
+        },
+        {
+            "eventId": "dataset.createObject",
+            "action": "uploadFileJs"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "action": "assignUserProjects"
+        },
+        {
+            "eventId": "getRecentTypesProvider.selectionChangeEvent",
+            "action": "assignUserProjects"
+        },
+        {
+            "eventId": "addObject.setTarget",
+            "action": "evaluateObjsBasedOnConfiguredRevRule"
+        },
+        {
+            "eventId": "addObject.newObjectToRelateEvaluated",
+            "action": "addObjectToTarget"
+        },
+        {
+            "eventId": "addObject.toTargetSuccess",
+            "action": "addObjectToTargetSuccess"
+        },
+        {
+            "eventId": "addObject.objectcreated",
+            "action": "updateRecentUsedTypes"
+        },
+        {
+            "eventId": "addObject.assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "addObject.assignProjects",
+            "action": "updateCtxVariableFalse"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "getAssignedProjectsProvider"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "navigateToNewTabPage"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "action": "initiateCreation"
+        },
+        {
+            "eventId": "getRecentTypesProvider.selectionChangeEvent",
+            "action": "initiateCreation"
+        },
+        {
+            "eventId": "dataset.getReferenceInfo",
+            "action": "getDatasetTypeInfo"
+        },
+        {
+            "eventId": "dataset.getDatasetTypesWithDefaultRelation",
+            "action": "getDatasetTypesWithDefaultRelation"
+        },
+        {
+            "eventId": "datasetForDeliverable.getDatasetTypesWithDefaultRelation",
+            "action": "getDatasetTypesWithDefaultRelationForDeliverable"
+        },
+        {
+
+            "eventId": "dataset.initDSCreateParams",
+            "action": "initDSCreateParams"
+        },
+        {
+
+            "eventId": "relations.getDefaultRelation",
+            "action": "getDefaultRelation"
+        },
+        {
+            "eventId": "relations.updateRelationList",
+            "action": "updateRelationList"
+        },
+        {
+            "eventId": "plmd.uploadPLMD",
+            "action": "getUploadPLMD"
+        },
+        {
+            "eventId": "ticket.openFile",
+            "action": "openFile"
+        },
+        {
+            "eventId": "plmd.createObject",
+            "action": "createPLMDDataset"
+        },
+        {
+            "eventId": "awPanel.loadNextValues",
+            "action": "generateNextValues"
+        },
+        {
+            "eventId": "init.assignedProjectsProvider",
+            "action": "getOwningProjectsProvider"
+        },
+        {
+            "eventId": "addObject.startMultiFileUpload",
+            "action": "startMultiFileUpload"
+        },
+        {
+            "eventId": "addObject.initNextUpload",
+            "action": "initNextUpload"
+        },
+        {
+            "eventId": "addObject.uploadReady",
+            "action": "uploadReady"
+        },
+        {
+            "eventId": "addObject.fileUpload",
+            "action": "fileUpload"
+        },
+        {
+            "eventId": "addObject.commitUploadedDataset",
+            "action": "commitUploadedDataset"
+        },
+        {
+            "eventId": "addObject.updateTypeAndReferences",
+            "action": "updateTypeAndReferences"
+        }
+    ],
+    "i18n": {
+        "invalidObjectWarning": [
+            "addObjectMessages"
+        ],
+        "addedObjectIsNotUnique": [
+            "addObjectMessages"
+        ],
+        "LOADING_TEXT": [
+            "BaseMessages"
+        ],
+        "MORE_LINK_TEXT": [
+            "BaseMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "FILTER_TEXT": [
+            "BaseMessages"
+        ],
+        "datasetType": [
+            "awAddDirectiveMessages"
+        ],
+        "recentSectionTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "otherSectionTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "ownProjectSectionTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "projectsSectionTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "pasteSuccessful": [
+            "awAddDirectiveMessages"
+        ],
+        "submitSuccessful": [
+            "awAddDirectiveMessages"
+        ],
+        "pasteSuccessfulWithTargetLocation": [
+            "awAddDirectiveMessages"
+        ],
+        "submitSuccessfulWithTargetLocation": [
+            "awAddDirectiveMessages"
+        ],
+        "fileUploadInProgress": [
+            "awAddDirectiveMessages"
+        ],
+        "fileUploadError": [
+            "awAddDirectiveMessages"
+        ],
+        "uploadFile": [
+            "awAddDirectiveMessages"
+        ],
+        "datasetName": [
+            "awAddDirectiveMessages"
+        ],
+        "datasetDesc": [
+            "awAddDirectiveMessages"
+        ],
+        "reference": [
+            "awAddDirectiveMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onInit": "initNewTabPageSub"
+    }
+}

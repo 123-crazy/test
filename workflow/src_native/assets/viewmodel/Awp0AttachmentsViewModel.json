@@ -1,0 +1,144 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/exist-when.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "createObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateObject"
+                } ]
+            }
+        },
+        "updateCtxVariable": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "register",
+                "name": "addItemEventProgressing",
+                "value": true
+            }
+        },
+        "createRelationForPaletteOrSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateRelation"
+                }]
+            }
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+            "deps": "js/autoAssignService"
+        },
+        "clearAddContext": {
+            "actionType": "JSFunction",
+            "deps": "js/appCtxService",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "0": "addObject"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "condition": "!data.isDestroyed()",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "clearAddEventProgContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "0": "addItemEventProgressing"
+            },
+            "deps": "js/appCtxService"
+        },
+        "updateAddContextClosePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "!data.isDestroyed()",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "updateAddContextKeepPanelOpen": {
+            "actionType": "JSFunction",
+            "deps": "js/addObjectUtils",
+            "method": "updateAddObjectContext",
+            "inputData": {}
+        }
+    },
+    "data": {
+    },
+    "dataProviders": {
+    },
+    "functions": {
+    },
+    "onEvent": [ {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'mselected'",
+            "action": "updateAddContextClosePanel"
+        },
+        {
+            "eventId": "Awp0ShowCreateObject.contentUnloaded",
+            "action": "clearAddContext"
+        },
+        {
+            "eventId": "addObject.startCreateObject",
+            "action": "updateCtxVariable"
+        },
+        {
+            "eventId": "Awp0AddObject.contentUnloaded",
+            "action": "clearAddEventProgContext",
+            "condition": "data.pinnedToForm.dbValue"
+        },
+        {
+            "eventId": "pasteItem.commitFailed",
+            "action": "clearAddEventProgContext"
+        },
+        {
+            "eventId": "objectAddedtoTargets",
+            "action": "clearAddEventProgContext"
+        }
+    ],
+    "conditions": {
+        "isAddPanelXRTLoaded": {
+            "expression": "data.activeView==='addObjectPrimarySub'"
+        },
+        "isSubmitWorkflowPopupPanelActive": {
+            "expression": "ctx.submitWorkflowPopupCtx || ctx.activeToolsAndInfoCommand.commandId === 'Awp0CreateWorkflowSubProcess' || ctx.activeToolsAndInfoCommand.commandId === 'Awp0NewWorkflowProcess'"
+        }
+    },
+    "messages":
+    {
+    
+    },
+    "i18n": {
+
+    }
+}

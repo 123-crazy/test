@@ -1,0 +1,12 @@
+<div class="aw-layout-panelSection">
+    <div role="button" class="aw-layout-panelSectionTitle aw-layout-flexRow" ng-class="{ 'aw-layout-collapsiblePanelSectionTitle collapsible' : isCollapsible }" title="{{!isCollapsible ? caption : (collapsed ==='true' ? expand : collapse)}}" ng-keydown="handleKeyPress($event)">
+        <aw-property-image ng-if="caption" class="aw-layout-panelSectionTitleChevron" ng-class="{ 'aw-layout-panelSectionTitleChevronDown' : collapsed === 'true' }" visible-when="isCollapsible" name="miscDownArrow_uxRefresh" ng-click="flipSectionDisplay()"></aw-property-image>
+        <label class="aw-layout-flex" title={{caption}} ng-class="{'collapsible' : isCollapsible }" ng-click="flipSectionDisplay()" >{{caption}}</label>
+        <aw-icon-button class="aw-layout-justifyFlexEnd" command="command" visible-when="{{command.condition}}" ng-repeat="command in commands"></aw-icon-button>
+        <aw-command-bar class="aw-layout-justifyFlexEnd aw-layout-workareaCommandbar" anchor="{{anchor}}" alignment="HORIZONTAL" context="context" ng-if="anchor && !ctx.toggleLabel"></aw-command-bar>
+    </div>
+    <aw-command-bar class="aw-layout-justifyFlexEnd aw-layout-workareaCommandbar" anchor="{{anchor}}" alignment="HORIZONTAL" context="context" ng-if="anchor && ctx.toggleLabel"></aw-command-bar>
+    <form name="{{name}}"  visible-when="collapsed !== 'true'"  class="aw-layout-panelSectionContent" ng-transclude novalidate>
+        <button type="submit" class="aw-hide-form-button" disabled="" aria-hidden="true"></button>
+    </form>
+</div>

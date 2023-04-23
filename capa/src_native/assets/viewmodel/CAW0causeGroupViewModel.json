@@ -1,0 +1,211 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-listbox.directive",
+        "js/aw-label.directive"
+    ],
+    "actions": {
+
+        "loadIshikawaCauses": {
+            "actionType": "JSFunction",
+            "method": "loadCauses",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "causeGroups": "causeGroups"
+            },
+            "events": {
+                "success": [ {
+                    "name": "setcause"
+                } ]
+            }
+        },
+        "setcause": {
+            "actionType": "JSFunction",
+            "method": "setcause",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "getParentIshikawa": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-06-DataManagement",
+            "method": "expandGRMRelationsForSecondary",
+            "inputData": {
+                "secondaryObjects": [ "{{ctx.selected}}" ],
+                "pref": {
+                    "expItemRev": true,
+                    "info": [ {
+                        "relationName": "CAW0RelatedMs",
+                        "objectTypeNames": [ "CAW0Ishikawa" ]
+                    } ]
+                }
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "loadIshikawaCauses"
+                } ]
+            }
+        },
+        "updateSelectionForCause": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionForCause",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "updateCauseOnOverviewFromInfo": {
+            "actionType": "JSFunction",
+            "method": "updateCauseOnOverviewFromInfo",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "reset": {
+            "actionType": "JSFunction",
+            "method": "resetCauseGroup",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "setPropertyInfoEdit": {
+            "actionType": "JSFunction",
+            "method": "setPropertyInfoEdit",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "outputData": ""
+            },
+            "events": {
+                "success": [
+                    {   "condition":"ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Overview'",
+                        "name": "doPostSaveEdit5WhyEventSuccess11"
+                    },
+                    {
+                        "condition":"ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Overview'",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "condition": "errorCode.code === 422010",
+                        "name": "caw0doPostSaveEdit5WhyActionFailure"
+                    }
+                ]
+            }
+        },
+        "doPostSaveEdit5WhyActionSuccess11": {
+            "actionType": "JSFunction",
+            "method": "updateTreeTable",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0EditTreeStructure"
+        },
+        "doPostSaveEdit5WhyActionFailure": {
+            "actionType": "JSFunction",
+            "method": "resetEditsPostFailure",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "getParentIshikawa"
+    },
+    "onEvent": [
+        {
+            "eventId": "loadIshikawaCauses",
+            "action": "loadIshikawaCauses"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'canceling'",
+            "action": "reset"
+        },
+        {
+            "eventId" : "setcause",
+            "action" : "setcause"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'canceling'",
+            "action": "setcause"
+        },
+        {
+            "eventId": "updateCauseOnOverviewFromInfo",
+            "action": "updateCauseOnOverviewFromInfo"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "ctx.tcSessionData.tcMajorVersion < 13 && state === 'saved' && state !== 'starting' && state !== 'canceling' && ctx.selected.modelType.typeHierarchyArray.indexOf( 'CAW0Defect' ) > -1  && ctx.selected.modelType.typeHierarchyArray.indexOf( 'CAW0Ishikawa' ) === -1",
+            "action": "setPropertyInfoEdit",
+            "cacheEventData": true
+        }
+    ],
+    "data": {
+        "cause": {
+            "displayName": "{{i18n.ishikawaCauseGroup}}",
+            "type": "STRING",
+            "dbValue": "{{ctx.selected.props.caw0CauseGroup.dbValues[0]}}",
+            "uiValue": "{{ctx.selected.props.caw0CauseGroup.dbValues[0]}}"
+        },
+        "caw0CauseGroup": {
+            "displayName": "{{i18n.ishikawaCauseGroup}}",
+            "type": "STRING",
+            "hasLov": "true",
+            "dbValue": ""
+        }
+    },
+    "messages": {},
+    "i18n": {
+        "description": [
+            "CAW0CapaMessages"
+        ],
+        "name": [
+            "CAW0CapaMessages"
+        ],
+        "ishikawaCauseGroup": [
+            "CAW0CapaMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ],
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ]
+    },
+    "conditions": {
+        "isEditInProgress": {
+            "expression": "ctx.editInProgress"
+        }
+    }
+}

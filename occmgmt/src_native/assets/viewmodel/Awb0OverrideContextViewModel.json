@@ -1,0 +1,72 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-property-label.directive"
+    ],
+
+    "actions": {
+        "populateOverridenContextParent":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "getContextObject"
+                },
+                {
+                    "action": "getOverridenContextParent"
+                }
+            ]
+        },
+        "getContextObject": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData" : {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "getOverridenContextParent": {
+            "actionType": "JSFunction",
+            "method": "getOverridenContextParent",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceInContextOverrideService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "populateOverridenContextParent"
+    },
+    "onEvent": [
+        {
+            "eventId": "overridenContextChanged",
+            "action": "populateOverridenContextParent"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria": {
+                "target": "treeLoadingInProgress"
+            },
+            "condition": "!data.contextKeyObject.treeLoadingInProgress",
+            "action": "populateOverridenContextParent"
+        }
+],
+
+    "data": {
+        "overrideContext": {
+            "type": "STRING",
+            "dbValue": "",
+            "displayName": "{{i18n.overrideContext}}"
+        },
+        "overridenContextParentElem": {
+            "type": "STRING",
+            "displayName": "",
+            "dbValue" : ""
+        }
+    },
+
+    "i18n": {
+        "overrideContext": [ "OccurrenceManagementConstants" ]
+    }
+}
+

@@ -1,0 +1,346 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-form.directive",
+        "js/aw-listbox.directive",
+        "js/aw-xrt.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-break.directive",
+        "js/aw-label.directive",
+        "js/aw-column.directive",
+        "js/aw-row.directive"
+    ],
+    "actions":
+    {
+        "reveal": {
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action":"loadCreatableTypes"
+                },
+                {
+                    "action":"ensureSessionTypeLoaded"
+                },
+                {
+                    "action":"convertToList"
+                },
+                {
+                    "action":"populateBackingObject"
+                },
+                {
+                    "action":"isAceIndexedProduct"
+                }
+            ]
+        },
+        "loadCreatableTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "getCreatbleSubBuisnessObjectNames",
+            "inputData":
+            {
+                "input":
+                [{
+                    "boName": "Fnd0AppSession",
+                    "exclusionPreference": "",
+                    "exclusionBONames": [],
+                    "context": ""
+                }]
+            },
+            "outputData":
+            {
+                "sessionTypeList": "{{function:processSessionTypes}}"
+            },
+            "deps": "js/saveWorkingContextService"
+        },
+        "ensureSessionTypeLoaded": {
+            "actionType": "JSFunctionAsync",
+            "method": "ensureModelTypesLoaded",
+            "inputData": {
+                "typeNames":  "{{data.sessionTypeList}}"
+            },
+            "deps": "soa/kernel/soaService"
+        },
+        "populateBackingObject": {
+            "actionType": "JSFunction",
+            "method": "getBackingObject",
+            "inputData": {
+                "data":  "{{data}}"
+            },
+            "deps": "js/createWorksetService"
+        },
+         "isAceIndexedProduct": {
+            "actionType": "JSFunction",
+            "method": "isAceIndexedProduct",
+            "outputData":{
+                "isAceIndexedProduct":""
+            },
+            "deps": "js/createWorksetService"
+        },
+        "convertToList":
+        {
+            "actionType": "JSFunction",
+            "method": "createListModelObjectsFromStrings",
+            "inputData":
+            {
+                "strings": "{{data.sessionTypeList}}"
+            },
+            "outputData":
+            {
+                "sessionTypeList": "",
+                "sessionType.dbValue" : "result.0.propInternalValue",
+                "sessionType.uiValue" : "result.0.propDisplayValue"
+            },
+
+            "deps": "js/listBoxService"
+        },
+        "createSessionAction" :{
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action":"genericAddObject",
+                    "condition": "conditions.isCreateRelateandSubmitObjectsApplicable"
+
+                },
+                {
+                    "action":"createOrUpdateSavedSessionSoa",
+                    "condition": "conditions.isCreateOrUpdateSavedSessionApplicable"
+
+                },
+                {
+                    "action":"updateWorkingContextAction"
+                },
+                {
+                    "action":"showSavedWorkingContext"
+                }
+            ]
+        },
+        "triggerBackgroundSBM": {
+            "actionType": "JSFunction",
+            "method": "saveUserWorkingContextState",
+            "inputData": {
+                "shouldFireEventOnSuccess": true
+            },
+            "deps": "js/backgroundWorkingContextService"
+        },
+
+        "genericAddObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdWorkingContext": "output[0].objects[0]"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "swc.objectCreated",
+                        "eventData": {
+                            "createdObject": "{{data.createdWorkingContext}}"
+                        }
+                    }
+
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "sessionCreationSuccess"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "createOrUpdateSavedSessionSoa": {
+            "actionType": "TcSoaService",
+            "serviceName": "Cad-2020-01-AppSessionManagement",
+            "method": "createOrUpdateSavedSession",
+            "inputData":{
+                "sessionsToCreateOrUpdate": "{{function:createInputForCreateAndUpdateSavedSessionSOA}}"
+            },
+            "outputData": {
+                "createdWorkingContext": "sessionOutputs[0].sessionObject"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "swc.objectCreated",
+                        "eventData": {
+                            "createdObject": "{{data.createdWorkingContext}}"
+                        }
+                    }
+
+                ]
+            },
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "sessionCreationSuccess"
+                    }
+                ]
+            },
+            "deps": "js/createWorksetService"
+        },
+        "showSavedWorkingContext":
+        {
+            "actionType": "JSFunction",
+            "method": "go",
+            "inputData": {
+                "showObject": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{data.createdWorkingContext.uid}}"
+                },
+                "option": {
+                    "inherit": false
+                }
+            },
+            "deps": "js/locationNavigation.service"
+        },
+        "updateWorkingContextAction" :
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2020-05-OccurrenceManagement",
+            "method": "updateWorkingContext",
+            "inputData": {
+                "input":
+                    [{
+                        "productInfo": "{{ctx.aceActiveContext.context.productContextInfo}}",
+                        "workingContext": "{{data.createdWorkingContext}}",
+                        "saveResult": true,
+                        "operation": "Create"
+                    }]
+            }
+        },
+        "prePopulateNameField":{
+            "actionType": "JSFunction",
+            "method": "dummyAction",
+            "inputData":
+            {
+                "dummyInput" : "{{data.i18n.createSessionPrefix}} {{ctx.aceActiveContext.context.modelObject.props.object_string.dbValues[0]}}"
+            },
+            "outputData": {
+                "object_name.dbValue" : "",
+                "object_name.valueUpdated" : true
+            },
+            "deps": "js/zoneFilterService"
+        }
+    },
+    "functions":
+    {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "processSwcTypes": {
+            "functionName": "processSwcTypes",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "processSessionTypes": {
+            "functionName": "processSessionTypes",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "createInputForCreateAndUpdateSavedSessionSOA":{
+            "functionName": "createInputForCreateAndUpdateSavedSessionSOA",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+
+    },
+    "conditions": {
+        "isCreateOrUpdateSavedSessionApplicable": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion >=3)) && !data.isAceIndexedProduct"
+        },
+        "isCreateRelateandSubmitObjectsApplicable": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion < 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion <=2)) || (data.isAceIndexedProduct) "
+        }
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "saveBWC.success",
+            "action": "createSessionAction"
+        },
+        {
+            "eventId": "saveBWC.failure",
+            "cacheEventData": true,
+            "message": "backgroundSaveFailedBeforeSessionCreate"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "prePopulateNameField"
+        }
+    ],
+    "data":
+    {
+        "sessionType": {
+            "type": "STRING",
+            "hasLov": true,
+            "dbValue": "",
+            "displayName": "{{i18n.type}}"
+        },
+        "sessionTypeList": {
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "topLine":{
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "isAceIndexedProduct":null
+    },
+    "messages":
+    {
+        "backgroundSaveFailedBeforeSessionCreate":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.autoSaveOfBookmarkNotYetComplete}}"
+        },
+        "sessionCreationSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.creationOfWorksetSuccessful}}",
+            "messageTextParams":
+            [
+                "{{data.createdWorkingContext.props.object_string.dbValues[0]}}"
+            ]
+        }
+    },
+    "i18n":
+    {
+        "CreateSessionCmd": [ "OccurrenceManagementSubsetConstants" ],
+        "createButtonText": [ "OccurrenceManagementSubsetConstants" ],
+        "autoSaveOfBookmarkNotYetComplete": [ "OccurrenceManagementMessages" ],
+        "creationOfWorksetSuccessful": [ "OccurrenceManagementSubsetConstants" ],
+        "createSessionPrefix":["OccurrenceManagementSubsetConstants"],
+        "type": [ "OccurrenceManagementConstants" ]
+    }
+}

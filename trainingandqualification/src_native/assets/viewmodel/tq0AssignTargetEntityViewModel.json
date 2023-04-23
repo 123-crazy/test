@@ -1,0 +1,524 @@
+{
+  "schemaVersion": "1.0.0",
+  "imports": [
+    "js/aw-panel-body.directive",
+    "js/aw-list-filter.directive",
+    "js/aw-default-cell.directive",
+    "js/aw-command-panel.directive",
+    "js/aw-tab-set.directive",
+    "js/aw-panel-footer.directive",
+    "js/aw-button.directive",
+    "js/aw-i18n.directive",
+    "js/aw-scrollpanel.directive",
+    "js/visible-when.directive",
+    "js/aw-include.directive",
+    "js/aw-list.directive",
+    "js/aw-listbox.directive",
+    "js/aw-checkbox.directive",
+    "js/aw-break.directive",
+    "js/aw-widget.directive",
+    "js/aw-property-label.directive"
+  ],
+  "data": {
+    "tabModels": [
+      {
+        "name": "{{i18n.user}}",
+        "tabKey": "userPage",
+        "selectedTab": true
+      },
+      {
+        "name": "{{i18n.equipment}}",
+        "tabKey": "equipmentPage",
+        "panelId": "searchTabPageSub",
+        "recreatePanel": true
+      },
+      {
+        "name": "{{i18n.palette}}",
+        "tabKey": "palettePage"
+      }
+    ],
+    "visibleSearchFilterPanelTabKeys": "[ 'results', 'filters' ]",
+    "userProjectObject": {
+      "displayName": "{{i18n.project}}",
+      "type": "STRING",
+      "hasLov": true
+    },
+    "searchString": {
+      "type": "STRING",
+      "dbValue": ""
+    },
+    "showUsersWithoutGroupRole": {
+      "displayName": "{{i18n.showUsersWithoutGroupRole}}",
+      "type": "BOOLEAN",
+      "isRequired": "false",
+      "isEditable": "true",
+      "dispValue": "",
+      "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+      "dbValue": false
+    },
+    "allGroups": {
+      "displayName": "{{i18n.group}}",
+      "type": "STRING",
+      "hasLov": true
+    },
+    "allRoles": {
+      "displayName": "{{i18n.role}}",
+      "type": "STRING",
+      "hasLov": true
+    },
+    "showUserGroupFlag": {
+      "dbValue": false
+    },
+    "displayGroupRoleList": {
+      "dbValue": false
+    },
+    "previousGroup": {
+      "dbValue": ""
+    },
+    "previousRole": {
+      "dbValue": ""
+    },
+    "filterBox": {
+      "displayName": "{{i18n.filterBox}}",
+      "type": "STRING",
+      "dbValue": ""
+    }
+  },
+  "actions": {
+    "paletteObjects": {
+      "actionType": "dataProvider",
+      "method": "paletteObjectProvider"
+    },
+    "revealUser": {
+      "actionType": "dataProvider",
+      "method": "userPerformSearch"
+    },
+    "setSearchShowFilter": {
+      "actionType": "JSFunction",
+      "method": "setFlagSeachShowFilter",
+      "inputData": {
+        "data": "{{data}}"
+      },
+      "deps": "js/tq0AssignTargetEntity"
+    },
+    "assign": {
+      "actionType": "TcSoaService",
+      "serviceName": "Core-2010-09-DataManagement",
+      "method": "setProperties",
+      "inputData": {
+        "info": "{{function:addTargetEntity}}"
+      },
+      "events": {
+        "success": [
+          {
+            "name": "cdm.relatedModified",
+            "eventData": {
+              "relatedModified": [
+                "{{ctx.selected}}"
+              ]
+            }
+          },
+          {
+            "name": "complete",
+            "eventData": {
+              "source": "toolAndInfoPanel"
+            }
+          }
+        ]
+      },
+      "actionMessages":
+      {
+          "failure": [
+              {
+              "message": "ServerFailureMsg"
+              }
+          ]
+      },
+      "deps": "js/tq0AssignTargetEntity"
+    },
+    "replaceExistingTargetEntity": {
+      "actionType": "TcSoaService",
+      "serviceName": "Core-2010-09-DataManagement",
+      "method": "setProperties",
+      "inputData": {
+        "info": "{{function:replaceTargetEntity}}"
+      },
+      "events": {
+        "success": [
+          {
+            "name": "cdm.relatedModified",
+            "eventData": {
+              "relatedModified": [
+                "{{ctx.pselected}}"
+              ],
+              "refreshLocationFlag": false
+            }
+          },
+          {
+            "name": "complete",
+            "eventData": {
+              "source": "toolAndInfoPanel"
+            }
+          }
+        ]
+      },
+      "actionMessages":
+      {
+          "failure": [
+              {
+              "message": "ServerFailureMsg"
+              }
+          ]
+      },
+      "deps": "js/tq0AssignTargetEntity"
+    },
+    "search": {
+      "actionType": "JSFunction",
+      "method": "performSearch",
+      "inputData": {
+        "data": "{{data}}",
+        "dataProvider": "{{data.dataProviders.userPerformSearch}}",
+        "participantType": ""
+      },
+      "policy": {
+        "types": [
+          {
+            "name": "Group",
+            "properties": [
+              {
+                "name": "object_full_name"
+              },
+              {
+                "name": "name"
+              }
+            ]
+          },
+          {
+            "name": "Role",
+            "properties": [
+              {
+                "name": "role_name"
+              }
+            ]
+          },
+          {
+            "name": "POM_member",
+            "properties": [
+              {
+                "name": "user",
+                "modifiers": [
+                  {
+                    "name": "withProperties",
+                    "Value": "true"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "GroupMember",
+            "properties": [
+              {
+                "name": "group",
+                "modifiers": [
+                  {
+                    "name": "withProperties",
+                    "Value": "true"
+                  }
+                ]
+              },
+              {
+                "name": "role",
+                "modifiers": [
+                  {
+                    "name": "withProperties",
+                    "Value": "true"
+                  }
+                ]
+              },
+              {
+                "name": "userName"
+              }
+            ]
+          },
+          {
+            "name": "User",
+            "properties": [
+              {
+                "name": "person",
+                "modifiers": [
+                  {
+                    "name": "withProperties",
+                    "Value": "true"
+                  }
+                ]
+              },
+              {
+                "name": "user_name"
+              },
+              {
+                "name": "user_id"
+              },
+              {
+                "name": "default_group",
+                "modifiers": [
+                  {
+                    "name": "withProperties",
+                    "Value": "true"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Person",
+            "properties": [
+              {
+                "name": "user_name"
+              },
+              {
+                "name": "PA9"
+              },
+              {
+                "name": "PA10"
+              }
+            ]
+          }
+        ]
+      },
+      "outputData": {
+        "searchResults": "searchResults",
+        "totalFound": "totalFound",
+        "totalLoaded": "totalLoaded"
+      },
+      "deps": "js/responsibleUserPanelService"
+    },
+    "revealGroupRoleLOV": {
+      "actionType": "JSFunction",
+      "method": "revealGroupRoleLOV",
+      "inputData": {
+        "data": "{{data}}"
+      },
+      "deps": "js/responsibleUserPanelService"
+    },
+    "addSelection": {
+      "actionType": "JSFunction",
+      "method": "addSelectedObject",
+      "inputData": {
+        "data": "{{data}}",
+        "multiSelectEnabled": "{{function:getMultiSelectMode}}",
+        "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+      },
+      "deps": "js/responsibleUserPanelService"
+    },
+    "getPaletteObjects": {
+      "actionType": "TcSoaService",
+      "serviceName": "Internal-AWS2-2019-06-Finder",
+      "method": "performSearchViewModel4",
+      "inputData": {
+        "searchInput": {
+          "attributesToInflate": [
+            "awp0CellProperties",
+            "awp0ThumbnailImageTicket"
+          ],
+          "searchCriteria": {
+            "search": ""
+          },
+          "maxToLoad": 25,
+          "maxToReturn": 25,
+          "startIndex": 0,
+          "providerName": "Awp0RecentObjectsProvider"
+        }
+      },
+      "outputData": {
+        "recentTotalFound": "totalLoaded",
+        "recentSearchResults": "{{json:searchResultsJSON}}"
+      }
+    },
+    "closePanel":
+    {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData":
+        {
+            "events":
+            [
+                {
+                    "name": "complete",
+                    "eventData":
+                    {
+                        "source": "toolAndInfoPanel"
+                    }
+                }
+            ]
+        }
+    }
+  },
+  "dataProviders": {
+    "userPerformSearch": {
+      "action": "search",
+      "response": "{{data.searchResults}}",
+      "totalFound": "{{data.totalFound}}",
+      "selectionModelMode": "single",
+      "commands": {
+        "Awp0ShowObjectCell": {
+          "id": "cmdOpen",
+          "areas": [
+            "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+          ],
+          "priorities": [
+            300
+          ],
+          "dependencies": [
+            "js/showObjectCommandHandler"
+          ],
+          "displayOption": "ON_HOVER_AND_SELECTION",
+          "position": "TOP_RIGHT"
+        }
+      }
+    },
+    "paletteObjectProvider": {
+      "action": "getPaletteObjects",
+      "response": "{{data.recentSearchResults}}",
+      "totalFound": "{{data.recentTotalFound}}",
+      "commandsAnchor": "awa_dataAssistant"
+    }
+  },
+  "functions": {
+    "addTargetEntity": {
+      "functionName": "addTargetEntity",
+      "parameters": [
+        "{{data}}",
+        "{{ctx}}"
+      ]
+    },
+    "getMultiSelectMode": {
+      "functionName": "getMultiSelectMode",
+      "parameters": [
+        "false"
+      ]
+    },
+    "replaceTargetEntity": {
+      "functionName": "replaceTargetEntity",
+      "parameters": [
+        "{{data}}",
+        "{{ctx}}"
+      ]
+    }
+  },
+  "i18n": {
+    "add": [
+      "trainingandqualificationMessages"
+    ],
+    "allGroups": [
+      "responsibleUserMessages"
+    ],
+    "allRoles": [
+      "responsibleUserMessages"
+    ],
+    "filterBox": [
+      "responsibleUserMessages"
+    ],
+    "group": [
+      "responsibleUserMessages"
+    ],
+    "role": [
+      "responsibleUserMessages"
+    ],
+    "replace": [
+      "trainingandqualificationMessages"
+    ],
+    "project": [
+      "responsibleUserMessages"
+    ],
+    "user": [
+      "trainingandqualificationMessages"
+    ],
+    "equipment": [
+      "trainingandqualificationMessages"
+    ],
+    "palette": [
+      "trainingandqualificationMessages"
+    ],
+    "showUsersWithoutGroupRole": [
+      "WorkflowCommandPanelsMessages"
+    ]
+  },
+  "conditions": {
+    "showUserPage": {
+      "expression": "data.selectedTab.tabKey === 'userPage'"
+    },
+    "showPalettePage": {
+      "expression": "data.selectedTab.tabKey === 'palettePage'"
+    },
+    "addUserObject": {
+      "expression": "data.dataProviders.userPerformSearch.selectedObjects.length > 0 && data.selectedTab.tabKey === 'userPage'"
+    },
+    "addEquipmentObject": {
+      "expression": "data.dataProviders.performSearch.selectedObjects.length > 0 && data.selectedTab.tabKey === 'results'"
+    },
+    "addPaletteObject": {
+      "expression": "data.dataProviders.paletteObjectProvider.selectedObjects.length > 0  && data.selectedTab.tabKey === 'palettePage'"
+    },
+    "isProjectObjectListEmpty": {
+      "expression": "data.projectObjectList.length<=0"
+    },
+    "enableGroupSelection": {
+      "expression": "!data.disabledGroup"
+    },
+    "enableRoleSelection": {
+      "expression": "!data.disabledRole"
+    },
+    "enableGroupRoleView": {
+      "expression": "!data.showUsersWithoutGroupRole.dbValue"
+    },
+    "isValidToAdd": {
+      "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+    },
+    "tq0IsAddCommandActive": {
+      "expression": "ctx.pselected === undefined || ctx.pselected === null  || ctx.relationContext.relationInfo[0].relationType !== 'tq0TargetEntity'"
+    }
+  },
+  "messages": {
+    "ServerFailureMsg": {
+       "messageType": "ERROR",
+       "messageText": "{{errorCode}}"
+     }
+  },
+  "onEvent": [
+    {
+      "eventId": "userPerformSearch.selectionChangeEvent",
+      "action": "addSelection"
+    },
+    {
+      "eventId": "userPerformSearch.modelObjectsUpdated",
+      "action": "addSelection"
+    },
+    {
+      "eventId": "awPopupWidget.close",
+      "action": "userPerformSearch"
+    },
+    {
+      "eventId": "awPanel.reveal",
+      "action": "revealGroupRoleLOV"
+    },
+    {
+      "eventId": "awTab.selected",
+      "condition": "data.selectedTab.tabKey === 'palettePage'",
+      "action": "paletteObjects"
+    },
+    {
+      "eventId": "awTab.selected",
+      "condition": "data.selectedTab.tabKey === 'userPage'",
+      "action": "revealUser"
+    },
+    {
+      "eventId": "awTab.selected",
+      "action": "setSearchShowFilter"
+    },
+    {
+      "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+      "action": "closePanel"
+    }
+  ]
+}

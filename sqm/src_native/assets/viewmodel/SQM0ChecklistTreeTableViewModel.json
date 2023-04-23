@@ -1,0 +1,274 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "actions": {
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.checklistTreeDataProvider}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "sortCriteria": "{{data.columnProviders.checklistColumnProvider.sortCriteria}}"
+            },
+            "outputData": {
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "dataProviders.checklistTreeDataProvider.columnConfig": "{{function:setNonModifiablePropForChecklist}}",
+                "searchResults": "result.treeLoadResult.childNodes"
+            },
+            "deps": "js/SQM0ChecklistTreeService",
+        "events": {
+                "success": [ {
+                    "name": "decorateNodes"
+                } ]
+            }
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.checklistTreeDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/SQM0ChecklistTreeService"
+        },
+        "loadTreeTablePropertiesOnInitialLoad": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTablePropertiesOnInitialLoad",
+            "deps": "js/SQM0ChecklistTreeService",
+            "inputData": {
+                "vmNodes": "{{data.dataProviders.checklistTreeDataProvider.viewModelCollection.loadedVMObjects}}",
+                "declViewModel": "{{data}}",
+                "uwDataProvider": "{{data.dataProviders.checklistTreeDataProvider}}",
+                "context": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "CAW0ChecklistColumns",
+                    "typesForArrange": "{{data.dataProviders.checklistTreeDataProvider.columnConfig.typesForArrange}}"
+                }
+            },
+            "outputData": {
+                "dataProviders.checklistTreeDataProvider.columnConfig": "result.propertyLoadResult.columnConfig",
+                "ctx.searchResponseInfo.columnConfig": "result.propertyLoadResult.columnConfig"
+            }
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "propertyLoadInput": "request.propertyLoadInput",
+                "delayTimeProperty": "{{data.delayTimeProperty}}"
+            },
+            "deps": "js/SQM0ChecklistTreeService"
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [
+                    {
+                        "scope": "LoginUser",
+                        "scopeName": "",
+                        "clientName": "AWClient",
+                        "resetColumnConfig": true,
+                        "columnConfigQueryInfos": [
+                            {
+                                "clientScopeURI": "CAW0ChecklistColumns",
+                                "operationType": "union",
+                                "typeNames": [
+                                    "Psi0Checklist",
+                                    "Apm0QualityChecklist"
+                                ]
+                            }
+                        ],
+                        "businessObjects": [
+                            {}
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "dataProviders.checklistTreeDataProvider.resetColumnConfigs": "columnConfigurations"
+            }
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [
+                    {
+                        "clientScopeURI": "CAW0ChecklistColumns",
+                        "columnConfigId": "CAW0ChecklistColumns",
+                        "columns": "{{data.dataProviders.checklistTreeDataProvider.newColumns}}",
+                        "scope": "LoginUser",
+                        "scopeName": ""
+                    }
+                ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [
+                    {
+                        "name": "occmgmtColumnConfig.saved"
+                    }
+                ]
+            }
+        },
+        "saveColumnConfigData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [
+                    {
+                        "clientScopeURI": "CAW0ChecklistColumns",
+                        "columnConfigId": "CAW0ChecklistColumns",
+                        "columns": "{{data.dataProviders.checklistTreeDataProvider.newColumns}}",
+                        "scope": "LoginUser",
+                        "scopeName": ""
+                    }
+                ]
+            },
+            "outputData": {}
+        },
+        "groupObjectsForDecorators": {
+           "actionType": "JSFunction",
+           "method": "groupObjectsForDecorators",
+           "inputData": {
+                "vmos": "{{data.dataProviders.checklistTreeDataProvider.viewModelCollection.loadedVMObjects}}",
+                "modifiedObjects": "{{data.eventData.modifiedObjects}}"
+            },
+            "deps": "js/SQM0ChecklistTreeService"
+        },
+        "decorateTreeNodeOnLoad": {
+            "actionType": "JSFunction",
+            "method": "groupObjectsForDecorators",
+            "inputData": {
+                "vmos": "{{data.dataProviders.checklistTreeDataProvider.viewModelCollection.loadedVMObjects}}",
+                "modifiedObjects": []
+           },
+           "deps": "js/SQM0ChecklistTreeService"
+       }
+    },
+    "data": {
+        "delayTimeTree": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "20",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "checklistTreeDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "single",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "treePageSize": 100,
+            "editContext": "TABLE_CONTEXT",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}"
+        },
+        "checklistPropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "checklistColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": [ {
+                "fieldName": "object_name",
+                "sortDirection": "ASC"
+            } ],
+            "saveColumnAction": "saveColumnConfigData",
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig"
+        }
+    },
+    "grids": {
+        "checklistTree": {
+            "dataProvider": "checklistTreeDataProvider",
+            "propertyProvider": "checklistPropertyProvider",
+            "columnProvider": "checklistColumnProvider",
+            "addIconColumn": false,
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "checklistTreeDataProvider.treeNodesLoaded",
+            "cacheEventData": true,
+            "condition": "!data.dataProviders.checklistTreeDataProvider.columnConfigLoadingInProgress",
+            "action": "loadTreeTablePropertiesOnInitialLoad"
+        },
+        {
+            "eventId": "cdm.modified",
+            "cacheEventData": true,
+            "action": "groupObjectsForDecorators"
+        },
+        {
+            "eventId": "viewModelObject.propsUpdated",
+            "action": "groupObjectsForDecorators"
+        },
+        {
+            "eventId": "checklistTree.plTable.toggleTreeNode",
+            "cacheEventData": true,
+            "action": "groupObjectsForDecorators"
+        },
+        {
+            "eventId": "decorateNodes",
+            "action": "decorateTreeNodeOnLoad"
+        }
+    ],
+    "functions": {
+        "setNonModifiablePropForChecklist": {
+            "functionName": "setNonModifiablePropForChecklist",
+            "parameters": [ ]
+        }
+    }
+}

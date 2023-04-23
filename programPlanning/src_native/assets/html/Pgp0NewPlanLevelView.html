@@ -1,0 +1,35 @@
+<aw-panel-body>
+    <aw-panel-body visible-when="data.dataProviders.awTypeSelector.getLength()>1">
+        <aw-panel-section caption="i18n.type">
+            <aw-type-selector prop="data.filterBox" override-id="PP" include="{{data.workFlowName.dbValue}}">
+            </aw-type-selector>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-body>
+        <aw-panel-section caption="{{data.searchResults[0].props.type_name.uiValues[0]}}"
+            exist-when="data.dataProviders.awTypeSelector.getLength()==1 && data.workFlowName.dbValue=='Prg0AbsEvent'">
+            <aw-xrt type="CREATE" object-type="Prg0Event"></aw-xrt>
+        </aw-panel-section>
+        <aw-panel-section caption="{{data.searchResults[0].props.type_name.uiValues[0]}}"
+            exist-when="data.dataProviders.awTypeSelector.getLength()==1 && data.workFlowName.dbValue=='Prg0AbsCriteria'">
+            <aw-xrt type="CREATE" object-type="Prg0Criteria"></aw-xrt>
+        </aw-panel-section>
+        <aw-panel-section caption="{{data.searchResults[0].props.type_name.uiValues[0]}}"
+            exist-when="data.dataProviders.awTypeSelector.getLength()==1 && (data.workFlowName.dbValue!='Prg0AbsEvent'&& data.workFlowName.dbValue!='Prg0AbsCriteria')">
+            <aw-xrt type="CREATE" object-type="{{ctx.programPlanningContext.type1}}"></aw-xrt>
+        </aw-panel-section>
+
+        <aw-panel-section caption="i18n.ownProjectSectionTitle">
+            <aw-command-panel-section caption="i18n.projectsSectionTitle" anchor="data.projectSectionCommands">
+                <aw-list dataprovider="data.dataProviders.getAssignedProjectsProvider">
+                    <aw-default-cell vmo="item"></aw-default-cell>
+                </aw-list>
+            </aw-command-panel-section>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-button action="createObject" visible-when="awPanelBody.$valid === true">
+            <aw-i18n>i18n.addButtonCommandTitle</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-panel-body>

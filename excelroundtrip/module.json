@@ -1,0 +1,207 @@
+{
+  "name": "excelroundtrip",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "Arm0ExportImport": {
+        "iconId": "cmdImportExportExcel",
+        "isGroup": true,
+        "title": "{{i18n.exportImportCmdTitle}}",
+        "description": "{{i18n.Arm0ExportImportDesc}}"
+      },
+      "Arm0Export": {
+        "iconId": "cmdExport",
+        "isGroup": false,
+        "title": "{{i18n.exportCmdTitle}}",
+        "description": "{{i18n.Arm0ExportDesc}}"
+      },
+      "Arm0ImportExcel": {
+        "iconId": "cmdImport",
+        "isGroup": false,
+        "title": "{{i18n.importCmdTitle}}",
+        "description": "{{i18n.Arm0ImportExcelDesc}}"
+      },
+      "Arm0SummaryTableExportImport": {
+        "iconId": "cmdImportExportExcel",
+        "isGroup": true,
+        "title": "{{i18n.exportImportCmdTitle}}",
+        "description": "{{i18n.Arm0ExportImportDesc}}"
+      },
+      "Arm0SummaryTableExport": {
+        "iconId": "cmdExport",
+        "isGroup": false,
+        "title": "{{i18n.exportCmdTitle}}",
+        "description": "{{i18n.Arm0ExportDesc}}"
+      },
+      "Arm0SummaryTableImportExcel": {
+        "iconId": "cmdImport",
+        "isGroup": false,
+        "title": "{{i18n.importCmdTitle}}",
+        "description": "{{i18n.Arm0ImportExcelDesc}}"
+      }
+    },
+    "commandHandlers": {
+      "Arm0ExportHandler": {
+        "id": "Arm0Export",
+        "action": "Arm0ActivateExportToRoundTripExcelPanel",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.exportExcelCommandCondition"
+        }
+      },
+      "Arm0ImportHandler": {
+        "id": "Arm0ImportExcel",
+        "action": "Arm0ActivateImportPanel",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.exportExcelCommandCondition"
+        }
+      },
+      "Arm0SummaryTableExportHandler": {
+        "id": "Arm0SummaryTableExport",
+        "action": "Arm0ActivateExportToRoundTripExcelPanel",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.exportSummaryTableExcelCommandCondition"
+        }
+      },
+      "Arm0SummaryTableImportHandler": {
+        "id": "Arm0SummaryTableImportExcel",
+        "action": "Arm0ActivateImportPanel",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.exportSummaryTableExcelCommandCondition"
+        }
+      }
+    },
+    "commandPlacements": {
+      "Arm0ExportImportPlacement": {
+        "id": "Arm0ExportImport",
+        "uiAnchor": "aw_primaryWorkArea",
+        "priority": 100
+      },
+      "Arm0ExportPlacement": {
+        "id": "Arm0Export",
+        "uiAnchor": "aw_primaryWorkArea",
+        "priority": 1,
+        "parentGroupId": "Arm0ExportImport"
+      },
+      "Arm0ImportPlacement": {
+        "id": "Arm0ImportExcel",
+        "uiAnchor": "aw_primaryWorkArea",
+        "priority": 2,
+        "parentGroupId": "Arm0ExportImport"
+      },
+      "Arm0SummaryTableExportImportPlacement": {
+        "id": "Arm0SummaryTableExportImport",
+        "uiAnchor": "aw_reqSummaryCommandbar",
+        "priority": 100
+      },
+      "Arm0SummaryTableExportPlacement": {
+        "id": "Arm0SummaryTableExport",
+        "uiAnchor": "aw_reqSummaryCommandbar",
+        "priority": 1,
+        "parentGroupId": "Arm0SummaryTableExportImport"
+      },
+      "Arm0SummaryTableImportPlacement": {
+        "id": "Arm0SummaryTableImportExcel",
+        "uiAnchor": "aw_reqSummaryCommandbar",
+        "priority": 2,
+        "parentGroupId": "Arm0SummaryTableExportImport"
+      }
+    },
+    "actions": {
+      "Arm0ActivateExportToRoundTripExcelPanel": {
+        "actionType": "JSFunction",
+        "method": "activateCommandPanel",
+        "deps": "js/commandPanel.service",
+        "inputData": {
+          "commandId": "Arm0ExportToRoundTripExcelDocument",
+          "location": "aw_toolsAndInfo"
+        }
+      },
+      "Arm0ActivateImportPanel": {
+        "actionType": "JSFunction",
+        "method": "activateCommandPanel",
+        "deps": "js/commandPanel.service",
+        "inputData": {
+          "commandId": "Arm0ImportExcel",
+          "location": "aw_toolsAndInfo"
+        }
+      }
+    },
+    "functions": {},
+    "conditions": {
+      "exportExcelCommandCondition": {
+        "expression": "ctx.workspace.workspaceId !== 'TcRMWorkspace' && ctx.selected.modelType && ( ctx.locationContext.modelObject && ctx.locationContext.modelObject.modelType.typeHierarchyArray.indexOf( 'Folder' ) !== -1 || ctx.aceActiveContext && !ctx.splitView.mode ) && !conditions.is4GDObject"
+      },
+      "roundTripWordCommandVisibilityCondition": {
+        "expression": "ctx.selected.modelType && conditions.isReqMicroserviceInstalled"
+      },
+      "isExportWithAddinEnabled": {
+        "expression": "data.preferences.REQ_Export_WithAddin[0] === 'true'"
+      },
+      "is4GDObject": {
+        "expression": "ctx.selected.uid.endsWith('AWB4GD')"
+      },
+      "isReqMicroserviceInstalled": {
+        "expression": "data.preferences.REQ_Microservice_Installed[0] === 'true'"
+      },
+      "isRMWorkspace": {
+        "expression": "ctx.workspace.workspaceId === 'TcRMWorkspace'"
+      },
+      "exportSummaryTableExcelCommandCondition": {
+        "expression": "ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_summary_table' && conditions.isRMWorkspace"
+      }
+    },
+    "preferences": [
+      "REQ_Microservice_Installed",
+      "REQ_Export_WithAddin"
+    ],
+    "messages": {
+      "exportGenericFailureMessage": {
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+      },
+      "notificationForExportRunInBackgroundMsg": {
+        "messageType": "INFO",
+        "messageText": "{{i18n.notificationForExportRInB}}"
+      }
+    },
+    "i18n": {
+      "notificationForExportRInB": [
+        "ExcelRoundTripMessages"
+      ],
+      "exportImportCmdTitle": [
+        "ExcelRoundTripMessages"
+      ],
+      "exportCmdTitle": [
+        "ExcelRoundTripMessages"
+      ],
+      "importCmdTitle": [
+        "ExcelRoundTripMessages"
+      ],
+      "arm0_exportCommands": [
+        "ExcelRoundTripMessages"
+      ],
+      "Arm0ExportImportDesc": [
+        "ExcelRoundTripMessages"
+      ],
+      "Arm0ExportDesc": [
+        "ExcelRoundTripMessages"
+      ],
+      "Arm0ImportExcelDesc": [
+        "ExcelRoundTripMessages"
+      ]
+    }
+  }
+}

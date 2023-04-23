@@ -1,0 +1,368 @@
+// Copyright (c) 2020 Siemens
+
+@import 'wysiwygTheme';
+
+.wysiwygTools {
+    border-right-color: #aaaaaa;
+    border-right-style: solid;
+    border-right-width: 1px;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: scrollbar;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.wysiwygItemPage {
+    flex-grow: 1;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: scrollbar;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.wysiwygItemContainer {
+    padding: 0
+}
+
+.wys-canvas-layoutTemplate {
+    border-style: dashed;
+    border-color: blue;
+    border-width: 1px;
+    margin: 0px 2px 2px;
+    width: auto;
+    height: auto;
+
+    &.widget-selection {
+        border-color: $panel_builder_selected_widget_border_color;
+        background-color: $panel_builder_selected_widget_background_color;
+        border-style: solid;
+    }
+}
+
+.canvasRowPanel {
+    border-style: dashed;
+    border-color: blue;
+    border-width: 1px;
+}
+
+.canvasRowPanel:hover {
+    border-style: solid;
+    border-color: red;
+    border-width: 1px;
+}
+
+.wysHidden {
+    visibility: collapse;
+    height: 0px;
+    width: 0px;
+}
+
+.widget {
+    min-height: 20px;
+    min-width: 1px
+}
+
+wys-canvas-editor {
+    height: 100%;
+    @include display_flex;
+    @include flex-direction(column);
+}
+
+wys-preview,
+.noncompWidget,
+wys-editor,
+wys-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+// CANVAS CONTAINER
+.wys-dummy-root {
+    height: inherit;
+}
+
+.wysErrorRoot {
+    display: block;
+    white-space: pre;
+    border: 2px solid rgb(204, 119, 119);
+    padding: 0px 1em;
+    margin: 1em;
+    background-color: rgb(255, 221, 221);
+    color: black;
+    pointer-events: none;
+}
+
+.wys-canvas-layout {
+    height: inherit;
+    justify-content: center;
+    background-color: #e2e2e2;
+    padding-top: rem-calc(24);
+}
+
+wys-canvas-container {
+    .aw-sidenav-layoutContainer {
+        max-width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+
+        &.aw-sidenav-float {
+            position: relative;
+        }
+    }
+}
+
+.aw-sidenav-normal {
+    width: 100%;
+}
+
+.aw-commandViewModelContainer-layout {
+    width: 500px;
+    height: 200px;
+    flex: 1 1 auto;
+    border: 1px inset black;
+}
+
+.aw-ui-treeNodeValue {
+    white-space: nowrap;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+span.aw-ui-nodeFiller {
+    margin-left: 0px;
+}
+
+.wys-prop-button {
+    margin-left: 10px;
+    margin-right: 0px;
+}
+
+.wys-prop-textbox {
+    border: 1px dotted #000000;
+    outline: 0;
+    height: 25px;
+    width: 100%;
+    border-color: black;
+    border-width: thin;
+}
+
+.wys-prop-textarea {
+    border: 1px dotted #000000;
+    outline: 0;
+    height: 50px;
+    width: 100%;
+    border-color: black;
+    border-width: thin;
+}
+
+.watermark {
+    opacity: 0.5;
+    color: BLACK;
+    font-family: fantasy;
+    font-size: 30px;
+    height: 100%;
+    width: 100%
+}
+
+.wys-canvas-dropAreaIndicator {
+    border-top: green;
+    border-top-width: 4px;
+    border-top-style: solid;
+    display: block;
+}
+
+.wys-canvas-dropAreaIndicatorLayout {
+    box-shadow: inset 0 -6px 0px 0px green;
+    display: block;
+}
+
+.wys-canvas-dropAreaIndicatorLayout * {
+    pointer-events: none;
+}
+
+wys-prop-panel .aw-command-panelContainer {
+    height: 855px;
+
+    .wys-propPanel-propContainers {
+        margin: 3px 0px;
+    }
+
+    .wys-propPanel-propValueContainers {
+        margin-top: 3px;
+        margin-bottom: 5px;
+    }
+
+    .wys-propPanel-checkboxValueContainers {
+        display: inline-block;
+        width: 15px;
+        vertical-align: top;
+    }
+
+}
+
+.propEditor li.aw-ui-treeNode .aw-ui-treeNodeValue {
+    padding: 0px;
+
+}
+
+aw-source-editor {
+    border: $default_border;
+}
+
+wys-canvas-container {
+
+    .aw-layout-subPanelContent .aw-layout-panelSection,
+    .aw-layout-subPanelContent .aw-layout-panelFooter,
+    .aw-layout-workareaCommandbar,
+    aw-tab-container,
+    aw-include {
+        pointer-events: none;
+    }
+}
+
+wys-widget-wrapper {
+    position: relative;
+    display: block;
+
+    .widget > *:first-child {
+        pointer-events: none;
+    }
+
+    .widget {
+        border: solid 1px transparent;
+        padding: 0px 4px;
+
+        &.widget-selection {
+            border-color: $panel_builder_selected_widget_border_color;
+            border-radius: 3px;
+            background-color: $panel_builder_selected_widget_background_color;
+        }
+    }
+
+    &.wys-alien-widgetLayout {
+        .widget {
+            border: solid 2px #c4cacc;
+            min-height: 45px;
+            min-width: 1px;
+            margin: 1px;
+        }
+
+        &::before {
+            content: attr(wrapped-widget-name);
+            background: #c4cacc;
+            font-size: 15px;
+            float: right;
+            margin: 1px 3px 2px 5px;
+            padding: 1px 5px 2px 5px;
+        }
+    }
+
+    &.wys-nested-widgetLayout {
+        .widget > *:first-child {
+            padding: 4px;
+        }
+
+        .widget {
+            border: 1px dashed $panel_builder_selected_widget_border_color;
+            border-radius: 3px;
+
+            &::before {
+                content: attr(wrapped-widget-view);
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                z-index: 10;
+                background-color: #DAECF0;
+                opacity: 0.3;
+            }
+
+            &.widget-selection {
+                border-style: solid;
+
+                &::before {
+                    background-color: #A0EEFF;
+                }
+            }
+        }
+    }
+
+    &[wrapped-widget-name="aw-button"], &[wrapped-widget-name="aw-avatar"] {
+        .widget {
+            padding: 4px;
+
+            wys-widget-wrapper[wrapped-widget-name="aw-i18n"] {
+                .widget {
+                    padding: 0px;
+                }
+            }
+        }
+    }
+
+    &[wrapped-widget-name="aw-image"] {
+        .widget {
+            padding: 4px;
+            overflow: auto;
+        }
+    }
+}
+
+.wys-toolbar-label-wrapper aw-property-label {
+    align-items: center;
+    display: flex;
+    padding-right: 5px;
+    flex: none;
+    margin-left: 10px;
+}
+
+.wys-toolbar-box {
+    z-index: 1;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+wys-widget-wrapper[wrapped-widget-view]::before {
+    content: attr(wrapped-widget-view);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 0px 3px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    background-color: #005f87;
+    border-color: #004669;
+    border: 1px solid;
+    text-align: center;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    z-index: 11;
+}
+
+wys-widget-wrapper[wrapped-widget-view]:hover::before {
+    background-color: #004669;
+}
+
+wysiwyg-prop .aw-splm-tableContainer {
+    .aw-commands-commandIconButton {
+        height: 1rem;
+        padding: 0;
+        transition: none;
+
+        .aw-commands-svg {
+            width: inherit;
+        }
+    }
+}
+
+wys-widget-wrapper img {
+    width: 100%;
+}
+
+.wys-canvas-overflow {
+    overflow-y: auto;
+}

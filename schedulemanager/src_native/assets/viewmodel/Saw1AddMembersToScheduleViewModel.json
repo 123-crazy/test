@@ -1,0 +1,84 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [{
+                    "panelId": "UserSub",
+                    "name": "{{i18n.users}}",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Saw1AddResourcePoolToSchedule",
+                    "name": "{{i18n.resourcePool}}",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Saw1AddDisciplinesToSchedule",
+                    "name": "{{i18n.discipline}}",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "Sc1Suppliers",
+                    "name": "{{i18n.suppliers}}",
+                    "recreatePanel": true,
+                    "visibleWhen": "ctx.preferences.SC_exchange_object_modifiable_states !== undefined && !data.i18n.filters"
+                }
+            ]
+        }
+    },
+    "actions":
+    {
+        "addResourceConditionToFilter": {
+            "actionType": "JSFunction",
+            "method": "editProgramViewCondition",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "selectedTab" : "{{data.selectedTab.panelId}}"
+            },
+            "deps": "js/Saw1ProgramAddFilterService"
+        },        
+        "addResourcesToFollowersPanel": {
+            "actionType": "JSFunction",
+            "method": "addObjectsToFollowersDataProvider",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedTab" : "{{data.selectedTab.panelId}}"
+            },
+            "deps": "js/Saw1NotificationService"
+        }
+    },
+    "conditions": {
+        "visibleAddBtn": {
+            "expression": "true"
+        }
+    },
+    "i18n": {
+        "users": [
+            "ScheduleManagerMessages"
+        ],
+        "discipline": [
+            "ScheduleManagerMessages"
+        ],
+        "saveBtnTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "resourcePool": [
+            "ScheduleManagerMessages"
+        ],
+        "suppliers": [
+            "supplierCollaborationMessages"
+        ],
+        "addButtonText": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

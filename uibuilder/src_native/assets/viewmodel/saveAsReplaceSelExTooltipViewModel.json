@@ -1,0 +1,122 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "data": {
+        "newExTooltip": {
+            "displayName": "{{i18n.viewName}}",
+            "type": "STRING",
+            "isEditable": true,
+            "dispValue": "",
+            "dbValue": "",
+            "autofocus": "true"
+        }
+    },
+    "actions": {
+        "saveAsAndReplace": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!, $viewName:String!){saveAsReplaceSelectedExtendedTooltip(input:{id:$commandID,viewName:$viewName}){id selectedExtendedTooltip}}",
+                    "variables":{
+                        "commandID": "{{ctx.selected.uid}}",
+                        "viewName": "{{data.newExTooltip.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "saveAsReplaceSelectedExtendedTooltip": "data.saveAsReplaceSelectedExtendedTooltip",
+                "saveAsErrorMsg": "errors[0].message"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "saveAsReplaceExTooltip.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "selectedExtendedTooltip",
+                            "propValue": "{{data.saveAsReplaceSelectedExtendedTooltip.selectedExtendedTooltip}}"
+                        }
+                    },
+                    {
+                        "condition": "!data.saveAsErrorMsg",
+                        "name": "saveAsReplaceExTooltip.notifyConfigChange"
+                    },
+                    {
+                        "condition": "!data.saveAsErrorMsg",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.saveAsErrorMsg",
+                        "message": "saveAsExtendedTooltipFailure"
+                    }
+                ]
+            }
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "updateSelectedObject": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedObjectProps",
+            "inputData":
+            {
+                "propName": "{{data.eventData.propName}}",
+                "propValue": "{{data.eventData.propValue}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        }
+    },
+    "dataProviders": {},
+    "onEvent": [ {
+            "eventId": "saveAsReplaceExTooltip.notifyConfigChange",
+            "action": "notifyConfigChange"
+        },
+        {
+            "eventId": "saveAsReplaceExTooltip.updateSelectedObject",
+            "cacheEventData": true,
+            "action": "updateSelectedObject"
+        }
+     ],
+    "conditions": {
+        "isValidToSaveAs": {
+            "expression": "data.newExTooltip.dbValue && data.newExTooltip.dbValue !='' && data.newExTooltip.dbValue !== ctx.selected.props.extendedTooltip.dbValue"
+        }
+    },
+    "messages": {
+        "saveAsExtendedTooltipFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.saveAsSelExtendedTooltipFailure}}",
+            "messageTextParams": [
+                "{{data.newExTooltip.dbValue}}"
+            ]
+        }
+    },
+    "i18n": {
+        "save": [ "XRTMessages" ],
+        "saveasCommand": [ "CommandBuilderMessages" ],
+        "viewName": [ "CommandBuilderMessages" ],
+        "saveAsSelExtendedTooltipFailure": [ "CommandBuilderMessages" ]
+    }
+}

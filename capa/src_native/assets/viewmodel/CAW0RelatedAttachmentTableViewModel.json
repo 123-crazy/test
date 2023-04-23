@@ -1,0 +1,110 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel-section.directive"
+    ],
+    "actions": {
+        "getRelatedAttachements": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "deps": "js/CAW0RelatedAttachmentTableService",
+            "outputData": {
+                "COEActions": "totalLoaded",
+                "ctx.search.totalFound": "totalLoaded.length",
+                "ctx.search.totalLoaded": "totalLoaded.length"
+            }
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.RelatedAttachmentTableProvider}}"
+            },
+
+            "deps": "js/CAW0RelatedAttachmentTableService"
+        }
+    },
+    "dataProviders": {
+        "RelatedAttachmentTableProvider": {
+            "action": "getRelatedAttachements",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                },
+                "Awp0ShowObjectCellDataset": {
+                    "id": "cmdOpen",
+                    "title": "Download",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectDatasetCommandHandler" ],
+                    "displayOption": "ON_SELECTION",
+                    "position": "TOP_RIGHT"
+                },
+                "Awp0NavigateObject": {
+                    "id": "cmdShowChildren",
+                    "title": "Navigate Object",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/navigateObjectCommandHandler" ],
+                    "displayOption": "ALWAYS",
+                    "position": "TOP_RIGHT"
+                }
+            },
+            "response": "{{data.COEActions}}",
+            "totalFound": "{{data.totalFound}}",
+            "cols": "{{data.columns}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "columnProviders": {
+        "RelatedAttachmentTableColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex": 1
+        }
+    },
+
+    "grids": {
+        "RelatedAttachmentTable": {
+            "dataProvider": "RelatedAttachmentTableProvider",
+            "columnProvider": "RelatedAttachmentTableColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "maxRowsToShow": 5,
+                "enablePinning": true
+            }
+        }
+    },
+    "i18n": {
+        "COEtitle": [
+            "CAW0CapaMessages"
+        ],
+        "name": [
+            "CAW0CapaMessages"
+        ],
+        "referenceObject": [
+            "CAW0CapaMessages"
+        ],
+        "type": [
+            "CAW0CapaMessages"
+        ],
+        "creationDate": [
+            "CAW0CapaMessages"
+        ],
+        "owner": [
+            "CAW0CapaMessages"
+        ],
+        "description": [
+            "CAW0CapaMessages"
+        ]
+    }
+}

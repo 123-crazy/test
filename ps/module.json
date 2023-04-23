@@ -1,0 +1,541 @@
+{
+  "name": "ps",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "psEditEffectivityGroupCmd": {
+        "iconId": "cmdEdit",
+        "title": "{{i18n.edit}}"
+      },
+      "ps0SetPin": {
+        "iconId": "cmdPin",
+        "isGroup": false,
+        "title": "{{i18n.ps0PinButtonToolTip}}",
+        "description": "{{i18n.panelPinButtonDesc}}"
+      },
+      "ps0SetUnPin": {
+        "iconId": "cmdUnpin",
+        "isGroup": false,
+        "title": "{{i18n.ps0UnpinButtonToolTip}}",
+        "description": "{{i18n.panelUnPinButtonDesc}}"
+      },
+      "ps0AddAlternate": {
+        "iconId": "cmdAdd",
+        "isGroup": false,
+        "title": "{{i18n.addAlternate}}",
+        "description": "{{i18n.ps0AddAlternateDesc}}"
+      },
+      "ps0AddAlternatePWA": {
+        "iconId": "cmdAlternate",
+        "isGroup": false,
+        "title": "{{i18n.addAlternatePWA}}",
+        "description": "{{i18n.ps0AddAlternateDesc}}"
+      },
+      "ps0RemoveAlternate": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.removeAlternate}}",
+        "description": "{{i18n.ps0RemoveAlternateDesc}}"
+      },
+      "ps0AddEffectivitiesCmd": {
+        "iconId": "cmdAdd",
+        "isGroup": false,
+        "title": "{{i18n.ps0AddEffectivitiesCmd}}",
+        "description": "{{i18n.ps00AddEffectivitiesCmdDesc}}"
+      },
+      "ps0RemoveEffectivitiesCmd": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.ps0RemoveEffectivitiesCmd}}",
+        "description": "{{i18n.ps0RemoveEffectivitiesCmdDesc}}"
+      },
+      "ps0EditEffectivityCmd": {
+        "iconId": "cmdEdit",
+        "title": "{{i18n.startEditButtonText}}",
+        "description": "{{i18n.ps0EditEffectivityCmdDesc}}"
+      }
+    },
+    "commandHandlers": {
+      "psEditEffectivityGroupHandler": {
+        "id": "psEditEffectivityGroupCmd",
+        "action": "launchEditEffectivityGroupPanel",
+        "activeWhen": {
+          "condition": "conditions.isEffectivityGroupEditable"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isEffectivityGroupEditable"
+        }
+      },
+      "ps0SetPinCommandHandler": {
+        "id": "ps0SetPin",
+        "action": "ps0SetPin",
+        "activeWhen": {
+          "condition": "conditions.isPs0PanelPinned"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isPs0PanelPinned"
+        }
+      },
+      "ps0SetUnPinCommandHandler": {
+        "id": "ps0SetUnPin",
+        "action": "ps0SetUnPin",
+        "activeWhen": {
+          "condition": "conditions.isPs0PanelUnPinned"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isPs0PanelUnPinned"
+        }
+      },
+      "ps0AddAlternateCommandHandler": {
+        "id": "ps0AddAlternate",
+        "action": "CheckForEditsAndAddAlternateCommandAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.ps0AddAlternateCommandCondition"
+        }
+      },
+      "ps0AddAlternatePWACommandHandler": {
+        "id": "ps0AddAlternatePWA",
+        "action": "CheckForEditsAndAddAlternateCommandAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.isNotOpenedFor4GStructure"
+        },
+        "enableWhen": {
+          "condition": "conditions.ps0AddAlternateCommandConditionForPWA"
+        }
+      },
+      "ps0RemoveAlternateCommandHandler": {
+        "id": "ps0RemoveAlternate",
+        "action": "removeAlternates",
+        "activeWhen": {
+          "condition": "conditions.ps0RemoveAlternateCommandCondition"
+        },
+        "visibleWhen": {
+          "condition": "conditions.ps0RemoveAlternateCommandCondition"
+        }
+      },
+      "ps0AddEffectivitiesCmdHandler": {
+        "id": "ps0AddEffectivitiesCmd",
+        "action": "ps0LaunchAddEffectivitiesPanel",
+        "activeWhen": true,
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.ps0AddEffectivitiesCommandCondition"
+        }
+      },
+      "ps0RemoveEffectivitiesCmdHandler": {
+        "id": "ps0RemoveEffectivitiesCmd",
+        "action": "ps0RemoveEffectivitiesAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.ps0RemoveEffectivitiesCommandVisibilityCondition"
+        },
+        "enableWhen": {
+          "condition": "conditions.ps0RemoveEffectivitiesCommandEnabledCondition"
+        }
+      },
+      "ps0EditEffectivityCommandHandler": {
+        "id": "ps0EditEffectivityCmd",
+        "action": "ps0LaunchEditEffectivityPanel",
+        "activeWhen": true,
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.ps0EditEffectivitiesCommandCondition"
+        }
+      }
+    },
+    "commandPlacements": {
+      "psEditEffectivityGroupCommandPlacement": {
+        "id": "psEditEffectivityGroupCmd",
+        "uiAnchor": "edit_effectivity_group_cell_commands",
+        "priority": 100,
+        "cellDisplay": {
+          "hover": true,
+          "selected": true,
+          "position": "TOP_RIGHT"
+        }
+      },
+      "ps0AddAlternateCommandPlacement": {
+        "id": "ps0AddAlternatePWA",
+        "uiAnchor": "aw_primaryWorkArea",
+        "parentGroupId": "Awb0AddGroup",
+        "priority": 40
+      },
+      "ps0SetPinPlacement": {
+        "id": "ps0SetPin",
+        "uiAnchor": "ps0_oneStepPinCommands",
+        "priority": 100
+      },
+      "ps0SetUnPinPlacement": {
+        "id": "ps0SetUnPin",
+        "uiAnchor": "ps0_oneStepPinCommands",
+        "priority": 100
+      },
+      "ps0AddEffectivitiesCmdPlacement": {
+        "id": "ps0AddEffectivitiesCmd",
+        "uiAnchor": "ps0_commandDisplayEffectivity",
+        "priority": 1
+      },
+      "ps0RemoveEffectivitiesCmdPlacement": {
+        "id": "ps0RemoveEffectivitiesCmd",
+        "uiAnchor": "ps0_commandDisplayEffectivity",
+        "priority": 1
+      },
+      "ps0EffectivityCellCmdPlacement": {
+        "id": "ps0EditEffectivityCmd",
+        "uiAnchor": "ps0_effectivity_cell_commands",
+        "priority": 100,
+        "cellDisplay": {
+          "hover": true,
+          "selected": true,
+          "position": "TOP_RIGHT"
+        }
+      }
+    },
+    "actions": {
+      "launchEditEffectivityGroupPanel": {
+        "actionType": "JSFunction",
+        "method": "execute",
+        "inputData": {
+          "vmo": "{{commandContext.vmo}}",
+          "title": "{{i18n.editEffectivityTooltip}}"
+        },
+        "deps": "js/editGroupEffectivityCommandHandler"
+      },
+      "ps0SetPin": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "ps0SetPin",
+              "eventData": {
+                "data": "{{commandContext}}"
+              }
+            }
+          ]
+        }
+      },
+      "ps0SetUnPin": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "ps0SetUnPin",
+              "eventData": {
+                "data": "{{commandContext}}"
+              }
+            }
+          ]
+        }
+      },
+      "CheckForEditsAndAddAlternateCommandAction": {
+        "actionType": "batchJob",
+        "steps": [
+          {
+            "action": "showLeaveConfirmation",
+            "condition": "conditions.isEditInProgressInTreeOrTable"
+          },
+          {
+            "action": "AddAlternateCommandAction"
+          }
+        ]
+      },
+      "AddAlternateCommandAction": {
+        "actionType": "JSFunction",
+        "method": "activateCommandPanel",
+        "deps": "js/commandPanel.service",
+        "inputData": {
+          "commandId": "ps0AddAlternate",
+          "location": "aw_toolsAndInfo"
+        }
+      },
+      "removeAlternates": {
+        "actionType": "JSFunction",
+        "method": "removeAlternates",
+        "inputData": {
+          "selectedAlternates": "{{ctx.mselected}}",
+          "selectedObjects": {
+            "$adapt": "{{ctx.xrtSummaryContextObject}}",
+            "path": "uid"
+          }
+        },
+        "outputData": {},
+        "deps": "js/alternatesService"
+      },
+      "ps0LaunchAddEffectivitiesPanel": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "awPanel.navigate",
+              "eventData": {
+                "destPanelId": "ps0AddEffectivity",
+                "title": "{{i18n.ps0AddEffectivitiesCmd}}",
+                "recreatePanel": true,
+                "supportGoBack": true
+              }
+            }
+          ]
+        }
+      },
+      "ps0RemoveEffectivitiesAction": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "removeEffectivitiesEvent",
+              "eventData": {
+                "data": "{{commandContext}}"
+              }
+            }
+          ]
+        }
+      },
+      "ps0LaunchEditEffectivityPanel": {
+        "actionType": "JSFunction",
+        "method": "execute",
+        "deps": "js/expressionEffectivityEditCommandHandler",
+        "inputData": {
+          "vmo": "{{commandContext.vmo}}",
+          "$scope": "{{$parent}}"
+        }
+      }
+    },
+    "conditions": {
+      "isEffectivityGroupEditable": {
+        "expression": "commandContext.vmo.props.is_modifiable.dbValues[ 0 ] === true || commandContext.vmo.props.is_modifiable.dbValues[ 0 ] === '1'"
+      },
+      "isEditInProgressInTreeOrTable": {
+        "expression": "(ctx.occDataProvider || ctx.occDataProvider2)  && (ctx['occDataProvider'].editInProgress() || ctx['occDataProvider2'].editInProgress()) || ctx.TABLE_CONTEXT && ctx['TABLE_CONTEXT'].editInProgress()"
+      },
+      "isPs0PanelPinned": {
+        "expression": "commandContext.pinnedToForm.dbValue"
+      },
+      "isPs0PanelUnPinned": {
+        "expression": "commandContext.unpinnedToForm.dbValue"
+      },
+      "ps0AddAlternateCommandCondition": {
+        "expression": "commandContext.objectSetSource==='Awp0AlternatesProvider.Item' && ctx.visibleServerCommands.Awp0AddAlternate && !ctx.hiddenCommands.ps0AddAlternate"
+      },
+      "ps0AddAlternateCommandConditionForPWA": {
+        "expression": "!ctx.aceActiveContext.context.isDuplicateEnabled && ctx.mselected.length === 1 && ctx.visibleServerCommands.Awp0AddAlternate && !ctx.hiddenCommands.ps0AddAlternate"
+      },
+      "ps0RemoveAlternateCommandCondition": {
+        "expression": "commandContext.objectSetSource==='Awp0AlternatesProvider.Item' && ctx.visibleServerCommands.Awp0RemoveAlternate && !ctx.hiddenCommands.ps0RemoveAlternate && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === undefined"
+      },
+      "ps0RemoveEffectivitiesCommandVisibilityCondition": {
+        "expression": "commandContext.activeView=='ps0DisplayEffectivities' && commandContext.dataProviders.getEffectivity.selectedObjects.length>0 "
+      },
+      "isNotOpenedFor4GStructure": {
+        "expression": "!ctx[commandContext.viewKey].supportedFeatures['4GStructureFeature']"
+      },
+      "ps0RemoveEffectivitiesCommandEnabledCondition": {
+        "expression": {
+          "$source": "conditions.ps0IsSelectionNotReleased",
+          "$query": {
+            "$eq": true
+          }
+        }
+      },
+      "ps0AddEffectivitiesCommandCondition": {
+        "expression": {
+          "$and": [
+            {
+              "$source": "conditions.ps0IsSelectionNotReleased",
+              "$query": {
+                "$eq": true
+              }
+            },
+            {
+              "$source": "commandContext.activeView",
+              "$query": {
+                "$eq": "ps0DisplayEffectivities"
+              }
+            }
+          ]
+        }
+      },
+      "ps0EditEffectivitiesCommandCondition": {
+        "expression": {
+          "$source": "conditions.ps0IsSelectionNotReleased",
+          "$query": {
+            "$eq": true
+          }
+        }
+      },
+      "ps0IsSelectionNotReleased": {
+        "expression": {
+          "$and": [
+            {
+              "$source": "ctx.expressionEffectivity.underlyingPropLoaded",
+              "$query": {
+                "$eq": true
+              }
+            },
+            {
+              "$source": {
+                "$adapt": "ctx.selected"
+              },
+              "$query": {
+                "$source": "props.release_status_list.uiValues",
+                "$query": {
+                  "$notin": [
+                    "TCM Released"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "i18n": {
+      "addAlternate": [
+        "PSConstants"
+      ],
+      "addAlternatePWA": [
+        "PSConstants"
+      ],
+      "removeAlternate": [
+        "PSConstants"
+      ],
+      "ps0PinButtonToolTip": [
+        "PSConstants"
+      ],
+      "ps0UnpinButtonToolTip": [
+        "PSConstants"
+      ],
+      "ps0_oneStepPinCommands": [
+        "PSConstants"
+      ],
+      "ps0AddAlternateDesc": [
+        "PSConstants"
+      ],
+      "ps0RemoveAlternateDesc": [
+        "PSConstants"
+      ],
+      "ps0AddEffectivitiesCmd": [
+        "PSConstants"
+      ],
+      "ps00AddEffectivitiesCmdDesc": [
+        "PSConstants"
+      ],
+      "ps0RemoveEffectivitiesCmd": [
+        "PSConstants"
+      ],
+      "ps0RemoveEffectivitiesCmdDesc": [
+        "PSConstants"
+      ],
+      "ps0_commandDisplayEffectivity": [
+        "PSConstants"
+      ],
+      "ps0EditEffectivityCmdDesc": [
+        "PSConstants"
+      ],
+      "startEditButtonText": [
+        "TCUICommandPanelsMessages"
+      ],
+      "editEffectivityTooltip": [
+        "OccurrenceManagementConstants"
+      ]
+    }
+  },
+  "saveHandlers": [
+    {
+      "conditions": {
+        "$and": [
+          {
+            "$or": [
+              {
+                "occDataProvider._editing": {
+                  "$eq": "true"
+                }
+              },
+              {
+                "occDataProvider2._editing": {
+                  "$eq": "true"
+                }
+              },
+              {
+                "INFO_PANEL_CONTEXT._editing": {
+                  "$eq": "true"
+                }
+              },
+              {
+                "NONE._editing": {
+                  "$eq": "true"
+                }
+              },
+              {
+                "VARIANT_TREE_CONTEXT._editing": {
+                  "$eq": "true"
+                }
+              },
+              {
+                "editInProgress": {
+                  "$eq": "true"
+                }
+              }
+            ]
+          },
+          {
+            "userSession.props.cm0GlobalChangeContext.dbValue": {
+              "$notNull": "true"
+            }
+          },
+          {
+            "occmgmtContext.currentState.incontext_uid": {
+              "$isNull": "true"
+            }
+          },
+          {
+            "sublocation.clientScopeURI": {
+              "$eq": "Awb0OccurrenceManagement"
+            }
+          },
+          {
+            "$or": [
+              {
+                "tcSessionData.tcMajorVersion": {
+                  "$gt": "13"
+                }
+              },
+              {
+                "$and": [
+                  {
+                    "tcSessionData.tcMajorVersion": {
+                      "$eq": "13"
+                    }
+                  },
+                  {
+                    "tcSessionData.tcMinorVersion": {
+                      "$gt": "2"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "target": {
+        "method": "getSaveHandler",
+        "deps": "js/psEditSaveHandler"
+      }
+    }
+  ]
+}

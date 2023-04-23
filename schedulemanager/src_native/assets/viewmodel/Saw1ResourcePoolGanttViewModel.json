@@ -1,0 +1,140 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+                "actionType": "dataProvider",
+                "methods": [
+                    "getResourcePool"
+                ]
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getResourcePool}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "ResourcePool",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ScheduleTask",
+                        "properties": [ {
+                            "name": "ResourceAssignment",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        } ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "deps": "js/userListService"
+        },
+        "addSelection":
+        {
+           "actionType": "JSFunction",
+           "method": "addSelectedObject",
+           "inputData": {
+              "data": "{{data}}",
+              "selection": "{{data.dataProviders.getResourcePool.selectedObjects}}"
+           },
+           "deps": "js/userListService"
+        }
+    },
+    "dataProviders":
+    {
+        "getResourcePool":
+        {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                   "id": "cmdAdd",
+                   "areas": [
+                      "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                   ],
+                   "priorities": [
+                      300
+                   ],
+                   "dependencies": [
+                      "js/showObjectCommandHandler"
+                   ],
+                   "displayOption": "ON_HOVER_AND_SELECTION",
+                   "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "ResourcePool": []
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1ResourcePoolGantt"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "getResourcePool.selectionChangeEvent",
+            "action": "addSelection"
+        }
+    ],
+    "i18n": {
+        "resourcePool": [
+            "ScheduleManagerMessages"
+        ],
+        "assignButtonText": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

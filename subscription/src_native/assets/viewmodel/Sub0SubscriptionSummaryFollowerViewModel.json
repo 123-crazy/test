@@ -1,0 +1,122 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-toolbar.directive",
+        "js/aw-panel.directive",
+        "js/aw-splm-table.directive"
+    ],
+    "onEvent": [
+
+        {
+            "eventId": "subscriptionFollowerTable.loadFollowerObjects",
+            "action": "loadFollowerObjects"
+        },
+        {
+            "eventId": "subscriptionFollowerTable.reveal",
+            "action": "followers_provider"
+        },
+        {
+            "eventId": "subscriptionFollowerObjects.updated",
+            "action": "updateSubscriptionObject"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'canceling'",
+            "action": "resetFollowerTable"
+        }
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadFollowerContext",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.followers_provider}}",
+                "columnDefs": "{{data.columnProviders.subscriptionFollowerTableColumnProvider.columns}}",
+                "targetTypeName": "{{ctx.xrtSummaryContextObject}}"
+            },
+            "outputData": {
+                "ctx.sub0Follower": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "subscriptionFollowerTable.loadFollowerObjects"
+                } ]
+            },
+            "deps": "js/awSubscriptionFollowerTableService"
+        },
+        "loadFollowerObjects": {
+            "actionType": "JSFunction",
+            "method": "loadFollowerObjects",
+            "inputData": {
+                "followerCtx": "{{ctx.sub0Follower}}",
+                "subscriptionObject": "{{ctx.xrtSummaryContextObject}}"
+            },
+            "outputData": {
+                "ctx.sub0Follower.followerObjects": "",
+                "searchResults": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "subscriptionFollowerTable.reveal"
+                } ]
+            },
+            "deps": "js/awSubscriptionFollowerTableService"
+        },
+        "updateSubscriptionObject": {
+            "actionType": "JSFunction",
+            "method": "updateSubscriptionObject",
+            "inputData": {
+                "subscriptionObject": "{{ctx.xrtSummaryContextObject}}",
+                "columnDefs": "{{ctx.sub0Follower.columnDefs}}",
+                "followerObjects": "{{ctx.sub0Follower.followerObjects}}"
+            },
+            "deps": "js/awSubscriptionFollowerTableService"
+        },
+        "resetFollowerTable":{
+            "actionType": "JSFunction",
+            "method": "resetFollowerTable",
+            "inputData": {
+                "followerCtx":"{{ctx.sub0Follower}}",
+                "subscriptionObject": "{{ctx.xrtSummaryContextObject}}"
+            },
+            "outputData": {
+                "ctx.sub0Follower.followerObjects": ""
+            },
+            "deps": "js/awSubscriptionFollowerTableService"
+        }
+    },
+    "dataProviders": {
+        "followers_provider": {
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.searchResults.length}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "columnProviders": {
+        "subscriptionFollowerTableColumnProvider": {
+            "columns": [ {
+                "name": "handler_parameters",
+                "displayName": "{{i18n.followersHeaderTitle}}",
+                "typeName": "String",
+                "isTableCommand": false,
+                "pinnedLeft": false,
+                "enableColumnMenu": false
+            } ],
+            "frozenColumnIndex": -1
+        }
+    },
+    "grids": {
+        "subscriptionFollowerTable": {
+            "dataProvider": "followers_provider",
+            "columnProvider": "subscriptionFollowerTableColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enableSorting": false
+            }
+        }
+    },
+    "i18n": {
+        "followersHeaderTitle": [ "SubscriptionMessages" ]
+    }
+}

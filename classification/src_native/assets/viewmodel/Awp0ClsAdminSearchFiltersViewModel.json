@@ -1,0 +1,221 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-button.directive",
+        "js/aw-checkbox-with-reset.directive",
+        "js/aw-class.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-i18n.directive",
+        "js/aw-icon-button.directive",
+        "js/aw-include.directive",
+        "js/aw-init.directive",
+        "js/aw-list.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive"
+    ],
+    "data": {
+        "operationType": {
+            "displayName": "{{i18n.PropertyLabel}}",
+            "type": "STRING",
+            "isRequired": "",
+            "hasLov": "true"
+        },
+        "operationTypeValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.Name}}",
+                    "dispValue": "Name",
+                    "propInternalValue": "Name"
+                },
+                {
+                    "propDisplayValue": "{{i18n.ID}}",
+                    "dispValue": "ID",
+                    "propInternalValue": "ID"
+                },
+                {
+                    "propDisplayValue": "{{i18n.Revision}}",
+                    "dispValue": "Revision",
+                    "propInternalValue": "Revision"
+                },
+                {
+                    "propDisplayValue": "{{i18n.Namespace}}",
+                    "dispValue": "Namespace",
+                    "propInternalValue": "Namespace"
+                },
+                {
+                    "propDisplayValue": "{{i18n.Status}}",
+                    "dispValue": "Status",
+                    "propInternalValue": "Status"
+                }
+            ]
+        },
+        "operationValues": {
+            "displayName": "{{i18n.PropertyValueLabel}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true"
+        },
+        "Releases": {
+            "displayName": "{{i18n.release}}",
+            "type": "STRING",
+            "isEditable": "true"
+        },
+        "addFilter": {
+            "dbValue": [ {
+                "action": "addFilter",
+                "iconName": "Add",
+                "tooltip": "{{i18n.addFilter}}"
+            } ]
+        },
+        "addFilterList": {
+            "isArray": "true",
+            "dbValue": []
+        }
+    },
+    "actions": {
+        "addFilterListAction": {
+            "actionType": "dataProvider",
+            "method": "addFilterListProvider"
+        },
+        "performFilter": {
+            "actionType": "JSFunction",
+            "method": "setFilters",
+            "inputData": {
+                "data": "{{data}}",
+                "addFilterList": "{{data.addFilterList}}"
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "revealFilterList",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "clsAdmin.createReleaseList"
+                    },
+                    {
+                        "name": "awp0clsAdmin.addFilterListAction"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "addFilter": {
+            "actionType": "JSFunction",
+            "method": "addFilter",
+            "inputData": {
+                "data": "{{data}}",
+                "addFilterList": "{{data.addFilterList}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "awp0clsAdmin.refreshFilterListProvider"
+                } ]
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "removeFilter": {
+            "actionType": "JSFunction",
+            "method": "removeFilter",
+            "inputData": {
+                "addFilterList": "{{data.addFilterList}}",
+                "selectedFilter": "{{data.selectedCell}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "awp0clsAdmin.refreshFilterListProvider"
+                } ]
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "createReleaseList": {
+            "actionType": "JSFunction",
+            "method": "createReleaseList",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyAdminService"
+        },
+        "resetReleases": {
+            "actionType": "JSFunction",
+            "method": "resetReleases",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyAdminService"
+        }
+    },
+    "dataProviders": {
+        "addFilterListProvider": {
+            "commands": {
+                "delete": {
+                    "id": "cmdRemove",
+                    "title": "{{i18n.removeFilter}}",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [ 300 ],
+                    "action": "removeFilter",
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            },
+            "response": "{{data.addFilterList.dbValue}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awp0clsAdmin.refreshFilterListProvider",
+            "action": "addFilterListProvider"
+        },
+        {
+            "eventId": "awp0clsAdmin.addFilter",
+            "action": "addFilter"
+        },
+        {
+            "eventId": "awp0clsAdmin.addFilterListAction",
+            "action": "addFilterListAction"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Awp0ClsAddFilterCell"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "criteria": {
+                "destPanelId": "Awp0ClsAddFilterCell"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "clsAdmin.createReleaseList",
+            "action": "createReleaseList"
+        }
+
+    ],
+    "conditions": {
+    },
+    "i18n": {
+        "addFilter":            [ "ClassificationAdminMessages" ],
+        "applyFilters":         [ "ClassificationAdminMessages" ],
+        "Filters":              [ "ClassificationAdminMessages" ],
+        "ID":                   [ "ClassificationAdminMessages" ],
+        "Name":                 [ "ClassificationAdminMessages" ],
+        "Namespace":            [ "ClassificationAdminMessages" ],
+        "propertiesTitle":      [ "ClassificationAdminMessages" ],
+        "PropertyLabel":        [ "ClassificationAdminMessages" ],
+        "PropertyValueLabel":   [ "ClassificationAdminMessages" ],
+        "release":              [ "ClassificationAdminMessages" ],
+        "removeFilter":         [ "ClassificationAdminMessages" ],
+        "Revision":             [ "ClassificationAdminMessages" ],
+        "Status":               [ "ClassificationAdminMessages" ]
+    }
+}

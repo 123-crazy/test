@@ -1,0 +1,31 @@
+<aw-filter-category-date-range-filter
+    ng-if="category.showDateRangeFilter"
+    search-action="searchAction"
+    category= "category"
+    id="{{category.displayName}}">
+</aw-filter-category-date-range-filter >
+
+<aw-filter-category-date-contents
+    search-action="searchAction"
+    filter="item"
+    category= "category"
+    ng-repeat="item in category.filterValues | limitTo: category.showMoreFilter ? category.defaultFilterValueDisplayCount+category.drilldown : category.filterValues.length">
+</aw-filter-category-date-contents >
+<!-- Show More/Less if years/months > 6 -->
+<div tabindex="0" class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled aw-aria-border"
+     ng-class="{'aw-ui-filterNameLabelDrilldown1': category.drilldown==1,
+                'aw-ui-filterNameLabelDrilldown2': category.drilldown==2,
+                'aw-ui-filterNameLabelDrilldown3': category.drilldown==3}"
+                ng-if="!category.showMoreFilter && category.filterValues.length >= category.defaultFilterValueDisplayCount+category.drilldown+1"
+     title="{{lessText}}" ng-keydown="lessFilterKeyPress($event)" ng-click="toggleFilters(false)">
+              {{lessText}}
+</div>
+<div tabindex="0" class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled aw-aria-border"
+     ng-class="{'aw-ui-filterNameLabelDrilldown1': category.drilldown==1,
+                'aw-ui-filterNameLabelDrilldown2': category.drilldown==2,
+                'aw-ui-filterNameLabelDrilldown3': category.drilldown==3}"
+                ng-if="category.showMoreFilter && category.filterValues.length >= category.defaultFilterValueDisplayCount+category.drilldown+1"
+     title="{{moreText}}" ng-keydown="moreFilterKeyPress($event)" ng-click="toggleFilters(true)">
+              {{moreText}}
+</div>
+

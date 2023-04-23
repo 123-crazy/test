@@ -1,0 +1,246 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "saveModify": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-AdvancedSavedSearch",
+            "method": "updateAdvancedSavedSearch",
+            "inputData": {
+                "inputs": "{{function:getSaveAndModifyAdvSearchInputs}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code===141153",
+                    "message": "confirmOverwrite"
+                } ],
+
+                "success": [ {
+                    "condition": "data.pinToHome.dbValue===true || data.pinToHome.dbValue==='true'",
+                    "message": "pinToHome"
+                } ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "saveCreate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-AdvancedSavedSearch",
+            "method": "createAdvancedSavedSearch",
+            "inputData": {
+                "inputs": "{{function:getSaveAndCreateAdvSearchInputs}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code===141152",
+                    "message": "confirmOverwrite"
+                } ],
+
+                "success": [ {
+                    "condition": "data.pinToHome.dbValue===true || data.pinToHome.dbValue==='true'",
+                    "message": "pinToHome"
+                } ]
+            },
+
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "overwrite": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-AdvancedSavedSearch",
+            "method": "createAdvancedSavedSearch",
+            "inputData": {
+                "inputs": "{{function:getOverwriteAdvSearchInputs}}"
+            },
+
+            "events": {
+                "success": [ {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "updateSavedSearchContext": {
+            "actionType": "JSFunction",
+            "method": "updateSavedSearchContext",
+            "inputData": {
+                "savedSearchObject": "{{ctx.selected}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0SaveSearchService"
+        },
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "updateSavedSearchContext",
+            "inputData": {
+                "savedSearchObject": "{{ctx.selected}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0SaveSearchService"
+        }
+    },
+    "messages": {
+        "confirmOverwrite": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.nameInUse}}",
+            "messageTextParams": [
+                "{{data.searchName.dbValue}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.CancelText}}",
+                    "action": ""
+                },
+
+                {
+                    "option": "Overwrite",
+                    "text": "{{i18n.OverwriteText}}",
+                    "action": "overwrite"
+                }
+            ]
+        },
+
+        "pinToHome": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pinToHome}}",
+            "messageTextParams": [
+                "{{data.searchName.dbValue}}"
+            ]
+        }
+    },
+    "data": {
+        "searchName": {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.savedAdvSearch.searchName}}",
+            "dispValue": "{{ctx.savedAdvSearch.searchName}}",
+            "maxLength": 128
+        },
+        "referencingSavedQuery": {
+            "displayName": "{{i18n.referencingSavedQuery}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.savedAdvSearch.referencingSavedQuery}}",
+            "dispValue": "{{ctx.savedAdvSearch.referencingSavedQuery}}"
+        },
+        "savedSearchCriteria": {
+            "displayName": "{{i18n.savedSearchCriteria}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.savedAdvSearch.savedSearchCriteria}}",
+            "dispValue": "{{ctx.savedAdvSearch.savedSearchCriteria}}"
+        },
+        "pinToHome": {
+            "displayName": "{{i18n.pinSearch}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.savedAdvSearch.pinned}}"
+        },
+        "shareSavedSearch": {
+            "displayName": "{{i18n.shareSavedSearch}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.savedAdvSearch.shared}}"
+        },
+        "favorite": {
+            "displayName": "{{i18n.favorite}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.savedAdvSearch.favorite}}"
+        }
+    },
+    "functions": {
+        "getSaveAndModifyAdvSearchInputs": {
+            "functionName": "getEditSavedAdvSearchInputs",
+            "parameters": [
+                "{{data}}",
+                "SaveAndModify"
+            ]
+        },
+        "getSaveAndCreateAdvSearchInputs": {
+            "functionName": "getEditSavedAdvSearchInputs",
+            "parameters": [
+                "{{data}}",
+                "SaveAndCreate"
+            ]
+        },
+        "getOverwriteAdvSearchInputs": {
+            "functionName": "getEditSavedAdvSearchInputs",
+            "parameters": [
+                "{{data}}",
+                "Overwrite"
+            ]
+        }
+    },
+    "conditions": {
+        "isValidToSave": {
+            "expression": "data.searchName.dbValue != '' && data.searchName.newValue !== undefined && data.searchName.value !== data.searchName.newValue"
+        },
+        "isValidToEdit": {
+            "expression": "data.searchName.dbValue == data.searchName.value && (data.pinToHome.newValue !== undefined && data.pinToHome.value !== data.pinToHome.newValue || data.shareSavedSearch.newValue !== undefined && data.shareSavedSearch.value !== data.shareSavedSearch.newValue || data.favorite.newValue !== undefined && data.favorite.value !== data.favorite.newValue)"
+        }
+    },
+    "onEvent": [ {
+        "eventId": "soa.getVisibleCommands",
+        "action": "updateSavedSearchContext"
+    } ],
+    "i18n": {
+        "Name": [ "SearchMessages" ],
+        "SaveSearch": [ "SearchMessages" ],
+        "referencingSavedQuery": [ "SearchMessages" ],
+        "savedSearchCriteria": [ "SearchMessages" ],
+        "Save": [ "SearchMessages" ],
+        "nameInUse": [ "SearchMessages" ],
+        "CancelText": [ "SearchMessages" ],
+        "OverwriteText": [ "SearchMessages" ],
+        "pinSearch": [ "SearchMessages" ],
+        "shareSavedSearch": [ "SearchMessages" ],
+        "favorite": [ "SearchMessages" ]
+    }
+
+}

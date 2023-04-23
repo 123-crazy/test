@@ -1,0 +1,136 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-image-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "showData": {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "loadAdvancedSearchData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "searchInput": {
+                    "attributesToInflate": [],
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Awp0SavedQuerySearchProvider",
+                    "searchCriteria": "{{function:getSearchCriteria}}",
+                    "searchFilterFieldSortType": "Priority",
+                    "startIndex": "{{function:getCursorStartIndexValue}}",
+                    "searchFilterMap6": "",
+                    "searchSortCriteria": "{{ctx.sublocation.sortCriteria}}"
+                },
+                "inflateProperties": false
+            },
+            "policy": {
+                "types": [ {
+                    "name": "BusinessObject",
+                    "properties": [ {
+                        "name": "awp0CellProperties"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.totalFound": "totalFound",
+                "ctx.searchResponseInfo.lastEndIndex": "endIndex",
+                "ctx.searchResponseInfo.searchString": "{{ctx.search.criteria.searchString}}",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.chartProvider": null,
+                "dataProviders.imageDataProvider.cursorObject": "cursor"
+            },
+            "events": {
+                "success": [ {
+                    "name": "teamcenter_search_advancedSearchImage.selectFirstItem",
+                    "condition": "ctx.search.totalLoaded===1 || totalFound>0 && data.dataProviders.imageDataProvider.startIndex===0"
+                } ]
+            },
+            "deps": "js/advancedSearchService",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "loadAdvancedSearchDataFailure"
+                    }
+                ]
+            }
+        },
+        "selectFirstItem": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.imageDataProvider.selectionModel}}",
+                "newSelection": "{{data.searchResults.objects[0].uid}}"
+            },
+            "deps": "js/selectionModelFactory"
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize":
+        {
+            "functionName": "getDefaultPageSize",
+            "parameters":
+            [
+                 "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "getSearchCriteria": {
+            "functionName": "getSearchCriteria",
+            "parameters": [
+                "{{data.dataProviders.imageDataProvider.startIndex}}",
+                "{{ctx.advancedSearch.criteria}}"
+            ]
+        },
+        "getCursorStartIndexValue": {
+            "functionName": "getCursorStartIndexValue",
+            "parameters": [ "{{data.dataProviders.imageDataProvider}}" ]
+        }
+    },
+
+    "dataProviders": {
+        "imageDataProvider": {
+            "action": "loadAdvancedSearchData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "conditions": {},
+    "onEvent": [ {
+        "eventId": "teamcenter_search_advancedSearchImage.contentLoaded",
+        "action": "showData"
+    }, {
+        "eventId": "teamcenter_search_advancedSearchImage.selectFirstItem",
+        "action": "selectFirstItem"
+    } ],
+    "messages": {
+        "loadAdvancedSearchDataFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    }
+}

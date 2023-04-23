@@ -1,0 +1,82 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+                 "js/aw-repeat.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-panel-section.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-i18n.directive",
+                 "js/aw-label.directive",
+                 "js/aw-button.directive"], 
+    "actions" :{
+        "reveal":
+        {
+            "actionType":"JSFunction",
+            "method":"updateHealthData",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "outputData":
+            {
+                "data":""
+            },
+            "deps":"js/Awp0AdminToolService"
+        },
+        "refreshHealthData":
+        {
+            "actionType":"Event",
+            "method":"Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name":"viewerAdmin.HealthData",
+                        "eventData":
+                        {
+                           "source":"viewerAdminPanel"
+                        }
+                     }
+                 ]
+           }
+        },       
+        "updateHealthData":
+        {
+            
+            "actionType":"JSFunction",
+            "method":"updateHealthData",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "outputData":
+            {
+                "data":""
+            },
+            "deps":"js/Awp0AdminToolService"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId":"viewerAdmin.nodeSelectionChanged",
+            "action":"updateHealthData"
+        }
+        
+    ],
+    "data":{
+        "nodeProp":{
+            "displayName":"{{ctx.viewerAdmin.selectedNodeType}}",
+            "type":"STRING",
+            "dbValue":"{{ctx.viewerAdmin.selectedNodeProperties}}"
+           
+                   }
+    },  
+    "i18n":{
+        "adminToolPanelTitle":["ViewerAdminMessages"],
+        "Refresh":["ViewerAdminMessages"]
+    }  
+}         
+              
+                

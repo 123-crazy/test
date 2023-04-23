@@ -1,0 +1,140 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        
+    ],
+    "actions":
+    {
+        "onChevronClick":
+        {
+            "actionType": "dataProvider",
+            "method": "workareaBreadcrumbChevronDataProvider"
+        },
+        "onChevronPopupObjSelected":
+        {
+            "actionType": "JSFunction",
+            "method": "updateBreadCrumbParamInUrl",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "id": "wabc", 
+                "dataProviderName": "workareaBreadcrumbChevronDataProvider",
+                "navigate": false
+            },
+            "outputData": 
+            {
+                "relationList": ""
+            },
+
+            "deps": "js/breadcrumbUtils"
+        },
+        "getChildren":
+        {
+           "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "columnConfigInput":
+                {
+                    "clientName": "AWClient",
+                    "clientScopeURI":"Awp0ObjectNavigation",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": ""
+                },
+                "saveColumnConfigData":
+                {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput":
+                {
+                    "attributesToInflate": [],
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "objectSet": "contents.Folder",
+                        "parentUid": "{{ctx.wabcChevron.scopedUid}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "startIndex": 0
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "breadcrumb.popUpLoading"
+                    }
+                ]
+            } 
+        }
+    },
+    "dataProviders":
+    {
+        "workareaBreadcrumbChevronDataProvider":
+        {
+            "action": "getChildren",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "commands":
+            {
+                "Awp0NavigateObject": {
+                    "id": "cmdShowChildren",
+                    "title": "Navigate",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/navigateObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "bottomRight"
+                }
+            }
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "wabc.chevronClicked",
+            "action": "onChevronClick"
+        },
+        {
+            "eventId": "breadcrumb.popUpLoading",
+            "action": "popUpLoading"
+        },
+        {
+            "eventId": "workareaBreadcrumbChevronDataProvider.selectionChangeEvent",
+            "action": "onChevronPopupObjSelected"
+        }
+    ]
+}

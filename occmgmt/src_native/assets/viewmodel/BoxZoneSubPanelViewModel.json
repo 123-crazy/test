@@ -1,0 +1,240 @@
+{
+    "imports": [
+        "js/aw-list-filter.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-listbox.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox-list.directive",
+        "js/aw-list.directive"
+    ],
+    "data": {
+        "selectedBoxZoneUIds" : [],
+        "searchOption": {
+            "displayName": "{{i18n.type}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true",
+            "dbValue": "",
+            "hasLov": "true"
+        },
+        "searchOptionTrueShapeOn":[
+            {
+                "propDisplayValue": "{{i18n.InsideOrIntersecting}}",
+                "propInternalValue": "Inside Or Intersects"
+            },
+            {
+                "propDisplayValue": "{{i18n.OutsideOrIntersecting}}",
+                "propInternalValue": "Outside Or Intersects"
+            },
+            {
+                "propDisplayValue": "{{i18n.InsideOnly}}",
+                "propInternalValue": "Within"
+            },
+            {
+                "propDisplayValue": "{{i18n.OutsideOnly}}",
+                "propInternalValue": "Outside"
+            },
+            {
+                "propDisplayValue": "{{i18n.IntersectOnly}}",
+                "propInternalValue": "Interferes"
+            }
+        ],
+        "searchOptionTrueShapeOff":[
+            {
+                "propDisplayValue": "{{i18n.InsideOrIntersecting}}",
+                "propInternalValue": "Inside Or Intersects"
+            },
+            {
+                "propDisplayValue": "{{i18n.OutsideOrIntersecting}}",
+                "propInternalValue": "Outside Or Intersects"
+            }
+        ],
+        "boxZoneFilter": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "actions": {
+        "initializePanelData" : {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "initializedBoxZoneProvider"
+                },
+                {
+                    "action": "initializeInitialResultCount"
+                }
+            ]
+        },
+        "initializeInitialResultCount":{
+            "actionType": "JSFunction",
+            "method": "dummyAction",
+            "inputData":
+            {
+                "inititalCountInp" : "{{data.totalFound}}"
+            },
+            "outputData": {
+                "initialCount" : ""
+            },
+            "deps": "js/zoneFilterService"
+        },
+        "initializedBoxZoneProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "loadBoxZonesUsingAction"
+        },
+        "searchBoxZone": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "{{function:getProviderName}}",
+                    "searchCriteria":
+                    {
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0Product.dbValues[0]}}",
+                        "searchString": "{{data.boxZoneFilter.dbValue}}",
+                        "zoneType": "RDVBoxZoneFormType"
+                    },
+                    "searchFilterFieldSortType": "Priority",
+                    "startIndex": "{{data.dataProviders.loadBoxZonesUsingAction.startIndex}}"
+                }
+            },
+            "outputData": {
+                "boxZoneResult": "searchResults",
+                "totalFound": "totalFound",
+                "boxZoneViewModelProperties" :"{{function:createCheckBoxViewModelPropertiesForBoxZones}}",
+                "selectedBoxZoneCount" : "{{function:getSelectedBoxZoneCount}}"
+            },
+            "deps": "js/zoneFilterService"
+        },
+        "addButtonAction":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "updateJitterFreeContextState"
+                },
+                {
+                    "action": "applyBoxZoneFilter"
+                },
+                {
+                    "action": "navigateToMainPanel"
+                }
+            ]
+        },
+        "updateJitterFreeContextState": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.retainTreeExpansionStateInJitterFreeWay",
+                "value": true
+            },
+            "deps": "js/appCtxService"
+        },
+        "applyBoxZoneFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "applyZoneFilter",
+            "inputData":
+            {
+                "selectedZoneUIds" : "{{data.selectedBoxZoneUIds}}",
+                "selectedSearchOption" : "{{data.searchOption}}",
+                "zoneType"  :"BoxZone",
+                "loadedObjects" : "{{data.dataProviders.loadBoxZonesUsingAction.viewModelCollection.loadedVMObjects}}"
+            },
+            "deps": "js/zoneFilterService"
+        },
+       "updateSelectedBoxZoneList": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedZoneList",
+            "inputData":
+            {
+                "selectedBoxZoneUIds" : "{{data.selectedBoxZoneUIds}}",
+                "selectedInputs" : "{{data.dataProviders.loadBoxZonesUsingAction.viewModelCollection.loadedVMObjects}}"
+            },
+            "outputData":
+            {
+                "selectedBoxZoneUIds":"",
+                "selectedBoxZoneCount" : "length"
+            },
+            "deps": "js/zoneFilterService"
+        },
+        "navigateToMainPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Awb0DiscoveryFilterCommandSubPanel",
+                            "title": ""
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "dataProviders": {
+        "loadBoxZonesUsingAction": {
+            "action": "searchBoxZone",
+            "response": "{{data.boxZoneViewModelProperties}}",
+            "totalFound":  "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "deps": "js/dynamicPropertyService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "initializePanelData",
+            "criteria":
+            {
+                "panelId" : "BoxZoneSubPanel"
+            }
+        }
+    ],
+    "i18n":
+    {
+          "InsideOnly" : ["OccurrenceManagementSubsetConstants"],
+          "OutsideOnly": [ "OccurrenceManagementSubsetConstants" ],
+          "IntersectOnly" : [ "OccurrenceManagementSubsetConstants" ],
+          "InsideOrIntersecting" : [ "OccurrenceManagementSubsetConstants" ],
+          "OutsideOrIntersecting" : [ "OccurrenceManagementSubsetConstants" ],
+          "Add": [ "OccurrenceManagementSubsetConstants" ],
+          "type" : ["OccurrenceManagementSubsetConstants"]
+    },
+    "preferences": [
+        "RDV_QSEARCH_REFINE"
+    ],
+    "functions":
+    {
+        "createCheckBoxViewModelPropertiesForBoxZones":
+        {
+            "functionName": "createCheckBoxViewModelPropertiesForZones",
+            "parameters": [
+                "{{data.selectedBoxZoneUIds}}", "{{response}}"
+            ]
+        },
+        "getSelectedBoxZoneCount": {
+            "functionName": "getSelectedBoxZoneCount",
+            "parameters": [
+                "{{data.selectedBoxZoneUIds}}", "{{response}}"
+            ]
+        },
+        "getProviderName": {
+            "functionName": "getProviderName",
+            "parameters": [
+                "ZoneProvider"
+            ]
+        }
+    }
+}

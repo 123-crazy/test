@@ -1,0 +1,129 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-textarea.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive"
+    ],
+    "data": {
+        "sourceClass": {},
+        "seletedAttributePlaceholder":{
+            "type": "STRINGARRAY",
+            "dataProvider":"selectedAttributeLOVProvider"
+        },
+        "selectedAttributeLOV":[],
+        "seletedAttribute":{},
+        "delim": {},
+        "NCString":{},
+        "panelCaption":"{{i18n.Acp0namingConvention}}"
+    },
+    "dataProviders": {
+        "selectedAttributeLOVProvider": {
+            "response": "{{data.selectedAttributeLOV}}"
+        }
+    },
+    "actions": {
+        "loadData":{
+            "actionType": "JSFunction",
+            "method": "loadProperties",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0NamingConventionBuilderService"
+        },
+        "seletedAttributeUpdateAction":{
+            "actionType": "JSFunction",
+            "method": "updateSeletedAttribute",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0NamingConventionBuilderService"
+        },
+        "seletedAttributeValueUpdateAction":{
+            "actionType": "JSFunction",
+            "method": "updateNamingConvention",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0NamingConventionBuilderService"
+        },
+        "namingConventionUpdateAction":{
+            "actionType": "JSFunction",
+            "method": "updateNamingConvention",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0NamingConventionBuilderService"
+        },
+        "editStateChanger":{
+            "actionType": "JSFunction",
+            "method": "NCBEditStateChanger",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0NamingConventionBuilderService"
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "loadData"
+    },
+    "i18n": {
+        "Acp0namingConvention": ["ControlInspectionPlanMessages"],
+        "Acp0namingConventionBuilder": ["ControlInspectionPlanMessages"],
+        "Preview": ["ControlInspectionPlanMessages"],
+        "Acp0invalidNCBErrorMsg": ["ControlInspectionPlanMessages"],
+        "Acp0nullNCBErrorMsg": ["ControlInspectionPlanMessages"]
+    },
+    "onEvent": [
+        {
+            "eventId": "editHandlerStateChange",
+            "action": "editStateChanger"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "seletedAttributeUpdateAction",
+            "criteria": {
+                "condition": "conditions.sourceClassChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "seletedAttributeValueUpdateAction",
+            "criteria": {
+                "condition": "conditions.seletedAttributeChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "namingConventionUpdateAction",
+            "criteria": {
+                "condition": "conditions.delimChangeCondition"
+            },
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {
+        "sourceClassChangeCondition": {
+            "expression": "data.sourceClass.dbValue",
+            "trackValues": true
+        },
+        "seletedAttributeChangeCondition": {
+            "expression": "data.seletedAttribute.uiValue",
+            "trackValues": true
+        },
+        "delimChangeCondition": {
+            "expression": "data.delim.dbValue",
+            "trackValues": true
+        }
+    }
+}

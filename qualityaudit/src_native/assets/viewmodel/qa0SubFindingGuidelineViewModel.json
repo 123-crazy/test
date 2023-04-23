@@ -1,0 +1,69 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-break.directive",
+        "js/aw-listbox.directive"
+    ],
+    "data": {
+        "findingGuideline": {
+            "displayName": "{{i18n.findingGuideline}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov": "true",
+            "dbValue": "",
+            "dispValue": ""
+        }
+    },
+    "actions": {
+        "loadFindingGuidelines": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qa0FindingGuideline",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "C2Issue"
+                    },
+                    "lov": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    },
+                    "filterData": {
+                        "filterString": "",
+                        "maxResults": 2000,
+                        "numberToReturn": 25,
+                        "order": 1,
+                        "sortPropertyName": ""
+                    }
+                }
+            },
+            "outputData": {
+                "findingGuidelines": "{{function:getLOVList}}"
+            },
+            "deps": "js/qa0SubFindingGuidelineService"
+        },
+        "setFindingGuideline":{
+            "actionType": "JSFunction",
+            "method": "setFindingGuideline",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps":"js/qa0SubFindingGuidelineService"
+        },
+        "clearFindingGuideline":{
+            "actionType": "JSFunction",
+            "method": "clearFindingGuideline",
+            "deps":"js/qa0SubFindingGuidelineService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "loadFindingGuidelines",
+        "onUnmount": "clearFindingGuideline"
+    },
+    "i18n": {
+        "findingGuideline": [ "CreateChangeMessages" ]
+    }
+}

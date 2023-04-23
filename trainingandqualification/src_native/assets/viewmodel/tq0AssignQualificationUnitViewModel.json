@@ -1,0 +1,189 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-property-label.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "getQualificationUnitList"
+        },
+        "tq0QuAssignedRefreshSplmTableAction": {
+            "actionType": "JSFunction",
+            "method": "publishEventToReloadQrTable",
+            "deps": "js/tq0SplmUtils"
+        },
+        "searchQualificationUnit": {
+            "actionType": "JSFunction",
+            "method": "searchQualificationUnit",
+            "deps": "js/tq0Utils",
+            "inputData": {
+                "selected": "{{ctx.selected}}",
+                "filterValue": "{{data.filterBox}}"
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            }
+        },
+        "assignQualificationUnits": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-TrainingQualificationAw-2020-12-TrainingQualification",
+            "method": "assignQualificationUnits",
+            "inputData": {
+                "assignQualificationInputs": "{{function:getAssignQUsSoaInp}}"
+            },
+            "outputData": {
+                "serviceData": "ServiceData",
+                "createdObject": "qualificationRecords"
+            },
+            "events": {
+                "success": [ {
+                        "name": "tq0QuAssignedRefreshSplmTable"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "assignQUnitsFailed"
+                } ]
+
+            },
+            "deps": "js/tq0Utils"
+        },
+        "assignPrerequisites": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [ {
+                    "object": "{{ctx.selected}}",
+                    "vecNameVal": [ {
+                        "name": "tq0Prerequisites",
+                        "values": "{{function:getPrerequisiteValues}}"
+                    } ]
+                } ]
+            },
+            "events": {
+                "success": [
+                {
+                    "name": "cdm.relatedModified",
+                    "condition": "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'com.siemens.splm.clientfx.tcui.xrt.objectNavigationSubLocation' || ctx.locationContext['ActiveWorkspace:SubLocation'] === 'showObject'",
+                    "eventData": {
+                        "refreshLocationFlag": true,
+                        "relations": "",
+                        "relatedModified": [
+                            "{{ctx.selected}}"
+                        ]
+                    }
+                },
+                {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "deps": "js/tq0Utils"
+        }
+    },
+    "data":{
+        "filterBox":{
+            "displayName": "{{i18n.filterBox}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "dataProviders": {
+        "getQualificationUnitList": {
+            "action": "searchQualificationUnit",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "conditions": {
+        "tq0IsQProfile": {
+            "expression": "ctx.selected.modelType.typeHierarchyArray.indexOf('Tq0QualificationProfile') > -1"
+        },
+        "tq0ShowQUnitAssignbtn":{
+            "expression": "conditions.tq0IsQProfile && data.dataProviders.getQualificationUnitList.selectedObjects.length > 0"
+        },
+        "tq0PreReqAssignbtn": {
+            "expression": "ctx.selected.modelType.typeHierarchyArray.indexOf('Tq0QualificationUnit') > -1 && data.dataProviders.getQualificationUnitList.selectedObjects.length > 0"
+        }
+    },
+    "messages": {
+        "assignQUnitsFailed": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.assignQUnitsFailed}}",
+            "messageTextParams": [
+                "{{data.serviceData.partialErrors[0].errorValues[0].message}}"
+            ]
+        }
+    },
+    "functions": {
+        "getAssignQUsSoaInp": {
+            "functionName": "getAssignQUsSoaInp",
+            "parameters": [
+                "{{data.dataProviders.getQualificationUnitList.selectedObjects}}",
+                "{{ctx.mselected}}",
+                "{{ctx.pselected}}"
+            ]
+        },
+        "getPrerequisiteValues": {
+            "functionName": "getPrerequisiteValues",
+            "parameters": [
+                "{{data.dataProviders.getQualificationUnitList}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+        "eventId": "tq0QuAssignedRefreshSplmTable",
+        "action": "tq0QuAssignedRefreshSplmTableAction"
+    } ],
+    "lifecycleHooks": {
+        "onInit": "reveal"
+    },
+    "i18n": {
+        "filterBox": [ "responsibleUserMessages" ],
+        "tq0AssignQualificationUnitTitle": [ "assignQualificationUnitMessages" ],
+        "tq0QualificationUnitSecTitle": [ "assignQualificationUnitMessages" ],
+        "assignQUnitsFailed": [ "assignQualificationUnitMessages" ],
+        "add": ["trainingandqualificationMessages"]
+    }
+}

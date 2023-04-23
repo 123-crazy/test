@@ -1,0 +1,316 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-search-box.directive",
+        "js/aw-property-lov-val.directive",
+        "js/aw-property-label.directive",
+        "js/aw-label.directive"
+    ],
+    "data": {
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.Awp0SearchTitle}}"
+        },
+        "awp0SavedSearchName": {
+            "displayName": "{{i18n.savedSearch}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "vertical": false
+        },
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "{{ctx.searchFolder.searchCriteria.searchString}}",
+            "dispValue": "{{ctx.searchFolder.searchCriteria.searchString}}"
+        },
+        "searchFolderName":
+        {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "isEditable": "false",
+            "dbValue": "{{ctx.searchFolder.props.object_name.dbValues[0]}}",
+            "dispValue": "{{ctx.searchFolder.props.object_name.uiValues[0]}}"
+        },
+        "searchFolderDesp":
+        {
+            "displayName": "{{i18n.Description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "isEditable": "false",
+            "dbValue": "{{ctx.searchFolder.props.object_desc.dbValues[0]}}",
+            "dispValue": "{{ctx.searchFolder.props.object_desc.uiValues[0]}}"
+        },
+        "isEditMode": false,
+        "isAdvancedSearch":{
+            "displayName": "{{i18n.advancedSearch}}",
+            "type": "BOOLEAN",
+            "vertical": false,
+            "dbValue": false,
+            "propertyLabelDisplay": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "actions":
+    {
+        "resetAdvancedSearch": {
+            "actionType": "JSFunction",
+            "method": "resetAdvancedSearch",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "setAdvancedSearch": {
+            "actionType": "JSFunction",
+            "method": "setAdvancedSearch",
+            "inputData": {
+                "data": "{{data}}",
+                "searchFolder": "{{ctx.mselected[0].uid}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "showData": {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "loadSavedSearch":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": "{{function:getDefaultPageSize}}",
+                    "maxToReturn": "{{function:getDefaultPageSize}}",
+                    "providerName": "Awp0SavedSearchProvider",
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}",
+                    "searchFilterMap6": "{{function:updateFilterMap}}"
+                },
+                "inflateProperties": false
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Awp0FullTextSavedSearch",
+                        "properties": [ {
+                            "name": "object_name"
+                        }, {
+                            "name": "awp0search_string"
+                        }, {
+                            "name": "creation_date"
+                        }, {
+                            "name": "awp0string_filters",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        }, {
+                            "name": "last_mod_date"
+                        }, {
+                            "name": "awp0SearchFilterArray"
+                        }, {
+                            "name": "owning_user"
+                        }, {
+                            "name": "awp0is_global_shared"
+                        }, {
+                            "name": "awp0ChartOn"
+                        } ]
+                    }, {
+                        "name": "SavedSearch",
+                        "properties": [ {
+                            "name": "object_name"
+                        }, {
+                            "name": "savedsearch_attr_names"
+                        }, {
+                            "name": "savedsearch_attr_values"
+                        }, {
+                            "name": "shared"
+                        }, {
+                            "name": "last_mod_date"
+                        }, {
+                            "name": "savedsearch_query",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        }, {
+                            "name": "owning_user"
+                        }, {
+                            "name": "saved_search_criteria"
+                        } ]
+                    }, {
+                        "name": "SavedQueryCriteria",
+                        "properties": [ {
+                            "name": "fnd0AttributeDisplayValues"
+                        } ]
+                    }, {
+                        "name": "Awp0StringSearchFilter",
+                        "properties": [ {
+                            "name": "awp0filter_name"
+                        }, {
+                            "name": "awp0value"
+                        } ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "ctx.search.savedSearchObjects": "{{json:searchResultsJSON}}",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "loadSavedSearchViewModel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+        "loadSavedSearchViewModel":
+        {
+            "actionType": "JSFunction",
+            "method": "createSavedSearchList",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "setInitialEditMode":
+        {
+            "actionType": "JSFunction",
+            "method": "setInitialEditMode",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "searchFolder": "{{ctx.mselected[0].uid}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "setExitEditMode":
+        {
+            "actionType": "JSFunction",
+            "method": "setExitEditMode",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "searchFolder": "{{ctx.mselected[0].uid}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "doFulltextSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "doFulltextSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "searchFolder": "{{ctx.mselected[0].uid}}"
+            },
+            "deps": "js/searchFolderService"
+        }
+    },
+    "functions": {
+        "getDefaultPageSize":
+        {
+            "functionName": "getDefaultPageSize",
+            "parameters":
+            [
+                 "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "getActualSearchFilterCategories": {
+            "functionName": "getActualSearchFilterCategories",
+            "parameters": ["{{data}}"]
+        },
+
+        "updateFilterMap":
+        {
+            "functionName": "updateFilterMap",
+            "parameters":
+            [
+                "{{ctx.search.activeFilterMap}}",
+                "{{ctx.search.provider}}"
+            ]
+        }
+    },
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadSavedSearch",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commands":
+            {
+                "Awp0ShowObjectCell":
+                {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT",
+                    "action":"executeSavedSearch"
+                }
+            }
+        }
+    },
+    "conditions":
+    {
+        "isEditMode": {
+            "expression": "data.isEditMode === true"
+        },
+        "showSavedSearch":{
+            "expression": "ctx.searchFolder.useRule === 'savedSearch'"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Awp0SearchFolderRule.contentLoaded",
+            "action": "setInitialEditMode"
+        },
+        {
+            "eventId": "Awp0SearchFolderRule.contentUnloaded",
+            "action": "setExitEditMode"
+        },
+        {
+            "eventId": "loadSavedSearchData",
+            "action": "showData"
+        },
+        {
+            "eventId": "loadSavedSearchViewModel",
+            "action": "loadSavedSearchViewModel"
+        },
+        {
+            "eventId": "Awp0SearchFolderRule.resetAdvancedSearch",
+            "action": "resetAdvancedSearch"
+        }
+    ],
+    "i18n":
+    {
+        "advancedSearch": ["SearchMessages"],
+        "Name":[ "SearchMessages" ],
+        "Description":[ "SearchMessages" ],
+        "searchFolderProperties":[ "SearchMessages"],
+        "searchFolderResults":[ "SearchMessages"],
+        "searchFolderSearch":[ "SearchMessages"],
+        "savedSearch": [ "SearchMessages" ],
+        "noRuleFound": [ "SearchMessages" ],
+        "Awp0SearchTitle": ["SearchMessages"]
+    }
+}
+

@@ -1,0 +1,37 @@
+<aw-panel-body>
+    <aw-panel-section class="aw-snapshot-margin" caption="i18n.showingProductSnapshot">
+        <aw-flex-row height="2f" align-content="center">
+            <aw-pic class="aw-pic-tile aw-snapshot-height" source="data.vmoForProductSnapshotGallery.thumbnailURL" alt="{{data.vmoForProductSnapshotGallery.cellHeader1}}" title="{{data.vmoForProductSnapshotGallery.cellHeader1}}"></aw-pic>
+            <div>{{data.vmoForProductSnapshotGallery}}</div>
+        </aw-flex-row>
+    </aw-panel-section>
+    <aw-separator class="aw-snapshot-seperator"></aw-separator>
+    <aw-command-bar anchor="viewerProductSnapshotsCommands" alignment="HORIZONTAL" context="data"></aw-command-bar>
+        <aw-flex-row height="50f" exist-when="conditions.snapshotsViewList">
+            <aw-scrollpanel>
+                <aw-listbox prop="data.listBox" list="data.listBoxValues.dbValue" action="selectionChange"></aw-listbox>
+                <aw-list-filter prop="data.filterBox" dataprovider="data.dataProviders.productSnapshotDataProvider">
+                    <aw-default-cell vmo="item" hideoverlay="true"></aw-default-cell>
+                </aw-list-filter>
+            </aw-scrollpanel>
+        </aw-flex-row>
+        <aw-flex-row height="50f" exist-when="conditions.snapshotsViewImage">
+            <aw-scrollpanel>
+                <aw-listbox prop="data.listBox" list="data.listBoxValues.dbValue" action="selectionChange"></aw-listbox>
+                <aw-list-filter prop="data.filterBox" class="aw-viewersnapshot-snapshotPanel" has-floating-cell-commands="false" show-check-box="data.dataProviders.productSnapshotCardViewDataProvider.selectionModel.multiSelectEnabled" dataprovider="data.dataProviders.productSnapshotCardViewDataProvider">
+                    <aw-flex-column align-content="center" justify="center" width="100%">
+                        <aw-pic source="item.thumbnailURL" alt="{{item.cellHeader1}}" title="{{item.cellHeader1}}"></aw-pic>
+                        <aw-flex-row height="2.7f">
+                            <aw-flex-column align-content="start" class="aw-viewersnapshot-snapshotNameContainer" aw-click="data.handleTextEditDblClick($event,item, data.dataProviders.productSnapshotCardViewDataProvider, data)" aw-click-options="{ debounceDoubleClick: true }" >
+                                <aw-textbox prop="item.productSnapshotTextBox"  aw-enter-key="renameProductSnapshotAction"   extended-tooltip="{extendedTooltipContent: '{{item.productSnapshotTextBox.dbValue}}' }"
+                                ></aw-textbox>
+                            </aw-flex-column>
+                            <aw-flex-column aw-click="data.handleCommandBarClick($event,item,data.dataProviders.productSnapshotCardViewDataProvider)" align-content="end" justify="center" class="aw-viewersnapshot-snapshotCommandBarContainer">
+                                <aw-command-bar class="aw-viewersnapshot-snapshotCommandBar" anchor="aw_3dSnapshotThumbnailViewCommands" alignment="HORIZONTAL" overflow='true' context="{vmo:item}"></aw-command-bar>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-list-filter>
+            </aw-scrollpanel>
+        </aw-flex-row>
+</aw-panel-body>

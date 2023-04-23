@@ -1,0 +1,419 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-scrollpanel.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-action-section.directive",
+        "js/aw-button.directive",
+        "js/aw-column.directive",
+        "js/aw-row.directive",
+        "js/aw-chip-list.directive",
+        "js/aw-icon.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "previewInfotooltipView": {
+            "view": "Arm0PreviewInfoTooltip"
+        }
+    },
+     "actions": {
+        "populateSecArea": {
+            "actionType": "JSFunction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "method": "populateSecArea",
+            "deps": "js/ImportPreview",
+            "events": {
+                "success": [ {
+                    "name": "progress.end",
+                    "excludeLocalDataCtx": true
+                },
+                {
+                    "name": "specificationSummaryDataProvider.reset"
+                } ],
+                "failure": [
+                {
+                    "name": "progress.end",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "registerCxtForActionsPanel": {
+            "actionType": "JSFunction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "method": "registerCxtForActionsPanel",
+            "deps": "js/ImportPreview"
+        },
+        "registerCxtForSettingsPanel": {
+            "actionType": "JSFunction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "method": "registerCxtForSettingsPanel",
+            "deps": "js/ImportPreview"
+        },
+        "showActionsPanel": {
+            "actionType": "JSFunction",
+            "method": "openBalloonPopup",
+            "inputData": {
+                "view": "Arm0ShowTypeChangePanel",
+                "commandDimension": "{{data.eventData.commandDimension}}",
+                "popuporientation": "RIGHT_CENTER",
+                "popupheight": "200px",
+                "popupclosebutton": "false",
+                "popupMinHeight": "50px",
+                "popupMinWidth": "100px"
+            },
+            "deps": "js/balloonPopupService"
+        },
+        "showSettingsPanel": {
+            "actionType": "JSFunction",
+            "method": "openBalloonPopup",
+            "inputData": {
+                "view": "Arm0ShowSettingChangePanel",
+                "commandDimension": "{{data.eventData.commandDimension}}",
+                "popuporientation": "RIGHT_CENTER",
+                "popupheight": "200px",
+                "popupclosebutton": "false",
+                "popupMinHeight": "50px",
+                "popupMinWidth": "75px"
+            },
+            "deps": "js/balloonPopupService"
+        },
+        "unRegisterData": {
+            "actionType": "JSFunction",
+            "method": "unRegisterPreviewData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ImportFromOffice"
+        },
+        "contentUnloadedPreview": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "compareAndPreviewBtnClicked"
+            }
+        },
+        "populateSpecificationSummaryDataForPreview":
+        {
+            "actionType": "JSFunction",
+            "method": "populateSpecificationSummaryDataForPreview",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/ImportPreview"
+        },
+        "previewContentUpdatedForObject": {
+            "actionType": "JSFunction",
+            "method": "previewContentUpdatedForObject",
+            "inputData":
+            {
+                "eventData": "{{data.eventMap['importPreview.previewContentUpdatedForObject']}}"
+            },
+            "deps": "js/ImportPreview"
+        },
+        "mergeAction":{
+            "actionType": "JSFunction",
+            "method": "getJSONDataForMerge",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0DerivedAndMergeService",
+            "events": {
+                "success": [
+                    {
+                        "name": "progress.start"
+                    }
+                ]
+            }
+        },
+        "reviseAction":{
+            "actionType": "JSFunction",
+            "method": "getJSONDataForRevise",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0DerivedAndMergeService",
+            "events": {
+                "success": [
+                    {
+                        "name": "progress.start"
+                    }
+                ]
+            }
+        },
+        "getFMSFileTicketForMerge": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-FileManagement",
+            "method": "getTransientFileTicketsForUpload",
+            "inputData": {
+                "transientFileInfos": [
+                    {
+                        "fileName": "mergeJsonString.txt",
+                        "isBinary": true
+                    }
+                ]
+            },
+            "outputData": {
+                "jsonFmsTicketForMerge": "transientFileTicketInfos[0].ticket"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "importSpecification.updateFileContentInFormDataForMerge"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "progress.end",
+                        "excludeLocalDataCtx": true
+                    }
+                ]
+            }
+        },
+        "updateFileContentInFormDataForMerge": {
+            "actionType": "JSFunction",
+            "method": "updateFileContentInFormDataForMerge",
+            "deps": "js/Arm0DerivedAndMergeService",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "uploadImportFileForMerge": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+                    "data": "{{data.formDataForMerge}}"
+                }
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "importSpecification.setJSONDataForMerge"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "progress.end",
+                        "excludeLocalDataCtx": true
+                    }
+                ]
+            },
+            "actionMessages": {},
+            "deps": "js/Arm0DerivedAndMergeService"
+        },
+        "setJSONDataForMerge": {
+            "actionType": "JSFunction",
+            "method": "setJSONDataForMerge",
+            "inputData": {
+                "data": "{{data}}",
+                "jsonFmsTicket": "{{data.jsonFmsTicketForMerge}}"
+            },
+            "deps": "js/Arm0DerivedAndMergeService"
+        },
+        "mergeUsingJSONData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2018-05-ImportExport",
+            "method": "importFromWord",
+            "inputData": {
+                "inputs": [
+                    {
+                        "selectedObject": "{{ctx.masterItemUid}}",
+                        "transientFileWriteTicket": "{{data.jsonFmsTicket}}",
+                        "applicationFormat": "{{data.mergeApplicationFormat}}",
+                        "createSpecElementType": "derived",
+                        "specificationType": "",
+                        "isLive": false,
+                        "isRunInBackground": false,
+                        "isPermanentconvertToHtml": false,
+                        "importAsSpec": true,
+                        "pasteTopSpecRevisionUnderSelection": true,
+                        "specDesc": "{{data.description.dbValue}}",
+                        "keywordImportRules": null,
+                        "importOptions": []
+                    }
+                ]
+            },
+            "outputData": {
+                "importedObject": "output[0].resultObjects[0]",
+                "partialErrors": "ServiceData.partialErrors"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "importSpecification.showObject"
+                    },
+                    {
+                        "name": "progress.end",
+                        "excludeLocalDataCtx": true
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "progress.end",
+                        "excludeLocalDataCtx": true
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "partialErrors",
+                    "message": "errorMessageOnAction"
+                } ]
+            },
+            "deps": "js/Arm0DerivedAndMergeService"
+        },
+        "showObject": {
+            "actionType": "JSFunction",
+            "method": "go",
+            "deps": "js/locationNavigation.service",
+            "inputData": {
+                "showObject": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+                "toParams": {
+                    "uid": "{{data.importedObject.uid}}"
+                },
+                "option": {
+                    "inherit": false,
+                    "reload": true
+                }
+            }
+        },
+        "unRegisterMergeContextData": {
+            "actionType": "JSFunction",
+            "method": "unRegisterMergeContextData",
+            "inputData": {
+            },
+            "deps": "js/Arm0DerivedAndMergeService"
+        }
+    },
+    "messages":
+    {
+        "errorMessageOnAction": {
+            "messageType": "WARNING",
+            "messageText": "{{data.partialErrors[0].errorValues[0].message}}"
+        }
+    },
+    "dataProviders":
+    {
+        "specificationSummaryDataProvider":
+        {
+            "type": "Static",
+            "action": "populateSpecificationSummaryDataForPreview",
+            "response": "{{data.summaryChips}}",
+            "totalFound": "{{data.summaryChips.length}}",
+            "deps": "js/ImportPreview"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "importPreview.populateSecArea",
+            "cacheEventData": true,
+            "action": "populateSecArea"
+        },
+        {
+            "eventId": "importPreview.registerCxtForActionsPanel",
+            "cacheEventData": true,
+            "action": "registerCxtForActionsPanel"
+        },
+        {
+            "eventId": "importPreview.registerCxtForSettingsPanel",
+            "cacheEventData": true,
+            "action": "registerCxtForSettingsPanel"
+        },
+        {
+            "eventId": "importPreview.showActionsPanel",
+            "action": "showActionsPanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "importPreview.showSettingsPanel",
+            "action": "showSettingsPanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "ImportPreview.contentUnloaded",
+            "action": "contentUnloadedPreview"
+        },
+        {
+            "eventId": "ImportPreview.contentUnloaded",
+            "action":"unRegisterData"
+        },
+        {
+            "eventId": "ImportPreview.contentUnloaded",
+            "action":"unRegisterMergeContextData",
+            "condition": "ctx.deriveAndMergeClick"
+        },
+        {
+            "eventId": "importPreview.previewContentUpdatedForObject",
+            "action": "previewContentUpdatedForObject",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "importPreview.getFMSFileTicketForMerge",
+            "action": "getFMSFileTicketForMerge"
+        },
+        {
+            "eventId": "importSpecification.updateFileContentInFormDataForMerge",
+            "action": "updateFileContentInFormDataForMerge"
+        },
+        {
+            "eventId": "importSpecification.uploadImportFileForMerge",
+            "action": "uploadImportFileForMerge"
+        },
+        {
+            "eventId": "importSpecification.setJSONDataForMerge",
+            "action": "setJSONDataForMerge"
+        },
+        {
+            "eventId": "importSpecification.mergeUsingJSONData",
+            "action": "mergeUsingJSONData"
+        },
+        {
+            "eventId": "importSpecification.showObject",
+            "action": "showObject"
+        }
+    ],
+    "conditions":
+    {
+    },
+    "functions": {
+    },
+    "i18n": {
+        "settingLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "revise": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "mergeCommandTitle": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "added": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "removed": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "modified": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "existing": [
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

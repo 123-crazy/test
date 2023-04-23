@@ -1,0 +1,101 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "assign": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2015-07-ScheduleManagement",
+            "method": "assignResources",
+            "inputData": {
+                "schedule": "{{ctx.schedule.scheduleObj}}",
+                "createAssignments": [
+                    {
+                        "task": "{{ctx.schedule.selectedObject}}",
+                        "resource": "{{data.userObject}}",
+                        "discipline": {},
+                        "assignedPercent": 100,
+                        "placeholderAssignment": {},
+                        "isPlaceHolder": false
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.schedule.selectedObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message":"assignResourcesFailure"
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "onEvent" : [
+        {
+            "eventId": "syncGanttSplitSelectionDone",
+            "action": "closePanel"
+        }
+
+    ],
+    "conditions": {
+        "isValidToAdd": {
+            "expression": "data.dataProviders.userPerformSearch.selectedObjects != null && data.dataProviders.userPerformSearch.selectedObjects.length > 0"
+        }
+    },
+    "messages": {
+        "assignResourcesFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "assignResourceCommandTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "users": [
+            "ScheduleManagerMessages"
+        ],
+        "assignButtonText": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

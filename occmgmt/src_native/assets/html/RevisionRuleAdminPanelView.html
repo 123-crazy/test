@@ -1,0 +1,61 @@
+<aw-panel-header>
+    <aw-label prop="data.revRuleName"></aw-label>
+    <aw-label prop="data.revRuleDesc"></aw-label>
+    <aw-break></aw-break>
+    <aw-command-panel-section caption="i18n.clauses" anchor="data.clausesCommandAnchor" context="data" class="aw-revRule-removeSpace"></aw-command-panel-section>
+</aw-panel-header>
+<aw-panel-body>
+    <div aw-repeat="item : data.clauses" name="RevisionRuleClausesSections" aw-class="[{'aw-revRule-clauseModify-indicator': item.modified == true }, {'aw-clauseName-background': item.selected == true },{'aw-revRule-disableMouseClick': (data.exactlySameClauseWarning.dbValue === true) }]">
+    <aw-panel-section caption="{{item.displayText}}" name="RevisionRuleClausesSectionProperties" collapsed="{{item.selected ? 'false' : 'true'}}"  class="aw-revRule-clauseIconSize">
+        <!-- 0.Working -->
+        <aw-include name="RevisionRuleAdminClauseProperties" sub-panel-context="data" exist-when="item.entryType == 0"></aw-include>
+        <!-- 1.Status -->
+        <aw-include name="RevisionRuleAdminClauseProperties" sub-panel-context="data" exist-when="item.entryType == 1"></aw-include>
+        <!-- 2.Override -->
+        <aw-flex-column justify="right" align-content="end" exist-when="item.entryType == 2">
+            <aw-command-bar class="aw-revRule-removeShadow" anchor="clausePropertiesCommandAnchor" reverse="isReverseSecond" alignment="HORIZONTAL"></aw-command-bar>
+        </aw-flex-column>
+        <aw-i18n exist-when="item.entryType == 2 && ctx.RevisionRuleAdmin.folder == undefined">i18n.addFolderMsg</aw-i18n>
+        <aw-default-cell vmo="ctx.RevisionRuleAdmin.folder" exist-when="item.entryType == 2 && ctx.RevisionRuleAdmin.folder !== undefined"></aw-default-cell>
+        <!-- 3.Date -->
+        <aw-widget prop="data.today" exist-when="item.entryType == 3" enable-when="conditions.isRevisionRuleEditable"></aw-widget>
+        <aw-date prop="data.date" exist-when="item.entryType == 3 && !conditions.isTimeEnabled" enable-when="conditions.isTodayUnchecked && conditions.isRevisionRuleEditable"></aw-date>
+        <aw-datetime prop="data.date" exist-when="item.entryType == 3 && conditions.isTimeEnabled" enable-when="conditions.isTodayUnchecked && conditions.isRevisionRuleEditable"></aw-datetime>
+        <!-- 4.Unit -->
+        <aw-widget prop="data.unit_no" enable-when="conditions.isRevisionRuleEditable" exist-when="item.entryType == 4"></aw-widget>
+        <!-- 6.Precise or 9.Group -->
+        <div class="aw-revRule-alignNoArgumentsLabel" exist-when="item.entryType === 6 || item.entryType === 9">
+            {{data.noArgumentsLabel.dbValue}}
+        </div>
+        <!-- 7.Latest -->
+        <aw-widget prop="data.latestConfigType" enable-when="conditions.isRevisionRuleEditable" exist-when="item.entryType == 7 && !ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature"></aw-widget>
+        <aw-widget prop="data.latestConfigTypeForRevOcc" enable-when="conditions.isRevisionRuleEditable" exist-when="item.entryType == 7 && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === true"></aw-widget>
+        <!-- 8.End Item -->
+        <aw-flex-column justify="right" align-content="end" exist-when="item.entryType == 8">
+            <aw-command-bar class="aw-revRule-removeShadow" anchor="clausePropertiesCommandAnchor" reverse="isReverseSecond" alignment="HORIZONTAL"></aw-command-bar>
+        </aw-flex-column>
+        <aw-i18n exist-when="item.entryType == 8 && ctx.RevisionRuleAdmin.end_item == undefined">i18n.addEndItemMsg</aw-i18n>
+        <aw-default-cell vmo="ctx.RevisionRuleAdmin.end_item" exist-when="ctx.RevisionRuleAdmin.end_item !== undefined && item.entryType == 8"></aw-default-cell>
+        <!-- 10.Branch -->
+        <aw-command-panel-section caption="i18n.branch" exist-when="item.entryType == 10">
+            <aw-default-cell vmo="ctx.RevisionRuleAdmin.branch" exist-when="ctx.RevisionRuleAdmin.branch !== undefined"></aw-default-cell>
+        </aw-command-panel-section>
+        <!-- 13.Release Event -->
+        <aw-include name="RevisionRuleAdminEventClause" exist-when="item.entryType == 13 && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === true" sub-panel-context="data"></aw-include>
+    </aw-panel-section>
+    </div>
+</aw-panel-body>
+<aw-separator exist-when="data.exactlySameClauseWarning.dbValue === true"></aw-separator>
+<aw-flex-row align-content="center" height="2" exist-when="data.exactlySameClauseWarning.dbValue === true">
+    <div class="aw-revRule-alignSimilarClauseErrorContent">
+        <div class="aw-revRule-similarClauseErrorIcon">
+            <aw-icon icon-id="indicatorError"></aw-icon>
+        </div>
+        <div class="aw-revRule-similarClauseErrorText">
+            <aw-i18n>i18n.exactlySameClauseWarning</aw-i18n>
+        </div>
+    </div>
+</aw-flex-row>
+<aw-panel-footer visible-when="data.mainPanel !=='RevisionRuleAdminMainPanel'">
+    <aw-include name="ConfigureProduct" exist-when="data.mainPanel !=='RevisionRuleAdminMainPanel' && data.activeView=='RevisionRuleAdminPanel'" sub-panel-context="data"></aw-include>
+</aw-panel-footer>

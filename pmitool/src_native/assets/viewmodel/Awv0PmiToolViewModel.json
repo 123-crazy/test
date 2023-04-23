@@ -1,0 +1,371 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+                 "js/aw-command-panel-section.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-tab-set.directive",
+                 "js/aw-list.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-checkbox.directive",
+                 "js/aw-tree.directive",
+                 "js/aw-button.directive",
+                 "js/aw-occmgmt-cell.directive",
+                 "js/aw-i18n.directive",
+                 "js/visible-when.directive",
+                 "js/exist-when.directive",
+                 "js/aw-guidance-message.directive"],
+    "actions": {
+        "pmiPanelRevealed":
+        {
+            "actionType": "JSFunctionAsync",
+            "method": "initialize",
+            "inputData":
+            {
+                "declViewModel": "{{data}}"
+            },
+            "outputData":
+            {
+                "pmiInstance":"pmiInstance",
+                "mvInstance":"mvInstance"
+            },
+            "deps": "js/PmiToolService"
+        },
+        "updateSelectionAction":
+        {
+            "actionType": "dataProvider",
+            "method": "selectionProvider"
+        },
+        "turnOnVisibility":
+        {
+            "actionType":"JSFunction",
+            "method":"turnOnVisibility",
+            "inputData":
+            {
+
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/PmiToolService"
+        },
+        "updateSelectionWithDisplayStrings":
+        {
+            "actionType": "JSFunction",
+            "method": "updateSelectionWithDisplayStrings",
+            "inputData":
+            {
+                "declViewModel":"{{data}}",
+                "modelName":"{{data.modelName}}"
+            },
+            "outputData":
+            {
+                "allTargets": "allTargets",
+                "totalFound": "totalFound",
+                "selectionDisplayName":"selectionDisplayName",
+                "notCurrentlyVisibleText": "notCurrentlyVisibleText", 
+                "hasNoPmiText": "hasNoPmiText",
+                "selectedModelName":"selectedModelName",
+                "modelName":"modelName"
+            },
+            "deps": "js/PmiToolService"
+        },
+
+        "modelViewDataFetchedAction":
+        {
+            "actionType": "JSFunction",
+            "method": "updateMVTabViewModel",
+            "inputData":
+            {
+                "mvInstance":"{{data.mvInstance}}",
+                "input":"{{data}}"
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/PmiToolService"
+        },
+
+        "pmiEntityDataFetchedAction":{
+            "actionType": "JSFunction",
+            "method": "updateTypesTabViewModel",
+            "inputData":
+            {
+                "pmiInstance":"{{data.pmiInstance}}",
+                "input":"{{data}}"
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/PmiToolService"
+        },
+
+        "modelViewEntryCheckedAction":
+        {
+            "actionType": "JSFunction",
+            "method": "modelViewEntryChecked",
+            "inputData":
+            {
+                "input":"{{node}}",
+                "mvInstance":"{{data.mvInstance}}",
+                "pmiInstance":"{{data.pmiInstance}}"
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/PmiToolService"
+        },
+
+        "pmiEntityModelViewNodeClickedAction":
+        {
+            "actionType": "JSFunction",
+            "method": "pmiEntityModelViewNodeClicked",
+            "inputData":
+            {
+                "eventData": "{{parameters.eventData}}",
+                "mvInstance":"{{data.mvInstance}}",
+                "pmiInstance":"{{data.pmiInstance}}"
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/PmiToolService"
+        },
+
+        "typesEntryCheckedAction":
+        {
+            "actionType": "JSFunction",
+            "method": "typesEntryChecked",
+            "inputData":
+            {
+                "input":"{{node}}",
+                "pmiInstance":"{{data.pmiInstance}}",
+                "mvInstance":"{{data.mvInstance}}"
+            },
+            "outputData":
+            {
+
+            },
+            "deps": "js/PmiToolService"
+        },
+
+        "registerForSelectionAndVisibilityAction":{
+            "actionType": "JSFunction",
+            "method": "registerForSelectionAndVisibility",
+            "inputData":
+            {
+                "eventData": "{{parameters.eventData}}",
+                "data":"{{data}}"
+            },
+
+            "deps": "js/PmiToolService"
+        },
+        "reorientTextAction":
+        {
+            "actionType": "JSFunction",
+            "method": "reorientText",
+            "deps": "js/PmiToolService"
+        },
+        "handleTabSelectionChangeAction":
+        {
+            "actionType": "JSFunction",
+            "method": "handleTabSelectionChange",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/PmiToolService"
+        },
+        "stepPrevAction":
+        {
+            "actionType": "JSFunction",
+            "method": "stepThroughPrev",
+            "inputData":
+            {
+                "mvInstance":"{{data.mvInstance}}",
+                "pmiInstance":"{{data.pmiInstance}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/PmiToolService"
+        },
+        "stepNextAction":
+        {
+            "actionType": "JSFunction",
+            "method": "stepThroughNext",
+            "inputData":
+            {
+                "mvInstance":"{{data.mvInstance}}",
+                "pmiInstance":"{{data.pmiInstance}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/PmiToolService"
+        },
+        "pmiPanelLoad": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "pmiPanelRevealed"
+                },
+                {
+
+                    "action": "pmiEntityDataFetchedAction"
+                },
+                {
+
+                    "action": "modelViewDataFetchedAction"
+
+                }
+            ]
+        },
+        "clearPmiCtxAction":{
+            "actionType": "JSFunction",
+            "method": "clearPmiCtx",
+            "deps": "js/PmiToolService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "pmiPanelLoad",
+        "onUnmount": "clearPmiCtxAction"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "pmiSelectionUpdated",
+            "action": "updateSelectionAction"
+        },
+        {
+            "eventId": "awTab.selected",
+            "action":  "handleTabSelectionChangeAction"
+        },
+        {
+          "eventId": "pmiTool.stepPrev",
+          "action" : "stepPrevAction"
+        },
+        {
+          "eventId": "pmiTool.stepNext",
+          "action" : "stepNextAction"
+        },
+        {
+            "eventId":"treePmiModelView.treeNodeSelected",
+            "action":"pmiEntityModelViewNodeClickedAction",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            }
+        },
+        {
+            "eventId":"treePmiTypes.treeNodeSelected",
+            "action":"pmiEntityModelViewNodeClickedAction",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            }
+        },
+        {
+            "eventId":"awViewerContext.update",
+            "condition": "conditions.isInACESublocation",
+            "action":"registerForSelectionAndVisibilityAction",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            }
+        },
+        {
+            "eventId":"commandBarResized",
+            "action":"clearPmiCtxAction"
+        }
+    ],
+    "data":
+    {
+        "tabModels":
+        [
+            {
+                "name": "{{i18n.modelViewsTabTitle}}",
+                "tabkey": "modelViewesTab"
+            },
+            {
+                "name": "{{i18n.pmiEntitiesTabTitle}}",
+                "tabkey": "entitiesTab"
+            }
+        ],
+
+        "stepOverCommands": "pmiStepCmdsAnchor",
+        "modelName": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "",
+            "isEditable": "true"
+        }
+    },
+
+    "dataProviders":
+    {
+        "selectionProvider":
+        {
+            "action": "updateSelectionWithDisplayStrings",
+            "response": "{{data.allTargets}}",
+            "totalFound": "{{data.totalFound}}"
+        }
+    },
+    "conditions":
+    {
+        "dataFetchComplete":
+        {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].pmiToolCtx.dataFetchComplete"
+        },
+        "selectionHasNoPmi":
+        {
+            "expression": "conditions.dataFetchComplete && !conditions.targetHasMVData && !conditions.targetHasTypeGroupsData"
+        },
+        "targetHasMVData":
+        {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].pmiToolCtx.selectionHasMVData"
+        },
+        "targetHasTypeGroupsData":
+        {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].pmiToolCtx.selectionHasTypesData"
+        },
+        "selectionIsNotVisible":
+        {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].pmiToolCtx.isTargetInVisible===true"
+        },
+        "isInACESublocation":
+        {
+            "expression": "(ctx.sublocation.nameToken==='com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation' || ctx.sublocation.nameToken==='multiBOMManager:taskPageSubLocation' || ctx.sublocation.nameToken==='com.siemens.splm.client.cba.CADBOMAlignment:CBASublocation') && ctx.sublocation.label !== 'Disclosure'"
+        },
+        "isInMBMSublocation":
+        {
+            "expression": "ctx.sublocation.nameToken==='multiBOMManager:taskPageSubLocation' && ctx.sublocation.label !== 'Disclosure'"
+        }
+    },
+     "i18n":
+    {
+        "PmiPanelTitle":["PmiToolMessages"],
+        "operationName":["PmiToolMessages"],
+        "modelViewsTabTitle":["PmiToolMessages"],
+        "pmiEntitiesTabTitle":["PmiToolMessages"],
+        "stepThroughLabel":["PmiToolMessages"],
+        "reorientText":["PmiToolMessages"],
+        "stepThroughNext":["PmiToolMessages"],
+        "stepThroughPrev":["PmiToolMessages"],
+        "toolPanelTitle":["PmiToolMessages"],
+        "showingPmiFor":["PmiToolMessages"],
+        "notCurrentlyVisible":["PmiToolMessages"],
+        "hasNoPmi":["PmiToolMessages"],
+        "show":["PmiToolMessages"]
+        
+    },
+    
+    "messages":{
+        "VisibilityMessageWarning": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.notCurrentlyVisible}}"
+        },
+        "NoPmiMessageWarning":{
+            "messageType": "WARNING",
+            "messageText":"{{i18n.hasNoPmi}}"
+        }
+    }
+
+}

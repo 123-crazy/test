@@ -1,0 +1,12 @@
+<aw-column class="aw-xrt-columnContentPanel" ng-repeat="elemdata in ::data._pageRendering track by $index" width="{{::elemdata.width ? elemdata.width : 'fill'}}"
+  ng-if="::elemdata.elementType === 'column' && elemdata.children && elemdata.children.length > 0">
+    <aw-walker-element class="aw-xrt-element" elemdata="elemdata" view-model="data"></aw-walker-element>
+</aw-column>
+<aw-panel-section ng-repeat="elemdata in ::data._pageRendering track by $index" caption="{{::elemdata.displayTitle}}"
+  collapsed="{{elemdata.collapsed}}" ng-if="::elemdata.elementType === 'section' && elemdata.children && elemdata.children.length > 0">
+    <aw-walker-element class="aw-xrt-element" elemdata="elemdata" view-model="data" ></aw-walker-element>
+</aw-panel-section>
+<div ng-repeat="elemdata in ::data._pageRendering track by $index" width="fill"
+  ng-if="::elemdata.elementType !== 'column' && elemdata.elementType !== 'section'" class="aw-xrt-nonColumnAndSection">
+    <aw-walker-element class="aw-xrt-element" elemdata="elemdata" view-model="data" ></aw-walker-element>
+</div>

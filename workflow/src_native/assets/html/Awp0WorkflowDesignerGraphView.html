@@ -1,0 +1,25 @@
+<aw-column width="fill">
+    <aw-toolbar first-anchor="aw_workflowDesigner" second-anchor="aw_toolbarRight" orientation="HORIZONTAL"></aw-toolbar>
+    <aw-row height="3f" class="aw-layout-breadCrumbContainer" visible-when="conditions.isFixedLayoutMode">
+        <aw-navigate-breadcrumb provider="data.provider" breadcrumb-config="data.breadCrumbConfig.workflowDesignerBreadcrumbConfig" visible-when="conditions.isFixedLayoutMode"></aw-navigate-breadcrumb>
+    </aw-row>
+    <aw-row height="fill" data-row-id="workflowGraphContainer">
+        <aw-column width="4" exist-when="ctx.graph.legendData.legendViews && ctx.workflowDgmCtx.taskLegendPaletteMode && conditions.isTemplateInEditMode">
+            <aw-scrollpanel>
+                <aw-workflow-handler-table>
+                    <aw-include name="Awp0WorkflowDesignerLegend" exist-when="ctx.graph.legendData.legendViews && ctx.workflowDgmCtx.taskLegendPaletteMode && conditions.isTemplateInEditMode"></aw-include>
+                </aw-workflow-handler-table>
+            </aw-scrollpanel>
+        </aw-column>
+        <aw-splitter direction="VERTICAL" exist-when="ctx.graph.legendData.legendViews && ctx.workflowDgmCtx.taskLegendPaletteMode && conditions.isTemplateInEditMode"></aw-splitter>
+        <aw-column width="8">
+            <aw-row height="fill">
+                <aw-graph graph-id="workflowDesignerGraph" graph-model="data.graphModel" legend-data="data.legend"></aw-graph>
+            </aw-row>
+        </aw-column>
+    </aw-row>
+    <aw-splitter direction="HORIZONTAL" exist-when="ctx.state.params.ttab_name" ></aw-splitter>
+    <aw-row height="25f" exist-when="ctx.state.params.ttab_name">
+        <aw-include name="Awp0TaskRelatedInfo"></aw-include>
+    </aw-row>
+</aw-column>

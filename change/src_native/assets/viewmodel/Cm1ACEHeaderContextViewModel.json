@@ -1,0 +1,55 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-property-label.directive",
+        "js/aw-flex-column.directive"
+    ],
+
+    "actions": {
+        "populateChangeContext": {
+            "actionType": "JSFunctionAsync",
+            "method": "populateChangeContext",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/changeMgmtUtils"
+        },
+        "unregisterContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "ecnForOpenedElement"
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "populateChangeContext",
+        "onUnmount": "unregisterContext"
+    },
+    "onEvent": [ {
+        "eventId": "overridenContextChanged",
+        "action": "populateChangeContext"
+    } ],
+
+    "data": {
+        "changeContextTitle": {
+            "type": "STRING",
+            "dbValue": "",
+            "displayName": "{{i18n.authoringChangeTitle}}"
+        },
+        "changeContextValue": {
+            "type": "OBJECT",
+            "displayName": "",
+            "dbValue": "",
+            "uiValue": "{{i18n.noAuthoringChangeTitle}}"
+
+        }
+    },
+
+    "i18n": {
+        "authoringChangeTitle": [ "ChangeMessages" ],
+        "noAuthoringChangeTitle": [ "ChangeMessages" ]
+    }
+}

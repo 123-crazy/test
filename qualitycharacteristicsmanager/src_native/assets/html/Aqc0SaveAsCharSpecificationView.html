@@ -1,0 +1,62 @@
+<aw-command-panel caption="i18n.SaveAs">
+    <aw-panel-body aw-init="data.panelId='Aqc0SaveAsCharSpecification'">
+        <aw-panel-section>
+            <aw-listbox prop="data.GroupList" list="data.groupList"></aw-listbox>
+            <aw-widget prop="data.objectName" exist-when="ctx.isTC13_2OnwardsSupported"></aw-widget>
+            <aw-xrt type="SAVEAS" vmo="ctx.selected"></aw-xrt>
+            <div exist-when="ctx.isClassificationPropSupported">
+                <aw-listbox prop="data.qc0Criticality" list="data.qc0CriticalityList"></aw-listbox>
+            </div>
+            <div exist-when="ctx.isOkConditionPropSupported">
+                <aw-widget exist-when="ctx.selected.type =='Qc0AttributiveCharSpec'" prop="data.qc0OkDescription">
+                </aw-widget>
+                <aw-widget exist-when="ctx.selected.type =='Qc0AttributiveCharSpec'" prop="data.qc0NokDescription">
+                </aw-widget>
+            </div>
+            <aw-listbox exist-when="ctx.selected.type==='Qc0VariableCharSpec' && ctx.isLimitationSupported "
+                prop="data.qc0limitation" list="data.limitationList"></aw-listbox>
+            <aw-listbox exist-when="ctx.selected.type==='Qc0VariableCharSpec'" prop="data.qc0UnitOfMeasure"
+                action="loadUnitOfMeasure" list="data.unitOfMeasureList"></aw-listbox>
+            <aw-widget exist-when="ctx.selected.type==='Qc0VariableCharSpec'" prop="data.qc0NominalValue"></aw-widget>
+            <aw-listbox exist-when="ctx.selected.type==='Qc0VariableCharSpec' && ctx.isToleranceTypeSupported"
+                prop="data.qc0ToleranceType" list="data.ToleranceTypeList"></aw-listbox>
+            <aw-widget exist-when="ctx.selected.type==='Qc0VariableCharSpec' && data.qc0limitation.dbValue !='Up'"
+                prop="data.qc0UpperTolerance"></aw-widget>
+            <aw-widget
+                exist-when="ctx.selected.type==='Qc0VariableCharSpec' && (data.qc0limitation.dbValue =='Both Sides' || data.qc0limitation.dbValue =='Up')"
+                prop="data.qc0LowerTolerance"></aw-widget>
+            <aw-widget exist-when="ctx.selected.type==='Qc0VariableCharSpec' && !ctx.isLimitationSupported"
+                prop="data.qc0LowerTolerance"></aw-widget>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <div exist-when="!ctx.isTC13_2OnwardsSupported">
+            <aw-button action="saveASVarCharSpec"
+                visible-when="ctx.selected.type==='Qc0VariableCharSpec' && data.groupList.length >0 ">
+                <aw-i18n>i18n.Save</aw-i18n>
+            </aw-button>
+            <aw-button action="saveASAttCharSpec"
+                visible-when="ctx.selected.type==='Qc0AttributiveCharSpec' && data.groupList.length >0">
+                <aw-i18n>i18n.Save</aw-i18n>
+            </aw-button>
+            <aw-button action="saveASVisCharSpec"
+                visible-when="ctx.selected.type==='Qc0VisualCharSpec' && data.groupList.length >0">
+                <aw-i18n>i18n.Save</aw-i18n>
+            </aw-button>
+        </div>
+        <div exist-when="ctx.isTC13_2OnwardsSupported">
+            <aw-button action="saveASVarCharSpec_tC13_2Onwards"
+                visible-when="ctx.selected.type==='Qc0VariableCharSpec' && data.groupList.length >0 && awPanelBody.$valid">
+                <aw-i18n>i18n.Save</aw-i18n>
+            </aw-button>
+            <aw-button action="saveASAttCharSpec_tC13_2Onwards"
+                visible-when="ctx.selected.type==='Qc0AttributiveCharSpec' && data.groupList.length >0 && awPanelBody.$valid">
+                <aw-i18n>i18n.Save</aw-i18n>
+            </aw-button>
+            <aw-button action="saveASVisCharSpec_tC13_2Onwards"
+                visible-when="ctx.selected.type==='Qc0VisualCharSpec' && data.groupList.length >0 && awPanelBody.$valid">
+                <aw-i18n>i18n.Save</aw-i18n>
+            </aw-button>
+        </div>
+    </aw-panel-footer>
+</aw-command-panel>

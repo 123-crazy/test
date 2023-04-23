@@ -1,0 +1,1001 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-graph.directive",
+        "js/aw-column.directive",
+        "js/aw-toolbar.directive"
+    ],
+
+    "actions": {
+        "updateSeedNodeDegree": {
+            "actionType": "JSFunction",
+            "method": "updateSeedNodeDegree",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Gc1TestHarness.startDrawGraph",
+                    "eventData": {                        
+                        "fmeaElementToAdd":"{{data.eventData.fmeaElementToAdd}}"
+                    }
+                } ]
+            },
+            "deps": "js/qfm0FmeaGraphService"
+        },
+        "graphHoverChanged": {
+            "actionType": "JSFunction",
+            "method": "graphHoverChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.hoverChanged']}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+        "graphSelectionChanged": {
+            "actionType": "JSFunction",
+            "method": "graphSelectionChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.selectionChanged']}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+        "handleItemsRemovedFromGraph": {
+            "actionType": "JSFunction",
+            "method": "handleItemsRemovedFromGraph",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "items": "{{data.eventMap['awGraph.itemsRemoved']}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+
+        "handleGraphItemsMoved": {
+            "actionType": "JSFunction",
+            "method": "handleGraphItemsMoved",
+            "inputData": {
+                "items": "{{data.eventMap['awGraph.graphItemsMoved'].items}}",
+                "graphModel": "{{data.graphModel}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+
+        "handleItemsAddedToGraph": {
+            "actionType": "JSFunction",
+            "method": "handleItemsAddedToGraph",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "items": "{{data.eventMap['awGraph.itemsAdded']}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+        "updateRelationCounts": {
+            "actionType": "JSFunction",
+            "method": "updateRelationCounts",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphService"
+        },
+        "drawGraph": {
+            "actionType": "JSFunction",
+            "method": "drawGraph",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/qfm0FmeaGraphService"
+        },
+
+        "itemsRemovedFromGraph": {
+            "actionType": "JSFunction",
+            "method": "itemsRemovedFromGraph",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "eventData": "{{parameters.eventData}}"
+            },
+            "deps": "js/qfm0FmeaGraphService"
+        },
+
+        "onGraphUpdated": {
+            "actionType": "JSFunction",
+            "method": "onGraphUpdated",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}"
+            },
+            "deps": "js/qfm0FmeaGraphService"
+        },
+
+        "requestGraphData": {
+            "actionType": "JSFunction",
+            "method": "requestGraphData",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "eventData": "{{parameters.eventData}}"
+            },
+            "deps": "js/qfm0FmeaGraphDataService"
+        },
+
+        "queryNetwork": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2020-12-FMEADataManagement",
+            "method": "getNetViewData",
+            "inputData": {
+                "input": "{{function:getQueryNetworkInput}}"
+            },
+
+            "outputData": {
+                "graphData": "netView",
+                "ctx.graph.graphModel.graphData": "netView"
+            },
+
+            "events": {
+                "success": [ {
+                        "condition": "data.eventData != undefined && data.eventData.expandDirection != undefined && data.eventData.rootIDs != undefined",
+                        "name": "Gc1TestHarness.updateDegree",
+                        "eventData": {
+                            "expandDirection": "{{data.eventData.expandDirection}}",
+                            "rootIDs": "{{data.eventData.rootIDs}}",
+                            "fmeaElementToAdd":"{{data.eventData.fmeaElementToAdd}}"
+                        }
+                    },
+                    {
+                        "condition": "((data.eventData === undefined) || (data.eventData !== undefined && data.eventData.expandDirection === undefined))",
+                        "name": "Gc1TestHarness.startDrawGraph"
+                    }
+                ]
+            },
+            "deps": "js/qfm0FmeaGraphDataService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "onNodeEditCommitted": {
+            "actionType": "JSFunction",
+            "method": "onNodeEditCommitted",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "eventData": "{{data.eventMap['awGraph.nodeEditCommitted']}}",
+                "legendState": "{{ctx.graph.legendState}}"
+            },
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+        "updateGraphChangeAction": {
+            "actionType": "JSFunction",
+            "method": "markGraphAsDirty",
+            "inputData": {
+                "hasPendingChanges": true
+            },
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+        "registerEditHandler": {
+            "actionType": "JSFunction",
+            "method": "registerGraphEditHandler",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0FmeaGraphUtil"
+        },
+        "updateCommandClassToSelected": {
+            "actionType": "JSFunction",
+            "method": "updateCommandClassToSelected",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/qfm0FmeaManagerUtils2"
+        },
+        "updateGraphThroughInfo": {
+            "actionType": "JSFunction",
+            "method": "updateGraphThroughInfo",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0FmeaGraphService"
+        },
+        "updateGraphNodesOnSeverityCascade": {
+            "actionType": "JSFunction",
+            "method": "updateGraphNodesOnRHEditSeverityCommand",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0FmeaGraphUtil2"
+        },
+        "handleViewSelectionChangeAction": {
+            "actionType": "JSFunction",
+            "method": "handleViewSelectionChange",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/qfm0FmeaManagerUtils2"
+        },
+        "resetRiskMethodRelatedData": {
+            "actionType": "JSFunction",
+            "method": "resetRiskMethodRelatedData",
+            "deps": "js/qfm0FmeaGraphService"
+        }       
+    },
+
+    "data": {
+        "showPreviewGraph": false,
+        "isInitialGraph": false,
+        "nodeHeightUpdateStrategy": "FIT_WRAP",
+        "mockedAnnotations": [ {
+            "categories": [ {
+                "internalName": "Rectangle",
+                "displayName": "Rectangle",
+                "categoryType": "annotations",
+                "isFiltered": false,
+                "isAuthorable": true,
+                "style": {
+                    "borderWidth": "1px",
+                    "borderStyle": "dashed",
+                    "color": "rgb(235,235,227)",
+                    "backgroundColor": "rgb(235,235,227)",
+                    "borderColor": "rgb(150, 150, 130)"
+                },
+                "subCategories": [ {
+                    "categoryType": "annotations",
+                    "displayName": "Rectangle",
+                    "internalName": "Rectangle"
+                } ]
+            } ],
+            "displayName": "i18n.Annotation",
+            "internalName": "annotations"
+        } ],
+        "graphModeToggle": {
+            "displayName": "",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "alignmentDirectionLists": [ {
+                "propDisplayValue": "LEFT",
+                "propInternalValue": "LEFT"
+            },
+            {
+                "propDisplayValue": "CENTER",
+                "propInternalValue": "CENTER"
+            },
+            {
+                "propDisplayValue": "RIGHT",
+                "propInternalValue": "RIGHT"
+            },
+            {
+                "propDisplayValue": "BOTTOM",
+                "propInternalValue": "BOTTOM"
+            },
+            {
+                "propDisplayValue": "MIDDLE",
+                "propInternalValue": "MIDDLE"
+            },
+            {
+                "propDisplayValue": "TOP",
+                "propInternalValue": "TOP"
+            }
+
+        ],
+        "alignmentTypeLists": [ {
+                "propDisplayValue": "ANCHOR",
+                "propInternalValue": "ANCHOR"
+            },
+            {
+                "propDisplayValue": "BOUNDING_BOX",
+                "propInternalValue": "BOUNDING_BOX"
+            },
+            {
+                "propDisplayValue": "ANCHOR_ALT",
+                "propInternalValue": "ANCHOR_ALT"
+            }
+        ],
+        "graphActionLists": [ {
+                "propDisplayValue": "Apply Layout",
+                "propInternalValue": "applyLayout"
+            },
+            {
+                "propDisplayValue": "Fit Graph",
+                "propInternalValue": "fitGraph"
+            },
+            {
+                "propDisplayValue": "FitViewPosition:LEFT",
+                "propInternalValue": "setFitViewPositionLeft"
+            },
+            {
+                "propDisplayValue": "FitViewPosition:CENTER",
+                "propInternalValue": "setFitViewPositionCenter"
+            },
+            {
+                "propDisplayValue": "Only Node Movable",
+                "propInternalValue": "toggleNodeMovable"
+            },
+            {
+                "propDisplayValue": "Only Port Movable",
+                "propInternalValue": "togglePortMovable"
+            },
+            {
+                "propDisplayValue": "Only Label Movable",
+                "propInternalValue": "toggleLabelMovable"
+            },
+            {
+                "propDisplayValue": "Node Port Label Boundary Movable",
+                "propInternalValue": "toggleAllMovable"
+            },
+            {
+                "propDisplayValue": "Expand Outgoing",
+                "propInternalValue": "expandOutgoing"
+            },
+            {
+                "propDisplayValue": "Expand Incoming",
+                "propInternalValue": "expandIncoming"
+            },
+            {
+                "propDisplayValue": "Expand All",
+                "propInternalValue": "expandAll"
+            },
+            {
+                "propDisplayValue": "Create Group for Selected",
+                "propInternalValue": "createGroupForSelected"
+            },
+            {
+                "propDisplayValue": "Remove Selected",
+                "propInternalValue": "removeSelected"
+            },
+            {
+                "propDisplayValue": "Hide Selected",
+                "propInternalValue": "hideSelected"
+            },
+            {
+                "propDisplayValue": "FadeNodeAnimation for Selected",
+                "propInternalValue": "fadeNodeAnimationForSelected"
+            },
+            {
+                "propDisplayValue": "Pan to view: AUTO",
+                "propInternalValue": "panToViewAuto"
+            },
+            {
+                "propDisplayValue": "Pan to view: CENTER",
+                "propInternalValue": "panToViewCenter"
+            },
+            {
+                "propDisplayValue": "Pan to view: FIT",
+                "propInternalValue": "panToViewFit"
+            },
+            {
+                "propDisplayValue": "Quick Alignment",
+                "propInternalValue": "quickAlignment"
+            },
+            {
+                "propDisplayValue": "Set Label Position",
+                "propInternalValue": "setLabelPosition"
+            },
+            {
+                "propDisplayValue": "Reset Label Position",
+                "propInternalValue": "resetLabelPosition"
+            },
+            {
+                "propDisplayValue": "Set Label Content",
+                "propInternalValue": "setLabelContent"
+            },
+            {
+                "propDisplayValue": "Set Label TruncateMode",
+                "propInternalValue": "setLabelTruncateMode"
+            },
+            {
+                "propDisplayValue": "Print Graph",
+                "propInternalValue": "printGraph"
+            },
+            {
+                "propDisplayValue": "Export Graph As String",
+                "propInternalValue": "exportGraph"
+            },
+            {
+                "propDisplayValue": "Save Graph",
+                "propInternalValue": "save"
+            },
+            {
+                "propDisplayValue": "Recall Graph",
+                "propInternalValue": "recall"
+            },
+            {
+                "propDisplayValue": "Node Word Wrap",
+                "propInternalValue": "setWordWrap"
+            },
+            {
+                "propDisplayValue": "Node Word Truncate",
+                "propInternalValue": "setWordTruncate"
+            },
+            {
+                "propDisplayValue": "Node Word Ellipsis",
+                "propInternalValue": "setWordEllipsis"
+            },
+            {
+                "propDisplayValue": "Column Layout",
+                "propInternalValue": "applyColumnLayout"
+            },
+            {
+                "propDisplayValue": "Sorted Layout",
+                "propInternalValue": "applySortedLayout"
+            }
+        ],
+
+        "graphAction": {
+            "displayName": "",
+            "type": "STRING",
+            "hasLov": true
+        },
+
+        "alignmentDirection": {
+            "displayName": "",
+            "type": "STRING",
+            "hasLov": true
+        },
+
+        "alignmentType": {
+            "displayName": "",
+            "type": "STRING",
+            "hasLov": true
+        },
+
+        "userInput": {
+            "displayName": "",
+            "type": "STRING",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+
+        "legend": {
+            "tabModels": [ {
+                "panelId": "Gc1RefineSub",
+                "name": "Filter"
+            } ]
+        },
+
+        "graphModel": {
+            "config": {
+                "enableEdit": true,
+                "minZoom": 0,
+                "maxZoom": 1,
+                "autoEdgeRoutingType": "HV_SEGMENT3",
+                "fitViewPosition": "CENTER",
+                "tooltipDelayTime": 500,
+                "doubleClickSpeed": 600,
+                "nodeHeightUpdateStrategy": "FIT_WRAP",
+                "enableJumper": true,
+                "tooltipOffset": {
+                    "x": 0,
+                    "y": 20
+                },
+                "jumper": {
+                    "jumperType": "ARC",
+                    "jumperSize": {
+                        "width": 10,
+                        "height": 10
+                    },
+                    "jumperPriority": "HORIZONTAL"
+                },
+                "movableItems": [
+                    "Node",
+                    "Port",
+                    "Label",
+                    "Boundary"
+                ],
+                "selectableItems": [
+                    "Node",
+                    "Edge",
+                    "Boundary"
+                ],
+                "layout": {
+                    "layoutMode": "IncUpdateLayout",
+                    "defaultOption": "TopToBottom",
+                    "options": [
+                        "TopToBottom",
+                        "RightToLeft",
+                        "LeftToRight",
+                        "BottomToTop"
+                    ],
+                    "config": {
+                        "nodeToNodeDistance": {
+                            "x": 50,
+                            "y": 50
+                        },
+                        "edgeToEdgeDistance": {
+                            "x": 25,
+                            "y": 25
+                        },
+                        "enableRSOP": true,
+                        "makeRoomInRSOPDisable": true,
+                        "snakeWrapLength": 500
+                    }
+                },
+                "showNodeOverlay": true,
+                "nodeOverlay": {
+                    "zoomThreshold": 0.7
+                },
+
+                "inputMode": "viewInputMode",
+                "tooltipHandler": "js/qfm0FmeaGraphTooltipHandler",
+                "moveWithoutSelection": true,
+                "enableAutoPan": true,
+                "enableMarqueeSelection": true,
+                "marqueeSelectionModifierKey": [
+                    "shift"
+                ],
+                "enableMultipleSelection": true,
+                "multipleSelectionModifierKey": [
+                    [
+                        "ctrl"
+                    ],
+                    [
+                        "shift"
+                    ]
+                ],
+
+                "showOverview": true,
+                "showFilter": true,
+                "syncPortEdgeVisibility": true,
+                "syncGroupDescendantsVisibilityOnFilter": false,
+                "enableObjectArrangement": true,
+                "snapToGridByAnchorPoint": false,
+                "showGrid": false,
+                "grid": {
+                    "lineStyle": "LINE",
+                    "lineColor": "rgb(129,182,196)",
+                    "showMajorLines": true,
+                    "showMinorLines": true,
+                    "bringToTop": false,
+                    "majorSpacing": 50,
+                    "minorLinesPerMajor": 5,
+                    "enableSnapping": true,
+                    "enableSnapConnections": false,
+                    "snapPointsPerMinor": 1,
+                    "snapConnectionTolerance": 0
+                },
+                "enableAlignment": false,
+                "alignment": {
+                    "strokeColor": "rgb(0,255,0)",
+                    "strokeWidth": 2,
+                    "strokeDashStyle": "SOLID",
+                    "tolerance": 10,
+                    "separateGridSnapAndAlignment": true
+                },
+
+                "dragAndDropModifierKey": {
+                    "copy": [
+                        "Alt",
+                        "Shift"
+                    ],
+                    "move": [
+                        "Alt"
+                    ]
+                },
+                "dragAndDropHandler": "js/qfm0FmeaGraphDragAndDropHandler",
+                "defaultTextCapHeightFactor": 0.9,
+                "isNetworkMode": false,
+
+                "defaults": {
+                    "nodeSize": {
+                        "width": 300,
+                        "height": 125
+                    },
+
+                    "nodePaddings": {
+                        "top": 50,
+                        "bottom": 50,
+                        "left": 50,
+                        "right": 50
+                    },
+
+                    "minimumNodeSize": {
+                        "width": 150,
+                        "height": 125
+                    },
+
+                    "nodeStyle": {
+                        "templateId": "Gc1DefaultNodeTemplate"
+                    },
+
+                    "edgeStyle": {
+                        "dashStyle": "solid",
+                        "thickness": 2.0,
+                        "color": "(0,0,0)",
+                        "targetArrow": {
+                            "arrowShape": "TRIANGLE",
+                            "arrowScale": 1.0,
+                            "fillInterior": true
+                        }
+                    },
+
+                    "boundaryStyle": {
+                        "thickness": 1,
+                        "strokeDash": "DASH",
+                        "fillColor": "(235,235,227)",
+                        "borderColor": "(150, 150, 130)",
+                        "boundaryPaddings": {
+                            "top": 10,
+                            "bottom": 10,
+                            "left": 10,
+                            "right": 10
+                        }
+                    },
+                    "nodeLabel": {
+                        "margin": [
+                            5,
+                            5,
+                            5,
+                            5
+                        ],
+                        "contentStyleClass": "aw-widgets-cellListCellTitle",
+                        "allowWrapping": true
+                    },
+                    "edgeLabel": {
+                        "maxWidth": 128,
+                        "placementRule": {
+                            "positionOption": "CENTER_OF_LONGEST_SEGMENT_HORIZONTAL",
+                            "rotationMode": "AlongWithSegment"
+                        }
+                    },
+                    "boundaryLabel": {
+                        "contentStyleClass": "aw-gctest-boundaryLabel",
+                        "backgroundStyleClass": "aw-graph-labelBackground",
+                        "textAlignment": "MIDDLE",
+                        "allowWrapping": true
+                    },
+                    "label": {
+                        "hasBackground": true,
+                        "backgroundFillColor": "argb(1,244,244,244)",
+                        "backgroundStyleClass": "aw-graph-labelBackground",
+                        "backgroundAnchor": [
+                            0.5,
+                            0.5
+                        ],
+                        "textAnchor": [
+                            0.5,
+                            0.5
+                        ],
+                        "contentStyleClass": "aw-widgets-label aw-base-normal aw-graph-label",
+                        "allowWrapping": false,
+                        "textOverflow": "ELLIPSIS",
+                        "maxMoveDistance": 500,
+                        "minWidth": 50
+                    }
+                },
+                "shadowEffects": [ {
+                    "effectId": "drop-shadow",
+                    "xOffset": 4,
+                    "yOffset": 4,
+                    "blurDeviation": 3
+                } ]
+            },
+
+            "nodeTemplates": {
+                "Gc1DefaultNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaTileNodeTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "rgb(255,182,121)",
+                        "Name": "New Node",
+                        "Name_editable": true,
+                        "Severity_editable": true,
+                        "Detection_editable": true,
+                        "Occurrence_editable":true
+                    },
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                },
+
+                "Gc1TileNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaTileNodeTemplate.html",
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                },
+
+                "Gc1GroupTileNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaGroupTileNodeTemplate.html",
+                    "initialBindData": {
+                        "HEADER_HEIGHT": 125
+                    },
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                },
+
+                "Gc1BigTileNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaBigTileNodeTemplate.html",
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                },
+
+                "Gc1BigGroupTileNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaBigGroupTileNodeTemplate.html",
+                    "initialBindData": {
+                        "HEADER_HEIGHT": 125
+                    },
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                },
+
+                "Gc1ActionGroupTileNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaActionGroupTileNodeTemplate.html",
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                },
+
+                "Gc1ActionGroupTileGroupNodeTemplate": {
+                    "templateUrl": "/html/qfm0FmeaActionGroupTileGroupNodeTemplate.html",
+                    "initialBindData": {
+                        "HEADER_HEIGHT": 125
+                    },
+                    "textOverflow": "ELLIPSIS",
+                    "padding": 50
+                }
+            },
+
+            "inputModes": {
+                "viewInputMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": false,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+
+                "editInputMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+
+                "edgeCreationMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "Edge",
+                    "defaultCursor": "default",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur",
+                    "enableSelfLoopConnection": true,
+                    "endPointTolerance": 10
+                },
+
+                "nodeCreationMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "Node",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+
+                "portCreationMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "Port",
+                    "defaultCursor": "default",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+
+                "boundaryCreationMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "Boundary",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                }
+            }
+        },
+
+        "isBasicNodeApply": false
+    },
+
+    "functions": {
+        "getQueryNetworkInput": {
+            "functionName": "getQueryNetworkInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}",
+                "{{parameters.eventData}}"
+            ]
+        }
+    },
+
+    "onEvent": [ 
+        {
+            "eventId": "Rv1RelationsBrowser.expandGraph",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "queryNetwork",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.itemsRemoved",
+            "action": "handleItemsRemovedFromGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.graphItemsMoved",
+            "action": "handleGraphItemsMoved",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.itemsAdded",
+            "action": "handleItemsAddedToGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.itemsRemoved",
+            "action": "updateRelationCounts",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.itemsAdded",
+            "action": "updateRelationCounts",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.visibilityChanged",
+            "action": "updateRelationCounts",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Gc1TestHarness.queryNetwork",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "queryNetwork"
+        },
+        {
+            "eventId": "Gc1TestHarness.legendInitialized",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "requestGraphData"
+        },
+        {
+            "eventId": "awGraph.initialized",
+            "action": "requestGraphData",
+            "condition": "conditions.isTestHarnessGraphEvent"
+        },
+        {
+            "eventId": "awGraph.initialized",
+            "action": "updateCommandClassToSelected",
+            "condition": "conditions.isTestHarnessGraphEvent"
+        },
+        {
+            "eventId": "Gc1TestHarness.activeViewUpdated",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "requestGraphData"
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "graphSelectionChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.hoverChanged",
+            "action": "graphHoverChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Gc1TestHarness.startDrawGraph",
+            "action": "drawGraph",
+            "cacheEventData": false
+        },
+        {
+            "eventId": "Gc1TestHarness.expandOutgoing",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "requestGraphData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Gc1TestHarness.expandIncoming",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "requestGraphData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Gc1TestHarness.expandAll",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action": "requestGraphData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.itemsRemoved",
+            "action": "itemsRemovedFromGraph",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Gc1TestHarness.graphUpdated",
+            "action": "onGraphUpdated",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Gc1TestHarness.updateDegree",
+            "action": "updateSeedNodeDegree"
+        },
+        {
+            "eventId": "closePanelInNetView",
+            "action": "closePanel",
+            "condition": "conditions.isInfoPanelOpen"
+        },
+        {
+            "eventId": "awGraph.nodeEditCommitted",
+            "action": "onNodeEditCommitted",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "qfm0Graph.Modified",
+            "action": "updateGraphChangeAction"
+        },
+        {
+            "eventId": "qfm0.registerEditHandler",
+            "action": "registerEditHandler"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved' && state !== 'canceling' && ((ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_NetView' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_NetView') || ((ctx.xrtPageContext.primaryXrtPageID ==='tc_xrt_StructureAnalysis' || ctx.xrtPageContext.secondaryXrtPageID ==='tc_xrt_StructureAnalysis') || ((ctx.xrtPageContext.primaryXrtPageID ==='tc_xrt_Function_Analysis' || ctx.xrtPageContext.secondaryXrtPageID ==='tc_xrt_Function_Analysis') && ctx.showFunctionNetView)|| ((ctx.xrtPageContext.primaryXrtPageID ==='tc_xrt_Failure_Analysis' || ctx.xrtPageContext.secondaryXrtPageID ==='tc_xrt_Failure_Analysis') && ctx.showFailureNetView) && ctx.tcSessionData.tcMajorVersion >= 13))",
+            "action": "updateGraphThroughInfo",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "severityUpdatedByRHEditSeverityCmd",
+            "condition": "(ctx.xrtPageContext.primaryXrtPageID ==='tc_xrt_Failure_Analysis' || ctx.xrtPageContext.secondaryXrtPageID ==='tc_xrt_Failure_Analysis') && ctx.showFailureNetView",
+            "action": "updateGraphNodesOnSeverityCascade",
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {
+        "isTestHarnessGraphEvent": {
+            "expression": "sourceGraph == data.graphModel"
+        },
+        "isInfoPanelOpen": {
+            "expression": "data.eventData && data.eventData.dataSource && data.eventData.dataSource.xrtType && data.eventData.dataSource.xrtType === 'INFO'"
+        }
+    },
+
+    "lifecycleHooks": {
+        "onMount": "handleViewSelectionChangeAction",
+        "onUnmount": "resetRiskMethodRelatedData"
+    }    
+}

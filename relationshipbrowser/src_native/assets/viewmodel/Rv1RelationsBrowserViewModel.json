@@ -1,0 +1,628 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-graph.directive",
+        "js/aw-toolbar.directive",
+        "js/aw-column.directive"
+    ],
+
+    "actions": {
+        "checkForAdvancedFeaturesLicenses": {
+            "actionType": "JSFunction",
+            "method": "checkForAdvancedFeaturesLicenses",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserService"
+        },
+
+        "queryLegendData": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2019-12-NetworkEngine",
+            "method": "getViews4",
+            "inputData": {
+                "getViewsInput": {
+                    "key": ["Relations"],
+                    "objectType":["{{ctx.xrtSummaryContextObject.type}}"]
+                }
+            },
+
+            "outputData": {
+                "legendData": "views"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "Rv1RelationsBrowser.initLegendData"
+                } ]
+            }
+        },
+
+        "handleModelObjectUpdated": {
+            "actionType": "JSFunction",
+            "method": "handleModelObjectUpdated",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "eventData": "{{data.eventData}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserService"
+        },
+
+        "initLegendData": {
+            "actionType": "JSFunction",
+            "method": "initLegendData",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserLegendService"
+        },
+
+        "initGraphStyle": {
+            "actionType": "JSFunction",
+            "method": "initGraphStyle",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserGraphStyles"
+        },
+        "queryNetwork": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2012-10-NetworkEngine",
+            "method": "queryNetwork2",
+            "inputData": {
+                "input": "{{function:getQueryNetworkInput}}"
+            },
+            "policy": {
+                "types": "{{function:getQueryNetworkPolicy}}"
+            },
+            "outputData": {
+                "ctx.graph.graphModel.graphData": "graph",
+                "oauthData": "ServiceData.partialErrors"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Rv1RelationsBrowser.startDrawGraph"
+                },
+                {
+                    "name": "complete",
+                    "condition": "ctx.activeToolsAndInfoCommand.commandId === 'Evm1ShowRecipe'",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ],
+                "failure": [ {
+                    "condition": "errorCode.code === 142009",
+                    "name": "Rv1RelationsBrowser.validateOauth",
+                    "eventData": {
+                        "onSuccessEvent": "Rv1RelationsBrowser.expandGraph",
+                        "onSuccessEventData": "{{data.oauthData}}"
+                    }
+                },
+                {
+                    "name": "complete",
+                    "condition": "ctx.activeToolsAndInfoCommand.commandId === 'Evm1ShowRecipe'",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==142009",
+                    "message": "oauthError"
+                } ]
+            },
+            "deps": "js/Rv1RelationBrowserService"
+        },
+
+        "getGraphStyleDef": {
+            "actionType": "TcSoaService",
+            "serviceName": "RelationshipViewer-2012-10-NetworkEngine",
+            "method": "getGraphStyleDef",
+            "inputData": {},
+            "outputData": {
+                "graphStyleResponse": "{{function:parseGraphStyleXML}}"
+            },
+            "deps": "js/Rv1RelationBrowserGraphStyles"
+        },
+
+        "drawGraph": {
+            "actionType": "JSFunction",
+            "method": "drawGraph",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "sortedLayoutPreferenceValue": "{{data.preferences.RV1_DARB_Sorted_Layouts}}",
+                "concentratedPreferenceValue": "{{data.preferences.RV1_DARB_Concentrated}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserDrawService"
+        },
+
+        "issueOauthRequest": {
+            "actionType": "JSFunction",
+            "method": "handleOauthRequestInternal",
+            "deps": "js/Rv1RelationBrowserUtils",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "eventdata": "{{data.eventData}}"
+            }
+        },
+
+        "handleItemsRemovedFromGraph": {
+            "actionType": "JSFunction",
+            "method": "handleItemsRemovedFromGraph",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "items": "{{data.eventMap['awGraph.itemsRemoved']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserService"
+        },
+
+        "handleGraphItemsMoved": {
+            "actionType": "JSFunction",
+            "method": "handleGraphItemsMoved",
+            "inputData": {
+                "items": "{{data.eventMap['awGraph.graphItemsMoved'].items}}",
+                "graphModel": "{{data.graphModel}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserService"
+        },
+
+        "handleItemsAddedToGraph": {
+            "actionType": "JSFunction",
+            "method": "handleItemsAddedToGraph",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "items": "{{data.eventMap['awGraph.itemsAdded']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserService"
+        },
+
+        "setNodeHeightOnWrappedHeightChanged": {
+            "actionType": "JSFunction",
+            "method": "setNodeHeightOnWrappedHeightChanged",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "nodes": "{{data.eventMap['awGraph.wrappedHeightChanged'].wrappedHeightChangedNodes}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserDrawService"
+        },
+        "updateActiveView": {
+            "actionType": "JSFunction",
+            "method": "updateActiveView",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}"
+            },
+            "deps": "js/Rv1RelationBrowserService"
+        },
+        "edgeHotspotClicked": {
+            "actionType": "JSFunction",
+            "method": "edgeHotspotClicked",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "edge": "{{data.eventMap['awGraph.hotspotClicked'].edge}}"
+            },
+            "deps": "js/Rv1RelationBrowserService"
+        },
+        "graphSelectionChanged": {
+            "actionType": "JSFunction",
+            "method": "graphSelectionChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.selectionChanged']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserSelectionService"
+        },
+        "graphHoverChanged": {
+            "actionType": "JSFunction",
+            "method": "graphHoverChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.hoverChanged']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserSelectionService"
+        },
+        "graphMultiSelect": {
+            "actionType": "JSFunction",
+            "method": "graphMultiSelect",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.selectionChanged']}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserSelectionService"
+        },
+        "updateRelationCounts": {
+            "actionType": "JSFunction",
+            "method": "updateRelationCounts",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "legend": "{{data.legend}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserUtils"
+        },
+        "onVisibilityChanged": {
+            "actionType": "JSFunction",
+            "method": "onVisibilityChanged",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}",
+                "eventData": "{{parameters.eventData}}"
+            },
+            "deps": "js/Rv1RelationBrowserService"
+        },
+        "onFilterApplied": {
+            "actionType": "JSFunction",
+            "method": "onFilterApplied",
+            "inputData": {
+                "graphModel": "{{ctx.graph.graphModel}}"
+            },
+            "deps": "js/Rv1RelationBrowserService"
+        }
+    },
+
+    "data": {
+
+        "legend": {
+            "tabModels": [ {
+                "panelId": "Rv1LegendFilterSub",
+                "name": "{{i18n.filter}}"
+            } ]
+        },
+
+        "graphModel": {
+            "config": {
+                "shadowEffects": [],
+                "enableEdit": false,
+                "minZoom": 0.1,
+                "maxZoom": 1,
+                "autoEdgeRoutingType": "HV_SEGMENT3",
+                "fitViewPosition": "CENTER",
+                "hoverDelayTime": 500,
+                "nodeHeightUpdateStrategy": "NONE",
+                "movableItems": [ "Node" ],
+                "selectableItems": [ "Node", "Edge" ],
+                "layout": {
+                    "layoutMode": "IncUpdateLayout",
+                    "defaultOption": "TopToBottom",
+                    "options": [
+                        "TopToBottom",
+                        "RightToLeft",
+                        "LeftToRight",
+                        "BottomToTop",
+                        "Organic",
+                        "Incremental"
+                    ]
+                },
+                "showNodeOverlay": true,
+                "nodeOverlay": {
+                    "zoomThreshold": 0.7,
+                    "graphOverlayHandler": "js/Rv1RelationBrowserOverlayHandler"
+                },
+                "inputMode": "viewInputMode",
+                "tooltipHandler": "js/Rv1RelationBrowserTooltipHandler",
+                "moveWithoutSelection": true,
+                "enableAutoPan": false,
+                "enableMarqueeSelection": true,
+                "marqueeSelectionModifierKey": [ "shift" ],
+                "enableMultipleSelection": true,
+                "multipleSelectionModifierKey": [
+                    [ "ctrl" ],
+                    [ "shift" ]
+                ],
+                "showOverview": true,
+                "showFilter": true,
+                "syncGroupDescendantsVisibilityOnFilter": false,
+                "enableObjectArrangement": true,
+                "enableAutoAlignment​": true,
+                "snapToGridByAnchorPoint": false,
+                "showGrid": false,
+                "grid": {},
+                "enableAlignment": false,
+                "alignment": {
+                    "strokeColor": "rgb(0,255,0)",
+                    "strokeWidth": 2,
+                    "strokeDashStyle": "SOLID",
+                    "tolerance": 10,
+                    "separateGridSnapAndAlignment": true
+                },
+                "defaults": {
+                    "nodeSize": {
+                        "width": 300,
+                        "height": 135
+                    },
+                    "nodeStyle": {
+                        "templateId": "Rv1TileNodeTemplate",
+                        "borderColor": "rgb(138,66,8)"
+                    },
+                    "edgeStyle": {
+                        "dashStyle": "SOLID",
+                        "thickness": 1.0,
+                        "color": "(0,0,0)",
+                        "isHotSpotEdge": true,
+                        "targetArrow": {
+                            "arrowShape": "SIMPLE",
+                            "arrowScale": 1.0,
+                            "fillInterior": true
+                        },
+                        "sourceArrow": {
+                            "arrowShape": "CIRCLE",
+                            "arrowScale": 1.0,
+                            "fillInterior": true
+                        }
+                    },
+                    "portStyle": {
+                        "fillColor": "(0,0,0)",
+                        "size": 0
+                    },
+                    "edgeLabel": {
+                        "maxWidth": 128
+                    },
+
+                    "portLabel": {
+                        "maxWidth": 96
+                    },
+                    "label": {
+                        "hasBackground": true,
+                        "backgroundFillColor": "argb(1,244,244,244)",
+                        "backgroundStyleClass": "aw-graph-labelBackground",
+                        "backgroundAnchor": [ 0.5, 0.5 ],
+                        "textAnchor": [ 0.5, 0.5 ],
+                        "contentStyleClass": "aw-widgets-label aw-base-normal aw-graph-label",
+                        "allowWrapping": false,
+                        "textOverflowMode": "ELLIPSIS",
+                        "maxPortLabelWidth": 96,
+                        "maxEdgeLabelWidth": 128,
+                        "maxMoveDistance": 500
+                    }
+                },
+                "customerFilter": "js/Rv1RelationBrowserGraphFilter"
+            },
+
+            "nodeTemplates": {
+                "Rv1TileNodeTemplate": {
+                    "dropShadow": {
+                        "hoverStyleClass": "",
+                        "selectedStyleClass": ""
+                    },
+                    "templateUrl": "/html/Rv1TileNodeTemplate.html",
+                    "textOverflow": "WRAP",
+                    "textPadding": 60,
+                    "roundCorner": {
+                        "rx": 2,
+                        "ry": 2,
+                        "strokeColorProperty": "node_fill_color",
+                        "borderStyleClass": ""
+                    }
+                }
+            },
+
+            "inputModes": {
+                "viewInputMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": false,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                }
+            },
+
+            "isShowLabel": false,
+
+            "hoverStyle": {
+                "node": "aw-widgets-cellListItemNodeHovered",
+                "edge": { "thicknessScale": 1.75 }
+            }
+        }
+    },
+
+    "functions": {
+        "getQueryNetworkInput": {
+            "functionName": "getQueryNetworkInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}",
+                "{{data.eventData}}"
+            ]
+        },
+        "getQueryNetworkPolicy": {
+            "functionName": "getQueryNetworkPolicy",
+            "parameters": [
+                "{{ctx}}",
+                "{{data.preferences.RV1_DARB_Filter_Properties}}"
+            ]
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "awGraph.initialized",
+            "action": "checkForAdvancedFeaturesLicenses"
+        },
+
+        {
+            "eventId": "awGraph.initialized",
+            "action": "queryLegendData"
+        },
+
+        {
+            "eventId": "awGraph.initialized",
+            "action": "initGraphStyle"
+        },
+
+        {
+            "eventId": "Rv1RelationsBrowser.queryGraphStyleDef",
+            "action": "getGraphStyleDef",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "Rv1RelationsBrowser.initLegendData",
+            "action": "initLegendData"
+        },
+
+        {
+            "eventId": "Rv1RelationsBrowser.legendInitialized",
+            "action": "queryNetwork"
+        },
+
+        {
+            "eventId": "Rv1RelationsBrowser.startDrawGraph",
+            "action": "drawGraph",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "Rv1RelationsBrowser.expandGraph",
+            "action": "queryNetwork",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "awGraph.itemsRemoved",
+            "action": "handleItemsRemovedFromGraph",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "awGraph.graphItemsMoved",
+            "action": "handleGraphItemsMoved",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "awGraph.itemsAdded",
+            "action": "handleItemsAddedToGraph",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "cdm.updated",
+            "action": "handleModelObjectUpdated",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "cdm.relatedModified",
+            "action": "handleModelObjectUpdated",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "awGraph.wrappedHeightChanged",
+            "action": "setNodeHeightOnWrappedHeightChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraphLegend.activeViewChanged",
+            "action": "updateActiveView"
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.activeViewUpdated",
+            "action": "queryNetwork",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.hotspotClicked",
+            "action": "edgeHotspotClicked",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "graphSelectionChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "condition": "conditions.isShiftOrCtrlKeyDown",
+            "action": "graphMultiSelect",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.hoverChanged",
+            "action": "graphHoverChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.itemsRemoved",
+            "action": "updateRelationCounts",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.itemsAdded",
+            "action": "updateRelationCounts",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.visibilityChanged",
+            "action": "updateRelationCounts",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.visibilityChanged",
+            "action": "onVisibilityChanged",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.filterApplied",
+            "action": "onFilterApplied",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.validateOauth",
+            "action": "issueOauthRequest",
+            "cacheEventData": true
+        }
+    ],
+
+    "conditions": {
+        "isShiftKeyDown": {
+            "expression": "data.eventMap['awGraph.selectionChanged'].isShiftKeyDown"
+        },
+        "isCtrlKeyDown": {
+            "expression": "data.eventMap['awGraph.selectionChanged'].isCtrlKeyDown"
+        },
+        "isShiftOrCtrlKeyDown": {
+            "expression": "data.eventMap['awGraph.selectionChanged'].isShiftKeyDown || data.eventMap['awGraph.selectionChanged'].isCtrlKeyDown"
+        }
+    },
+
+    "preferences": [
+        "RV1_DARB_Expand_Incoming_Levels",
+        "RV1_DARB_Expand_Outgoing_Levels",
+        "RV1_DARB_Filter_Properties",
+        "RV1_DARB_Concentrated",
+        "RV1_DARB_Expand_All_1_Level_Command_Visible",
+        "RV1_DARB_Expand_Selected_1_Level_Command_Visible",
+        "RV1_DARB_Sorted_Layouts"
+    ],
+
+    "i18n": {
+        "filter": [ "RelationBrowserMessages" ],
+        "objects": [ "RelationBrowserMessages" ],
+        "relations": [ "RelationBrowserMessages" ]
+    },
+
+    "messages": {
+        "oauthError": {
+            "messageType": "NONE",
+            "messageText": ""
+        }
+    }
+}

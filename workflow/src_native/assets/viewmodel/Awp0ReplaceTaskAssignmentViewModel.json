@@ -1,0 +1,135 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "reveal": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "closePopupPanel"
+                },
+                {
+                    "action": "revealPanel"
+                }
+            ]
+        },
+        "closePopupPanel": {
+            "actionType": "JSFunction",
+            "method": "hidePopupPanel",
+            "inputData": {
+                "popupId": "{{data.popupId}}"
+            },
+            "deps": "js/Awp0WorkflowPopupService"
+        },
+        "revealPanel":
+        {
+            "actionType": "JSFunction",
+            "method": "openReplaceTaskAssignmentPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx.selected}}"
+            },
+
+            "deps": "js/Awp0WorkflowAssignmentPanelService"
+        },
+        "replaceTaskAssignment":
+        {
+            "actionType": "JSFunction",
+            "method": "replaceTaskAssignment",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selected": "{{ctx.selected}}",
+                "ctx": "{{ctx}}",
+                "context": "{{ctx.taskAssignmentCtx}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowAssignmentService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "data":
+    {
+        "isAddButtonVisible": false
+    },
+    "functions":
+    {
+    },
+
+    "conditions":
+    {
+        "isValidToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        },
+        "checkSelectionChange":
+        {
+            "expression": "name == 'selected' || name == 'mselected'"
+        },
+        "checkWorkflowContextChange":
+        {
+            "expression": "name == 'workflow' && !ctx.workflow"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Workflow.closeOpenedPanel",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkWorkflowContextChange",
+            "action": "revealPanel"
+        }
+    ],
+
+    "i18n":
+    {
+        "Replace_Title": [ "WorkflowCommandPanelsMessages" ],
+        "modify": [ "WorkflowCommandPanelsMessages" ],
+        "duplicateReviewerMsg":[ "WorkflowCommandPanelsMessages" ],
+        "multipleDuplicateMsg": [ "WorkflowCommandPanelsMessages" ]
+    }
+}

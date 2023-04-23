@@ -1,0 +1,15 @@
+<div class="aw-graph-legendCategoryItemRoot">
+    <div>
+        <div class="aw-graph-legendItemMarker" ng-style="{'border-style':category.style.borderStyle, 'border-width':category.style.borderWidth, 'background-color': category.isFiltered ? transparent : category.style.color, 'border-color': hover && !category.isFiltered ? transparent : category.style.borderColor}" ng-mouseenter="hover = true" ng-mouseleave="hover = false" ng-click="toggleFilter(category)" ng-if="!category.isSub"></div>
+        <div class="aw-graph-legendItemContent">
+            <aw-icon class="aw-graph-legendItemEditImage aw-graph-legendItemMarkerScale" visible-when="editable && category.creationMode == 1 && (!category.isExpanded || category.isSub)" icon-id="cmdCreateSingle"></aw-icon>
+            <aw-icon class="aw-graph-legendItemEditImage aw-graph-legendItemMarkerScale" visible-when="editable && category.creationMode == 2 && (!category.isExpanded || category.isSub)" icon-id="cmdMultipleCreate"></aw-icon>
+        </div>
+        <div class="aw-graph-legendFilterName link-style-5" ng-class="{'aw-state-selected': category.isSelected && !editable && category.count > 0 }" ng-click="select($event, category)">
+            <div class="aw-graph-legendItemContent">{{category.displayName}}</div>
+            <div class="aw-graph-legendItemContent" ng-if="!category.isSub">({{category.count}})</div>
+            <div class="aw-graph-legendItemContent" visible-when="editable && category.authorableSubCategories.length > 1 && !category.isExpanded" ng-if="!category.isSub">...</div>
+        </div>
+    </div>
+    <div class="aw-graph-legendSubType" visible-when="category.isExpanded && category.authorableSubCategories.length > 1" ng-transclude></div>
+</div>

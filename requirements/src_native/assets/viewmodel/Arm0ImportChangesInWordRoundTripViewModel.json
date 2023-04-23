@@ -1,0 +1,396 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-i18n.directive",
+        "js/aw-break.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-label.directive",
+        "js/aw-file-upload.directive",
+        "js/enable-when.directive"
+    ],
+    "data": {
+        "fieldLabel": {
+            "displayName": "{{i18n.CompareOptions}}"
+        },
+        "overwriteConflict": {
+            "displayName": "{{i18n.overwriteConflictLabel}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "importComments": {
+            "displayName": "{{i18n.importCommentsLabel}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "configurationSetting": {
+            "displayName": "{{i18n.configurationSettingLabel}}",
+            "dbValue": false,
+            "type": "BOOLEAN",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+
+    },
+    "actions": {
+        "updateCtxAndImportWord":
+        {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "isImportWordRoundTripEventProgressing",
+                "value": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "Arm0ImportChangesInWordRoundTrip.getTransientFileTicketsForUpload"
+                    }
+                ]
+            },
+            "deps": "js/appCtxService"
+        },
+        "unregisterImportCmdContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isImportWordRoundTripEventProgressing"
+            }
+        },
+        "activateImportChangesInWordPanel": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Arm0ImportChangesInWordRoundTrip",
+                "location": "aw_toolsAndInfo"
+            }
+        },
+        "getTransientFileTicketsForUpload": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-FileManagement",
+            "method": "getTransientFileTicketsForUpload",
+            "inputData": {
+                "transientFileInfos": [ {
+                    "fileName": "{{data.fileName}}",
+                    "isBinary": true,
+                    "deleteFlag": true
+                } ]
+            },
+
+            "outputData": {
+                "fmsTicket": "transientFileTicketInfos[0].ticket"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "fmsTicket.update"
+                } ]
+            }
+        },
+        "updateFormData": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+
+                    {
+                        "name": "importWordRoundTrip.gotTransientFileTicket"
+                    }
+                ]
+            },
+
+            "deps": "js/declUtils"
+        },
+        "uploadFile": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+
+                    "data": "{{data.formData}}"
+                }
+            },
+
+            "events": {
+                "success": [ {
+                        "name": "progress.start"
+                    },
+                    {
+                        "name": "importWordRoundTrip.importWordDocument"
+                    }
+                ],
+
+                "failure": [ {
+                    "name": "Arm0WordRoundTrip.importDocumentFailed"
+                } ]
+            }
+        },
+        "callImportMicroservice": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{function:getMicroServiceURL}}",
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "data": {
+                        "mode": "RoundTripImport",
+                        "documentName": "{{data.fileName}}",
+                        "inputWordFileTicket": "{{data.fmsTicket}}",
+                        "toplineID": "{{data.toplineRevID}}",
+                        "includeComments": "{{data.includeComments}}"
+                    }
+                }
+            },
+
+            "outputData": {
+                "importData": "data.fileTicket"
+            },
+
+            "events": {
+                "success": [ {
+                        "name": "importWordRoundTrip.callImportSOA"
+                    },
+                    {
+                        "name": "progress.end"
+                    }
+                ],
+                "failure": [ {
+                        "name": "importPreview.activateImportChangesInWordPanel"
+                    },
+                    {
+                        "name": "progress.end"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode.data.errorKey=='DocumentMismatchError'",
+                        "message": "DocumentMismatchError"
+                    },
+                    {
+                        "condition": "errorCode.data.errorKey==='ImportFailedError'",
+                        "message": "ImportFailedError"
+                    },
+                    {
+                        "condition":"errorCode.data.errorKey !== 'ImportFailedError' && errorCode.data.errorKey !== 'DocumentMismatchError'",
+                        "message": "MicroserviceInstallationError"
+                    }
+
+                ]
+            },
+            "deps": "js/Arm0ImportChangesInWordRoundTrip"
+
+        },
+
+        "importWordDocument": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2018-05-ImportExport",
+            "method": "importFromWord",
+            "inputData": {
+                "inputs": "{{function:getImportWordDocumentInput}}"
+            },
+            "outputData": {
+                "importedObject": "output[0].resultObjects[0]",
+                "partialErrors": "ServiceData.partialErrors",
+                "updatedobjects":"ServiceData.updated"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "Arm0ImportChangesInWordRoundTrip.unregisterImportCmdContext"
+                    },
+                    {
+                        "name": "importPreview.activateImportChangesInWordPanel"
+                    },
+                    {
+                        "name": "requirementDocumentation.documentationTabRefresh"
+                    },
+                    {
+                        "name": "Arm0ImportChangesInWordRoundTrip.refreshOccurenceObjects"
+                    },
+                    {
+                        "name": "progress.end"
+                    }
+                ],
+
+                "failure": [
+                    {
+                        "name": "Arm0ImportChangesInWordRoundTrip.unregisterImportCmdContext"
+                    },
+                    {
+                        "name": "Arm0WordRoundTrip.importDocumentFailed"
+                    },
+                    {
+                        "name": "progress.end"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "notificationForImportSpecificationMsg",
+                    "condition": "data.isRunningInBackground"
+                } ],
+                "failure": [ {
+                        "condition": "partialErrors",
+                        "message": "errorMessageOnAction"
+                } ]
+            },
+            "deps": "js/Arm0ImportChangesInWordRoundTrip"
+        },
+        "refreshOccurenceObjects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-DataManagement",
+            "method": "refreshObjects",
+            "inputData": {
+                "objects": "{{function:getOccurrenceId}}"
+
+            },
+            "deps": "js/Arm0ImportChangesInWordRoundTrip"
+
+        }
+    },
+    "onEvent": [ {
+            "eventId": "fmsTicket.update",
+            "action": "updateFormData"
+        },
+        {
+            "eventId": "importWordRoundTrip.gotTransientFileTicket",
+            "action": "uploadFile"
+        },
+        {
+            "eventId": "importWordRoundTrip.importWordDocument",
+            "action": "callImportMicroservice"
+        },
+        {
+            "eventId": "importWordRoundTrip.callImportSOA",
+            "action": "importWordDocument"
+        },
+        {
+            "eventId": "importPreview.activateImportChangesInWordPanel",
+            "action": "activateImportChangesInWordPanel"
+
+        },
+        {
+            "eventId": "Arm0ImportChangesInWordRoundTrip.refreshOccurenceObjects",
+            "action": "refreshOccurenceObjects"
+
+        },
+        {
+            "eventId": "Arm0ImportChangesInWordRoundTrip.getTransientFileTicketsForUpload",
+            "action": "getTransientFileTicketsForUpload"
+        },
+        {
+            "eventId": "Arm0ImportChangesInWordRoundTrip.unregisterImportCmdContext",
+            "action": "unregisterImportCmdContext"
+        }
+    ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getMicroServiceURL": {
+            "functionName": "getMicroServiceURL",
+            "parameters": [
+                "{{data}}", "{{ctx}}"
+            ]
+        },
+        "getImportWordDocumentInput": {
+            "functionName": "getImportWordDocumentInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getOccurrenceId": {
+            "functionName": "getOccurrenceId",
+            "parameters": [
+                "{{data.updatedobjects}}"
+            ]
+        }
+    },
+    "i18n": {
+        "importTitle": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "importPanelTitle": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "overwriteConflictLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "importCommentsLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "configurationSettingLabel": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "CompareOptions": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "DocumentMismatchError": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "ImportFailedError": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "MicroserviceInstallationError":[
+            "RequirementsCommandPanelsMessages"
+        ]
+    },
+    "conditions": {
+        "isImportAllowed": {
+            "expression": "data.fileName && data.validFile"
+        }
+    },
+    "messages": {
+        "DocumentMismatchError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.DocumentMismatchError}}"
+        },
+        "ImportFailedError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.ImportFailedError}}"
+        },
+        "MicroserviceInstallationError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.MicroserviceInstallationError}}",
+            "messageTextParams": [
+                "{{data.i18n.importTitle}}"
+            ]
+        },
+        "errorMessageOnAction": {
+         "messageType": "ERROR",
+        "messageText": "{{data.partialErrors[0].errorValues[0].message}}"
+        }
+    }
+}

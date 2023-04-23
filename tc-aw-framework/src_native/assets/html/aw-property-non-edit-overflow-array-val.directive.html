@@ -1,0 +1,27 @@
+<div class="aw-layout-fxbreadCrumbs aw-layout-flexRow">
+    <ul class="aw-jswidgets-arrayNonEditValueOverflowCellList">
+        <li class="aw-jswidgets-arrayValueOverflowCellListItem" ng-repeat="displayValue in prop.displayValues track by $index" >
+            <div ng-show="::( prop.isNull != null && prop.type == 'OBJECT' || prop.type == 'OBJECTARRAY')" class="aw-widgets-propertyNonEditValue" >
+                <a class="aw-widgets-propertyValueLink" ng-click="openObjectLinkPage()"
+                        ng-class="{'aw-jswidgets-change': prop.oldValue}" ng-bind-html="addSeparator( $index )">
+                </a>
+            </div>
+        </li>
+    </ul>
+    <aw-property-image ng-click="openOverflowPopup( $event )" class="{{ isClicked ? 'aw-jswidget-controlArrow aw-jswidget-controlArrowRotateRight' : 'aw-jswidget-controlArrow' }}" name="miscChevronRight" ng-show="isOverflow"></aw-property-image>
+    <div ng-show="::( prop.isNull != null && prop.type !== 'OBJECT' && prop.type !== 'OBJECTARRAY' )" class="aw-widgets-propertyNonEditValue" ng-style="{'width': availableWidth }">
+        <div class="aw-jswidget-textOverflow" title={{stringValue}}>
+              {{stringValue}}
+        </div>
+    </div>
+</div>
+
+<div class="{{ isClicked ? 'aw-layout-overflowPopupCellist aw-layout-popup afx-content-background' : 'hidden'}} aw-base-scrollPanel" ng-style="{'left': leftPosition}">
+    <div class="aw-widgets-cellListWidgetContainer">
+        <ul class="aw-widgets-cellListWidget">
+            <li class="aw-widgets-cellListItem aw-widgets-cellTop" ng-click="openObjectLinkFromOverflow()" ng-repeat="displayValue in prop.displayValues track by $index" ng-if="$index >= overflowIndex">
+                <a  class="aw-jswidgets-arrayValueOverflowCellListItem" >{{ displayValue }} </a>
+            </li>
+        </ul>
+    </div>
+</div>

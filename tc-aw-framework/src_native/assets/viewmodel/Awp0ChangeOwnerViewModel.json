@@ -1,0 +1,312 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+       "js/aw-command-panel.directive",
+       "js/aw-panel-body.directive",
+       "js/aw-panel-section.directive",
+       "js/aw-panel-footer.directive",
+       "js/aw-list-filter.directive",
+       "js/visible-when.directive",
+       "js/aw-default-cell.directive",
+       "js/aw-button.directive",
+       "js/aw-i18n.directive",
+       "js/aw-default-group-cell.directive",
+       "js/aw-header-cell.directive",
+       "js/aw-changeowner-cell.directive",
+       "js/aw-changeowner-cell-content.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "search": {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "searchInput":{
+                    "maxToLoad": 100,
+                    "maxToReturn": 25,
+                    "providerName": "Awp0ResourceProvider",
+                    "searchCriteria": {
+                        "searchString": "{{data.filterBox.dbValue}}",
+                        "resourceProviderContentType": "Users",
+                        "group": "",
+                        "role": "",
+                        "searchSubGroup": "false"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.userPerformSearch.startIndex}}"
+                }
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "POM_member",
+                        "properties":
+                        [
+                            {
+                                "name": "user",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "group",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties":
+                        [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Group",
+                        "properties":
+                        [
+                            {
+                                "name": "name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_user",
+                        "properties":
+                        [
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties":
+                        [
+                            {
+                                "name": "person",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties":
+                        [
+                            {
+                                "name": "user_name"
+                            },
+
+                            {
+                                "name": "PA9"
+                            },
+
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_application_object",
+                        "properties":
+                        [
+                            {
+                                "name": "owning_user"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "changeOwner": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "changeOwnership",
+            "inputData": {
+                "input":"{{function:getChangeOwnerInput}}"
+            },
+            "outputData": {
+                "changeOwnershipPartialErrors": "partialErrors"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "condition": "(ctx.mselected && ctx.mselected.length === 1)",
+                    "message": "singleObjectChangeOwnershipSuccess"
+                }, {
+                    "condition": "(ctx.mselected && ctx.mselected.length > 1)",
+                    "message": "multipleObjectsChangeOwnershipSuccess"
+                }],
+                "failure": [ {
+                    "condition": "(ctx.mselected && ctx.mselected.length === 1 && data.changeOwnershipPartialErrors )",
+                    "message": "changeOwnershipForObjectFailure"
+                },
+                {
+                    "condition": "(ctx.mselected && ctx.mselected.length > 1 && data.changeOwnershipPartialErrors )",
+                    "message": "partialObjectsChangeOwnershipFailure"
+                }]
+            },
+            "deps": "js/tcChangeOwnerService"
+        }
+    },
+    "data": {
+      "filterBox": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      }
+   },
+   "dataProviders": {
+      "userPerformSearch": {
+         "action": "search",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "single"
+      }
+   },
+    "messages": {
+        "singleObjectChangeOwnershipSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.singleObjectChangeOwnershipSuccess}}",
+            "messageTextParams": [ "{{ctx.mselected[0].props.object_string.uiValues[0]}}" ]
+        },
+        "multipleObjectsChangeOwnershipSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleObjectsChangeOwnershipSuccess}}",
+            "messageTextParams": [
+                "{{ctx.mselected.length}}",
+                "{{ctx.mselected.length}}"
+            ]
+        },
+        "partialObjectsChangeOwnershipFailure": {
+            "expression": {
+                "successCount": "ctx.mselected.length - data.changeOwnershipPartialErrors.length"
+            },
+            "messageType": "ERROR",
+            "messageKey": "changeOwnerNotyError",
+            "messageTextParams": [
+                "{{expression.successCount}}",
+                "{{ctx.mselected.length}}"
+            ],
+            "messageData": {
+                "partialErrors": "{{data.changeOwnershipPartialErrors}}"
+            }
+        },
+        "changeOwnershipForObjectFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.changeOwnershipForObjectFailure}}",
+            "messageTextParams": [ "{{ctx.mselected[0].props.object_string.uiValues[0]}}" ]
+        }
+    },
+   "conditions": {
+      "isSearchResultsEmpty": {
+         "expression": "data.dataProviders.userPerformSearch.response.length <= 0"
+      },
+      "isValidToPerformChangeOwnership": {
+        "expression": "data.dataProviders.userPerformSearch.selectedObjects.length === 1"
+     }
+   },
+   "onEvent": [
+      {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0ChangeOwner"
+            },
+
+            "action": "reveal"
+       }
+   ],
+   "functions":
+    {
+        "getChangeOwnerInput":
+        {
+            "functionName": "getChangeOwnerInput",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx.mselected}}",
+                "{{data.dataProviders.userPerformSearch}}"
+            ]
+        }
+    },
+   "i18n": {
+      "user": [ "Awp0ChangeOwnerMessages" ],
+      "change": [ "Awp0ChangeOwnerMessages" ],
+      "Awp0ChangeOwner": [ "Awp0ChangeOwnerMessages" ],
+      "EmailAddress": [ "Awp0ChangeOwnerMessages" ],
+      "PhoneNumber": [ "Awp0ChangeOwnerMessages" ],
+      "singleObjectChangeOwnershipSuccess": [ "Awp0ChangeOwnerMessages" ],
+      "multipleObjectsChangeOwnershipSuccess": [ "Awp0ChangeOwnerMessages" ],
+      "changeOwnershipForObjectFailure": [ "Awp0ChangeOwnerMessages" ]
+   }
+}

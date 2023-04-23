@@ -1,0 +1,21 @@
+<aw-panel-body class="aw-requirements-importPanelBody">
+    <aw-listbox prop="data.importType" list="data.reqSpecEleTypeList"></aw-listbox>
+    <aw-listbox prop="data.conditionProcessingType" list="data.conditionProcessingTypeList.dbValue"></aw-listbox>
+    <aw-list dataprovider="data.dataProviders.addConditionListProvider">
+        <aw-include name="Arm0AddRulesCell" sub-panel-context="item"></aw-include>
+    </aw-list>
+    <aw-icon-button button-type="button" class="aw-layout-right" command="data.addCondition.dbValue[0]"></aw-icon-button>
+    <aw-command-panel-section caption="i18n.propertyRulesCaption" anchor="data.importFromWordRuleSubCommands" exist-when="conditions.isMicroserviceInstalled">
+        <aw-list dataprovider="data.dataProviders.dispPropRulesList" visible-when="data.dispPropRules.dbValue.length">
+            <aw-include name="Arm0ImportPropRulesCell" sub-panel-context="item"></aw-include>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="addAdvanceRule" visible-when="conditions.isAddRuleVisible" aw-class="{'disabled': !(awPanelBody.$valid) }">
+        <aw-i18n>i18n.Add</aw-i18n>
+    </aw-button>
+    <aw-button action="updateAdvanceRule" visible-when="conditions.isUpdateRuleVisible" aw-class="{'disabled': !(awPanelBody.$valid) }">
+        <aw-i18n>i18n.update</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

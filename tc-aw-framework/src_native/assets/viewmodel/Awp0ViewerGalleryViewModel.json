@@ -1,0 +1,437 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-icon-button.directive",
+        "js/aw-include.directive",
+        "js/aw-model-thumbnail.directive",
+        "js/exist-when.directive",
+        "js/aw-viewer-gallery.directive"
+    ],
+    "actions": {
+        "getViewerDataAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-DataManagement",
+            "method": "getViewerData",
+            "inputData": {
+                "inputs": {
+                    "obj": "{{ctx.selected}}",
+                    "dataset": "",
+                    "direction": ""
+                }
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Dataset",
+                        "properties": [
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "object_type"
+                            },
+                            {
+                                "name": "last_mod_date"
+                            },
+                            {
+                                "name": "ref_list",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "checked_out"
+                            },
+                            {
+                                "name": "checked_out_user"
+                            },
+                            {
+                                "name": "is_modifiable"
+                            },
+                            {
+                                "name": "fnd0IsCheckoutable"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ImanFile",
+                        "properties": [
+                            {
+                                "name": "file_size"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "viewerData": "output"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "viewer.dataFetched"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "viewer.dataFetched"
+                    }
+                ]
+            }
+        },
+        "onPreviousChevronClick": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-DataManagement",
+            "method": "getViewerData",
+            "inputData": {
+                "inputs": {
+                    "obj": "{{ctx.selected}}",
+                    "dataset": "{{data.viewerData.datasetData}}",
+                    "direction": "previous"
+                }
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Dataset",
+                        "properties": [
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "object_type"
+                            },
+                            {
+                                "name": "last_mod_date"
+                            },
+                            {
+                                "name": "ref_list",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "checked_out"
+                            },
+                            {
+                                "name": "checked_out_user"
+                            },
+                            {
+                                "name": "is_modifiable"
+                            },
+                            {
+                                "name": "fnd0IsCheckoutable"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ImanFile",
+                        "properties": [
+                            {
+                                "name": "file_size"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "viewerData": "output"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "viewer.dataFetched"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "viewer.dataFetched"
+                    }
+                ]
+            }
+        },
+        "onNextChevronClick": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-DataManagement",
+            "method": "getViewerData",
+            "inputData": {
+                "inputs": {
+                    "obj": "{{ctx.selected}}",
+                    "dataset": "{{data.viewerData.datasetData}}",
+                    "direction": "next"
+                }
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Dataset",
+                        "properties": [
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "object_type"
+                            },
+                            {
+                                "name": "last_mod_date"
+                            },
+                            {
+                                "name": "ref_list",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "checked_out"
+                            },
+                            {
+                                "name": "checked_out_user"
+                            },
+                            {
+                                "name": "is_modifiable"
+                            },
+                            {
+                                "name": "fnd0IsCheckoutable"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ImanFile",
+                        "properties": [
+                            {
+                                "name": "file_size"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "viewerData": "output"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "viewer.dataFetched"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "viewer.dataFetched"
+                    }
+                ]
+            }
+        },
+        "showViewer": {
+            "actionType": "JSFunction",
+            "method": "showViewer",
+            "inputData": {
+                "inData": "{{data}}"
+            },
+            "deps": "js/Awp0ViewerGalleryUtils"
+        },
+        "checkoutViewer": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-Reservation",
+            "method": "checkout",
+            "inputData": {
+                "objects": [
+                    {
+                        "uid": "{{ctx.viewerContext.vmo.uid}}",
+                        "type": "{{ctx.viewerContext.vmo.type}}"
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "uvCommand.executed",
+                        "eventData": {
+                            "callback": "postCheckout",
+                            "vmo": "{{ctx.viewerContext.vmo}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "cancelCheckoutViewer": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-Reservation",
+            "method": "cancelCheckout",
+            "inputData": {
+                "objects": [
+                    {
+                        "uid": "{{ctx.viewerContext.vmo.uid}}",
+                        "type": "{{ctx.viewerContext.vmo.type}}"
+                    }
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Dataset",
+                        "properties": [
+                            {
+                                "name": "is_modifiable"
+                            },
+                            {
+                                "name": "fnd0IsCheckoutable"
+                            },
+                            {
+                                "name": "last_mod_date"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "uvCommand.executed",
+                        "eventData": {
+                            "callback": "postCancelCheckout",
+                            "vmo": "{{ctx.viewerContext.vmo}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "uvCommand.executed",
+                        "eventData": {
+                            "callback": "postCancelCheckOut",
+                            "vmo": "{{ctx.viewerContext.vmo}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "checkinViewer": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-Reservation",
+            "method": "checkin",
+            "inputData": {
+                "objects": [
+                    {
+                        "uid": "{{ctx.viewerContext.vmo.uid}}",
+                        "type": "{{ctx.viewerContext.vmo.type}}"
+                    }
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Dataset",
+                        "properties": [
+                            {
+                                "name": "is_modifiable"
+                            },
+                            {
+                                "name": "fnd0IsCheckoutable"
+                            },
+                            {
+                                "name": "last_mod_date"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "uvCommand.executed",
+                        "eventData": {
+                            "callback": "postCheckin",
+                            "vmo": "{{ctx.viewerContext.vmo}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "uvCommand.executed",
+                        "eventData": {
+                            "callback": "postCheckin",
+                            "vmo": "{{ctx.viewerContext.vmo}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "objectSet.selectionChangeEvent",
+            "action": "getViewerDataAction"
+        },
+        {
+            "eventId": "viewer.dataFetched",
+            "action": "showViewer"
+        },
+        {
+            "eventId": "preCheckout.success",
+            "action": "checkoutViewer"
+        },
+        {
+            "eventId": "preCancelCheckout.success",
+            "action": "cancelCheckoutViewer"
+        },
+        {
+            "eventId": "preCheckin.success",
+            "action": "checkinViewer"
+        }
+    ],
+    "data": {
+        "commands": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "action": "onPreviousChevronClick",
+                    "iconName": "miscChevronLeft",
+                    "tooltip": "{{i18n.previousButtonTitle}}"
+                },
+                {
+                    "action": "onNextChevronClick",
+                    "iconName": "miscChevronRight",
+                    "tooltip": "{{i18n.nextText}}"
+                }
+            ]
+        },
+        "headerProperties1": {
+            "isArray": "true",
+            "dbValue": [
+                "object_name",
+                "object_type",
+                "last_mod_date"
+            ]
+        },
+        "headerProperties2": {
+            "isArray": "true",
+            "dbValue": [
+                "file_size"
+            ]
+        }
+    },
+    "functions": {},
+    "messages": {},
+    "conditions": {},
+    "lifecycleHooks": {
+        "onMount": "getViewerDataAction"
+    },
+    "i18n": {
+        "previousButtonTitle": [
+            "Awp0ViewerGalleryMessages"
+        ],
+        "nextText": [
+            "dateTimeServiceMessages"
+        ]
+    }
+}

@@ -1,0 +1,241 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-xrt.directive"
+     ],
+
+    "dataProviders":
+    {
+        "getAssignedProjectsProvider":
+        {
+            "response": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+            "totalFound": "{{data.dataProviders.getUserProjectsProvider.selectedObjects.length}}",
+            "selectionModelMode": "single",
+            "commands":
+            {
+                "Awp0RemoveProjectsCell":
+                {
+                    "id": "cmdRemove",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/removeObjectCellCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+
+    "conditions":
+    {
+        "TyepToRefresh": {
+            "expression": "data.eventRefresh.dbValue==='Prg0Event'"
+        }
+    },
+
+    "actions":
+    {
+        "createObject":
+        {
+           "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                         {
+                          "name": "assignProjects",
+                          "condition": "data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects.length>0"
+                         },
+                         {
+                             "name": "refresh",
+                             "condition": "data.eventRefresh.dbValue==='Prg0Event'",
+                             "eventData":
+                             {
+                                 "source": "toolAndInfoPanel",
+                                 "selectedObject" : "{{ctx.programPlanningContext.parent}}"
+                             }
+                        },
+                        {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Events' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Events' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Criteria' || ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Criteria'",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "relations": "",
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                        },
+                        {
+                            "name": "cdm.relatedModified",
+                            "condition": "ctx.xrtPageContext.primaryXrtPageID === 'ipp0_imp_view' || ctx.xrtPageContext.secondaryXrtPageID === 'ipp0_imp_view'",
+                            "eventData": {
+                                "relatedModified": [ "{{ctx.xrtSummaryContextObject}}" ]
+                            }
+                        },
+                          {
+                            "name": "complete",
+                            "condition": "data.pinnedToForm.dbValue",
+                            "eventData":
+                            {
+                                "source": "toolAndInfoPanel"
+                            }
+                         },
+                        {
+                        "name": "awPanel.loadNextValues",
+                        "condition": "data.unpinnedToForm.dbValue"
+                        }
+
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/addPlanObjectUtils"
+         },
+        "navigateToNewTabPage":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                         "name": "awPanel.navigate",
+                         "eventData": {
+                             "destPanelId": "CreateProjectSub"
+                         }
+                     }
+                 ]
+            }
+        },
+         "assignProjectsToCreatedObject":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [
+                    {
+                        "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                        "objectToAssign": [
+                            "{{data.createdMainObject}}"
+                        ],
+                        "objectToRemove": []
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        }
+    },
+
+    "onEvent":
+     [
+       {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "CreateProjectSub"
+            }
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "getAssignedProjectsProvider"
+        },
+        {
+            "eventId": "assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "userProjects.assignProjects",
+            "action": "navigateToNewTabPage"
+        }
+    ],
+
+    "functions":
+    {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        },
+        "getCreatedObject": {
+            "functionName": "getCreatedObject",
+            "parameters":
+            [
+
+            ]
+      }
+    },
+
+    "data":
+    {
+        "prg0ParentPlan" :
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.programPlanningContext.parent.uid}}"
+        },
+        "prg0PlanObject" :
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.programPlanningContext.parent.uid}}"
+        },
+        "prg0EventObject" :
+        {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.programPlanningContext.parent.uid}}"
+        },
+        "eventRefresh":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "{{ctx.programPlanningContext.type1}}"
+        },
+        "createProjectSectionCommands":"prg0_createProjectSectionCommands"
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n":
+    {
+       "addButtonCommandTitle": [ "ProgramPlanningCommandPanelsMessages"],
+       "ownProjectSectionTitle": [ "ProgramPlanningCommandPanelsMessages"],
+       "projectsSectionTitle": [ "ProgramPlanningCommandPanelsMessages"],
+       "events": [ "ProgramPlanningCommandPanelsMessages"]
+    }
+}

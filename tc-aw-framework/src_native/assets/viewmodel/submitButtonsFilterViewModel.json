@@ -1,0 +1,95 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-button.directive",
+        "js/aw-init.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-i18n.directive",
+        "js/aw-class.directive"
+    ],
+    "data": {},
+    "i18n": {
+        "clearButtonTitle": [
+            "UIMessages"
+        ],
+        "invalidDate": [
+            "UIMessages"
+        ],
+        "FILTER_TEXT": [
+            "BaseMessages"
+        ]
+    },
+    "actions": {
+        "filterAction": {
+            "actionType": "JSFunction",
+            "method": "doFiltering",
+            "inputData": {
+                "column": "{{data.context.column}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "viewModel": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "pltable.columnFilterApplied",
+                        "condition": "data.context.filterError !== true && data.context.filterNoAction !== true",
+                        "eventData": {
+                            "gridId": "{{data.context.gridId}}",
+                            "columnName": "{{data.context.column.field}}"
+                        }
+                    },
+                    {
+                        "name": "pltable.columnFilterApplied",
+                        "condition": "data.context.filterError !== true && data.context.filterNoAction === true",
+                        "eventData": {}
+                    }
+                ]
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "removeAction": {
+            "actionType": "JSFunction",
+            "method": "removeFilter",
+            "inputData": {
+                "column": "{{data.context.column}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "viewModel": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "pltable.columnFilterApplied",
+                        "condition": "data.context.filterError !== true && data.context.filterNoAction !== true",
+                        "eventData": {
+                            "gridId": "{{data.context.gridId}}",
+                            "columnName": "{{data.context.column.field}}"
+                        }
+                    },
+                    {
+                        "name": "pltable.columnFilterApplied",
+                        "condition": "data.context.filterError !== true && data.context.filterNoAction === true",
+                        "eventData": {}
+                    }
+                ]
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "checkForFilterDisability": {
+            "actionType": "JSFunction",
+            "method": "checkForFilterDisability",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "isBulkEditing": "{{data.context.isBulkEditing}}"
+            },
+            "deps": "js/awColumnFilterService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "checkForFilterDisability"
+    }
+}

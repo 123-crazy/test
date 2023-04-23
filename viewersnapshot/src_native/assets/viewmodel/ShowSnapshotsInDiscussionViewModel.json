@@ -1,0 +1,150 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-pic.directive",
+        "js/aw-list.directive"
+    ],
+    "actions":
+    {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "productSnapshotCardOnDiscussionViewDataProvider"
+        },
+        "unregisterSnapshotDiscussionContextdata": {
+            "actionType": "JSFunction",
+            "method": "unregisterSnapshotDiscussionContextdata",
+            "inputData": {
+            },
+            "outputData":{
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "loadProductSnapshotDataForCard": {
+            "actionType": "JSFunction",
+            "method": "revealSnapshotOnDiscussionPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData":{
+               "snapshotOnDiscussion": "snapshotOnDiscussion",
+               "snapshotTotalFound":"snapshotTotalFound"
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "updateProductSnapshotOnDiscussion": {
+            "actionType": "JSFunction",
+            "method": "updateProductSnapshotOnDiscussion",
+            "inputData": {
+                "eventData": "{{data.eventMap['viewerProductSnapshotListDataUpdated']}}"
+            },
+            "outputData":{
+            },
+            "deps": "js/viewerProductSnapshotService"
+        },
+        "showEditProductSnapshotAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "ProductSnapshotEditSub",
+                        "title": "{{data.i18n.editProductSnapshot}}",
+                        "supportGoBack": true,
+                        "recreatePanel": true,
+                        "isolateMode": true
+                    }
+                } ]
+            }
+        }
+    },
+
+    "data": {
+        "addSnapshotOnDiscussionCmds": "awv0_addSnapshotOnDiscussionCmds",
+        "vmoForProductSnapshotOnDiscussiom": "",
+        "snapshotOnDiscussion":"",
+        "isRemoveSnapshotCalledOnProductGallery":""
+    },
+
+    "conditions":
+    {
+        "isViewerRevealedAndIn3DMode":
+        {
+            "expression": "ctx.awDefaultViewer.isViewerRevealed && ctx.awDefaultViewer.viewerViewMode === 'VIEWER3D'"
+        },
+        "isAceSubLocation":
+        {
+            "expression":"ctx.sublocation.nameToken === 'com.siemens.splm.client.occmgmt:OccurrenceManagementSubLocation'"
+        },
+        "isAc0SnapshotDiscussionsEnabled":
+        {
+            "expression": "ctx.preferences.Ac0SnapshotDiscussionsEnabled[0]==='true'"
+        },
+        "showSnapshotOnDiscussionPanel": {
+            "expression": "conditions.isViewerRevealedAndIn3DMode && conditions.isAceSubLocation && conditions.isAc0SnapshotDiscussionsEnabled && !conditions.isTypeFnd0Workset && !conditions.isSavedWorkingContextObj && !conditions.isSessionSnapshotVisibleCondition"
+        },
+        "isTypeFnd0Workset": {
+            "expression": "ctx.aceActiveContext.context.worksetTopNode && ctx.aceActiveContext.context.worksetTopNode.modelType.typeHierarchyArray.indexOf( 'Fnd0WorksetRevision' ) > -1"
+        },
+        "isSavedWorkingContextObj": {
+            "expression": "ctx.aceActiveContext.context.workingContextObj && ctx.aceActiveContext.context.workingContextObj.modelType.typeHierarchyArray.indexOf( 'Awb0SavedBookmark' ) > -1"
+        },
+        "isSessionSnapshotVisibleCondition": {
+            "expression": "ctx.aceActiveContext.context.topElement.modelType.typeHierarchyArray.indexOf('Fnd0AppSession') !== -1"
+        },
+        "showSnapshotInMyGalleryDiscussion": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awv0SnapshotSearchResults'"
+        }
+    },
+
+    "functions":
+    {
+    },
+
+    "dataProviders":
+    {
+        "productSnapshotCardOnDiscussionViewDataProvider": {
+            "action": "loadProductSnapshotDataForCard",
+            "response": "{{data.snapshotOnDiscussion}}",
+            "totalFound": "{{data.snapshotTotalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "viewerProductSnapshotOnDiscussionUpdated",
+            "action": "reveal"
+        },
+        {
+            "eventId": "viewerProductSnapshotOnDiscussionModified",
+            "action": "reveal"
+        },
+        {
+            "eventId": "viewerProductSnapshot.removeFromDiscussion",
+            "action": "unregisterSnapshotDiscussionContextdata"
+        },
+        {
+            "eventId": "viewerProductSnapshot.removeFromDiscussion",
+            "action": "reveal"
+        },
+        {
+            "eventId": "showEditProductSnapshot",
+            "action": "showEditProductSnapshotAction"
+        }
+    ],
+    "lifecycleHooks": {
+        "onMount": "reveal",
+        "onUnmount": "unregisterSnapshotDiscussionContextdata"
+    },
+
+    "i18n":
+    {
+        "snapshot": ["ViewerSnapshotMessages"],
+        "editProductSnapshot": [ "ViewerSnapshotMessages" ]
+    }
+}

@@ -1,0 +1,31 @@
+
+<aw-panel-body>
+    <div class="aw-requirement-createTracelink">
+        <aw-command-bar anchor="arm0_swapTracelinkObjectsCommand" class = "aw-commands-commandBarHorizontalRight" alignment="HORIZONTAL" context="data"></aw-command-bar>
+        <aw-command-panel-section caption="i18n.startLink" anchor="data.startItemListcommands" context="data" >
+            <aw-include name="Arm0RequirementHint" exist-when="conditions.showDropHintForStartBucket" sub-panel-context="data"></aw-include>
+            <aw-include name="Arm0StartItemListCreateSub" sub-panel-context="data"></aw-include>
+        </aw-command-panel-section>
+    </div>
+
+    <div class="aw-requirement-createTracelink">
+        <aw-command-panel-section caption="i18n.endLink" anchor="data.endItemListcommands" context="data" >
+            <aw-include name="Arm0RequirementHint" exist-when="conditions.showDropHintForEndBucket" sub-panel-context="data"></aw-include>
+            <aw-include name="Arm0EndItemListCreateSub" sub-panel-context="data"></aw-include>
+        </aw-command-panel-section>
+    </div>
+
+    <aw-panel-footer visible-when="conditions.visibleFooter" >
+        <aw-listbox prop="data.traceLinkType" list="data.traceLinkTypeList" action="traceLinkTypeUpdated"></aw-listbox>
+        <aw-form name="commandPanelForm" >
+            <aw-xrt type="CREATE" object-type="{{data.selectedTraceLinkType}}" class="aw-requirements-tracelinkPropertiesPanelSection aw-base-scrollPanel" visible-when="conditions.visiblePropertiesSection" exist-when="data.fetchTracelinkProperty"></aw-xrt>
+        </aw-form>
+    </aw-panel-footer>
+</aw-panel-body>
+
+<aw-panel-footer visible-when="conditions.visibleFooter" >
+        <aw-button action="createTraceLink" aw-class="{'disabled': !(conditions.visibleCreateTracelinkButton)}" ><aw-i18n>i18n.createTraceLink</aw-i18n></aw-button>
+        <aw-button action="createObject" aw-class="{'disabled': !(conditions.visibleCreateObjectButton && awPanelBody.$valid)}" ><aw-i18n>i18n.createTraceLink</aw-i18n></aw-button>
+</aw-panel-footer>
+
+

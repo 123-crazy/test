@@ -1,0 +1,462 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-label.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/exist-when.directive",
+        "js/aw-include.directive",
+        "js/aw-i18n.directive"
+    ],
+
+    "data": {
+        "name":{
+            "displayName": "{{i18n.Workflow_Name}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "uiValue": "{{ctx.workflowPalData.selTemplate.displayName}}"
+         },
+         "assignmentPanelAnchor": "awp0_templateAssignmentPanelAnchor",
+         "isAddButtonVisible": true
+    },
+
+    "actions":
+    {
+        "initializeDataProvider":
+       {
+          "actionType": "dataProvider",
+          "methods": ["assignerDataProvider", "reviewersDataProvider", "acknowledgersDataProvider", "notifyeesDataProvider", "adhocReviewersDataProvider"]
+        },
+        "closeCurrentOpenedPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "loadPanel": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-Workflow",
+            "method": "getWorkflowTaskViewModel",
+            "inputData":
+            {
+                "input":
+                [
+                    {
+                        "selection": "{{ctx.workflowPalData.selTemplate}}",
+                        "typeToPropertiesMap":
+                        {
+                            "Signoff":
+                            [
+                                "REF(group_member,GroupMember).group",
+                                "REF(group_member,GroupMember).role",
+                                "REF(group_member,GroupMember).user",
+                                "REF(resource_pool,ResourcePool).group",
+                                "REF(resource_pool,ResourcePool).role",
+                                "resource_pool",
+                                "group_member"
+                            ],
+                            "GroupMember":
+                            [
+                                "group",
+                                "role"
+                            ],
+                            "EPMSignoffProfile":
+                            [
+                                "REF(group,Group).object_full_name",
+                                "REF(role,Role).role_name",
+                                "number_of_signoffs",
+                                "allow_subgroups"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "reviewProfiles": "output[0].taskJSONStrings.EPMSelectSignoffTaskTemplate_profiles",
+                "profileSignoffs": "output[0].taskJSONStrings.EPMReviewTask_profile_signoffs",
+                "adhocSignoffs": "output[0].taskJSONStrings.EPMReviewTask_adhoc_signoffs",
+                "ackReviewProfiles": "output[0].taskJSONStrings.EPMAcknowledgeTask_profiles",
+                "ackProfileSignoffs": "output[0].taskJSONStrings.EPMAcknowledgeTask_profile_signoffs",
+                "ackAdhocSignoffs": "output[0].taskJSONStrings.EPMAcknowledgeTask_adhoc_signoffs",
+                "taskTemplateQuorumValue": "output[0].additionalData.review_task_quorum[0]"
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "EPMSignoffProfile",
+                        "properties":
+                        [
+                            {
+                                "name": "number_of_signoffs"
+                            },
+                            {
+                                "name": "allow_subgroups"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "group"
+                            },
+                            {
+                                "name": "role"
+                            }
+
+                        ]
+                    },
+                    {
+                        "name": "Signoff",
+                        "properties":
+                        [
+                            {
+                                "name": "group_member"
+                            },
+                            {
+                                "name": "resource_pool"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "templateAssignmentPanel.propsLoaded"
+                    }
+
+                ]
+            }
+        },
+        "populateAssignmentPanelData": {
+            "actionType": "JSFunction",
+            "method": "populateAssignmentPanelData",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "selected": "{{ctx.workflowPalData.selTemplate}}",
+               "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0TemplateAssignmentPanelService"
+        },
+        "addSelectedUsers": {
+            "actionType": "JSFunction",
+            "method": "addSelectedUsers",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0TemplateAssignmentPanelService"
+        },
+        "navigateToMainPage":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "{{data.previousView}}",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "updateTemplatePalData": {
+            "actionType": "JSFunction",
+            "method": "updateTemplatePalData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "palDataMap": "{{ctx.workflowPalData.palDataMap}}",
+                "selTemplate": "{{ctx.workflowPalData.selTemplate}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "closePanel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0TemplateAssignmentPanelService"
+        },
+        "navigateToAssignmentSubPanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "Awp0TemplateAssignmentPanelSub"
+                        }
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "updatePanelInternal"
+                    }
+                ]
+            }
+        },
+        "populateEditNotificationMsg": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "populateEditNotificationMsgEvent",
+                        "condition": "conditions.isUsersPanelVisibleModified"
+                    },
+                    {
+                        "name": "populateEditNotificationMsgEvent",
+                        "condition": "conditions.isTaskAssignmentPanelVisibleModified"
+                    }
+                ]
+            }
+        },
+        "savePanelModification": {
+            "actionType": "JSFunction",
+            "method": "handlePanelModification",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "isSaveAction" : true
+            },
+            "deps": "js/Awp0TemplateAssignmentPanelService"
+        },
+        "cancelPanelModification": {
+            "actionType": "JSFunction",
+            "method": "handlePanelModification",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0TemplateAssignmentPanelService"
+        }
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "palMgmt.refreshAssignmentPanel",
+            "action": "loadPanel",
+            "condition": "conditions.isTaskAssignmentPanelVisibleNonModified"
+        },
+        {
+            "eventId": "palMgmt.refreshAssignmentPanel",
+            "action": "navigateToAssignmentSubPanel",
+            "condition": "conditions.isUsersPanelVisibleNonModified"
+        },
+        {
+            "eventId": "palMgmt.refreshAssignmentPanel",
+            "action": "populateEditNotificationMsg"
+        },
+        {
+            "eventId": "populateEditNotificationMsgEvent",
+            "message": "panelEditWarningMsg"
+        },
+        {
+            "eventId": "updatePanelInternal",
+            "action": "loadPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+               "panelId": "Awp0TemplateAssignmentPanelSub"
+            },
+            "action": "loadPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+               "panelId": "Awp0TemplateAssignmentPanelSub"
+           },
+            "action": "initializeDataProvider"
+        },
+        {
+            "eventId": "Awp0TemplateAssignment.contentUnloaded",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId":"templateAssignmentPanel.propsLoaded",
+            "action": "populateAssignmentPanelData"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "navigateToMainPage"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "addSelectedUsers"
+        },
+        {
+            "eventId": "closePanel",
+            "action": "closeCurrentOpenedPanel"
+        },
+        {
+            "eventId": "navigateToAssignmentSubPanelInternal",
+            "action": "navigateToAssignmentSubPanel"
+        }
+    ],
+    "messages": {
+        "panelEditWarningMsg": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.panelModificationWarningMsg}}",
+            "messageTextParams":
+            [
+                "{{data.selTemplate}}"
+            ],
+            "navigationOptions":
+            [
+                {
+                    "option": "Cancel",
+                    "text": "{{i18n.discard}}",
+                    "action": "cancelPanelModification"
+                },
+                {
+                    "option": "modify",
+                    "text": "{{i18n.modify}}",
+                    "action": "savePanelModification"
+                }
+            ]
+        }
+    },
+
+    "conditions":
+    {
+        "isRouteTaskTemplateSelected":
+        {
+            "expression": "data.selTemplate.modelType.typeHierarchyArray.indexOf( 'EPMRouteTaskTemplate' ) > -1"
+        },
+        "isReviewTaskTemplateSelected":
+        {
+            "expression": "data.selTemplate.modelType.typeHierarchyArray.indexOf( 'EPMReviewTaskTemplate' ) > -1"
+        },
+        "isAcknowledgeTaskTemplateSelected":
+        {
+            "expression": "data.selTemplate.modelType.typeHierarchyArray.indexOf( 'EPMAcknowledgeTaskTemplate' ) > -1"
+        },
+        "isReviewOrAckTaskTemplateSelected":
+        {
+            "expression": "data.selTemplate.modelType.typeHierarchyArray.indexOf( 'EPMReviewTaskTemplate' ) > -1 || data.selTemplate.modelType.typeHierarchyArray.indexOf( 'EPMAcknowledgeTaskTemplate' ) > -1"
+        },
+        "isProfileExist":
+        {
+            "expression": "data.reviewProfiles && data.reviewProfiles.length > 0"
+        },
+        "isValidToModify":
+        {
+            "expression": "data.isTemplateAssignmentInProgress && conditions.isPriviledgeToModify"
+        },
+        "isPriviledgeToModify":
+        {
+            "expression": "ctx.workflowPalData.isPriviledgeToModify && conditions.isPalMgmtTCServerVersion122OrLater"
+        },
+        "isPalMgmtTCServerVersion122OrLater": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 12 || (ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion >= 2 ) )"
+        },
+        "isTaskAssignmentPanelVisibleModified": {
+            "expression": "(data.isTemplateAssignmentInProgress && (!ctx.panelContext.destPanelId || ctx.panelContext.destPanelId === 'Awp0TemplateAssignmentPanelSub'))"
+        },
+        "isTaskAssignmentPanelVisibleNonModified": {
+            "expression": "(!data.isTemplateAssignmentInProgress && ( !ctx.panelContext.destPanelId || ctx.panelContext.destPanelId === 'Awp0TemplateAssignmentPanelSub'))"
+        },
+        "isUsersPanelVisibleModified": {
+            "expression": "data.isTemplateAssignmentInProgress && ctx.panelContext.destPanelId === 'Users'"
+        },
+        "isUsersPanelVisibleNonModified": {
+            "expression": "!data.isTemplateAssignmentInProgress && ctx.panelContext.destPanelId === 'Users'"
+        }
+    },
+    "dataProviders": {
+        "assignerDataProvider":{
+            "selectionModelMode": "single"
+        },
+        "reviewersDataProvider":{
+            "selectionModelMode": "multiple",
+            "commandsAnchor"  : "aw_templateProfileCellCommand"
+        },
+        "adhocReviewersDataProvider":{
+            "selectionModelMode": "multiple"
+        },
+        "acknowledgersDataProvider":{
+            "selectionModelMode": "multiple"
+        },
+        "notifyeesDataProvider":{
+            "selectionModelMode": "multiple"
+        }
+    },
+
+    "i18n": {
+        "taskAssignments": [ "WorkflowCommandPanelsMessages" ],
+        "modify": [ "WorkflowCommandPanelsMessages" ],
+        "task": [ "WorkflowCommandPanelsMessages" ],
+        "Workflow_Name": [ "WorkflowCommandPanelsMessages" ],
+        "status": [ "WorkflowCommandPanelsMessages" ],
+        "assignments": [ "WorkflowCommandPanelsMessages" ],
+        "Assigner": [ "WorkflowCommandPanelsMessages" ],
+        "addReviewerLabelText": [ "InboxMessages" ],
+        "additionalReviewers": [ "InboxMessages" ],
+        "assignee" : [ "WorkflowCommandPanelsMessages" ],
+        "Acknowledgers": [ "WorkflowCommandPanelsMessages" ],
+        "Notifyees": [ "WorkflowCommandPanelsMessages" ],
+        "required": [ "WorkflowCommandPanelsMessages" ],
+        "duplicateReviewerMsg": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "wasNotAdded": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "multipleDuplicateMsg": [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "panelModificationWarningMsg" :  [ "WorkflowCommandPanelsMessages" ],
+        "discard": ["InboxMessages"]
+    }
+
+}
+

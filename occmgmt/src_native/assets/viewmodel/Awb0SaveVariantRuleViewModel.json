@@ -1,0 +1,99 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-xrt.directive",
+        "js/visible-when.directive",
+        "js/aw-form.directive"
+    ],
+    "actions": {
+        "saveAsVariantRule": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceConfiguration",
+            "method": "createOrUpdateClassicVariantRule",
+            "inputData": {
+                "inputData": {
+                    "productContext": {
+                        "type": "Awb0ProductContextInfo",
+                        "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}"
+                    },
+                    "variantRuleName": "{{function:fetchVariantRuleName}}",
+                    "variantContent": {
+                        "variantRule": {
+                        },
+                        "variantOptionValueEntry": "{{function:fetchSelectedOptions}}"
+                    }
+                }
+            },
+            "outputData": {
+                "classicVariants": "{{function:processSaveClassicVariantResponse}}"
+            },
+            "deps": "js/classicVariantService",
+            "events": {
+                "success": [
+                    {
+                        "name":"Awb0SaveVariantPanel.clearCache"
+                    },
+                    {
+                        "name": "Awb0SaveVariantPanel.close"
+                    },
+                    {
+                        "name": "Awb0SaveVariantPanel.resetDirtyFlag"
+                    }
+                ]
+            }
+        },
+        "resetDirtyFlag": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "path": "classicCfgContext.isSavePanelDirty",
+                "value": false
+            }
+        },
+        "clearDataProviderCache": {
+            "actionType": "JSFunction",
+            "method": "clearDataProviderCache",
+            "deps": "js/classicVariantService",
+            "inputData": {
+              "data": "{{data}}"
+            }
+        }
+    },
+
+    "functions": {
+        "fetchSelectedOptions": {
+            "functionName": "fetchSelectedOptions",
+            "parameters": ["{{ctx.classicCfgContext}}"]
+        },
+        "fetchVariantRuleName":{
+            "functionName": "fetchVariantRuleName",
+            "parameters": ["{{data}}"]
+        },
+        "processSaveClassicVariantResponse": {
+            "functionName": "processSaveClassicVariantResponse",
+            "parameters": []
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "Awb0SaveVariantPanel.resetDirtyFlag",
+            "action": "resetDirtyFlag"
+        },
+        {
+            "eventId": "Awb0SaveVariantPanel.clearCache",
+            "action": "clearDataProviderCache"
+        }
+    ],
+
+    "i18n": {
+        "saveButtonText": [
+            "OccurrenceManagementConstants"
+        ]
+    }
+}

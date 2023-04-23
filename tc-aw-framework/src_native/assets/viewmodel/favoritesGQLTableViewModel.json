@@ -1,0 +1,243 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive"
+    ],
+    "ports": {
+        "pwaSelection": {
+            "syncObject": {}
+        }
+    },
+    "actions": {
+        "updatePWASelectionPort": {
+            "actionType": "Sync",
+            "inputData": {
+                "port": "pwaSelection",
+                "syncObject": "{{data.eventData.selectedObjects}}"
+            }
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                        "operationType": "configured",
+                        "typeNames": [ "WorkspaceObject" ],
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [ {} ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.gridDataProvider.resetColumnConfigs": "columnConfigurations"
+            }
+        },
+        "doGridDataProvider": {
+            "actionType": "dataProvider",
+            "method": "gridDataProvider"
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($searchInput:SearchInput){favorites(searchInput:$searchInput){totalFound columnConfig totalLoaded results {uid thumbnailURL hasThumbnail type typeHierarchy typeIconURL indicators{image tooltip} props}}}",
+                    "variables": {
+                        "searchInput": {
+                            "columnConfigInput": {
+                                "clientName": "AWClient",
+                                "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                                "hostingClientName": "",
+                                "operationType": "as_arranged",
+                                "columnsToExclude": []
+                            },
+                            "saveColumnConfigData": {
+                                "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                                "columnConfigId": "{{data.dataProviders.gridDataProvider.columnConfig.columnConfigId}}",
+                                "scope": "LoginUser",
+                                "scopeName": "",
+                                "columns": "{{data.dataProviders.gridDataProvider.newColumns}}"
+                            },
+                            "maxToLoad": 50,
+                            "maxToReturn": 50,
+                            "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                            "searchSortCriteria": "{{data.columnProviders.clientScopeUI.sortCriteria}}",
+                            "inflateProperties": true,
+                            "role": "{{ctx.userSession.props.role_name.dbValues[0]}}",
+                            "groupMember": "{{ctx.userSession.props.fnd0groupmember.dbValues[0]}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [{
+                "id": "search",
+                "responseObjs": "data.favorites.results"
+            }],
+            "outputData": {
+                "totalFound": "data.favorites.totalFound",
+                "searchResults": "data.favorites.results",
+                "dataProviders.gridDataProvider.columnConfig": "data.favorites.columnConfig",
+                "ctx.search.totalFound": "data.favorites.totalFound",
+                "ctx.search.totalLoaded": "data.favorites.totalLoaded"
+            }
+        },
+        "loadData": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($searchInput:SearchInput){favorites(searchInput:$searchInput){totalFound columnConfig totalLoaded results{uid thumbnailURL hasThumbnail type typeHierarchy props navigation}}}",
+                    "variables": {
+                        "searchInput": {
+                            "columnConfigInput": {
+                                "clientName": "AWClient",
+                                "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}",
+                                "columnsToExclude": [],
+                                "operationType": "None",
+                                "hostingClientName": ""
+                            },
+                            "maxToLoad": 50,
+                            "maxToReturn": 50,
+                            "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                            "searchFilterMap": [],
+                            "searchSortCriteria": "{{data.columnProviders.clientScopeUI.sortCriteria}}",
+                            "cursor": {
+                                "startIndex": "{{data.dataProviders.gridDataProvider.startIndex}}",
+                                "endIndex": 0,
+                                "startReached": false,
+                                "endReached": false
+                            },
+                            "inflateProperties": true,
+                            "role": "{{ctx.userSession.props.role_name.dbValues[0]}}",
+                            "groupMember": "{{ctx.userSession.props.fnd0groupmember.dbValues[0]}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [{
+                "id": "search",
+                "responseObjs": "data.favorites.results"
+            }],
+            "outputData": {
+                "totalFound": "data.favorites.totalFound",
+                "searchResults": "data.favorites.results",
+                "dataProviders.gridDataProvider.columnConfig": "data.favorites.columnConfig",
+                "ctx.search.totalFound": "data.favorites.totalFound",
+                "ctx.search.totalLoaded": "data.favorites.totalLoaded"
+            }
+        },
+        "refreshSublocation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "condition": "ctx.sublocation.clientScopeURI === 'Awp0MyFavorites'",
+                    "name": "primaryWorkarea.reset"
+                } ]
+            }
+        }
+    },
+
+    "messages": {
+        "invalidFileError": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.invalidFileError}}",
+            "navigationOptions": [ {
+                "option": "Discard",
+                "text": "{{i18n.discard}}"
+            }, {
+                "option": "Save",
+                "text": "{{i18n.save}}"
+            } ]
+        }
+    },
+
+    "i18n": {
+        "navigationConfirmationSingle": [ "TCUICommandPanelsMessages" ],
+        "navigationConfirmationMultiple": [ "XRTMessages" ],
+        "save": [ "TCUICommandPanelsMessages" ],
+        "discard": [ "TCUICommandPanelsMessages" ],
+        "invalidFileError": [ "TCUICommandPanelsMessages" ]
+    },
+
+    "dataProviders": {
+        "gridDataProvider": {
+            "action": "loadData",
+            "editContext": "TABLE_CONTEXT",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+
+    "dataParseDefinitions": {
+        "search": {
+            "thumbnailURL": "{{response.thumbnailURL}}",
+            "type": "{{response.type}}",
+            "typeHierarchy": "{{response.typeHierarchy}}",
+            "typeIconURL": "{{response.typeIconURL}}",
+            "hasThumbnail": "{{response.hasThumbnail}}",
+            "identifier": "{{response.uid}}",
+            "props": "{{response.props}}",
+            "navigation": "{{response.navigation}}"
+        }
+    },
+
+    "columnProviders": {
+        "clientScopeUI": {
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "sortCriteria": []
+        }
+    },
+
+    "grids": {
+        "gridView": {
+            "dataProvider": "gridDataProvider",
+            "columnProvider": "clientScopeUI",
+            "addIconColumn": true,
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true
+            }
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "favorites.changed",
+            "action": "refreshSublocation"
+        },
+        {
+            "eventId": "gridDataProvider.selectionChangeEvent",
+            "action": "updatePWASelectionPort",
+            "cacheEventData": true
+        }
+    ]
+}

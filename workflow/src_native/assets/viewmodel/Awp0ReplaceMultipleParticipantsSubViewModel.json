@@ -1,0 +1,393 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-widget.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-listbox.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-section.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "openReassignMultipleParticipantsPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selectedObjects": "{{ctx.workflow.selectedObjects}}"
+            },
+
+            "outputData":
+            {
+                "participants": ""
+            },
+
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+
+        "populateParticipantTypes":
+        {
+            "actionType": "JSFunction",
+            "method": "populateParticipantTypes",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selectedObjects": "{{ctx.workflow.selectedObjects}}"
+            },
+
+            "outputData":
+            {
+                "participants": ""
+            },
+
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+
+        "generateNotificationsToUser":
+        {
+            "actionType": "JSFunction",
+            "method": "generateNotificationsToUser",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selectedObjects": "{{ctx.workflow.selectedObjects}}",
+                "input":"{{data.output}}"
+            },
+
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+
+
+        "navigateToMainPage":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "Awp0ReplaceMultipleParticipantsSub"
+                        }
+                    }
+                ]
+            }
+        },
+        "addSelectedUsers":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectedUsers",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+        "openUserPanelFromSection":
+        {
+            "actionType": "JSFunction",
+            "method": "openUserPanel",
+            "inputData":
+            {
+                "data": "{{commandContext}}",
+                "isFromSectionSelected": true
+            },
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+        "openUserPanelToSection":
+        {
+            "actionType": "JSFunction",
+            "method": "openUserPanel",
+            "inputData":
+            {
+                "data": "{{commandContext}}",
+                "isFromSectionSelected": false
+            },
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+
+        "reassignParticipants":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-10-DataManagement",
+            "method": "reassignParticipants",
+            "inputData":
+            {
+                "reassignParticipantInfo":
+                [
+                    {
+                        "itemRevs": "{{ctx.workflow.selectedObjects}}",
+                        "allParticipantTypes": false,
+                        "comments": "{{data.comments.dbValue}}",
+                        "participantTypes": "{{function:getParticipantTypes}}",
+                        "fromAssignee": "{{data.fromUsers[0]}}",
+                        "toAssignee": "{{data.toUsers[0]}}"
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "output": "ServiceData"
+            },
+            "events":{
+               "success":[
+                  {
+                        "name": "ReassignParticipants.generateNotifications"
+                   }
+
+
+               ],
+                "failure":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "ReassignParticipants.unRegisterCtx"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Awp0ReplaceMultipleParticipants"
+        },
+        "unRegisterCtx":
+        {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData":
+            {
+                "name": "workflow"
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+
+    },
+
+
+
+    "functions":
+    {
+        "getParticipantTypes":
+        {
+            "functionName": "getParticipantTypes",
+            "parameters":
+            [
+                "{{data.participantType.dbValue}}",
+                "{{data}}"
+            ]
+        }
+    },
+
+    "conditions":
+    {
+        "isValidToReassign":
+        {
+            "expression": "( data.comments && data.comments.dbValue.length>0) && (data.dataProviders.fromUser.viewModelCollection.loadedVMObjects.length > 0) && (data.dataProviders.toUser.viewModelCollection.loadedVMObjects.length > 0)"
+        },
+        "checkSelectionChange":
+        {
+            "expression": "name == 'mselected'"
+        }
+    },
+
+    "data":
+    {
+        "participantType":
+        {
+            "displayName": "{{i18n.participant}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true,
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+
+        "comments":
+        {
+            "displayName": "{{i18n.comments}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "numberOfLines": 3,
+            "maxLength": 240,
+            "dbValue": "",
+            "uiValue":""
+        },
+        "fromSectionCommands":"awp0_fromSectionCommands",
+        "toSectionCommands":"awp0_toSectionCommands"
+    },
+
+    "dataProviders":
+    {
+        "fromUser": {
+            "response": "{{data.fromUsers}}",
+            "totalFound": "{{data.fromUsers.length}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0RemoveProjectsCell":
+                {
+                    "id": "cmdRemove",
+                    "title": "Remove",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/removeObjectCellCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        },
+        "toUser": {
+            "response": "{{data.toUsers}}",
+            "totalFound": "{{data.toUsers.length}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0RemoveProjectsCell":
+                {
+                    "id": "cmdRemove",
+                    "title": "Remove",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/removeObjectCellCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+
+
+    "i18n": {
+        "replaceMultipleParticipantsCommandTitle": [ "WorkflowCommandPanelsMessages"],
+        "assignFrom": ["WorkflowCommandPanelsMessages"],
+        "assignTo": ["WorkflowCommandPanelsMessages"],
+        "comments": ["WorkflowCommandPanelsMessages"],
+        "participant": ["WorkflowCommandPanelsMessages"],
+        "All": ["WorkflowCommandPanelsMessages"],
+        "reassignParticipants": ["WorkflowCommandPanelsMessages"],
+        "oneSelectedSuccess": ["WorkflowCommandPanelsMessages"],
+        "oneSelectedFailure": ["WorkflowCommandPanelsMessages"],
+        "moreThanOneSuccess": ["WorkflowCommandPanelsMessages"]
+
+    },
+    "messages": {
+        "oneSelectedSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.oneSelectedSuccess}}",
+            "messageTextParams":
+            [
+                "{{data.updatedSelObjsname.uiValues[0]}}"
+
+            ]
+        },
+        "oneSelectedFailure":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.oneSelectedFailure}}",
+            "messageTextParams":
+            [
+                "{{data.failedSelObjsname.uiValues[0]}}"
+
+            ]
+        },
+        "moreThanOneSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.moreThanOneSuccess}}",
+            "messageTextParams":
+            [
+                "{{data.updatedCount}}",
+                "{{data.selectedCount}}"
+
+            ]
+        },
+        "soaFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0ReplaceMultipleParticipantsSub"
+            },
+
+            "action": "reveal"
+        },
+        {
+            "eventId": "generateParticipantList",
+            "action": "populateParticipantTypes"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "navigateToMainPage"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "addSelectedUsers"
+        },
+        {
+            "eventId": "ReassignParticipants.generateNotifications",
+            "action": "generateNotificationsToUser"
+        },
+        {
+            "eventId": "Awp0FromSectionAddCmdEvent",
+            "action": "openUserPanelFromSection"
+        },
+        {
+            "eventId": "Awp0ToSectionAddCmdEvent",
+            "action": "openUserPanelToSection"
+        },
+        {
+            "eventId": "ReassignParticipants.unRegisterCtx",
+            "action": "unRegisterCtx"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        }
+   ]
+
+}

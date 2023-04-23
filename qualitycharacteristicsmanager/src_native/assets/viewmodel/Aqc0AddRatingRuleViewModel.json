@@ -1,0 +1,341 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-tab-set.directive"
+    ],
+    "data": {
+        "tabs": [
+            {
+                "panelId": "Aqc0RatingRuleNewTab",
+                "name": "{{i18n.Aqc0New}}",
+                "recreatePanel": true
+            },
+            {
+                "panelId": "Aqc0RatingRuleSearchTab",
+                "name": "{{i18n.Aqc0Search}}",
+                "selectedTab": true,
+                "recreatePanel": true
+            }
+        ],
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "actions": {
+        "CreateOrAttachRatingRuleObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ 
+                    {
+                        "name": "createRatingRuleObjectEvent",
+                        "condition": "(data.object_name.dbValue !== '' && data.object_name.dbValue !== undefined && data.object_name.dbValue !== null && data.selectedTab.panelId === 'Aqc0RatingRuleNewTab') && data.dataProviders.loadFilteredList.selectedObjects.length === 0"
+                    },
+                    {
+                        "name": "unSelectRatingRuleFromListEvent",
+                        "condition": "(data.object_name.dbValue !== '' && data.object_name.dbValue !== undefined && data.object_name.dbValue !== null && data.selectedTab.panelId === 'Aqc0RatingRuleNewTab') && data.dataProviders.loadFilteredList.selectedObjects.length > 0"
+                    },
+                    {
+                        "name": "createReferenceWithChecklistSpecEvent",
+                        "condition": "data.selectedTab.panelId === 'Aqc0RatingRuleSearchTab' && data.dataProviders.loadFilteredList.selectedObjects.length > 0"
+                    }
+                ]
+            }
+        },     
+        "createRatingRuleObject":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "",
+                        "data": {
+                            "boName": "Qc0RatingRule",
+                            "stringProps": { 
+                                "qc0RatingRuleId": "{{data.qc0RatingRuleId.dbValue}}",                               
+                                "object_name": "{{data.object_name.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}"
+                            }                            
+                        }
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "serviceData": "ServiceData",                                
+                "errorMessage": "{{function:populateErrorString}}"  
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createReferenceWithChecklistSpecEvent"                        
+                    }
+                ]
+            },
+            "actionMessages": {               
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0ChecklistSpecService"
+        },
+        "createReferenceWithChecklistSpec": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",            
+            "deps": "js/Aqc0ChecklistSpecService",
+            "inputData": {
+                "info": [
+                    {
+                        "object": "{{ctx.selected}}",
+                        "timestamp": "",
+                        "vecNameVal": [
+                            {
+                                "name": "qc0RatingRuleReference",
+                                "values": [
+                                    "{{function:getSelectedOrNewlyCreatedObject}}"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "serviceData": "ServiceData",
+                "updateElementResponse": "",
+                "updatedObject": "ServiceData.updated[0]",
+                "errorMessage": "{{function:populateErrorString}}"       
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.updatedObject && data.dataProviders.loadFilteredList.selectedObjects.length === 0",
+                        "message": "createObjectSuccess"
+                    },
+                    {
+                        "condition": "data.updatedObject && data.dataProviders.loadFilteredList.selectedObjects.length > 0",
+                        "message": "AttachObjectSuccess"
+                    }
+                ],
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },   
+        "getSearchResults": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "deps": "js/Aqc0ChecklistSpecService",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "inflateProperties": false,
+                "saveColumnConfigData": {},
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awp0SavedQuerySearchProvider",
+                    "searchCriteria": "{{function:getSearchCriteria}}",
+                    "cursor": {
+                        "startIndex": "{{data.dataProviders.loadFilteredList.startIndex}}"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical"
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResponse": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "errorMessage": "{{function:populateErrorString}}"   
+            },
+            "actionMessages": {                
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },
+        "loadList": {
+            "actionType": "dataProvider",
+            "method": "loadFilteredList"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "dataProviders": {
+        "loadFilteredList": {
+            "action": "getSearchResults",
+            "response": "{{data.searchResponse}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "noResultsFound": "{{i18n.Aqc0NoSearchResults}}"
+        }
+    },
+    "functions": {               
+        "getSelectedOrNewlyCreatedObject": {
+            "functionName": "getSelectedOrNewlyCreatedObject",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getSearchCriteria": {
+            "functionName": "getSearchCriteria",
+            "parameters": [
+                "{{data}}",
+                "{{data.dataProviders.loadFilteredList.startIndex}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "loadList"
+    },
+    "onEvent": [             
+        {
+            "eventId": "createRatingRuleObjectEvent",
+            "action": "createRatingRuleObject"
+        },    
+        {
+            "eventId": "createReferenceWithChecklistSpecEvent",
+            "action": "createReferenceWithChecklistSpec"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "unSelectRatingRuleFromListEvent",
+            "message": "unSelectRatingRuleFromListMessage"
+        }
+    ],
+    "i18n": {
+        "Aqc0Add": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0AddRatingRule": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0New": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0Search": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0PartialError": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0NoSearchResults": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0RatingRuleCreateSuccessMessage": [
+            "qualitycentermanagerMessages"
+        ],
+        "Aqc0UnSelectRatingRuleFromListMessage": [
+            "qualitycentermanagerMessages"
+        ]
+    },
+    "messages": {
+        "unSelectRatingRuleFromListMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.Aqc0UnSelectRatingRuleFromListMessage}}",
+            "messageTextParams": [
+                "{{data.dataProviders.loadFilteredList.selectedObjects[0].props.object_name.dbValues[0]}}"
+            ]
+        },
+        "AttachObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Aqc0RatingRuleCreateSuccessMessage}}",
+            "messageTextParams": [
+                "{{data.dataProviders.loadFilteredList.selectedObjects[0].props.object_name.dbValues[0]}}",
+                "{{ctx.selected.props.object_name.dbValue}}"
+            ]
+        },
+        "createObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Aqc0RatingRuleCreateSuccessMessage}}",
+            "messageTextParams": [
+                "{{data.createdObject.props.object_string.dbValues[0]}}",
+                "{{ctx.selected.props.object_name.dbValue}}"
+            ]
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.Aqc0PartialError}}",
+            "messageTextParams": [
+                "{{data.errorMessage}}"
+            ]
+        }
+    },
+    "conditions": {        
+        "isValidToCreate": {
+            "expression": "((data.object_name.dbValue !== '' && data.object_name.dbValue !== undefined && data.object_name.dbValue !== null && data.selectedTab.panelId === 'Aqc0RatingRuleNewTab') || data.dataProviders.loadFilteredList.selectedObjects.length > 0)"
+        }
+    }    
+}

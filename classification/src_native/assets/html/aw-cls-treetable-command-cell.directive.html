@@ -1,0 +1,31 @@
+<div class="aw-jswidgets-cellTop aw-jswidgets-uiNonEditCell">
+    <div class="ui-grid-tree-base-row-header-buttons ui-grid-tree-base-header" ng-class="{'aw-jswidgets-treeExpandCollapseCmd': !row.entity.isLeaf }" ng-click="treeButtonClick(row, $event)" ng-style="{'padding-left': row.grid.options.treeIndent * row.treeLevel + 'px'}" >
+        <aw-icon icon-id="{{vmo.loadingStatus ? 'miscInProcessIndicator' : row.entity.isLeaf ? 'typeBlankIcon' : row.treeNode.state === 'expanded' ? 'miscExpand' : 'miscCollapse'}}" title="{{vmo._twistieTitle}}"></aw-icon>
+    </div>
+    <div class="aw-widgets-gridCellColorContainer aw-widgets-treeTableColorContainer">
+            <span class="{{vmo.gridDecoratorStyle}} aw-widgets-gridCellColorIndicator" ng-class="{'aw-widgets-showCellDecorator' : $parent.dataprovider.showDecorators}" ng-attr-title="{{vmo.colorTitle}}"></span>
+    </div>
+    <div class="aw-widgets-dataGridCellImage" title="{{ctx.visibilityControls ? cellTitle : ''}}" ng-class="{'aw-widgets-partialVisibility': !vmo.visible, 'aw-occmgmt-cellImageTooltip': ctx.visibilityControls}" ng-click="imageButtonClick(row, $event)">
+        <img class="aw-base-icon" ng-src="{{vmo.iconURL}}" />
+    </div>
+    <div class="aw-jswidgets-tableNonEditContainer aw-layout-flexRowContainer" title="{{ row.entity.displayName }}" >
+        <div class="aw-jswidgets-dataGridCellText aw-widgets-propertyNonEditValue  aw-ui-showHighlight">
+            <aw-sublocation-body>
+                <span class="aw-jswidgets-text" aw-parse-html display-val="vmo.displayName"></span>
+            </aw-sublocation-body>
+        </div>
+        <div class="aw-jswidgets-gridCellCommands aw-widgets-cellInteraction">
+            <div ng-show="dataProvider.selectionModel.multiSelectEnabled && vmo.selected">
+                <a class="aw-commands-cellCommandCommon">
+                    <div class="aw-commands-svg">
+                        <aw-icon icon-id="cmdCheckmark"></aw-icon>
+                    </div>
+                </a>
+            </div>
+            <div ng-show="!dataProvider.selectionModel.multiSelectEnabled || !vmo.selected">
+                <aw-list-command ng-repeat="command in commands" vmo="vmo" command="command"></aw-list-command>
+                <aw-table-command-bar ng-if="anchor" anchor="{{anchor}}" context="commandContext" class="aw-layout-flexRow"></aw-table-command-bar>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,861 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "description": "",
+    "definitions": {
+        "actionDef": {
+            "oneOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "pinPanel"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/pinPanel"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "unpinPanel"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/unpinPanel"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "createViewModelObject"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/createViewModelObject"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "arrangeTableColumns"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/arrangeTableColumns"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "setSelection"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/setSelection"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "executeViewOrientationCommand"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/executeViewOrientationCommand"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "updateFilterCategories"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/updateFilterCategories"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "openFile"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/openFile"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "activateCommandPanel"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/activateCommandPanel"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "showInfoMessage"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/showInfoMessage"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "showWarningMessage"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/showWarningMessage"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "showErrorMessage"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/showErrorMessage"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "modifyCtx"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/modifyCtx"
+                    },
+                    "else": false
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "actionType": {
+                                "const": "updateFormData"
+                            }
+                        }
+                    },
+                    "then": {
+                        "$ref": "#/definitions/updateFormData"
+                    },
+                    "else": false
+                }
+            ]
+        },
+        "activateCommandPanel": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "activateCommandPanel"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "properties": {
+                        "commandId": {
+                            "type": "string"
+                        },
+                        "location": {
+                            "type": "string"
+                        },
+                        "context": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "push": {
+                            "type": "boolean"
+                        },
+                        "closeWhenCommandHidden": {
+                            "type": "boolean"
+                        },
+                        "config": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "showInfoMessage": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "showInfoMessage"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        },
+                        "params": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "showWarningMessage": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "showWarningMessage"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        },
+                        "params": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "showErrorMessage": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "showErrorMessage"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        },
+                        "params": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "modifyCtx": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "modifyCtx"
+                },
+                "inputData": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "properties": {
+                        "methodType": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "value": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "array"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "path": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "updateFormData": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "updateFormData"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "fileData": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "data": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "openFile": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "openFile"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "fileTicket": {
+                            "type": "string"
+                        },
+                        "openFileName": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "updateFilterCategories": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "updateFilterCategories"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "category": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "skipClientFiltering": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "executeViewOrientationCommand": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "executeViewOrientationCommand"
+                },
+                "inputData": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "properties": {
+                        "viewerContextNamespace": {
+                            "type": "string"
+                        },
+                        "cameraOrientation": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "setSelection": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "setSelection"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "selectionModel": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "newSelection": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "createViewModelObject": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "createViewModelObject"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "source": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "operationName": {
+                            "type": "string"
+                        },
+                        "owningObjUid": {
+                            "type": "string"
+                        },
+                        "serverVMO": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "arrangeTableColumns": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "arrangeTableColumns"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "declViewModel": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        },
+                        "eventData": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "object"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "pinPanel": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "pinPanel"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "data": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        },
+        "unpinPanel": {
+            "type": "object",
+            "description": "",
+            "additionalProperties": false,
+            "required": [
+                "actionType"
+            ],
+            "properties": {
+                "actionType": {
+                    "type": "string",
+                    "description": "",
+                    "const": "unpinPanel"
+                },
+                "inputData": {
+                    "type": "object",
+                    "description": "JSON data for the action input. For ex. 'request' header can be the inputData in case of 'RESTService' actionType with method 'Get'.",
+                    "additionalProperties": false,
+                    "properties": {
+                        "data": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "outputData": {
+                    "type": "object",
+                    "description": "JSON data for the action output. As part of this, the result of the action is mapped to view model data."
+                },
+                "events": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "Events can be fired and listened/handled in declarative View Models. They are a means of a View Model communicating with other View Models or UI elements. 'Actions' can fire events."
+                },
+                "actionMessages": {
+                    "$ref": "#/definitions/actionMessagesDef",
+                    "description": "User messages. It can be made condition based"
+                }
+            }
+        }
+    }
+}

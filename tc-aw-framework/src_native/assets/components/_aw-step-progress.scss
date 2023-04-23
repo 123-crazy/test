@@ -1,0 +1,91 @@
+// Copyright (c) 2020 Siemens
+@import 'mixins/mixins';
+// aw-step-progress
+    .aw-step-progressChevronContainer {
+        @include display_flex;
+        width: $fontsize_100pct;
+        @include flex-direction(row);
+        margin: $stepprogress_margin;
+        font-size: $fontsize_normal;
+        font-weight: normal;
+        font-style: normal;
+
+        li:first-child {
+            border-radius: $stepprogress_border_radius;
+
+            &:before {
+                border: $stepprogress_border;
+            }
+
+            .aw-step-progressChevronText {
+                padding: $stepprogress_text_padding_first;
+            }
+        }
+
+        li:last-child {
+            border-radius: $stepprogress_border_right_radius;
+            border-right-width: $stepprogress_border_width;
+            border-right-style: $stepprogress_li_border_style;
+
+            &:after {
+                border: $stepprogress_border;
+            }
+
+            .aw-step-progressChevronText {
+                padding: $stepprogress_text_padding_last;
+            }
+        }
+    }
+
+    .aw-step-progressChevronContainer li {
+        position: relative;
+        max-width: $stepprogress_li_max_width;
+        min-width: $stepprogress_li_min_width;
+        align-self: stretch;
+        height: $stepprogress_li_height;
+        box-sizing: border-box;
+        border-width: $stepprogress_border_li_width;
+        border-style: $stepprogress_li_border_style;
+        border-width: $stepprogress_li_border_right_width;
+    }
+
+    .aw-step-progressChevronContainer {
+        li::before,
+        li::after {
+            position: absolute;
+            top: $stepprogress_li_before_top;
+            border-width: $stepprogress_li_border_width;
+            border-style: $stepprogress_li_border_style;
+            content: " "
+        }
+        li::before {
+            left: $stepprogress_li_before_top;
+        }
+        li::after {
+            z-index: $stepprogress_li_after_z_index;
+            left: $fontsize_100pct;
+            display: block;
+            width: $stepprogress_li_before_top;
+            height: $stepprogress_li_before_top;
+        }
+    }
+
+    .aw-step-progressChevronText {
+        padding: $stepprogress_text_padding;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        height: $stepprogress_text_height;
+    }
+
+    @media (min-width: $stepprogress_width) {
+        .aw-step-ProgressProperty {
+            display: none;
+        }
+    }
+
+    @media (max-width: $stepprogress_width) {
+        .aw-step-ProgressChevron {
+            display: none;
+        }
+    }

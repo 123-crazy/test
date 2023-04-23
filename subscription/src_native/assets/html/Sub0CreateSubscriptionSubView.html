@@ -1,0 +1,31 @@
+
+<aw-panel-body>
+        <aw-panel-section visible-when="data.subscribedObjectType.propertyDisplayName!=''">
+                <aw-title-link prop="data.subscribedObjectType" action="goToTypeSelection"></aw-title-link>
+        </aw-panel-section>
+        <aw-panel-section visible-when="data.subscribedObjectType.propertyDisplayName=='' && ctx.subscriptionCtx.subscribableObjects.objects.length<=1">
+            <aw-title-link prop="data.subscribedObject" action="goToListSubscriptions"></aw-title-link>
+        </aw-panel-section>
+        <aw-panel-section visible-when="ctx.subscriptionCtx.subscribableObjects.objects.length>1" caption="i18n.multiObjectSelected">
+        </aw-panel-section>
+        <aw-panel-section>
+            <aw-row height = "2f" visible-when="ctx.subscriptionCtx.subscribableObjects.objects.length<=1 && ((ctx.tcSessionData.tcMajorVersion > 11 && !(ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion === 0)) || (ctx.tcSessionData.tcMajorVersion === 11 && (ctx.tcSessionData.tcMinorVersion > 2 || (ctx.tcSessionData.tcMinorVersion === 2 && ctx.tcSessionData.tcQRMNumber >= 7))))">
+                <aw-column  width="fill">
+                    <aw-checkbox prop="data.multiEventCheckbox" action="multiEventDisplay"></aw-checkbox>
+                </aw-column>
+                <aw-column>
+                    <aw-icon-button button-type="button" command="data.editEventConfigurationCommand"></aw-icon-button>
+                </aw-column>
+            </aw-row>
+            <aw-row height = "5f">
+                <aw-column width="fill">
+                    <aw-listbox prop="data.eventType" list="ctx.subscriptionCtx.eventTypeList" action="addEventTypeToList" title={{data.eventType.uiValue}}></aw-listbox>
+                </aw-column>
+            </aw-row>
+        </aw-panel-section>
+        <aw-include-view view="data.view" view-model="data.viewModel"></aw-include-view>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="createSubscriptions"><aw-i18n>i18n.followCommandTitle</aw-i18n></aw-button>
+</aw-panel-footer>
+

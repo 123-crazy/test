@@ -1,0 +1,122 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-popup2.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-listbox.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "loadAttachLov": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-06-LOV",
+            "method": "getAttachedLOVs",
+            "inputData": {
+                "inputs": [ {
+                    "typeName": "Qfm0FailureElement",
+                    "propNames": [
+                        "qfm0Severity"
+                    ]
+                } ]
+            },
+            "outputData": {
+                "severityLovUID": "{{function:getSeverityLovUID}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "loadListOfSeverity"
+                } ]
+            },
+            "deps": "js/qfm0EditSeverityPopup"
+        },
+        "loadListOfSeverity": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "lovInput": {
+                        "owningObject": {
+                            "uid": "{{data.severityLovUID}}",
+                            "type": "Qfm0FailureElement"
+                        },
+                        "boName": "Qfm0FailureElement",
+                        "operationName": "Create"
+                    },
+                    "propertyName": "qfm0Severity",
+                    "filterData": {
+                        "filterString": "",
+                        "maxResults": 0,
+                        "numberToReturn": 10000,
+                        "sortPropertyName": "",
+                        "order": 1
+                    }
+                }
+            },
+            "outputData": {
+                "listOfSeverity": "{{function:getSeverityLOVList}}"
+            },
+            "deps": "js/qfm0EditSeverityPopup"
+        },
+        "SaveAction": {
+            "actionType": "JSFunction",
+            "method": "commitSeverity",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/qfm0EditSeverityPopup"
+        },
+        "closePopupWindow": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "inputData": {
+                "popupId": "{{data.popupId}}"
+            },
+            "deps": "js/popupService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "aw.complete",
+            "action": "closePopupWindow",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "showcaseApp.closePopup",
+            "action": "closePopupWindow",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "loadListOfSeverity",
+            "action": "loadListOfSeverity"
+        }
+    ],
+    "data": {
+        "SeverityProp": {
+            "displayName": "{{i18n.qfm0Value}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": "{{ctx.selected.props.qfm0Severity.dbValues[0]}}",
+            "dispValue": "{{ctx.selected.props.qfm0Severity.dbValues[0]}}",
+            "sel": "true"
+        },       
+        "popupId":"qfm0EditSeverity"
+    },
+    "lifecycleHooks": {
+        "onInit": "loadAttachLov"
+    },   
+    "i18n": {
+        "qfm0Value": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Cancel": [
+            "qualityFmeaMessages"
+        ],
+        "save": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

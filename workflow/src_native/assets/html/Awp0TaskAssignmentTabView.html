@@ -1,0 +1,25 @@
+<aw-column height="fill">
+    <aw-panel-body>
+        <aw-panel-section caption="i18n.participation" visible-when="conditions.isReviewAckRouteTaskTemplateSelected">
+            <aw-flex-row height="5f">
+                <aw-flex-column width="3">
+                    <aw-radiobutton  prop="data.quorumOptions" enable-when="conditions.isTemplateInEditMode"></aw-radiobutton>
+                </aw-flex-column>
+                <aw-flex-column width="4f">
+                    <aw-numeric id="sstPercentQuorumValue" prop="data.percentQuorumValue" visible-when="data.quorumOptions.dbValue" enable-when="conditions.isTemplateInEditMode" ></aw-numeric>
+                    <aw-numeric id="sstNumericQuorumValue" prop="data.numericQuorumValue" visible-when="!data.quorumOptions.dbValue" enable-when="conditions.isTemplateInEditMode" ></aw-numeric>
+                </aw-flex-column>
+                <aw-flex-column width="1"></aw-flex-column>
+                <aw-flex-column width="4">
+                    <aw-checkbox prop="data.waitForReviewers" visible-when="!conditions.isACKTaskTemplateSelected" enable-when="conditions.isTemplateInEditMode"></aw-checkbox>
+                </aw-flex-column>
+                <aw-flex-column width="3"></aw-flex-column>
+            </aw-flex-row>
+        </aw-panel-section>
+        <aw-command-panel-section caption="i18n.assignments" anchor="data.assignmentAnchor" context="data.dataProviders.assignmentDataProvider">
+            <aw-checkbox prop="data.autoCompleteSignoffOption" exist-when="conditions.isAutoCompleteSignoffOption" action="updateAdhocSignoffHandlers"></aw-checkbox>
+            <aw-workflow-handler-table></aw-workflow-handler-table>
+            <aw-splm-table gridid="assignmentsHandlerTable"></aw-splm-table>
+        </aw-command-panel-section>
+    </aw-panel-body>
+</aw-column>

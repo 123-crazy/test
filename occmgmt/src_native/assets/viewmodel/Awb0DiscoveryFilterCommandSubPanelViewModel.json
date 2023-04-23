@@ -1,0 +1,530 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                 "js/aw-filter-category.directive",
+                 "js/aw-panel-body.directive",
+                 "js/aw-repeat.directive",
+                 "js/exist-when.directive",
+                 "js/aw-scrollpanel.directive",
+                 "js/aw-layout-slot.directive",
+                 "js/aw-textbox.directive",
+                 "js/aw-filter-in-filters-searchbox.directive",
+                 "js/aw-link.directive",
+                 "js/aw-include.directive",
+                 "js/aw-button.directive",
+                 "js/aw-panel-footer.directive",
+                 "js/aw-i18n.directive",
+                 "js/aw-panel-header.directive",
+                 "js/aw-separator.directive",
+                 "js/aw-flex-row.directive",
+                 "js/aw-flex-column.directive",
+                 "js/aw-icon.directive"
+    ],
+    "actions":
+    {
+        "setContext":{
+            "actionType": "JSFunction",
+            "method": "setContext",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "contextKey": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "filterPanel.doReveal"
+                } ]
+            },
+            "deps":"js/discoveryFilterService"
+        },
+        "toggleDelayedApply":{
+            "actionType": "JSFunction",
+            "method": "toggleDelayedApply",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "toggle": "{{data.eventData.toggleValue}}"
+            },
+            "deps":"js/discoveryFilterService"
+        },
+        "updateCategoryResults":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategoryResults",
+            "inputData":
+            {
+                "category":"{{ctx.search.valueCategory}}"
+            },
+            "deps":"js/filterPanelService"
+        },
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "getFilterData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "recipe": ""
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "selectStructureFilterAction":
+        {
+            "actionType": "JSFunction",
+            "method": "selectACEFilter",
+            "inputData":
+            {
+                "category"     : "{{category}}",
+                "filter"       : "{{filter}}",
+                "data"         : "{{data}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "selectGivenCategory":
+        {
+            "actionType": "JSFunction",
+            "method": "selectCategory",
+            "inputData":
+            {
+                "category"     : "{{category}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "initialize":
+        {
+            "actionType": "JSFunction",
+            "method": "initialize",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "initializeAndReveal": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "initialize"
+                },
+                {
+                    "action": "reveal"
+                }
+            ]
+        },
+        "updateRecipeOnDelete":{
+            "actionType": "JSFunction",
+            "method": "updateRecipeCriteriaList",
+            "inputData": {
+                "recipe": "{{data.recipe}}",
+                "recipeItem": "{{data.eventData.recipeItem}}",
+                "recipeIndex": "{{data.eventData.recipeIndex}}",
+                "selectedValue": "{{data.eventData.selectedValue}}",
+                "subCriteriaIndex": "{{data.eventData.subCriteriaIndex}}"
+            },
+            "outputData" : {
+                "deleteRecipeInfo":""
+            },
+            "events": {
+                "success": [ {
+                    "name": "occmgmt.recipeUpdated",
+                    "eventData": {
+                        "updatedRecipes": "{{data.deleteRecipeInfo.updatedRecipes}}",
+                        "deletedRecipe": "{{data.deleteRecipeInfo.deletedRecipe}}",
+                        "syncFilter" : true
+                    }
+                } ]
+            },
+            "deps": "js/filterRecipeValidationService"
+        },
+        "updateProximityValue":{
+            "actionType": "JSFunction",
+            "method": "setProximityValueToRecipe",
+            "inputData": {
+                "recipe": "{{data.recipe}}",
+                "recipeIndex": "{{data.eventData.recipeIndex}}",
+                "newProximityValue": "{{data.eventData.newProximityValue}}"
+            },
+            "outputData" : {
+                "updatedRecipe": ""
+            },
+            "events": {
+                "success": [ {
+                    "condition": "!data.delayedApply",
+                    "name": "occmgmt.recipeUpdated",
+                    "eventData": {
+                        "updatedRecipes": "{{data.updatedRecipe}}",
+                        "syncFilter" : false
+                    }
+                } ]
+            },
+            "deps": "js/filterRecipeValidationService"
+        },
+        "updateRecipeOnOperatorModification": {
+            "actionType": "JSFunction",
+            "method": "updateRecipeTermOperator",
+            "inputData": {
+                "recipe": "{{data.recipe}}",
+                "recipeIndex": "{{data.eventData.recipeIndex}}",
+                "criteriaOperatorType": "{{data.eventData.criteriaOperatorType}}"
+            },
+            "outputData" : {
+                "updatedRecipe": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "occmgmt.recipeUpdated",
+                    "eventData": {
+                        "updatedRecipes": "{{data.updatedRecipe}}",
+                        "syncFilter" : false
+                    }
+                } ]
+            },
+            "deps": "js/filterRecipeValidationService"
+        },
+        "toggleShowMore":{
+            "actionType": "JSFunction",
+            "method": "toggleExpand",
+            "inputData": {
+                "value": "{{data.showMoreLink.dbValue}}"
+            },
+            "outputData": {
+                "showMoreLink.dbValue":""
+            },
+            "deps": "js/proximityFilterService"
+        },
+        "persistCategoryFilterToUpdateState": {
+            "actionType": "JSFunction",
+            "method": "persistCategoryFilterToUpdateState",
+            "inputData": {
+                "context": "{{data.eventData}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "performFacetSearch"
+                } ]
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "performFacetSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-Finder",
+            "method": "performFacetSearch",
+            "inputData": {
+                "facetSearchInput": {
+                    "maxToReturn": 100,
+                    "providerName": "Awb0FullTextSearchProvider",
+                    "searchCriteria": {
+                        "categoryForFacetSearch": "{{ctx.search.valueCategory.internalName}}",
+                        "facetSearchString": "{{ctx.search.valueCategory.filterBy}}",
+                        "forceThreshhold": false,
+                        "searchString": "$DefaultSearchProvider_STD$*",
+                        "productContextUids": "{{function:getProductContextInfoUid}}"
+                    },
+                    "searchFilterMap": {},
+                    "startIndex": "{{function:getStartIndexForFacetSearch}}"
+                }
+            },
+            "outputData": {
+                "ctx.search.filterMap": "{{function:updateFilterMapForFacet}}",
+                "ctx.search.valueCategory.endIndex": "endIndex",
+                "ctx.search.valueCategory.hasMoreFacetValues": "hasMoreFacetValues"
+
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateFilterPanel"
+                }]
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "applyFilter": {
+            "actionType": "JSFunction",
+            "method": "applyFilter",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "addRecipe":{
+            "actionType": "JSFunction",
+            "method": "addRecipe",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "processRecipeOnUpdate": {
+            "actionType": "JSFunction",
+            "method": "processRecipeOnUpdate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "processOnNavigateBack": {
+            "actionType": "JSFunction",
+            "method": "processOnNavigateBack",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/discoveryFilterService"
+        },
+        "updateRecipeOnProximityValueUpdate": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateProximityValue"
+                },
+                {
+                    "action": "updateProximityDisplayString",
+                    "condition": "data.delayedApply"
+                }
+            ]
+        },
+        "updateProximityDisplayString":{
+            "actionType": "JSFunction",
+            "method": "setProximityDisplayStringToRecipe",
+            "inputData": {
+                "recipe": "{{data.updatedRecipe}}",
+                "recipeIndex": "{{data.eventData.recipeIndex}}",
+                "newProximityValue": "{{data.eventData.newProximityValue}}"
+            },
+            "outputData" : {
+                "updatedRecipe": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "occmgmt.recipeUpdated",
+                    "eventData": {
+                        "updatedRecipes": "{{data.updatedRecipe}}",
+                        "updatedIndex": "{{data.eventData.recipeIndex}}",
+                        "syncFilter" : false
+                    }
+                } ]
+            },
+            "deps": "js/filterRecipeValidationService"
+        },
+        "getDelayedApplyPreference":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Administration-2012-09-PreferenceManagement",
+            "method": "getPreferences",
+            "inputData":
+            {
+                "preferenceNames": [ "AWC_Discovery_Delayed_Filter_Apply" ],
+                "includePreferenceDescriptions": false
+            },
+            "outputData":
+            {
+                "preference":"{{function:processInitialDelayedApplyPreference}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "filterPanel.initializeAndReveal"
+                } ]
+            },
+            "deps":"js/discoveryFilterService"
+        },
+        "includeExcludeSelected":{
+            "actionType": "JSFunction",
+            "method": "applySelectedElementFilterInRecipe",
+            "deps":"js/includeExcludeFilterService"
+        }
+    },
+    "functions": {
+        "getStartIndexForFacetSearch": {
+            "functionName": "getStartIndexForFacetSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "updateFilterMapForFacet": {
+            "functionName": "updateFilterMapForFacet",
+            "parameters": [
+                "{{data}}", "{{response}}"]
+        },
+        "processInitialDelayedApplyPreference": {
+            "functionName": "processInitialDelayedApplyPreference",
+            "parameters": [
+                "{{data}}", "{{response}}"]
+        },
+        "getProductContextInfoUid": {
+            "functionName": "getProductContextInfoUid",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId" : "Awb0DiscoveryFilterCommandSubPanel"
+            },
+            "cacheEventData": true,
+            "action": "setContext"
+        },
+        {
+            "eventId": "filterPanel.doReveal",
+            "condition": "conditions.isInAceActiveContext",
+            "action": "getDelayedApplyPreference"
+        },
+        {
+            "eventId": "filterPanel.doReveal",
+            "condition": "conditions.isNotInAceActiveContext",
+            "action": "initializeAndReveal"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "criteria":
+            {
+                "destPanelId" : "Awb0DiscoveryFilterCommandSubPanel"
+            },
+            "cacheEventData": true,
+            "action": "processOnNavigateBack"
+        },
+        {
+            "eventId": "filterPanel.initializeAndReveal",
+            "action": "initializeAndReveal"
+        },
+        {
+            "eventId": "occmgmt.recipeUpdated",
+            "action": "processRecipeOnUpdate",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action":"updateCategoryResults",
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "proximityValueUpdated",
+            "action": "updateRecipeOnProximityValueUpdate",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "operatorModified",
+            "action": "updateRecipeOnOperatorModification",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "recipeDeleted",
+            "action": "updateRecipeOnDelete",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "toggleExpansionUnpopulated",
+            "action": "persistCategoryFilterToUpdateState",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "filterInFilter.serverFilter",
+            "action": "performFacetSearch",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "performFacetSearch",
+            "action": "performFacetSearch",
+            "cacheEventData": true,
+            "condition": "conditions.isSmartDiscovery"
+        },
+        {
+            "eventId": "discoveryFilter.recipeAdded",
+            "action": "addRecipe",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "filterPanel.toggleDelayedApply",
+            "action": "toggleDelayedApply",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "discoveryFilter.includeExcludeSelectedElement",
+            "action": "includeExcludeSelected",
+            "cacheEventData": true,
+            "condition": "data.eventMap[ 'awPanel.reveal' ] && (ctx.panelContext.operation === 'Include' || ctx.panelContext.operation === 'Exclude')"
+        }
+    ],
+    "conditions": {
+        "isSmartDiscovery": {
+            "expression": "(ctx[data.contextKey].context.supportedFeatures.Awb0EnableSmartDiscoveryFeature === true)"
+        },
+        "isFilterButtonVisible": {
+            "expression": "(data.delayedApply && data.enableApply && conditions.isInAceActiveContext)"
+        },
+        "isTCVersion132OrLater": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion >= 13 && ctx.tcSessionData.tcMinorVersion >= 2) || ctx.tcSessionData.tcMajorVersion >=14"
+        },
+        "isInAceActiveContext": {
+            "expression": "data.contextKey === 'aceActiveContext'"
+        },
+        "isNotInAceActiveContext": {
+            "expression": "data.contextKey !== 'aceActiveContext'"
+        }
+    },
+    "data":
+    {
+        "excludeByFilteringTooltip": {
+            "view": "extendedTooltipDefault"
+        },
+        "excludeByFilteringTooltipContext": {
+            "title": "{{i18n.exclude}}",
+            "description": "{{i18n.excludeByFilteringDesc}}"
+        },
+        "recipe" :
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+
+            ]
+        },
+        "showMore":
+        {
+            "displayName": "{{i18n.MORE_LINK_TEXT}}",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "showLess":
+        {
+            "displayName": "{{i18n.LESS_LINK_TEXT}}",
+            "type": "STRING",
+            "dbValue": "",
+            "dispValue": ""
+        },
+        "showFilterOperator":
+        {
+            "dbValue": false,
+            "type": "BOOLEAN"
+        },
+        "searchBox1": {
+            "displayName": "",
+            "type": "STRING"
+        },
+        "showMoreLink": {
+            "type": "BOOLEAN",
+            "isEditable": "true",
+            "dbValue": true
+        },
+        "enableApply" : false,
+        "delayedApply": false
+    },
+    "i18n":
+    {
+          "subset" :        ["OccurrenceManagementConstants"],
+          "MORE_LINK_TEXT": [ "BaseMessages" ],
+          "LESS_LINK_TEXT": [ "BaseMessages" ],
+          "filterButtonTitle": ["OccurrenceManagementSubsetConstants"],
+          "exclude":["OccurrenceManagementSubsetConstants"],
+          "excludeByFilteringDesc":["OccurrenceManagementSubsetConstants"]
+    }
+}

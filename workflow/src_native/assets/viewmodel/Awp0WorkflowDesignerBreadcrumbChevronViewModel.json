@@ -1,0 +1,105 @@
+{
+    "schemaVersion" : "1.0.0",
+    "actions":
+    {
+        "onChevronClickAW":
+        {
+            "actionType": "dataProvider",
+            "method": "workflowDesignerChevronDataProvider"
+        },
+        "getChildren":
+        {
+            "actionType": "JSFunction",
+            "method": "loadChevronPopup",
+            "inputData":
+            {
+               "data": "{{ctx.workflowDesignerNativeBreadCrumbChevron.scopedUid}}"
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowDesignerNativeBreadCrumb.popUpLoading"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowDesignerBreadcrumbPanel"
+        },
+        "onWorkflowDesignerChevronDataSelection":
+        {
+            "actionType": "JSFunction",
+            "method": "onChevronDataSelection",
+            "inputData": {
+                "selectedObject": "{{data.dataProviders.workflowDesignerChevronDataProvider.selectedObjects[0]}}"
+            },
+            "deps": "js/Awp0WorkflowDesignerBreadcrumbPanel"
+        },
+        "workflowDesignerBreadCrumbPopUpLoading":
+        {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData":
+            {
+               "id":"workflowDesignerNativeBreadCrumb",
+               "data": "{{data}}",
+               "key":"loading",
+               "value":false,
+               "unRegister": false
+            },
+            "deps": "js/breadcrumbUtils"
+        },
+        "closePopUp":
+        {
+            "actionType": "JSFunction",
+            "method": "toggle",
+            "inputData":
+            {
+               "id": "workflowDesignerNativeBreadCrumb",
+               "data": "{{data}}",
+               "key":"showPopup",
+               "value":false,
+               "unRegister": true
+            },
+            "deps": "js/breadcrumbUtils"
+        }
+    },
+
+    "dataProviders":
+    {
+        "workflowDesignerChevronDataProvider":
+        {
+            "action": "getChildren",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "workflowDesignerNativeBreadCrumb.chevronClicked",
+            "action": "onChevronClickAW"
+        },
+        {
+            "eventId": "workflowDesignerNativeBreadCrumb.popUpLoading",
+            "action": "workflowDesignerBreadCrumbPopUpLoading"
+        },
+        {
+            "eventId": "workflowDesignerChevronDataProvider.selectionChangeEvent",
+            "action": "onWorkflowDesignerChevronDataSelection",
+            "condition" :"data.dataProviders.workflowDesignerChevronDataProvider.selectedObjects && data.dataProviders.workflowDesignerChevronDataProvider.selectedObjects.length >= 1"
+        },
+        {
+            "eventId": "workflowDesignerNativeBreadCrumb.update",
+            "action": "closePopUp"
+        }
+
+    ]
+}

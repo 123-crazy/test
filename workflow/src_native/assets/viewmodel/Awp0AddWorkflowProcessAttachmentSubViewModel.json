@@ -1,0 +1,44 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-form.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+    },
+    "actions": {
+        "addProcessAttachments": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "workflowProcess.addTargetAttachments",
+                        "eventData": {
+                            "selectedObjects": "{{data.sourceObjects}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "conditions": {
+        "isAddButtonVisible": {
+            "expression": "conditions.isPaletteTabAddButtonVisible || conditions.isSearchTabAddButtonVisible"
+        },
+        "isPaletteTabAddButtonVisible": {
+          "expression":"data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible": {
+          "expression":"data.selectedTab.panelId==='resultsTabPageSub'  && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "onEvent": [
+    ],
+    "i18n": {
+        "Add_Title": [ "WorkflowCommandPanelsMessages" ]
+    }
+}

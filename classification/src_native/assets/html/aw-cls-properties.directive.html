@@ -1,0 +1,190 @@
+<div aw-repeat="attribute : attributes" ng-if="ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes'">
+    <!-- Attribute -->
+    <div exist-when="attribute.type !== 'Block' && attribute.type !== 'Separator'">
+       <div ng-if="attribute.visible">
+           <aw-cls-attribute-annotation prop="attribute.vmos" parentattribute="attribute" childlevel="parentlevel" instance="instance"
+               ng-mouseover="selectNode(attribute, $event)"></aw-cls-attribute-annotation>
+       </div>
+   </div>
+
+   <div exist-when="attribute.type === 'Block' && !attribute.cardinalController" >
+       <div ng-if="attribute.polymorphicTypeProperty">
+           <div ng-if="view === -1">
+               <aw-cls-properties attributes="attribute.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel" instance="false"></aw-cls-properties>
+           </div>
+       </div>
+       <div ng-if="!attribute.polymorphicTypeProperty && !attribute.isCardinalControl ">
+           <div aw-repeat="child : attribute.children">
+               <div exist-when="child.type !== 'Block' && child.type !== 'Separator'">
+                   <div ng-if="attribute.visible">
+                       <aw-cls-attribute-annotation prop="child.vmos" parentattribute="child" childlevel="parentlevel" instance="instance"
+                           ng-mouseover="selectNode(child, $event)"></aw-cls-attribute-annotation>
+                   </div>
+               </div>
+           </div>
+       </div>
+       <div ng-if="!attribute.polymorphicTypeProperty && attribute.isCardinalControl === '' ">
+           <aw-cls-properties attributes="attribute.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel" instance="false"></aw-cls-properties>
+       </div>
+
+   </div>
+
+   <!-- Cardinal Block : Classification Admin manager -->
+  <!-- <div exist-when="attribute.type ==='Block' && !attribute.isCardinalControl && ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes'">
+      <aw-cls-properties attributes="attribute.children" view="data.panelMode" showallprop="data.showAllProp" visible-when="ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes'"></aw-cls-properties>
+   </div>  -->
+
+   <div exist-when="attribute.type === 'Block' && attribute.cardinalController" >
+       <div aw-repeat="child : attribute.children">
+           <div exist-when="child.type !== 'Block' && child.type !== 'Separator' && !child.polymorphicTypeProperty">
+               <div ng-if="attribute.visible">
+                   <aw-cls-attribute-annotation prop="child.vmos" parentattribute="child" childlevel="parentlevel" instance="instance"
+                       ng-mouseover="selectNode(child, $event)"></aw-cls-attribute-annotation>
+               </div>
+           </div>
+       </div>
+   </div>
+
+
+<!--    <aw-cls-attribute-annotation prop="attribute.cardinalController.vmos" ng-keyup="evalKeyup($event, attribute)" cardinalattribute="attribute" parentattribute="attribute" childlevel="parentlevel"></aw-cls-attribute-annotation> -->
+
+   <div exist-when="attribute.type ==='Separator' && !attribute.isCardinalControl">
+       <aw-separator></aw-separator>
+   </div>
+
+   <!-- Block 
+   <div exist-when="attribute.type === 'Block' && !attribute.cardinalController">
+     <div ng-if="attribute.visible">
+       <ul class="aw-ui-tree" ng-style="{'padding-left': 16 + 'px'}">
+           <div class="aw-cls-block">
+               <aw-command-panel-section caption="{{attribute.name}}{{attribute.suffix}}" collapsed="{{!attribute.propExpanded}}" context="{attribute}" ng-mouseover="selectNode(attribute, $event)">
+                   <div class="aw-cls-treeValueSection">
+                       <div ng-if="attribute.polymorphicTypeProperty">
+                           <div ng-if="view === -1">
+                               <aw-cls-attribute-annotation prop="attribute.polymorphicTypeProperty.vmos" childlevel="parentlevel"></aw-cls-attribute-annotation>
+                               <aw-cls-properties attributes="attribute.polymorphicTypeProperty.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel">
+                               </aw-cls-properties>
+                           </div>
+                           <div ng-if="view != -1">
+                               <aw-cls-attribute-annotation prop="attribute.polymorphicTypeProperty.vmos" parentattribute="attribute" childlevel="parentlevel"></aw-cls-attribute-annotation>
+                           </div>
+                       </div>
+                       <aw-cls-properties attributes="attribute.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel" instance="false"></aw-cls-properties>
+                   </div>
+               </aw-command-panel-section>
+           </div>
+           </ul>
+       </div>
+   </div>
+
+   Cardinal Block -->
+ <!--  <div exist-when="attribute.type === 'Block' && attribute.cardinalController" class="aw-cls-cardinal-parent" title="{{attribute.name}}">
+       <ul class="aw-ui-tree" ng-style="{'padding-left': 16 + 'px'}">
+           <div class="aw-cls-block">
+               <aw-command-panel-section caption="{{attribute.name}}{{attribute.suffix}}" anchor="data.classifyViewCommands" collapsed="{{!attribute.propExpanded}}"
+                   context="{attribute}" ng-mouseover="selectNode(attribute, $event)">
+                   - Cardinal Property
+                       <li ng-class="{'aw-cls-cardinalController' : (data.panelMode !== -1 && attribute.instances.length > 0) }">
+                           <div class="aw-cls-treeValueSection">
+                               <aw-cls-attribute-annotation prop="attribute.cardinalController.vmos" ng-keyup="evalKeyup($event, attribute)" cardinalattribute="attribute" parentattribute="attribute" childlevel="parentlevel"></aw-cls-attribute-annotation>
+                               <aw-cls-properties attributes="attribute.children" view="data.panelMode" showallprop="data.showAllProp" visible-when="ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes'"></aw-cls-properties>
+                           </div>
+                       </li>
+                        Cardinal Blocks -->
+                       <!-- Container height is calculated based on the number of rows 
+                       <aw-splm-table  ng-style="{'padding-left': 16 + 'px', 'padding-top': 16 + 'px'}" container-height="getTableHeight(attribute)" ng-if="attribute.tableView && attribute.visible && attribute.instances.length > 0" gridid="gridView" class="aw-cls-table" ></aw-splm-table>
+                       <ul class="aw-ui-tree" ng-if="!attribute.tableView && instance.visible" aw-repeat="instance : attribute.instances track by $index" title="{{instance.name}}"
+                           ng-style="{'padding-left': 16 + 'px'}">
+                           <div class="aw-cls-block aw-cls-cardinal-block">
+                               <aw-command-panel-section caption="{{instance.name}}" collapsed="{{!instance.propExpanded}}" ng-mouseover="selectNode(instance, $event)" class="aw-cls-blockHeader">
+                                   <li >
+                                       <div class="aw-cls-treeValueSection">
+                                           <div ng-if="instance.polymorphicTypeProperty">
+                                               <aw-cls-attribute-annotation prop="instance.polymorphicTypeProperty.vmos" parentattribute="instance" childlevel="parentlevel+1"></aw-cls-attribute-annotation>
+                                           </div>
+                                           <aw-cls-properties attributes="instance.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel" instance="true"></aw-cls-properties>
+                                       </div>
+                                   </li>
+                               </aw-command-panel-section>
+                           </div>
+                       </ul>
+               </aw-command-panel-section>
+          </div>
+       </ul>
+   </div> -->
+</div>
+
+<div aw-repeat="attribute : attributes" ng-if="ctx.locationContext['ActiveWorkspace:SubLocation'] !== 'clsNodes'">
+   <!-- Attribute -->
+   <div exist-when="attribute.type !== 'Block' && attribute.type !== 'Separator' && !attribute.isCardinalControl">
+      <div ng-if="attribute.visible">
+          <aw-cls-attribute-annotation prop="attribute.vmos" parentattribute="attribute" childlevel="parentlevel" instance="instance"
+              ng-mouseover="selectNode(attribute, $event)"></aw-cls-attribute-annotation>
+      </div>
+  </div>
+
+  <div exist-when="attribute.type ==='Separator' && !attribute.isCardinalControl">
+      <aw-separator></aw-separator>
+  </div>
+
+  <!-- Block -->
+  <div exist-when="attribute.type === 'Block' && !attribute.cardinalController">
+    <div ng-if="attribute.visible">
+      <ul class="aw-ui-tree" ng-style="{'padding-left': 16 + 'px'}">
+          <div class="aw-clspanel-block">
+              <aw-command-panel-section caption="{{attribute.name}}{{attribute.suffix}}" collapsed="{{!attribute.propExpanded}}" context="{attribute}" ng-mouseover="selectNode(attribute, $event)">
+                  <div class="aw-clspanel-treeValueSection">
+                      <div ng-if="attribute.polymorphicTypeProperty">
+                          <div ng-if="view === -1">
+                              <aw-cls-attribute-annotation prop="attribute.polymorphicTypeProperty.vmos" childlevel="parentlevel"></aw-cls-attribute-annotation>
+                              <aw-cls-properties attributes="attribute.polymorphicTypeProperty.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel">
+                              </aw-cls-properties>
+                          </div>
+                          <div ng-if="view != -1">
+                              <aw-cls-attribute-annotation prop="attribute.polymorphicTypeProperty.vmos" parentattribute="attribute" childlevel="parentlevel"></aw-cls-attribute-annotation>
+                          </div>
+                      </div>
+                      <aw-cls-properties attributes="attribute.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel" instance="false"></aw-cls-properties>
+                  </div>
+              </aw-command-panel-section>
+          </div>
+          </ul>
+      </div>
+  </div>
+
+  <!-- Cardinal Block -->
+  <div exist-when="attribute.type === 'Block' && attribute.cardinalController" class="aw-cls-cardinal-parent" title="{{attribute.name}}">
+      <ul class="aw-ui-tree" ng-style="{'padding-left': 16 + 'px'}">
+          <div class="aw-clspanel-block">
+              <aw-command-panel-section caption="{{attribute.name}}{{attribute.suffix}}" anchor="data.classifyViewCommands" collapsed="{{!attribute.propExpanded}}"
+                  context="{attribute}" ng-mouseover="selectNode(attribute, $event)">
+                  <!-- Cardinal Property -->
+                      <li ng-class="{'aw-clspanel-cardinalController' : (data.panelMode !== -1 && attribute.instances.length > 0) }">
+                          <div class="aw-clspanel-treeValueSection">
+                              <aw-cls-attribute-annotation prop="attribute.cardinalController.vmos" ng-keyup="evalKeyup($event, attribute)" cardinalattribute="attribute" parentattribute="attribute" childlevel="parentlevel"></aw-cls-attribute-annotation>
+                              <aw-cls-properties attributes="attribute.children" view="data.panelMode" showallprop="data.showAllProp" visible-when="ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes'"></aw-cls-properties>
+                          </div>
+                      </li>
+                      <!-- Cardinal Blocks -->
+                      <!-- Container height is calculated based on the number of rows -->
+                      <aw-splm-table  ng-style="{'padding-left': 16 + 'px', 'padding-top': 16 + 'px'}" container-height="getTableHeight(attribute)" ng-if="attribute.tableView && attribute.visible && attribute.instances.length > 0" gridid="gridView" class="aw-clspanel-table" ></aw-splm-table>
+                      <ul class="aw-ui-tree" ng-if="!attribute.tableView && instance.visible" aw-repeat="instance : attribute.instances track by $index" title="{{instance.name}}"
+                          ng-style="{'padding-left': 16 + 'px'}">
+                          <div class="aw-clspanel-block aw-clspanel-cardinalBlock">
+                              <aw-command-panel-section caption="{{instance.name}}" collapsed="{{!instance.propExpanded}}" ng-mouseover="selectNode(instance, $event)" class="aw-clspanel-blockHeader">
+                                  <li >
+                                      <div class="aw-clspanel-treeValueSection">
+                                          <div ng-if="instance.polymorphicTypeProperty">
+                                              <aw-cls-attribute-annotation prop="instance.polymorphicTypeProperty.vmos" parentattribute="instance" childlevel="parentlevel+1"></aw-cls-attribute-annotation>
+                                          </div>
+                                          <aw-cls-properties attributes="instance.children" view="view" showallprop="showallprop" activeview="activeview" currentlevel="parentlevel" parentlevel="parentlevel" instance="true"></aw-cls-properties>
+                                      </div>
+                                  </li>
+                              </aw-command-panel-section>
+                          </div>
+                      </ul>
+              </aw-command-panel-section>
+         </div>
+      </ul>
+  </div>
+</div>

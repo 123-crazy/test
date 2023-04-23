@@ -1,0 +1,143 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-filter-category.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-repeat.directive"
+    ],
+
+    "actions": {
+        "updateCategoryResults":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategoryResults",
+            "inputData":
+            {
+                "category":"{{ctx.search.valueCategory}}"
+            },
+            "deps":"js/filterPanelService"
+        },
+        "update": {
+            "actionType": "JSFunction",
+            "method": "updateCategories",
+            "inputData": {
+                "categories": "{{ctx.searchResponseInfo.searchFilterCategories}}",
+                "categoryValues": "{{ctx.searchResponseInfo.searchFilterMap}}",
+                "groupProperty": "{{ctx.searchResponseInfo.objectsGroupedByProperty.internalPropertyName}}",
+                "colorToggle": false,
+                "currentCategories": "{{ctx.searchResponseInfo.searchCurrentFilterCategories}}",
+                "showRange": false
+            },
+            "outputData": {
+                "categories": ""
+            },
+            "deps": "js/filterPanelService"
+        },
+        "selectCategory": {
+            "actionType": "JSFunction",
+            "method": "selectCategory",
+            "inputData": {
+                "category": "{{category}}"
+            },
+            "outputData": {
+                "categories": ""
+            },
+            "deps": "js/filterPanelEvents"
+        },
+        "selectHierarchyCategory": {
+            "actionType": "JSFunction",
+            "method": "selectHierarchyCategory",
+            "inputData": {
+                "category": "{{category}}"
+            },
+            "outputData": {
+                "categories": ""
+            },
+            "deps": "js/filterPanelEvents"
+        },
+        "selectFilter": {
+            "actionType": "JSFunction",
+            "method": "selectFilter",
+            "inputData": {
+                "category": "{{category}}",
+                "filter": "{{filter}}"
+            },
+            "deps": "js/filterPanelEvents"
+        },
+
+        "selectHierarchyFilter": {
+            "actionType": "JSFunction",
+            "method": "selectHierarchyFilter",
+            "inputData": {
+                "category": "{{category}}",
+                "node": "{{selectedNode}}"
+            },
+            "deps": "js/filterPanelEvents"
+        },
+
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "loadFilterPanelData",
+            "inputData": {
+                "filteredPreferenceInstances": "{{ctx.tcadmconsole.preferences.filteredPreferenceInstances}}",
+                "filteredPreferenceFilters": "{{ctx.tcadmconsole.preferences.filteredPreferenceFilters}}"
+            },
+            "deps": "js/adminPreferencesService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "updateFilterPanel",
+            "action": "update"
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action":"updateCategoryResults"
+        }
+    ],
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "dbValue": "{{ctx.search.criteria.searchString}}",
+            "type": "STRING"
+        },
+        "searchName": {
+            "displayName": "",
+            "type": "STRING"
+        }
+    },
+
+    "dataProviders": {},
+
+    "columnProviders": {},
+
+    "grids": {},
+
+    "dataParseDefinitions": {},
+
+    "messages": {},
+    "conditions": {},
+    "i18n": {
+
+        "categories": [
+            "SearchMessages"
+        ],
+
+        "TypeFilter": [
+            "SearchMessages"
+        ],
+
+        "refine": [
+            "SearchMessages"
+        ],
+
+        "SearchFilters": [
+            "SearchMessages"
+        ],
+
+        "preferenceFilterPanelTitle": [
+            "preferenceMessages"
+        ]
+    }
+}

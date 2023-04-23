@@ -1,0 +1,34 @@
+<div class="aw-layout-flexRowContainer">
+    <div class="aw-layout-flexRow aw-jswidgets-arrayWidgetContainer" ng-class="{'changed': prop.dirty, 'aw-array-border': prop.displayValsModel.length }">
+        <div class="aw-jswidgets-arrayValueCellListContainer aw-base-normal">
+            <ul tabindex="{{prop.displayValsModel.length > 0 ? 0 : -1 }}" ng-disabled="{{prop.displayValsModel.length > 0 ? false : true }}" role="listbox" aria-label="{{prop.propertyDisplayName}}" class="aw-jswidgets-arrayEditValueCellList" ng-style="{'maxHeight': arrayHeight}">
+                <li role="option" tabindex="-1" class="aw-aria-border aw-jswidgets-arrayValueCellListItem aw-layout-flexColumnContainer" ng-class="{'aw-state-selected': displayNode.selected}" ng-repeat="displayNode in prop.displayValsModel track by $index">
+                    <div class="aw-jswidgets-arrayValueContainer">
+                        <div class="aw-jswidgets-arrayValue">
+                            <div ng-click="selectAndEdit($event, $index)">{{displayNode.displayValue}}</div>
+                        </div>
+                        <div class="aw-layout-flexColumnContainer">
+                            <div class="aw-jswidgets-arrayIcons">
+                                <button type="button" class="aw-commands-commandIconButton aw-widgets-defaultPropertyValueButton" ng-click="moveUp($index)" ng-disabled="prop.editArrayInlineMode" ng-show="prop.isEnabled !== false" title="{{prop.moveUpButtonTitle}}">
+                                    <aw-property-image name="cmdMoveUp"></aw-property-image>
+                                </button>
+                                <button type="button" class="aw-commands-commandIconButton aw-widgets-defaultPropertyValueButton" ng-click="moveDown($index)" ng-disabled="prop.editArrayInlineMode" ng-show="prop.isEnabled !== false" title="{{prop.moveDownButtonTitle}}">
+                                    <aw-property-image name="cmdMoveDown"></aw-property-image>
+                                </button>
+                                <button type="button" class="aw-commands-commandIconButton aw-widgets-defaultPropertyValueButton" ng-click="remove($index)" ng-disabled="prop.editArrayInlineMode" ng-show="prop.isEnabled !== false" title="{{prop.removeButtonTitle}}">
+                                    <aw-property-image name="cmdRemove"></aw-property-image>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="aw-jswidgets-arrayEditableWidget">
+            <aw-property-array-edit-val prop="dummyProp"></aw-property-array-edit-val>
+        </div>
+    </div>
+    <div class="aw-layout-flexRowContainer aw-layout-alignItemsEnd">
+        <aw-command-bar class="aw-layout-propertyCommandsNoShadow" exist-when="prop.uwAnchor" anchor="{{prop.uwAnchor}}" alignment="HORIZONTAL" context="prop"></aw-command-bar>
+    </div>
+</div>

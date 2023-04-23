@@ -1,0 +1,151 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-image-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "getreportdefinitionlist": {
+            "actionType": "TcSoaService",
+            "serviceName": "Reports-2008-06-CrfReports",
+            "method": "getReportDefinitions",
+            "inputData": {
+                "inputCriteria": [ {
+                        "category": "",
+                        "source": "Teamcenter"
+                    },
+                    {
+                        "category": "",
+                        "source": "Office Template"
+                    },
+                    {
+                        "category": "",
+                        "source": "Active Workspace"
+                    }
+                ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "ReportDefinition",
+                    "properties": [ {
+                            "name": "rd_style_sheets",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        },
+                        {
+                            "name": "rd_source"
+                        },
+                        {
+                            "name": "rd_name"
+                        },
+                        {
+                            "name": "rd_type"
+                        },
+                        {
+                            "name": "rd_id"
+                        },
+                        {
+                            "name": "rd_parameters"
+                        },
+                        {
+                            "name": "rd_param_values"
+                        },
+                        {
+                            "name": "fnd0IsAsync"
+                        },
+                        {
+                            "name": "owning_user"
+                        },
+                        {
+                            "name": "creation_date"
+                        }
+                    ]
+                } ]
+            },
+            "outputData": {
+                "ctx.chartProvider": null,
+                "searchResults": "{{function:getReportDefinitionVal}}"
+            },
+            "deps": "js/showReportBuilderReportsService"
+        },
+        "performReportFiltring": {
+            "actionType": "JSFunction",
+            "method": "performReportFiltering",
+            "inputData": {
+                "filterVal": "{{filterString}}"
+            },
+            "deps": "js/showReportBuilderReportsService"
+        },
+        "performReportSelection": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}",
+                "newSelection": "{{data.eventData.reportuid}}"
+            },
+            "events":{
+              "success":[
+                  {
+                      "name": "showPanelForQuickRunSummCustomReport"
+                  }
+              ]
+            },
+            "deps": "js/selectionModelFactory"
+        },
+        "displaySummaryCustomReportPanel": {
+            "actionType": "JSFunction",
+            "method": "displaySummaryCustomReportPanel",
+            "deps": "js/showReportBuilderReportsService",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            }
+        }
+    },
+    "dataProviders": {
+        "imageDataProvider": {
+            "action": "getreportdefinitionlist",
+            "response": "{{data.searchResults.reportdefinitions}}",
+            "totalFound": "{{data.searchResults.reportdefinitions.length}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "reportdefinition_cell_commands"
+        }
+    },
+    "functions": {
+        "getReportDefinitionVal": {
+            "functionName": "getReportDefinitionVal",
+            "parameters": []
+        }
+    },
+    "onEvent": [ {
+            "eventId": "showReportBuilderReportsImage.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "dataProvider.reset",
+            "action": "reveal"
+        },
+        {
+            "eventId": "reportDefBreadCrumb.filterReports",
+            "action": "performReportFiltring",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "selectReportAndDisplayGenerateReportPanel",
+            "action": "performReportSelection",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "showPanelForQuickRunSummCustomReport",
+            "action": "displaySummaryCustomReportPanel"
+        }
+    ]
+}

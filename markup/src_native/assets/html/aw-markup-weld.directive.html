@@ -1,0 +1,43 @@
+<div class="aw-widgets-propertyContainer">
+    <aw-property-label prop="prop" ></aw-property-label>
+    <div class="aw-markup-weldSymbols">
+        <span ng-repeat="v in list" title="{{v.propDisplayValue}}" ng-click="selected(v)">
+            <span ng-if="v.propInternalValue.length===1">
+                {{v.propInternalValue}}
+            </span>
+            <svg ng-if="v.propInternalValue.length>1" width="32" height="32">
+                <g transform="translate(16,16)" stroke="black" strokeWidth="1">
+                    <line ng-attr-x1={{x1(v.propInternalValue)}} y1="0" ng-attr-x2={{x2(v.propInternalValue)}} y2="0"></line>
+                    <path id="{{v.propInternalValue}}" ng-attr-d={{pathd[v.propInternalValue]}} fill="{{fill(v.propInternalValue)}}"></path>
+                </g>
+            </svg>
+        </span>
+    </div>
+    <br/>
+    <table cellpadding="2" class="aw-markup-weldFrame">
+        <tr>
+            <td><input type="text" size="6" ng-model="array[0][0]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+            <td><input type="text" size="6" ng-model="array[0][1]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+            <td><input type="text" size="6" ng-model="array[0][2]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <svg width="192" height="32">
+                    <g transform="translate(96,16)" stroke="black" strokeWidth="1">
+                        <line x1="-80" y1="0" x2="80" y2="0"></line>
+                        <path ng-repeat="v in array[1][0].split(' ')"
+                              ng-attr-transform={{trans(v)}} ng-attr-d={{pathd[v]}} fill="{{fill(v)}}"></path>
+                    </g>
+                </svg>
+            </td>
+            <td><input type="text" size="6" ng-model="array[1][1]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" size="6" ng-model="array[2][0]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+            <td><input type="text" size="6" ng-model="array[2][1]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+            <td><input type="text" size="6" ng-model="array[2][2]" ng-change="updateDbValue()" ng-focus="setFocus($event)"/></td>
+            <td></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,208 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-default-cell.directive"
+    ],
+
+    "actions": {
+        "callDataProvider": {
+            "actionType": "dataProvider",
+            "methods": [
+                "listDataProvider"
+            ]
+        },
+        "loadData": {
+            "actionType": "JSFunction",
+            "method": "eventsToShowInPopUp",
+            "inputData": {
+                "data": "{{data}}",
+                "flag": true
+            },
+            "deps": "js/Timeline/uiTimelineUtils",
+            "events": {
+                "success": [ {
+                        "name": "updateCtxPanelActive"
+                    },
+                    {
+                        "name": "fireShowHighlightedEventInPanel"
+                    }
+                ]
+            }
+        },
+        "updateSelection": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionInPopup",
+            "deps": "js/Timeline/uiTimelineUtils",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "updateCtxPanelActiveAction": {
+            "actionType": "JSFunction",
+            "method": "updateCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isStackEventPanelActive",
+                "value": true
+            }
+        },
+        "updateCtxPanelActiveToFalseAction": {
+            "actionType": "JSFunction",
+            "method": "updateCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isStackEventPanelActive",
+                "value": false
+            }
+        },
+        "registerContextForPanel": {
+            "actionType": "JSFunction",
+            "method": "registerContextForStackedEventPanel",
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "unregisterContextForPanel": {
+            "actionType": "JSFunction",
+            "method": "unregisterContextForStackedEventPanel",
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateCtxPanelActiveToFalse"
+                } ]
+            }
+
+        },
+        "hideGoToOptionsPopup": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "deps": "js/popupService"
+        },
+        "fireShowHighlightedEventInPanelAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "showHighlightedEventInPanel"
+                } ]
+            }
+        },
+        "showHighlightedEventInPanelAction": {
+            "actionType": "JSFunction",
+            "method": "showHighlightedEventInPopup",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "selectEventOnTimeline": {
+            "actionType": "JSFunction",
+            "method": "selectEventOnTimeline",
+            "deps": "js/PlanNavigationTimelineSync",
+            "inputData": {
+                "id": "{{data.dataProviders.listDataProvider.selectedObjects[0].uid}}"
+            }
+        }
+    },
+    "data": {},
+    "functions": {},
+    "dataProviders": {
+        "listDataProvider": {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.searchResults.length}}",
+            "selectionModel": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Pgp0ShowOverlapEventsCmdPanel.contentLoaded",
+            "action": "callDataProvider"
+        },
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "action": "selectEventOnTimeline"
+        },
+        {
+            "eventId": "updateCtxPanelActive",
+            "action": "updateCtxPanelActiveAction"
+        },
+        {
+            "eventId": "updateCtxPanelActiveToFalse",
+            "action": "updateCtxPanelActiveToFalseAction"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria": {
+                "name": "toUpdateStackEventPanel"
+            },
+            "action": "callDataProvider"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria": {
+                "name": "toCloseStackEventPanel"
+            },
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awsidenav.openClose",
+            "action": "updateCtxPanelActiveToFalseAction"
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria": {
+                "name": "ActiveWorkspace:xrtContext"
+            },
+            "action": "hideGoToOptionsPopup"
+        },
+        {
+            "eventId": "showHighlightedEventInPanel",
+            "action": "showHighlightedEventInPanelAction",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "fireShowHighlightedEventInPanel",
+            "action": "fireShowHighlightedEventInPanelAction"
+        }
+    ],
+    "lifecycleHooks": {
+        "onMount": "registerContextForPanel",
+        "onUnmount": "unregisterContextForPanel"
+    },
+    "conditions": {
+        "isEventSelected": {
+            "expression": "data.selectedType === 'Events'"
+        }
+    },
+    "i18n": {
+        "Pgp0Events" : [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0Milestones": [
+            "ProgramPlanningCommandPanelsMessages"
+        ]
+    }
+}

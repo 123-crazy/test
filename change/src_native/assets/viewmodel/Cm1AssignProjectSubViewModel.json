@@ -1,0 +1,53 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-project-selector.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive"
+    ],
+    "actions": {
+        "assignProject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "cm1userProjects.assignProjects",
+                        "eventData": {
+                            "selectedProjects": "{{data.eventMap['awProjectSelector.selectionChangeEvent'].selectedObjects}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "data": {
+        "projectSearchFilter": {
+            "type": "STRING",
+            "isEditable": "true",
+            "requiredText": "Filter"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "getUserProjectsProvider.selectionChangeEvent",
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {
+        "isAssignProjectButtonVisible": {
+            "expression": "(data.dataProviders.getUserProjectsProvider.selectedObjects != undefined) && (data.dataProviders.getUserProjectsProvider.selectedObjects.length>0)"
+        }
+    },
+    "i18n": {
+        "searchText": [
+            "UIMessages"
+        ],
+        "assignButtonTitle": [
+            "awAddDirectiveMessages"
+        ]
+    }
+}

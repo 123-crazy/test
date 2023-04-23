@@ -1,0 +1,93 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-listbox.directive",
+        "js/aw-column-chart.directive",
+        "js/aw-chart-search-view.directive"
+    ],
+    "actions": {
+        "selectCategoryHeader": {
+            "actionType": "JSFunction",
+            "method": "selectCat",
+            "inputData": {"chartListboxPropData" : "{{data.chartListboxPropData}}" },
+            "outputData": {},
+            "deps": "js/awChartDataProviderService"
+        },
+        "triggerSelectCategoryHeaderEvent": {
+            "actionType": "JSFunction",
+            "method": "triggerSearchFilterTargetCategoryEvent",
+            "inputData": {
+                "internalPropertyNameToGroupOn" : "{{data.chartListboxPropData.dbValue}}"
+            },
+            "outputData": {},
+
+            "deps": "js/awChartDataProviderService"
+        },
+        "targetFilterCategoryUpdated": {
+            "actionType": "JSFunction",
+            "method": "targetFilterCategoryUpdated",
+            "inputData": { "chartListboxPropData" : "{{data.chartListboxPropData}}" },
+            "outputData": {},
+
+            "deps": "js/awChartDataProviderService"
+        }
+    },
+    "functions": {
+        "selectCategoryHeader": {
+            "functionName": "selectCat",
+            "parameters": []
+        }
+    },
+    "data": {
+         "chartListboxPropData":
+         {
+            "displayName": "{{i18n.SearchResultsChartSelectorTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov": "true",
+            "dbValue": "{{ctx.chartProvider.chartListboxPropData.dbValue}}",
+            "dispValue": "{{ctx.chartProvider.chartListboxPropData.dispValue}}",
+            "propertyChangeEventAction": "selectCategory"
+        },
+        "chartTitleValue":
+        {
+            "titleValue" : "{{i18n.SearchResultsChartTitle}} {{ctx.chartProvider.chartListboxPropData.dispValue}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "selectCategoryHeader",
+            "action": "selectCategoryHeader"
+        },
+        {
+            "eventId": "createChartDataProvider",
+            "action": "selectCategoryHeader"
+        },
+        {
+            "eventId": "targetFilterCategoryUpdated",
+            "action": "targetFilterCategoryUpdated",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "appCtx.update",
+            "criteria":
+            {
+                 "name": "searchResponseInfo",
+                 "target": "objectsGroupedByProperty"
+            },
+            "action": "targetFilterCategoryUpdated",
+            "cacheEventData": true
+        }
+    ],
+    "dataProviders":
+    {},
+    "messages": {},
+    "conditions": {},
+    "i18n": {
+        "SearchResultsChartTitle": [ "SearchMessages" ],
+        "SearchResultsChartSelectorTitle" : [ "SearchMessages" ],
+        "Description" : [ "SearchMessages" ],
+        "colon" : [ "SearchMessages" ]
+
+    }
+}

@@ -1,0 +1,123 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+        [
+            "js/aw-command-panel.directive",
+            "js/aw-panel-footer.directive",
+            "js/visible-when.directive",
+            "js/aw-button.directive",
+            "js/aw-i18n.directive",
+            "js/aw-add.directive"
+        ],
+    "actions":
+    {
+        "Pec0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Pec0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "createObject":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                 [
+                     {
+                         "name": "addObject.startCreateObject"
+                     }
+                 ]
+            }
+        },
+        "createRelationForPaletteOrSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateRelation"
+                } ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "data":
+    {
+        "pec0pincommands":"pec0_oneStepPinCommands",
+         "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addChange.pec0SetPin",
+            "cacheEventData": true,
+            "action": "Pec0SetPin"
+          },
+          {
+            "eventId": "addChange.pec0SetUnPin",
+            "cacheEventData": true,
+            "action": "Pec0SetUnPin"
+          },
+          {
+            "eventId": "closePanel",
+            "action": "closePanel"
+          }
+    ],
+    "conditions":
+    {
+        "isPaletteTabAddButtonVisible":
+        {
+          "expression":"data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "isSearchTabAddButtonVisible":
+        {
+          "expression":"data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "i18n":
+    {
+        "RelateChangeTitle": ["PrgPlanningEventChangeConstants"],
+        "addButtonTitle":[ "TCUICommandPanelsMessages"],
+        "Pec0PinButtonToolTip": ["PrgPlanningEventChangeConstants"],
+        "Pec0UnpinButtonToolTip": ["PrgPlanningEventChangeConstants"]
+    }
+}

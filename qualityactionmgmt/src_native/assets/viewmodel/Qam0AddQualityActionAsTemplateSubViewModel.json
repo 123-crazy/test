@@ -1,0 +1,246 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-sub-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-button.directive",
+        "js/aw-form.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "createObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "",
+                        "data": {
+                            "boName": "Qam0QualityAction",
+                            "stringProps": {
+                                "fnd0ActionItemId": "{{data.fnd0ActionItemId.dbValue}}",
+                                "object_name": "{{data.object_name.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}",
+                                "qam0QualityActionStatus": "Template",
+                                "qam0QualityActionType":"{{function:getQualityActionType}}",
+                                "qam0QualityActionSubtype":"{{function:getQualityActionSubType}}"
+                            }
+                        }
+                    }
+                ]
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'QualityActionSubLocation'"
+                    },
+                    {
+                        "name": "qam0.createRelation"
+                    }
+                ]
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "generateQualityActionId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "generateNextValuesForProperties",
+            "inputData": {
+                "propertyNamingRuleInfo": [ {
+
+                    "clientId": "",
+                    "operationType": 1,
+                    "businessObjectTypeName": "Qam0QualityAction",
+                    "propertyNameAttachedPattern": {
+                        "fnd0ActionItemId": "XXnnnnnnnnnnn"
+                    }
+                } ]
+
+            },
+            "outputData": {
+                "ctx.getQAActionId": "generatedValues[0].generatedValues.fnd0ActionItemId.nextValue"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateID"
+                } ]
+            }
+        },
+        "updateID": {
+            "actionType": "JSFunction",
+            "method": "updateID",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:createQualityActionRelationInput}}"
+            },
+            "outputData": {
+                "createdRelationObject": "output[0].relation"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "getNextId",
+                        "condition": "!data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name":"clearGenericRelationContextData",
+                        "condition": "data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "qam0QARelationCreated",
+                        "eventData":{
+                            "createdRelationObject":"{{data.createdRelationObject}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "clearGenericRelationContextData" : {
+            "actionType": "JSFunction",
+            "method": "clearGenericRelationContextData",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0AddGenericQualityActionService"
+        }
+    },
+    "functions": {
+        "getQualityActionType":{
+            "functionName": "getQualityActionType",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getQualityActionSubType":{
+            "functionName": "getQualityActionSubType",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "createQualityActionRelationInput" : {
+            "functionName": "createQualityActionRelationInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "data": {
+        "fnd0ActionItemId": {
+            "displayName": "{{i18n.actionItemID}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.getQAActionId}}",
+            "uiValue": "{{ctx.getQAActionId}}"
+        },
+        "object_name": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "uiValue": "",
+            "maxLength":128
+        },
+        "object_desc": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "uiValue": "",
+            "maxLength":240
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "qam0.createRelation",
+            "action": "createRelation"
+        },
+        {
+            "eventId": "updateID",
+            "action": "updateID"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "generateQualityActionId"
+        },
+        {
+            "eventId": "getNextId",
+            "action": "generateQualityActionId"
+        },
+        {
+            "eventId":"clearGenericRelationContextData",
+            "action":"clearGenericRelationContextData"
+        }
+    ],
+    "i18n":{
+        "addQualActAsTemplate":[
+            "QualityActionMgmtMessages"
+        ],
+        "qam0Add":[
+            "QualityActionMgmtMessages"
+        ],
+        "propertiesTitle":[
+            "QualityActionMgmtMessages"
+        ],
+        "description": [
+            "QualityActionMgmtMessages"
+        ],
+        "name": [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

@@ -1,0 +1,115 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-class.directive",
+        "js/aw-image.directive",
+        "js/aw-icon-button.directive",
+        "js/exist-when.directive",
+        "js/aw-repeat.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-click.directive"
+    ],
+    "actions": {
+        
+        "navigateToSuggestedClass": {
+            "actionType": "JSFunction",
+            "method": "navigateToSuggestedClass",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "getHierarchy": {
+            "actionType": "JSFunction",
+            "method": "detectNodeType",
+            "inputData": {
+                "selectedNode": "{{selectedNode}}",
+                "data": "{{data}}",
+                "isVncAction": true
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "getAttributes": {
+            "actionType": "JSFunction",
+            "method": "getAttributes",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "initSuggestionsPanel": {
+            "actionType": "JSFunction",
+            "method": "initSuggestionsPanel",
+            "inputData": {
+                "data":"{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "onCircularPrevChevronClick":{
+            "actionType": "JSFunction",
+            "method": "onCircularPrevChevronClick",
+            "inputData": {
+                 "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "onCircularNextChevronClick":{
+            "actionType": "JSFunction",
+            "method": "onCircularNextChevronClick",
+            "inputData": {
+                 "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        }
+    },
+   "data":
+   {
+       "suggestedCommands":
+       {
+           "isArray": "true",
+           "dbValue":
+           [
+                {
+                    "action": "onCircularPrevChevronClick",
+                    "iconName": "miscChevronLeft",
+                    "tooltip": "{{i18n.previousButtonTitle}}"
+                },
+               {
+                   "action": "onCircularNextChevronClick",
+                   "iconName": "miscChevronRight",
+                   "tooltip": "{{i18n.nextButtonTitle}}"
+               }
+
+           ]
+         },
+         "suggestedClassSelected": false,
+         "suggestedSectionCollapse": false
+   },
+   "onEvent":[
+        {
+           "eventId": "awPanel.reveal",
+           "condition": "!data.suggestedClassSelected",
+           "action": "initSuggestionsPanel"
+        },
+        {
+            "eventId":"navigateToSuggestedClassEvent",
+            "action":"navigateToSuggestedClass"
+        }
+   ],
+    "functions": {},
+    "messages": { },
+    "conditions": {
+
+    },
+    "i18n":
+    {
+        "suggestedClassification": [ "ClassificationPanelMessages" ],
+        "assignClass": [ "ClassificationPanelMessages" ],
+        "match": [ "ClassificationPanelMessages" ],
+        "previousButtonTitle":          [ "ClassificationPanelMessages" ],
+        "nextButtonTitle":              [ "ClassificationPanelMessages" ]
+    }
+}

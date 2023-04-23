@@ -1,0 +1,298 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-tab-set.directive",
+        "js/aw-panel-body.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/userPanelService"
+        },
+        "populateProjectData":
+        {
+            "actionType": "JSFunction",
+            "method": "populateProjectData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selectionArray": "{{function:getObjectsToLoad}}"
+            },
+
+            "deps": "js/userPanelService"
+        },
+
+        "getUserProjectProperties":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData":
+            {
+                "objects": "{{function:getObjectsToLoad}}",
+                "attributes":
+                [
+                    "project_list"
+                ]
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "WorkspaceObject",
+                        "properties":
+                        [
+                            {
+                                "name": "project_list",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+
+                            {
+                                "name": "owning_project"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMTask",
+                        "properties":
+                        [
+                            {
+                                "name": "root_task",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "root_target_attachments",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Signoff",
+                        "properties":
+                        [
+                            {
+                                "name": "fnd0ParentTask",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMPerformSignoffTask",
+                        "properties":
+                        [
+                            {
+                                "name": "root_task",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "root_target_attachments",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "TC_Project",
+                        "properties":
+                        [
+                            {
+                                "name": "object_string"
+                            },
+
+                            {
+                                "name": "project_id"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "projectPropertiesLoaded"
+                    }
+                ]
+            },
+
+            "deps": "js/userPanelService"
+        },
+
+        "handleTabSelectionChange":
+        {
+            "actionType": "JSFunction",
+            "method": "handleTabSelectionChange",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/userPanelService"
+        },
+        "updatePinnedPanelData": {
+            "actionType": "JSFunction",
+            "method": "updatePinnedPanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/userPanelService"
+        }
+
+    },
+
+    "data":
+    {
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "panelId": "UserTab",
+                    "name": "{{i18n.Users}}",
+                    "resourceProviderContentType":"Users",
+                    "recreatePanel": true
+                },
+                {
+                    "panelId": "ResourcePoolTab",
+                    "name": "{{i18n.ResourcePools}}",
+                    "resourceProviderContentType":"ResourcePool",
+                    "visibleWhen":"data.preferences.WRKFLW_allow_resourcepool_assignments[0]=='true'",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+    "functions":
+    {
+        "getObjectsToLoad":
+        {
+            "functionName": "getObjectsToLoad",
+            "parameters":
+            [
+                "{{ctx}}",
+                "{{ctx.mselected}}"
+            ]
+        }
+    },
+
+    "conditions":
+    {
+        "isResourcePoolTabVisible":
+        {
+            "expression": "data.preferences.TC_Enable_Implicit_CO[0] == 'false'"
+        },
+        "isResourcePoolTabVisible1":
+        {
+            "expression": "data.preferences.WRKFLW_allow_resourcepool_assignments[0]=='true'"
+        },
+        "isProjectObjectListEmpty":
+        {
+            "expression": "data.projectObjectList.length<=0"
+        },
+        "showParticipantTypes":
+        {
+            "expression": "ctx.participantCtx.assignableParticipantTypes && ctx.participantCtx.assignableParticipantTypes.length > 0 && ctx.activeToolsAndInfoCommand && ctx.activeToolsAndInfoCommand.commandId === 'AddParticipant'"
+        }
+    },
+
+    "preferences":
+    [
+        "WRKFLW_allow_resourcepool_assignments",
+        "WRKFLW_show_user_assignment_options",
+        "WRKFLW_user_panel_content_display",
+        "EPM_ARG_target_user_group_list_separator"
+    ],
+
+    "i18n":
+    {
+        "Users": [ "WorkflowCommandPanelsMessages"],
+        "ResourcePools": [ "WorkflowCommandPanelsMessages"],
+        "project": [ "WorkflowCommandPanelsMessages"],
+        "owning": [ "WorkflowCommandPanelsMessages"],
+        "none": [ "WorkflowCommandPanelsMessages"],
+        "any": [ "WorkflowCommandPanelsMessages"]
+    },
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "projectPropertiesLoaded",
+            "action": "populateProjectData"
+        },
+        {
+            "eventId": "loadProjectData",
+            "action": "getUserProjectProperties"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Users"
+            },
+
+            "action": "reveal"
+        },
+        {
+            "eventId": "awTab.selected",
+            "action":  "handleTabSelectionChange"
+        },
+        {
+            "eventId": "workflow.updatePinnedPanelData",
+            "action":  "updatePinnedPanelData"
+        }
+    ]
+}

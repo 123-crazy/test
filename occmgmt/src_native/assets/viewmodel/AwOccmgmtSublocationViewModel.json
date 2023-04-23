@@ -1,0 +1,43 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-sublocation.directive",
+        "js/aw-data-navigator.directive"
+    ],
+    "actions": {
+        "initializeOccmgmtSublocation": {
+            "actionType": "JSFunction",
+            "method": "initializeOccmgmtSublocation",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "deps": "js/occmgmtSublocationService"
+        },
+        "destroyOccmgmtSublocation": {
+            "actionType": "JSFunction",
+            "method": "destroyOccmgmtSublocation",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/occmgmtSublocationService"
+        },
+        "updateState": {
+            "actionType": "JSFunction",
+            "method": "updateState",
+            "inputData": {
+                "contextKey": "{{data.contextKey}}"
+            },
+            "deps": "js/occmgmtSublocationService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeOccmgmtSublocation",
+        "onUnmount": "destroyOccmgmtSublocation"
+    },
+    "onEvent": [ {
+        "eventId": "splitViewLocationUpdated",
+        "action": "updateState"
+    } ],
+    "i18n": {}
+}

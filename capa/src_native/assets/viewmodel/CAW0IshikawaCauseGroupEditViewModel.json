@@ -1,0 +1,273 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "getCauses": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-Session",
+            "method": "getPreferences",
+            "inputData": {
+                "requestedPrefs": [ {
+                    "scope": "Site",
+                    "names": [
+                        "CAW0IshikawaCauseGroupVal"
+                    ]
+                } ]
+            },
+            "outputData": {
+                "preferences": "{{function:getICGValues}}"
+            },
+            "events": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "validateList": {
+            "actionType": "JSFunction",
+            "method": "rejectSuggestions",
+            "inputData": {
+                "selected": "request.selected",
+                "suggestion": "request.suggestion",
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "valid": "valid",
+                "message": "message"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "updateICGValues": {
+            "actionType": "JSFunction",
+            "method": "updateICGValues",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "flag": "fromEdit"
+            }
+        },
+        "resetICGValues": {
+            "actionType": "JSFunction",
+            "method": "resetICGValues",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            }
+        },
+        "setPropertyInCtx": {
+            "actionType": "JSFunction",
+            "method": "setcauseInCtx",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "udpateVMOProperty": {
+            "actionType": "JSFunction",
+            "method": "udpateVMOProperty",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "udpateNonEditVMOProperty": {
+            "actionType": "JSFunction",
+            "method": "udpateNonEditVMOProperty",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "caw0lovValueChanged": {
+            "actionType": "JSFunction",
+            "method": "lovValueChanged",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        },
+        "setPropertyInfoEdit": {
+            "actionType": "JSFunction",
+            "method": "setPropertyInfoEdit",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "outputData": ""
+            },
+            "events": {
+                "success": [ {
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Overview'",
+                        "name": "doPostSaveEdit5WhyEventSuccess11"
+                    },
+                    {
+                        "name": "Caw0IshikawaMethodology.CategoryUpdated",
+                        "eventData": {
+                            "updatedIshikawa": "{{data.outputData}}"
+                        }
+                    },
+                    {
+                        "name": "doUpdateCauseGroupData",
+                        "eventData": {
+                            "data": "{{data}}"
+                        }
+                    }
+                ],
+                "failure": [ {
+                    "condition": "errorCode.code === 422010 || errorCode.code === 38522",
+                    "name": "caw0doPostSaveEdit5WhyActionFailure"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode.code === 422010",
+                        "message": "caw0RemoveCauseErrorMessage"
+                    },
+                    {
+                        "condition": "errorCode.code === 38522",
+                        "message": "caw0RemoveLastCauseErrorMessage"
+                    }
+                ]
+            }
+        },
+        "doPostSaveEdit5WhyActionSuccess11": {
+            "actionType": "JSFunction",
+            "method": "updateTreeTable",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/CAW0EditTreeStructure"
+        },
+        "doPostSaveEdit5WhyActionFailure": {
+            "actionType": "JSFunction",
+            "method": "resetEditsPostFailure",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "showWarningOnSwitch": {
+            "actionType": "JSFunction",
+            "method": "showWarningOnSwitch",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "updateICGValues"
+        },
+        {
+            "eventId": "resetICGValues",
+            "action": "resetICGValues"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "setPropertyInCtx"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'starting'",
+            "action": "udpateVMOProperty",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved'",
+            "action": "udpateNonEditVMOProperty",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'saved' && state !== 'canceling' && ctx.selected.modelType.typeHierarchyArray.indexOf( 'CAW0Ishikawa' ) > -1",
+            "action": "setPropertyInfoEdit",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "doPostSaveEdit5WhyEventSuccess11",
+            "action": "doPostSaveEdit5WhyActionSuccess11"
+        },
+        {
+            "eventId": "caw0doPostSaveEdit5WhyActionFailure",
+            "action": "doPostSaveEdit5WhyActionFailure"
+        },
+        {
+            "eventId": "caw0CauseGroupInfo.arrayValueRemoved",
+            "action": "caw0lovValueChanged",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "condition": "state === 'canceling' && state !== 'saved'",
+            "action": "showWarningOnSwitch",
+            "cacheEventData": true
+        }
+    ],
+    "dataProviders": {
+        "getCausesProvider": {
+            "initializeAction": "getCauses",
+            "validateAction": "validateList",
+            "response": "{{data.preferences}}",
+            "valid": "{{data.valid}}",
+            "message": "{{data.message}}",
+            "moreValuesExist": false
+        }
+    },
+    "data": {
+        "caw0CauseGroupInfo": {
+            "displayName": "{{i18n.causeGroup}}",
+            "type": "STRINGARRAY",
+            "isArray": true,
+            "dataProvider": "getCausesProvider"
+        },
+        "caw0IshikawaCauseGroupInfo": {
+            "displayName": "{{i18n.causeGroup}}",
+            "type": "STRINGARRAY",
+            "isArray": "true",
+            "isEditable": "false"
+        }
+    },
+    "i18n": {
+        "causeGroup": [
+            "CAW0CapaMessages"
+        ],
+        "caw0RemoveCauseErrorMessage": [
+            "CAW0CapaMessages"
+        ],
+        "caw0RemoveLastCauseErrorMessage": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "messages": {
+        "caw0RemoveCauseErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.caw0RemoveCauseErrorMessage}}",
+            "messageTextParams": [
+                "{{ctx.removedCauseGroup}}"
+            ]
+        },
+        "caw0RemoveLastCauseErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.caw0RemoveLastCauseErrorMessage}}"
+        }
+    },
+    "conditions": {
+        "isEditInProgress": {
+            "expression": "ctx.editInProgress"
+        }
+    }
+}

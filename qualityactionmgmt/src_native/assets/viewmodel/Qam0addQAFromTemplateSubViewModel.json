@@ -1,0 +1,172 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-search-box.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-button.directive"
+    ],
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "*"
+        },
+        "searchFilterPanels": [ {
+                "tabKey": "results",
+                "panelId": "qualityActionsResultsPagesSub",
+                "name": "{{i18n.results}}",
+                "visibleWhen": "data.visibleSearchFilterPanelTabKeys.indexOf('results')>-1 "
+            },
+            {
+                "tabKey": "filters",
+                "panelId": "qualityActionsFiltersPagesSub",
+                "name": "{{i18n.filterTabTitle}}",
+                "visibleWhen": "data.visibleSearchFilterPanelTabKeys.indexOf('filters')>-1 "
+            }
+        ],
+        "visibleSearchFilterPanelTabKeys": "[ 'results', 'filters' ]",
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        }
+    },
+    "actions": {
+        "presetFilter": {
+            "actionType": "JSFunction",
+            "method": "presetFilter",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "initQASearch"
+                } ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "findSubBusinessObjectsAndInvokeSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "evalConditionForDefaultRelation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "getDefaultRelationforSearch",
+                    "condition": "data.targetObject && data.relationList.length>1"
+                } ]
+            }
+        },
+        "getDefaultRelationforSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-DataManagement",
+            "method": "getDefaultRelation",
+            "inputData": {
+                "input": [ {
+                    "primaryType": "{{data.targetObject.type}}",
+                    "secondaryType": "{{data.eventData.selectedObjects[0].type}}"
+                } ]
+            },
+            "outputData": {
+                "defaultRelation": "output[0].defaultRelation"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.updateRelationList"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "selectQualityAction": {
+            "actionType": "JSFunction",
+            "method": "selectQualityAction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "qam0.navigateToQualityAction"
+                } ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "navigateToAddQualityActionSubView": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "Qam0AddGenericQualityActionSub",
+                        "title": "{{i18n.Qam0Back}}",
+                        "recreatePanel": true,
+                        "supportGoBack": true
+                    }
+                } ]
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "presetFilter"
+    },
+    "onEvent": [ {
+            "eventId": "initQASearch",
+            "action": "search"
+        },
+        {
+            "eventId": "performSearch.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "evalConditionForDefaultRelation"
+        },
+        {
+            "eventId": "getDefaultRelationforSearch",
+            "action": "getDefaultRelationforSearch"
+        },
+        {
+            "eventId": "qam0.navigateToQualityAction",
+            "action": "navigateToAddQualityActionSubView"
+        }
+    ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showSearchFilterPanel": {
+            "expression": "data.showSearchFilter != undefined && data.showSearchFilter == true"
+        }
+    },
+    "i18n": {
+        "Qam00Select": [
+            "QualityActionMgmtMessages"
+        ],
+        "results": [
+            "UIMessages"
+        ],
+        "filterTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ],
+        "Qam0Back": [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

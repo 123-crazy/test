@@ -1,0 +1,36 @@
+<aw-flex-column width="fill" height="fill">
+    <aw-flex-column width="fill" height="fill">
+        <aw-flex-row width="fill" height="70%">
+            <aw-flex-column width="fill">
+                <div class="aw-layout-panelSectionTitle">{{i18n.saw1_ResourceLoadViewSectionTitle}}</div>
+                <aw-break></aw-break>
+                <aw-guidance-message message="validUserRoleMessageInfo" exist-when="!conditions.isValidUserRole && conditions.isValidInTCVersion" closable="false" banner-style="false" show-icon="true" show-type="false">
+                </aw-guidance-message>
+                <aw-guidance-message message="validTCVersionMessageInfo" exist-when="!conditions.isValidInTCVersion" closable="false" banner-style="false" show-icon="true" show-type="false">
+                </aw-guidance-message>
+                <aw-toolbar id="aw_resourceChartToolbar" first-anchor="aw_resourceChart" second-anchor="aw_toolbarRight" exist-when="conditions.isValidUserRole && conditions.isValidInTCVersion" orientation="HORIZONTAL"></aw-toolbar>
+                <aw-flex-row width="fill" height="100%">
+                    <aw-matrix class="aw-schedulemanager-resourceChart" exist-when="conditions.isValidUserRole && conditions.isValidInTCVersion" gridid="resourceLoadViewTable"></aw-matrix>
+                </aw-flex-row>
+            </aw-flex-column>
+        </aw-flex-row>
+        <aw-splitter direction="HORIZONTAL" exist-when="ctx.resourceChartCtx.splitPanelLocation === 'bottom' && conditions.isValidUserRole && conditions.isValidInTCVersion " ></aw-splitter>
+        <aw-flex-row width="fill" height="30%" exist-when="ctx.resourceChartCtx.splitPanelLocation === 'bottom' && conditions.isValidUserRole && conditions.isValidInTCVersion">
+            <aw-flex-column width="fill">
+                <div class="aw-layout-panelSectionTitle">{{i18n.saw1_AssignedTasksSectionTitle}}</div>
+                <aw-break></aw-break>
+                <aw-toolbar id="aw_resourceChartAssignedTaskToolbar" first-anchor="aw_resourceChartTask" second-anchor="schedulemanager_table_toolbar_right" orientation="HORIZONTAL"></aw-toolbar>
+                <aw-splm-table class="aw-schedulemanager-resourceChart-splitTable" gridid="gridTableView" ></aw-splm-table>
+            </aw-flex-column>
+        </aw-flex-row>
+    </aw-flex-column>
+    <aw-splitter exist-when="ctx.resourceChartCtx.splitPanelLocation === 'right' && conditions.isValidUserRole && conditions.isValidInTCVersion" ></aw-splitter>
+    <aw-column width="30%" height="fill" exist-when="ctx.resourceChartCtx.splitPanelLocation === 'right' && conditions.isValidUserRole && conditions.isValidInTCVersion ">
+        <aw-column width="fill">
+            <div class="aw-layout-panelSectionTitle">{{i18n.saw1_AssignedTasksSectionTitle}}</div>
+            <aw-break></aw-break>
+            <aw-toolbar id="aw_resourceChartAssignedTaskToolbar" first-anchor="aw_resourceChartTask" second-anchor="schedulemanager_table_toolbar_right" orientation="HORIZONTAL"></aw-toolbar>
+            <aw-splm-table class="aw-schedulemanager-resourceChart-splitTable" gridid="gridTableView" ></aw-splm-table>
+        </aw-column>
+    </aw-column>
+</aw-flex-column>

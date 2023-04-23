@@ -1,0 +1,255 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive",
+        "js/aw-xrt.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-form.directive"
+    ],
+    "actions": {
+        "initializeSelectedEvent": {
+            "actionType": "dataProvider",
+            "method": "selectedEventProvider"
+        },
+        "addSelectedEvent": {
+            "actionType": "JSFunction",
+            "method": "addSelectedEvent",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "openCreatedObject": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{data.newObject.uid}}"
+            }
+        },
+        "OOTBSaveAsAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2012-09-DataManagement",
+            "method": "saveAsObjectAndRelate",
+            "inputData": {
+                "saveAsInput": "{{function:getSaveAsInputForEvent}}",
+                "relateInfo": [ {
+                    "relate": true
+                } ]
+            },
+            "outputData": {
+                "newObject": "",
+                "newObjectCreated": "{{function:getNewCreatedObject}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "Pgp0AddPlanLevel.SaveAs.Complete",
+                        "eventData": {
+                            "newObjectUid": "{{data.newObject.uid}}"
+                        }
+                    },
+                    {
+                        "name": "openOnCreate",
+                        "condition": "data.openOnCreate.dbValues[0] === true"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.xrtSummaryContextObject !== 'tc_xrt_Timeline'",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "createSuccessMsg"
+                } ],
+                "failure": [ {
+                    "message": "startSaveAsFailure"
+                } ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "data.pinnedToForm.dbValue",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "refreshFromTemplateTabActionJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "refreshFromTemplateTabAction"
+                },
+                {
+                    "action": "initializeSelectedEvent"
+                }
+            ]
+        },
+        "refreshFromTemplateTabAction": {
+            "actionType": "JSFunction",
+            "method": "refreshFromTemplateTab",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "updateSaveAsForm": {
+            "actionType": "JSFunction",
+            "method": "modifySaveAsForm",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "destroy": {
+            "actionType": "JSFunction",
+            "method": "destroy",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "removeEventAction": {
+            "actionType": "JSFunction",
+            "method": "removeEventFromProvider",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "remove":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "removeEvent"
+                } ]
+            }
+        }
+
+    },
+   
+    "dataProviders": {
+        "selectedEventProvider": {
+            "initializeAction": "addSelectedEvent",
+            "response": "{{data.dataProviders.selectedEventProvider.viewModelCollection.loadedVMObjects}}",
+            "selectionModelMode": "single",
+            "noResultsFound": "{{i18n.noResultsFound}}",
+            "commandsAnchor": "aw_removeCellCommand"
+        }
+    },
+    "data": {
+        "templateSectionCommands": "pgp0_BasedOnEventSectionCommands"
+    },
+
+    "conditions": {
+        "isTemplateSelectedInView": {
+            "expression": "data.dataProviders.selectedEventProvider.viewModelCollection.loadedVMObjects.length > 0"
+        },
+        "isTemplateSelectedInCtx": {
+            "expression": "ctx.programPlanningContext.selectedTemplate !== undefined"
+        },
+        "isSelectedEvent": {
+            "expression": "data.selectedEvent"
+        }
+    },
+
+    "functions": {
+        "getSaveAsInput": {
+            "functionName": "getSaveAsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getSaveAsInputForEvent": {
+            "functionName": "getSaveAsInputForEvent",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.loadNextValues",
+            "action": "generateNextValues"
+        },
+        {
+            "eventId": "openOnCreate",
+            "action": "openCreatedObject"
+        },
+        {
+            "eventId": "Pgp0AddPlanLevel.SaveAs.Complete",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "Pgp0CreateFromTemplate.refreshTab",
+            "action": "refreshFromTemplateTabActionJob"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "updateSaveAsForm"
+        },
+        {
+            "eventId": "Pgp0CreateEventBasedOn.removeEvent",
+            "action": "remove"
+        },
+        {
+            "eventId": "removeEvent",
+            "action": "removeEventAction"
+        }
+    ],
+
+    "messages": {
+        "createSuccessMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Pgp0SaveAsOperationSuccessful}}",
+            "messageTextParams": [
+                "{{data.newObject.props.object_string.uiValue}}"
+            ]
+        },
+        "startSaveAsFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+
+    },
+
+    "i18n": {
+        "addCriteriaCommandTitle": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0Template": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0SaveAsOperationSuccessful": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0CreatePlanFromTemplate": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0Required": [ "ProgramPlanningCommandPanelsMessages" ],
+        "properties" : [ "ProgramPlanningCommandPanelsMessages" ],
+        "addEventOnTimelineCommandTitle": [ "ProgramPlanningCommandPanelsMessages" ],
+        "aw_removeCellCommand": [ "ProgramPlanningCommandPanelsMessages" ]
+    },
+
+    "lifecycleHooks": {
+        "onInit": "initializeSelectedEvent",
+        "onMount": "initializeSelectedEvent",
+        "onUnmount":"destroy"
+    }
+}

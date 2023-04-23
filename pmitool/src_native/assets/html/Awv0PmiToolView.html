@@ -1,0 +1,40 @@
+<aw-command-panel caption="i18n.PmiPanelTitle">
+    <aw-panel-body>
+        <aw-command-panel-section exist-when="conditions.isInACESublocation" caption="i18n.showingPmiFor">
+            <aw-list dataprovider="data.dataProviders.selectionProvider">
+                <aw-occmgmt-cell vmo="item"></aw-occmgmt-cell>
+            </aw-list>
+            <div title="{{i18n.notCurrentlyVisible}}">
+            <aw-guidance-message exist-when="conditions.selectionIsNotVisible" show-type="true" message="VisibilityMessageWarning" banner-style="true" show-icon="true" >
+                <aw-button action="turnOnVisibility"><aw-i18n>i18n.show</aw-i18n></aw-button>
+            </aw-guidance-message>
+        </div>
+            <div title="{{i18n.hasNoPmi}}">
+                <aw-guidance-message exist-when="!conditions.selectionIsNotVisible && conditions.selectionHasNoPmi" show-type="true" message="NoPmiMessageWarning" banner-style="true" show-icon="true" ></aw-guidance-message>
+            </div>
+        </aw-command-panel-section>
+        <aw-tab-set visible-when="!conditions.selectionHasNoPmi" tabs="data.tabModels"></aw-tab-set>
+        <aw-command-panel-section visible-when="!conditions.selectionHasNoPmi" caption="i18n.stepThroughLabel" anchor="data.stepOverCommands">
+            <div name="Model Views" exist-when="data.selectedTab.tabkey==='modelViewesTab' && conditions.targetHasMVData">
+                <aw-tree name="'treePmiModelView'" tree="data.modelViewData" class="treePmi">
+                    <aw-checkbox prop="node.checkbox" action="modelViewEntryCheckedAction" exist-when="!node.parentModelView"></aw-checkbox>
+                    <aw-checkbox prop="node.checkbox" action="typesEntryCheckedAction" exist-when="node.parentModelView"></aw-checkbox>
+                    {{node.propertyDisplayName}}
+                </aw-tree>
+            </div>
+
+            <div name="Types" exist-when="data.selectedTab.tabkey==='entitiesTab' && conditions.targetHasTypeGroupsData">
+                <aw-tree name="'treePmiTypes'" tree="data.entities" class="treePmi">
+                    <aw-checkbox prop="node.checkbox" action="typesEntryCheckedAction"></aw-checkbox>
+                    {{node.propertyDisplayName}}
+                </aw-tree>
+            </div>
+        </aw-command-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-button visible-when="conditions.targetHasMVData || conditions.targetHasTypeGroupsData" action="reorientTextAction">
+            <aw-i18n>i18n.reorientText</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+
+</aw-command-panel>

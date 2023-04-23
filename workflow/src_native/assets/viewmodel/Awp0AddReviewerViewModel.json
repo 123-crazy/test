@@ -1,0 +1,252 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx":"{{ctx.workflow.selectedObject}}"
+            },
+
+            "deps": "js/Awp0AddReviewer"
+        },
+
+        "addReviewers":
+        {
+            "actionType": "JSFunction",
+            "method": "addReviewers",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selection": "{{data.selectedObjects}}"
+            },
+
+            "deps": "js/Awp0AddReviewer"
+        },
+
+        "addReviewersInternal":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "addSignoffs",
+            "inputData":
+              {
+                   "signoffs": [ {
+                        "task": "{{data.validEPMTask}}",
+                        "signoffInfo": "{{function:getsignoffInfo}}"
+
+                   } ]
+              },
+            "outputData": {
+                "createdSignoffUids": "created"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "Signoff",
+                        "properties": [
+                            {
+                                "name": "fnd0DecisionRequired"
+                            },
+                            {
+                                "name": "group_member",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "resource_pool",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":{
+               "success":[
+                  {
+                    "name":"workflow.updateAssigneeOrigin",
+                    "eventData": {
+                        "createdSignoffUids": "{{data.createdSignoffUids}}",
+                        "selectedObjects": "{{data.selectedObjects}}"
+                    },
+                    "condition": "data.createdSignoffUids && (ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion > 0 ) )"
+                  },
+                  {
+                     "name":"cdm.relatedModified",
+                     "eventData":{
+                        "relatedModified":[
+                           "{{ctx.workflow.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                     "name":"complete",
+                     "eventData":{
+                        "source":"toolAndInfoPanel"
+                     }
+                  }
+               ],
+                "failure":[
+                    {
+                        "name":"workflow.updateAssigneeOrigin",
+                        "eventData": {
+                            "createdSignoffUids": "{{data.createdSignoffUids}}",
+                            "selectedObjects": "{{data.selectedObjects}}"
+                        },
+                        "condition": "data.createdSignoffUids && (ctx.tcSessionData.tcMajorVersion > 13 || (ctx.tcSessionData.tcMajorVersion === 13 && ctx.tcSessionData.tcMinorVersion > 0 ) )"
+                    },
+                  {
+                     "name":"cdm.relatedModified",
+                     "eventData":{
+                        "relatedModified":[
+                           "{{ctx.workflow.selectedObject}}"
+                        ]
+                     }
+                  },
+                  {
+                     "name":"complete",
+                     "eventData":{
+                        "source":"toolAndInfoPanel"
+                     }
+                  }
+               ]
+            },
+            "deps":"js/Awp0InboxUtils",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "serverError"
+                    }
+                ]
+            }
+        },
+
+        "addAddiitonalSearchCriteria":
+        {
+            "actionType": "JSFunction",
+            "method": "addAddiitonalSearchCriteria",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selection": "{{ctx.workflow.selectedObject}}"
+            },
+            "deps": "js/Awp0AddReviewer"
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "updateAssigneeOrigin": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2014-06-Workflow",
+            "method": "performAction3",
+            "inputData": {
+                "input": "{{function:getAssigeeOriginUpdateData}}"
+            },
+            "deps": "js/Awp0InboxUtils"
+        }
+    },
+
+    "functions":
+    {
+        "getsignoffInfo":
+        {
+            "functionName": "getsignoffInfo",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getAssigeeOriginUpdateData": {
+            "functionName": "getAssigeeOriginUpdateData",
+            "parameters":
+            [
+                "{{data.eventMap['workflow.updateAssigneeOrigin'].createdSignoffUids}}",
+                "{{data.eventMap['workflow.updateAssigneeOrigin'].selectedObjects}}"
+            ]
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awTab.selected",
+            "action":  "addAddiitonalSearchCriteria"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "Awp0AddReviewerViewModel.addSignoffs",
+            "action":  "addReviewersInternal"
+        },
+        {
+            "eventId": "workflow.updateAssigneeOrigin",
+            "cacheEventData": true,
+            "action":  "updateAssigneeOrigin"
+        }
+    ],
+    "messages": {
+        "serverError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "conditions":
+    {
+        "isValidToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        },
+        "checkSelectionChange":
+        {
+            "expression": "name == 'selected'"
+        }
+    },
+    "i18n":
+    {
+        "addCommandTitle": [ "InboxMessages"]
+    }
+
+}

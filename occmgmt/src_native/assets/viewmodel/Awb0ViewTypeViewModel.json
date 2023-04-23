@@ -1,0 +1,116 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-link-with-popup.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":
+    {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "populateCurrentViewType"
+                }
+            ]
+        },
+        "populateContextKey":{
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "populateCurrentViewType": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "initializeViewTypeConfigurationInfo"
+                },
+                {
+                    "action": "parseViewTypeResponseObj"
+                }
+            ]
+        },
+        "initializeViewTypeConfigurationInfo":
+        {
+            "actionType": "JSFunction",
+            "method": "getCtx",
+            "inputData": {
+                "path": "{{data.contextKey}}"
+            },
+            "outputData": {
+                "currentViewTypeProp" : "result.productContextInfo.props.awb0ViewType"
+            },
+            "deps": "js/appCtxService"
+        },
+        "parseViewTypeResponseObj": {
+            "actionType": "JSFunction",
+            "method": "getViewModelData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "dataParsers": [{
+                "id": "viewTypeUid",
+                "responseObjs": "currentViewTypeProp"
+            }],
+            "outputData": {
+               "currentViewType" : "currentViewTypeProp"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "updateCurrentViewTypes": {
+            "actionType": "JSFunction",
+            "method": "updateCurrentViewTypes",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/aceViewTypesService"
+        }
+    },
+
+    "dataParseDefinitions": {
+        "viewTypeUid": {
+            "identifier": "{{response.dbValues.0}}",
+            "props": {
+                "object_name": {
+                    "displayName": "{{response.uiValues.0}}",
+                    "value":"{{response.uiValues.0}}",
+                    "displayValue": "{{response.uiValues.0}}",
+                    "type": "STRING"
+                }
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "awViewType.ValueChanged",
+            "cacheEventData": true,
+            "condition":"data.viewKey === viewKey",
+            "action": "updateCurrentViewTypes"
+        },
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "populateCurrentViewType"
+        }
+
+    ],
+
+    "messages": {},
+
+    "data": {},
+
+    "i18n":
+    {
+        "viewtype": ["OccurrenceManagementConstants"],
+        "filter": ["OccurrenceManagementConstants"]
+    }
+}

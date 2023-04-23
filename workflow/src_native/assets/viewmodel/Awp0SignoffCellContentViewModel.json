@@ -1,0 +1,48 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-model-icon.directive",
+        "js/aw-visual-indicator.directive",
+        "js/exist-when.directive",
+        "js/aw-link.directive"
+    ],
+
+    "actions":
+    {
+        "populateSignoffData": {
+            "actionType": "JSFunction",
+            "method": "populateSignoffData",
+            "inputData": {
+                "data": "{{subPanelContext}}"
+            },
+            "deps": "js/Awp0SignoffCellContentService"
+        },
+        "updateDecisionRequired": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:setPropertiesInputForSignoffDecision}}"
+            },
+            "deps": "js/Awp0SignoffCellContentService"
+        }
+    },
+
+    "functions": {
+        "setPropertiesInputForSignoffDecision": {
+            "functionName": "setPropertiesInputForSignoffDecision",
+            "parameters": [
+                "{{subPanelContext}}"
+            ]
+        }
+    },
+    "data": {
+    },
+    "lifecycleHooks": {
+        "onMount": "populateSignoffData"
+    },
+    "i18n": {
+    }
+
+}

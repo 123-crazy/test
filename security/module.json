@@ -1,0 +1,472 @@
+{
+  "name": "security",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "Awp0SetOrClearLocationCode": {
+        "iconId": "cmdCreateLocation",
+        "isGroup": false,
+        "title": "{{i18n.SetOrClearLocationCodeTitle}}",
+        "description": "{{i18n.Awp0SetOrClearLocationCodeDesc}}"
+      },
+      "Awp0RemoveExsistingCodeCmd": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.Remove}}",
+        "description": "{{i18n.Awp0RemoveExsistingCodeCmdDesc}}"
+      },
+      "Awp0AttachLicenses": {
+        "iconId": "cmdLicense",
+        "isGroup": false,
+        "title": "{{i18n.AttachLicenses}}",
+        "description": "{{i18n.Awp0AttachLicensesDesc}}"
+      },
+      "Awp0AttachLicenseCmd": {
+        "iconId": "cmdAdd",
+        "isGroup": false,
+        "title": "{{i18n.AttachLicense}}",
+        "description": "{{i18n.Awp0AttachLicensesDesc}}"
+      },
+      "Awp0DetachLicenseCmd": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.DetachLicense}}",
+        "description": "{{i18n.Awp0DetachLicenseCmdDesc}}"
+      },
+      "Awp0SelectLicenseCellCmd": {
+        "iconId": "cmdAdd",
+        "isGroup": false,
+        "title": "{{i18n.SelectLicense}}",
+        "description": "{{i18n.Awp0SelectLicenseCellCmdDesc}}"
+      },
+      "Awp0UnselectLicenseCellCmd": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.UnselectLicense}}",
+        "description": "{{i18n.Awp0UnselectLicenseCellCmdDesc}}"
+      },
+      "Awp0DetachLicenseCellCmd": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.DetachLicense}}"
+      },
+      "Awp0AttachLicensesLegacy": {
+        "iconId": "cmdLicense",
+        "isGroup": false,
+        "title": "{{i18n.AttachLicenses}}"
+      },
+      "Awp0AddLicenseCmd": {
+        "iconId": "cmdAdd",
+        "isGroup": false,
+        "title": "{{i18n.AddLicense}}"
+      }
+    },
+    "commandHandlers": {
+      "setOrClearLocationCodeCommandHandler": {
+        "id": "Awp0SetOrClearLocationCode",
+        "action": "setOrClear",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.enableLocationCode"
+        }
+      },
+      "Awp0RemoveExsistingCodeCmdHandler": {
+        "id": "Awp0RemoveExsistingCodeCmd",
+        "action": "Awp0RemoveExsistingCodeCmdAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "Awp0AttachLicensesHandler": {
+        "id": "Awp0AttachLicenses",
+        "action": "Awp0AttachLicensesCmdPanelAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.attachLicenses"
+        }
+      },
+      "Awp0AttachLicenseCmdHandler": {
+        "id": "Awp0AttachLicenseCmd",
+        "action": "Awp0AttachLicenseCmdPanelAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "Awp0DetachLicenseCmdHandler": {
+        "id": "Awp0DetachLicenseCmd",
+        "action": "Awp0DetachLicenseCmdPanelAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "Awp0SelectLicenseCellCmdHandler": {
+        "id": "Awp0SelectLicenseCellCmd",
+        "action": "Awp0SelectLicenseCellCmdAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "Awp0UnselectLicenseCellCmdHandler": {
+        "id": "Awp0UnselectLicenseCellCmd",
+        "action": "Awp0UnselectLicenseCellCmdAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "Awp0DetachLicenseCellCmdHandler": {
+        "id": "Awp0DetachLicenseCmd",
+        "action": "Awp0DetachLicenseCellCmdAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "Awp0AttachLicensesLegacyHandler": {
+        "id": "Awp0AttachLicensesLegacy",
+        "action": "Awp0AttachLicensesLegacyCmdPanelAction",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.attachLicensesLegacy"
+        }
+      },
+      "Awp0AddLicenseCmdHandler": {
+        "id": "Awp0AddLicenseCmd",
+        "action": "Awp0AddLicenseCmdPanelAction",
+        "activeWhen": true,
+        "visibleWhen": true
+      },
+      "removeProjectCellCommandHandler": {
+        "id": "Awp0RemoveProjectsCell",
+        "action": "removeProjectCellCmdAction",
+        "activeWhen": {
+          "condition": "conditions.Aut0RemoveProjectsCmdCond"
+        },
+        "visibleWhen": {
+          "condition": "conditions.Aut0RemoveProjectsCmdCond"
+        }
+      }
+    },
+    "conditions": {
+      "enableLocationCode": {
+        "expression": "ctx.visibleServerCommands.Awp0SetOrClearLocationCode && ctx.userSession!==null && ctx.userSession.props.fnd0LocationCode!==null"
+      },
+      "attachLicenses": {
+        "expression": {
+          "$and": [
+            {
+              "$source": "ctx.visibleServerCommands.Aut0AttachLicenses",
+              "$query": {
+                "$eq": true
+              }
+            },
+            {
+              "$source": "ctx.mselected.length",
+              "$query": {
+                "$gte": 1
+              }
+            },
+            {
+              "$source": "ctx.mselected",
+              "$query": {
+                "$source": "modelType.typeHierarchyArray",
+                "$query": {
+                  "$notin": [
+                    "Mdl0ApplicationModel",
+                    "Mdl0ModelElement",
+                    "Mdl0SubsetDefinition"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "attachLicensesLegacy": {
+        "expression": "ctx.visibleServerCommands.Aut0AttachLicensesLegacy && ctx.selected!==null"
+      },
+      "Aut0RemoveProjectsCmdCond": {
+        "expression": "(ctx.panelContext.destPanelId === 'addObjectPrimarySub')||(ctx.panelContext.destPanelId === 'saveAsNew')||(ctx.panelContext.destPanelId === 'saveAsRevision')"
+      }
+    },
+    "commandPlacements": {
+      "setOrClearLocationCodeToolsAndInfo": {
+        "id": "Awp0SetOrClearLocationCode",
+        "uiAnchor": "aw_rightWall",
+        "priority": 460,
+        "parentGroupId": "Awp0ManageGroup"
+      },
+      "Awp0RemoveExsistingCodeCmdPlacement": {
+        "id": "Awp0RemoveExsistingCodeCmd",
+        "uiAnchor": "awp0_securityCmdPanelCommands",
+        "priority": 100
+      },
+      "Awp0AttachLicensesCmdPlacement": {
+        "id": "Awp0AttachLicenses",
+        "uiAnchor": "aw_rightWall",
+        "priority": 190,
+        "parentGroupId": "Awp0ManageGroup"
+      },
+      "Awp0AttachLicenseCmdPlacement": {
+        "id": "Awp0AttachLicenseCmd",
+        "uiAnchor": "awp0_attachLicensesCommands",
+        "priority": 100
+      },
+      "Awp0DetachLicenseCmdPlacement": {
+        "id": "Awp0DetachLicenseCmd",
+        "uiAnchor": "awp0_attachLicensesCommands",
+        "priority": 101
+      },
+      "Awp0SelectLicenseCellCmdPlacement": {
+        "id": "Awp0SelectLicenseCellCmd",
+        "uiAnchor": "awp0_selectLicenseCommands",
+        "priority": 100,
+        "cellDisplay": {
+          "hover": true,
+          "position": "TOP_RIGHT",
+          "selected": true
+        }
+      },
+      "Awp0UnselectLicenseCellCmdPlacement": {
+        "id": "Awp0UnselectLicenseCellCmd",
+        "uiAnchor": "awp0_unselectLicenseCommands",
+        "priority": 100,
+        "cellDisplay": {
+          "hover": true,
+          "position": "TOP_RIGHT",
+          "selected": true
+        }
+      },
+      "Awp0DetachLicenseCellCmdPlacement": {
+        "id": "Awp0DetachLicenseCmd",
+        "uiAnchor": "awp0_attachLicensesLegacyCommands",
+        "priority": 100,
+        "cellDisplay": {
+          "hover": true,
+          "position": "TOP_RIGHT",
+          "selected": true
+        }
+      },
+      "Awp0AttachLicensesLegacyCmdPlacement": {
+        "id": "Awp0AttachLicensesLegacy",
+        "uiAnchor": "aw_rightWall",
+        "priority": 200,
+        "parentGroupId": "Awp0ManageGroup"
+      },
+      "Awp0AddLicenseCmdPlacenment": {
+        "id": "Awp0AddLicenseCmd",
+        "uiAnchor": "awp0_addLicenseLegacyCommands",
+        "priority": 100,
+        "cellDisplay": {
+          "hover": true,
+          "position": "TOP_RIGHT",
+          "selected": true
+        }
+      },
+      "removeProjectCellCommandPlacement": {
+        "id": "Awp0RemoveProjectsCell",
+        "uiAnchor": "aw_removeProjectCellCommandAction",
+        "areas": [
+          "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+        ],
+        "priority": 300,
+        "cellDisplay": {
+          "hover": true,
+          "position": "TOP_RIGHT",
+          "selected": true
+        }
+      }
+    },
+    "actions": {
+      "setOrClear": {
+        "actionType": "JSFunction",
+        "method": "setLocationCode",
+        "deps": "js/Awp0SetOrClearLocationCodeService",
+        "inputData": {
+          "commandId": "Awp0SetOrClearLocationCode",
+          "location": "aw_toolsAndInfo"
+        }
+      },
+      "Awp0RemoveExsistingCodeCmdAction": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "awp0RemoveExsistingCodeCmdEvent"
+            }
+          ]
+        }
+      },
+      "Awp0AttachLicensesCmdPanelAction": {
+        "actionType": "JSFunction",
+        "method": "activateCommandPanel",
+        "deps": "js/commandPanel.service",
+        "inputData": {
+          "commandId": "Awp0AttachLicenses",
+          "location": "aw_toolsAndInfo"
+        }
+      },
+      "Awp0AttachLicenseCmdPanelAction": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "awPanel.navigate",
+              "eventData": {
+                "destPanelId": "Awp0AttachLicense",
+                "title": "{{i18n.AttachLicense}}",
+                "supportGoBack": true
+              }
+            }
+          ]
+        }
+      },
+      "Awp0DetachLicenseCmdPanelAction": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "awPanel.navigate",
+              "eventData": {
+                "destPanelId": "Awp0DetachLicense",
+                "title": "{{i18n.DetachLicense}}",
+                "supportGoBack": true
+              }
+            }
+          ]
+        }
+      },
+      "Awp0SelectLicenseCellCmdAction": {
+        "actionType": "JSFunction",
+        "method": "execute",
+        "inputData": {
+          "vmo": "{{commandContext.vmo}}"
+        },
+        "deps": "js/selectLicenseCellCommandHandler"
+      },
+      "Awp0UnselectLicenseCellCmdAction": {
+        "actionType": "JSFunction",
+        "method": "execute",
+        "inputData": {
+          "vmo": "{{commandContext.vmo}}"
+        },
+        "deps": "js/unselectLicenseCellCommandHandler"
+      },
+      "Awp0DetachLicenseCellCmdAction": {
+        "actionType": "JSFunction",
+        "method": "execute",
+        "inputData": {
+          "vmo": "{{commandContext.vmo}}"
+        },
+        "deps": "js/detachLicenseCellCommandHandler"
+      },
+      "Awp0AttachLicensesLegacyCmdPanelAction": {
+        "actionType": "JSFunction",
+        "method": "activateCommandPanel",
+        "deps": "js/commandPanel.service",
+        "inputData": {
+          "commandId": "Awp0AttachLicensesLegacy",
+          "location": "aw_toolsAndInfo"
+        }
+      },
+      "Awp0AddLicenseCmdPanelAction": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+          "events": [
+            {
+              "name": "awPanel.navigate",
+              "eventData": {
+                "destPanelId": "Awp0AddLicense",
+                "title": "{{i18n.AddLicense}}",
+                "supportGoBack": true,
+                "recreatePanel": true
+              }
+            }
+          ]
+        }
+      },
+      "removeProjectCellCmdAction": {
+        "actionType": "JSFunction",
+        "method": "execute",
+        "inputData": {
+          "vmo": "{{commandContext.vmo}}",
+          "scope": "{{$parent.$$childHead}}"
+        },
+        "deps": "js/removeObjectCellCommandHandler"
+      }
+    },
+    "i18n": {
+      "SetOrClearLocationCodeTitle": [
+        "SecurityMessages"
+      ],
+      "Awp0SetOrClearLocationCodeDesc": [
+        "SecurityMessages"
+      ],
+      "Remove": [
+        "SecurityMessages"
+      ],
+      "AttachedLicense": [
+        "SecurityMessages"
+      ],
+      "AttachLicenses": [
+        "SecurityMessages"
+      ],
+      "AttachLicense": [
+        "SecurityMessages"
+      ],
+      "DetachLicense": [
+        "SecurityMessages"
+      ],
+      "DettachLicense": [
+        "SecurityMessages"
+      ],
+      "SelectLicense": [
+        "SecurityMessages"
+      ],
+      "UnselectLicense": [
+        "SecurityMessages"
+      ],
+      "awp0_securityCmdPanelCommands": [
+        "SecurityMessages"
+      ],
+      "awp0_attachLicensesCommands": [
+        "SecurityMessages"
+      ],
+      "awp0_selectLicenseCommands": [
+        "SecurityMessages"
+      ],
+      "awp0_unselectLicenseCommands": [
+        "SecurityMessages"
+      ],
+      "awp0_attachLicensesLegacyCommands": [
+        "SecurityMessages"
+      ],
+      "aw_removeProjectCellCommandAction": [
+        "ProjmgmtConstants"
+      ],
+      "Awp0RemoveExsistingCodeCmdDesc": [
+        "SecurityMessages"
+      ],
+      "Awp0AttachLicensesDesc": [
+        "SecurityMessages"
+      ],
+      "Awp0DetachLicenseCmdDesc": [
+        "SecurityMessages"
+      ],
+      "Awp0SelectLicenseCellCmdDesc": [
+        "SecurityMessages"
+      ],
+      "Awp0UnselectLicenseCellCmdDesc": [
+        "SecurityMessages"
+      ],
+      "AddLicense": [
+        "SecurityMessages"
+      ]
+    }
+  }
+}

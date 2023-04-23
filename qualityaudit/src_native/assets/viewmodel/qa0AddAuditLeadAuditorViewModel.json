@@ -1,0 +1,169 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-search-box.directive",
+        "js/aw-list.directive",
+        "js/aw-button.directive",
+        "js/aw-default-cell.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive"
+    ],
+    "dataProviders": {
+        "performUserSearch": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "actions": {
+        "getUsers": {
+            "actionType": "dataProvider",
+            "method": "performUserSearch"
+        },
+        "doSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "searchInitiated"
+                    }
+                ]
+            }
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performQPUserSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "POM_user",
+                        "properties": [
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps": "js/qa0AuditUserRoles"
+        },
+        "addTeamMember": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:createAuditRoleRelationInput}}"
+            },
+            "outputData": {
+                "serviceData": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    }
+                ]
+            },
+            "deps": "js/qa0AuditUserRoles"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "searchInitiated",
+            "condition": "data.searchBox.dbValue && data.searchBox.dbValue.length>0",
+            "action": "getUsers"
+        }
+    ],
+    "functions": {
+        "createAuditRoleRelationInput": {
+            "functionName": "createAuditRoleRelationInput",
+            "parameters": [
+                "Qa0AuditLeadAuditor",
+                "{{data.dataProviders.performUserSearch.selectedObjects}}",
+                "{{ctx.xrtSummaryContextObject}}"
+            ]
+        }
+    },
+    "data": {
+        "searchBox": {
+            "displayName": "{{i18n.qa0AuditRoleSearchBoxPlaceholder}}",
+            "type": "STRING"
+        },
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.qa0AuditRoleSearchBoxPlaceholder}}"
+        }
+    },
+    "messages": {
+        "errorResponse": {
+            "messageType": "INFO",
+            "messageText": "{{errorMessage}}"
+        }
+    },
+    "i18n": {
+        "qa0Add": [
+            "qualityauditMessages"
+        ],
+        "qa0AuditRoleSearchBoxPlaceholder": [
+            "qualityauditMessages"
+        ]
+    }
+}

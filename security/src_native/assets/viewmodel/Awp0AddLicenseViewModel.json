@@ -1,0 +1,272 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-button.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-repeat.directive",
+        "js/aw-include.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "initialize",
+            "inputData":
+            {
+                "data" : "{{data}}",
+                "legacy": true
+            },
+            "deps": "js/licenseMgmtService"
+        },
+
+        "callDataProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "availableLicenses"
+        },
+
+        "getLicense":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Security-2017-12-AwLicensing",
+            "method": "getLicensesWithTypes",
+            "inputData":
+            {
+                "licenseInputs":
+                {
+                    "selectedObjects": "{{ctx.license.adaptedObjects}}",
+                    "paginationInfo":
+                    {
+                        "startIndex": "{{data.dataProviders.availableProjects.startIndex}}",
+                        "maxToReturn": 50
+                    },
+                    "filterInfo": {
+                      "licenseId" : "{{data.filterBox.dbValue}}",
+                      "licenseType": ""
+                    },
+                    "isAceContext": false,
+                    "isAssigned": true
+                }
+            },
+
+            "outputData":
+            {
+                "searchResults": "licensesOutput.availableLicenseList",
+                "availableLicenseTypes": "licensesOutput.availableLicenseTypes"
+            },
+
+            "deps": "js/licenseMgmtService",
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "ITAR_License",
+                        "properties":
+                        [
+                            {
+                                "name": "ead_paragraph"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+
+
+        "attach":
+        {
+            "actionType": "JSFunction",
+            "method": "getSelectedLicensesforAttach",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/licenseMgmtService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "awSecurity.attach"
+                    }
+                ]
+            }
+        },
+
+        "edit":
+        {
+            "actionType": "JSFunction",
+            "method": "getSelectedLicensesforEdit",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/licenseMgmtService"
+        },
+
+        "submit":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "AuthorizedDataAccess-2009-10-LicenseManagement",
+            "method": "attachLicenses",
+            "inputData":
+            {
+                "attachLicense":
+                [
+                    {
+                        "selectedLicenses": "{{data.licenseName}}",
+                        "objects": "{{ctx.mselected}}",
+                        "eadParagraph": "{{data.authPara}}"
+                    }
+                ]
+            },
+
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "multipleAttachSuccess"
+                    }
+                ]
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+
+        "checkSelected":
+        {
+            "actionType": "JSFunction",
+            "method": "checkSelected",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/licenseMgmtService"
+        }
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "reveal"
+        },
+        {
+            "eventId": "availableLicenses.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "checkSelected"
+        },
+        {
+            "eventId": "awSecurity.getLicenses",
+            "action": "callDataProvider"
+        },
+
+        {
+            "eventId": "awSecurity.attach",
+            "action": "submit"
+        }
+    ],
+    "conditions":
+    {
+        "isValidToShowAddButton":
+        {
+            "expression": "data.dataProviders.availableLicenses.selectedObjects.length > 0 && !data.enableEdit || data.itarEditMode"
+        },
+        "isValidToShowEditButton":
+        {
+            "expression": "data.dataProviders.availableLicenses.selectedObjects.length > 0 && data.enableEdit && !data.itarEditMode"
+        }
+    },
+
+    "data":
+    {
+        "filterBox":
+        {
+            "displayName": "",
+            "type": "STRING"
+        },
+        "licenseType" :
+        {
+            "type": "STRING",
+            "hasLov": true
+        }
+
+    },
+
+    "dataProviders":
+    {
+
+        "availableLicenses":
+        {
+            "action": "getLicense",
+            "selectionModelMode": "multiple",
+            "commands":
+            {
+                "Awp0ShowObjectCell":
+                {
+                    "id": "cmdOpen",
+                    "title": "Add",
+                    "areas":
+                    [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities":
+                    [
+                        300
+                    ],
+                    "dependencies":
+                    [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.searchResults.length}}"
+        },
+
+        "availableLicenseTypes":
+        {
+            "dataProviderType" : "Static"
+        }
+    },
+
+    "i18n":
+    {
+        "Attached": ["SecurityMessages"],
+        "AttachLicense": ["SecurityMessages"],
+        "AttachedLicense": ["SecurityMessages"],
+        "AddLicenseButtonText": ["SecurityMessages"],
+        "EditLicenseButtonText": ["SecurityMessages"],
+        "LicenseTypesTitle": ["SecurityMessages"]
+    }
+}

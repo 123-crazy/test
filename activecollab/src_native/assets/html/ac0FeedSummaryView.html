@@ -1,0 +1,123 @@
+<aw-panel-body>
+    <aw-command-panel-section caption="i18n.discussion" collapsed="false">
+        <div class="aw-activecollab-feedShadow">
+            <aw-flex-column class="aw-layout-flexRow" aw-class="[{'aw-activecollab-openStatus aw-widgets-showCellDecorator': ctx.newConvObj.props.convStatus.dbValue==='Open' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'},{'aw-activecollab-closedStatus aw-widgets-showCellDecorator': ctx.newConvObj.props.convStatus.dbValue==='Closed' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'},{'aw-activecollab-inProgressStatus aw-widgets-showCellDecorator': ctx.newConvObj.props.convStatus.dbValue==='In Progress' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'}]">
+                <aw-flex-row justify="left" align-content="center">
+                    <aw-flex-column>
+                        <aw-flex-row class="aw-activecollab-srcObjChip" justify="left" align-content="center">
+                            <aw-flex-column justify="center" width="2f" visible-when="ctx.newConvObj.props.isConvPrivate.dbValue">
+                                    <aw-icon class="aw-commands-svg" icon-id="indicatorPrivate"></aw-icon>
+                            </aw-flex-column>
+                            <aw-flex-column>
+                                <aw-flex-row class="aw-activecollab-srcObjChip" justify="left" align-content="center">
+                                    <aw-chip chip="ctx.newConvObj.chipData" extended-tooltip="{{ctx.newConvObj.chipData.extendedTooltip}}" button-type="base" action="clickObjChipAction"></aw-chip>
+                                    <div id="{{ctx.newConvObj.srcObjIdRef}}">
+                                        <strong><aw-link prop="ctx.newConvObj.moreSourceObjPopupLink" visible-when="ctx.newConvObj.moreSourceObjPopupLink" link-id="{{ctx.newConvObj.srcObjIdRef}}" action="noop" aw-click="ctx.newConvObj.clickSrcObjLink(ctx.newConvObj)"></aw-link></strong>
+                                    </div>
+                                </aw-flex-row>
+                            </aw-flex-column>
+                            <aw-flex-column justify="right" align-content="end">
+                                <aw-pic id="{{ctx.newConvObj.moreCellCmdsIdRef}}" class="aw-widget-thumbnail aw-commands-commandToolbarIconButton" icon-id="data.cmdMore" aw-click="ctx.newConvObj.doShowMoreCmds(ctx.newConvObj)" extended-tooltip="{{ctx.newConvObj.moreDesc}}"></aw-pic>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+                <div class="aw-activecollab-convSeparator aw-theme-separator"></div>
+                <aw-flex-column justify="center" visible-when="ctx.newConvObj.isConvActionable && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'">
+                    <aw-flex-row justify="left" align-content="start" class="aw-activecollab-userBold">
+                        <aw-flex-column width="10f">
+                            <div visible-when="!ctx.newConvObj.convStatusModifiable" class="aw-activecollab-statusLabel">
+                                {{ctx.newConvObj.props.convStatus.displayValues[0]}}
+                            </div>
+                            <aw-link-with-popup-menu prop="ctx.newConvObj.props.convStatus" dataprovider="data.dataProviders.convStatusLOVDataProvider" visible-when="ctx.newConvObj.convStatusModifiable"></aw-link-with-popup-menu>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-flex-column>
+                <aw-flex-column justify="center">
+                    <aw-flex-row justify="left" align-content="start">
+                        <aw-flex-column width="5f">
+                            <aw-avatar size="small" source="ctx.newConvObj.thumbnailUrl" exist-when="ctx.newConvObj.hasThumbnail"></aw-avatar>
+                            <aw-avatar size="small" source="ctx.newConvObj.typeIconURL" exist-when="!ctx.newConvObj.hasThumbnail"></aw-avatar>
+                        </aw-flex-column>
+                        <aw-flex-column>
+                            <aw-flex-row class="aw-widgets-propertyNonEditValue" justify="space-between" height="1.5f" class="aw-activecollab-convCreds">
+                                <aw-flex-column width="6" class="aw-activecollab-userBold">
+                                    <div>{{ctx.newConvObj.props.userName.displayValues[0]}}</div>
+                                </aw-flex-column>
+                                <aw-flex-column width="4" align-content="end">
+                                    {{ctx.newConvObj.props.modifiedDateTime.displayValues[0]}}
+                                </aw-flex-column>
+                            </aw-flex-row>
+                            <aw-flex-row visible-when="!ctx.newConvObj.beingEdited" class="aw-activecollab-viewRichText">
+                                <div aw-parse-html="" display-val="ctx.newConvObj.props.richTextObject.curtailRichText" is-rich-text="true" visible-when="ctx.newConvObj.props.richTextObject && ctx.newConvObj.props.richTextObject.curtailRichText.length > 0 && ctx.newConvObj.showMore"></div>
+                                <div aw-parse-html="" display-val="ctx.newConvObj.props.richText.displayValues[0]" is-rich-text="true" visible-when="ctx.newConvObj.props.richText.displayValues[0] && ctx.newConvObj.props.richText.displayValues[0].length > 0 && !ctx.newConvObj.showMore"></div>
+                                <div visible-when="!ctx.newConvObj.props.richText.displayValues[0] && ctx.newConvObj.showMore">
+                                    {{ctx.newConvObj.props.plainTextObject.curtailPlainText}}
+                                </div>
+                                <div visible-when="!ctx.newConvObj.props.richText.displayValues[0] && !ctx.newConvObj.showMore">
+                                    {{ctx.newConvObj.props.plainText.displayValues[0]}}
+                                </div>
+                            </aw-flex-row>
+                            <aw-flex-row height="1.5f">
+                                <aw-link prop="ctx.newConvObj.moreLink" action="noop" aw-click="ctx.newConvObj.doShowMore(ctx.newConvObj)" visible-when="ctx.newConvObj.showMoreLink"></aw-link>
+                                <aw-link prop="ctx.newConvObj.lessLink" action="noop" aw-click="ctx.newConvObj.doShowLess(ctx.newConvObj)" visible-when="ctx.newConvObj.showLessLink"></aw-link>
+                            </aw-flex-row>
+                            <aw-flex-row class="aw-activecollab-quickReply" exist-when="ctx.newConvObj.beingEdited">
+                                <aw-flex-column width="12">
+                                    <div class="aw-activecollab-editor">
+                                        <div id="{{ctx.newConvObj.commentCKEId}}" name="{{ctx.newConvObj.commentCKEId}}"></div>
+                                    </div>
+                                </aw-flex-column>
+                            </aw-flex-row>
+                            <aw-include name="Ac0DiscardSaveComment" sub-panel-context="ctx.newConvObj" exist-when="ctx.newConvObj.beingEdited"></aw-include>
+                            <aw-flex-row>
+                                <aw-flex-column align-content="center" justify="center" width="100%" aw-repeat=" relatedObj : ctx.newConvObj.props.inflatedRelatedObjList">
+                                    <aw-include name="Ac0SnapshotCard" sub-panel-context="{snapshot:relatedObj, showCMDBar:true}"></aw-include>
+                                </aw-flex-column>
+                            </aw-flex-row>
+                            <aw-flex-row justify="left" align-content="center" exist-when="!ctx.newConvObj.beingEdited">
+                                <aw-flex-column justify="center" align-content="end">
+                                    <aw-pic id="{{ctx.newConvObj.moreCmtCellCmdsIdRef}}" class="aw-widget-thumbnail aw-commands-commandToolbarIconButton" icon-id="data.cmdMore" aw-click="ctx.newConvObj.doShowMoreCmtCellCmds(ctx.newConvObj)" extended-tooltip="{{ctx.newConvObj.moreDesc}}" visible-when="ctx.newConvObj.showMoreCmtCellCmds"></aw-pic>
+                                </aw-flex-column>
+                            </aw-flex-row>
+                        </aw-flex-column>
+                    </aw-flex-row>
+                </aw-flex-column>
+                <div class="aw-activecollab-convSeparator aw-theme-separator"></div>
+                <aw-include name="Ac0CommentList" exist-when="ctx.newConvObj.expandComments" sub-panel-context="ctx.newConvObj"></aw-include>
+                <aw-flex-row height="2f">
+                    <aw-flex-column width="4" justify="center">
+                        <!-- <strong><aw-link prop="ctx.newConvObj.expandCommentsLink" action="noop" aw-click="ctx.newConvObj.doExpandComments(ctx.newConvObj)" visible-when="!ctx.newConvObj.expandComments"></aw-link></strong>
+                        <strong><aw-link prop="ctx.newConvObj.collapseCommentsLink" action="noop" aw-click="ctx.newConvObj.doExpandComments(ctx.newConvObj)" visible-when="ctx.newConvObj.expandComments"></aw-link></strong> -->
+                    </aw-flex-column>
+                    <aw-flex-column width="4"></aw-flex-column>
+                    <aw-flex-column width="4" justify="center" align-content="end">
+                        <strong><aw-link prop="ctx.newConvObj.followConvLink" action="noop" aw-click="ctx.newConvObj.doFollowConv(ctx.newConvObj)" visible-when="ctx.newConvObj.showFollowConv" extended-tooltip="{{ctx.newConvObj.followConvDesc}}"></aw-link></strong>
+                        <strong><aw-link prop="ctx.newConvObj.unfollowConvLink" action="noop" aw-click="ctx.newConvObj.doFollowConv(ctx.newConvObj)" visible-when="!ctx.newConvObj.showFollowConv" extended-tooltip="{{ctx.newConvObj.unFollowConvDesc}}"></aw-link></strong>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+        </div>
+    </aw-command-panel-section>
+</aw-panel-body>
+
+<!--Source Objects-->
+<aw-panel-body>
+    <aw-flex-row height=".35f"></aw-flex-row>
+    <aw-command-panel-section caption="i18n.sourceObjects" collapsed="false">
+        <aw-list dataprovider = "data.dataProviders.convSourceObjectsDataProvider" >
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <!--Participants List-->
+    <aw-command-panel-section caption="i18n.participants" collapsed="false">
+        <aw-list dataprovider = "data.dataProviders.convParticipantsDataProvider" >
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <aw-command-panel-section caption="i18n.snapshot" collapsed="false">
+        <aw-list dataprovider = "data.dataProviders.convRelatedObjDataProvider" >
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>

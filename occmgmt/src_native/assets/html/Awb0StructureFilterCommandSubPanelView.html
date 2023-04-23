@@ -1,0 +1,20 @@
+
+<aw-panel-body scrollable="false">
+    <!--Removed Aw-include as with scrollable=false an additional space was introduced in the panel header-->
+    <aw-layout-slot name="Awb0ContextFeature_ContextInFilter"  ></aw-layout-slot>
+
+    <aw-filter-in-filters-searchbox
+    category="ctx.aceActiveContext.context.categoriesToRender" prop="data.searchBox1" >
+    </aw-filter-in-filters-searchbox>
+    <aw-panel-section>
+    <aw-scrollpanel>
+        <aw-filter-category
+            exist-when="item.categoryType!='Proximity' || (item.categoryType=='Attribute' && item.filterValues.length==1 && item.filterValues[0].internalName=='')"
+            search-action="selectStructureFilterAction"
+            category-action="selectGivenCategory" category="item"
+            aw-repeat="item : ctx.aceActiveContext.context.categoriesToRender | filterInFiltersSearch :data.searchBox1.dbValue:this track by $index">
+            <aw-textbox prop="category.filterValues[0].prop" exist-when="(category.categoryType=='Attribute' && category.filterValues.length==1 && category.filterValues[0].internalName=='')" aw-enter-key="selectStructureFilterAction"></aw-textbox>
+        </aw-filter-category>
+    </aw-scrollpanel>
+</aw-panel-section>
+</aw-panel-body>

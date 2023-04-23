@@ -1,0 +1,194 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-form.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive"
+    ],
+
+    "actions":
+    {
+
+        "callDataProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "getAttachedLicense"
+        },
+
+        "getLicense":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Security-2017-12-AwLicensing",
+            "method": "getLicensesWithTypes",
+            "inputData":
+            {
+                "licenseInputs":
+                {
+                    "selectedObjects": "{{ctx.license.adaptedObjects}}",
+                    "paginationInfo":
+                    {
+                        "startIndex": "{{data.dataProviders.availableProjects.startIndex}}",
+                        "maxToReturn": 50
+                    },
+                    "filterInfo": {
+                      "licenseId" : "{{data.filterBox.dbValue}}",
+                      "licenseType": "{{data.licenseType.dbValue.internalValue}}"
+                    },
+                    "isAceContext": false,
+                    "isAssigned": true
+                }
+            },
+
+            "outputData":
+            {
+                "searchResults": "licensesOutput.commonAssignedLicenseList",
+                "totalFound": "totalFound",
+                "endIndex": "endIndex"
+            },
+
+            "deps": "js/licenseMgmtService",
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "ITAR_License",
+                        "properties":
+                        [
+                            {
+                                "name": "ead_paragraph"
+                            }
+                        ]
+                    }
+                ]
+            }
+
+        },
+
+        "updateLicenses":
+        {
+            "actionType": "JSFunction",
+            "method": "updateLicenses",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/licenseMgmtService"
+        },
+
+        "detach":
+        {
+            "actionType": "JSFunction",
+            "method": "getSelectedLicensesforDetach",
+            "inputData":
+            {
+                "data" : "{{data}}",
+                "legacy": true
+            },
+            "deps": "js/licenseMgmtService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "awSecurity.detach"
+                    }
+                ]
+            }
+        },
+
+        "submit":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "AuthorizedDataAccess-2007-06-LicenseManagement",
+            "method": "removeLicenses",
+            "inputData":
+            {
+                "removeLicense":
+                [
+                    {
+                        "selectedLicenses": "{{data.licenseName}}",
+                        "objects": "{{ctx.mselected}}"
+                    }
+                ]
+            },
+
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "message": "multipleDetachSuccess"
+                    }
+                ]
+            },
+
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "callDataProvider"
+        },
+        {
+            "eventId": "getAttachedLicense.modelObjectsUpdated",
+            "action": "updateLicenses",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awSecurity.selectLicenseForDetach",
+            "action": "detach",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awSecurity.detach",
+            "action": "submit"
+        }
+    ],
+
+    "data":
+    {
+        "awp0_addLicenseLegacyCommandAnchor" : "awp0_addLicenseLegacyCommands"
+    },
+
+    "dataProviders":
+    {
+        "getAttachedLicense":
+        {
+            "action": "getLicense",
+            "selectionModelMode": "single",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.searchResults.length}}",
+            "commandsAnchor":"awp0_attachLicensesLegacyCommands"
+        }
+    },
+
+    "i18n":
+    {
+        "Assigned": ["SecurityMessages"],
+        "Attached": ["SecurityMessages"],
+        "AddLicense": ["SecurityMessages"],
+        "DetachLicense": ["SecurityMessages"],
+        "Licenses": ["SecurityMessages"]
+    }
+}

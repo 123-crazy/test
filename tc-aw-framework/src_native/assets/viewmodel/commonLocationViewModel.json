@@ -1,0 +1,286 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/visible-when.directive",
+        "js/aw-tab-set.directive",
+        "js/exist-when.directive",
+        "js/aw-layout-slot.directive"
+    ],
+    "data": {
+        "locationPanelStyle": "",
+        "layoutSummaryOnly": "false",
+        "preNarrowTitle": null
+    },
+    "actions": {
+        "checkNarrowMode": {
+            "actionType": "JSFunction",
+            "method": "checkNarrowMode",
+            "deps": "js/aw.narrowMode.service"
+        },
+        "constructAndUpdateTitles": {
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action": "constructTitles"
+                },
+                {
+                    "action": "setTitlesInCtx"
+                },
+                {
+                    "action":"updateTitles"
+                }
+            ]
+        },
+        "registerLocationContextAndConstructHeader": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "getLocationName"
+                },
+                {
+                    "action": "registerLocationName"
+                },
+                {
+                    "action": "registerKeyBoardEvents"
+                },
+                {
+                    "action": "subscribeForUnloadEvent"
+                },
+                {
+                    "action": "constructTitles"
+                },
+                {
+                    "action": "setTitlesInCtx"
+                },
+                {
+                    "action": "getAvailableSubPages",
+                    "inputArg": {
+                        "parentState": null,
+                        "additionalEvalEnv": "{{actionData.additionalEvalEnv}}"
+                    },
+                    "outputArg": [
+                        "availablePages"
+                    ]
+                },
+                {
+                    "action": "constructTabs",
+                    "inputArg": {
+                        "availablePages": "{{actionData.availablePages}}"
+                    }
+                }
+            ]
+        },
+        "getLocationName": {
+            "actionType": "JSFunction",
+            "method": "normalizeStateName",
+            "deps": "js/defaultLocationService",
+            "outputData": {
+                "normalizeStateName": ""
+            }
+        },
+        "registerLocationName": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "locationContext",
+                "value": {
+                    "ActiveWorkspace:Location": "{{data.normalizeStateName}}",
+                    "ActiveWorkspace:SubLocation": "{{ctx.locationContext['ActiveWorkspace:SubLocation']}}"
+                }
+            }
+        },
+        "registerKeyBoardEvents": {
+            "actionType": "JSFunction",
+            "method": "registerKeyDownEvent",
+            "deps": "js/keyboardService"
+        },
+        "subscribeForUnloadEvent": {
+            "actionType": "JSFunction",
+            "method": "subscribeForLocationUnloadEvent",
+            "inputData": {
+                "name": "commonLocation"
+            },
+            "deps": "js/defaultLocationService"
+        },
+        "constructTitles": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTitles",
+            "deps": "js/awHeaderService",
+            "outputData": {
+                "browserTitle": "result.browserTitle",
+                "browserSubTitle": "result.browserSubTitle",
+                "headerTitle": "result.headerTitle"
+            }
+        },
+        "setTitlesInCtx": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "location.titles",
+                "value": {
+                    "browserTitle": "{{data.browserTitle}}",
+                    "browserSubTitle": "{{data.browserSubTitle}}",
+                    "headerTitle": "{{data.headerTitle}}"
+                }
+            }
+        },
+        "getAvailableSubPages": {
+            "actionType": "JSFunctionAsync",
+            "method": "getAvailableSubpages",
+            "deps": "js/page.service",
+            "inputData": {
+                "parentState": null,
+                "additionalEvalEnv": "{{parameters.additionalEvalEnv}}"
+            },
+            "outputData": {
+                "availablePages": ""
+            }
+        },
+        "constructTabs": {
+            "actionType": "JSFunctionAsync",
+            "method": "constructTabs",
+            "deps": "js/awHeaderService",
+            "inputData": {
+                "availablePages": "{{parameters.availablePages}}"
+            },
+            "outputData": {
+                "subLocationTabs": ""
+            }
+        },
+        "updateBreadcrumbAction": {
+            "actionType": "JSFunction",
+            "method": "updateBreadCrumb",
+            "deps": "js/awHeaderService",
+            "inputData": {
+                "eventData": "{{data.eventMap['refreshBreadCrumb']}}"
+            },
+            "outputData": {
+                "breadCrumbProvider": "result.breadCrumbProvider",
+                "breadcrumbConfig": "result.breadcrumbConfig",
+                "objFound": "result.objFound"
+            }
+        },
+        "resetBreadcrumbAction": {
+            "actionType": "JSFunction",
+            "method": "resetBreadCrumb",
+            "deps": "js/awHeaderService",
+            "outputData": {
+                "breadCrumbProvider": "result.breadCrumbProvider"
+            }
+        },
+        "updateTitles": {
+            "actionType": "JSFunction",
+            "method": "updateDocumentTitles",
+            "deps": "js/awHeaderService"
+        },
+        "updateTabs": {
+            "actionType": "JSFunction",
+            "method": "updateTabs",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/defaultLocationService"
+        },
+        "closeTab": {
+            "actionType": "JSFunction",
+            "method": "closeTab",
+            "inputData": {
+                "subLocationTabs": "{{data.subLocationTabs}}",
+                "removedTab": "{{data.removedTab}}"
+            },
+            "deps": "js/awHeaderService"
+        },
+        "switchSubLocation": {
+            "actionType": "JSFunction",
+            "method": "switchSubLocation",
+            "inputData": {
+                "pageId": "{{data.pageId}}",
+                "tabTitle": "{{data.tabTitle}}",
+                "subLocationTabs": "{{data.subLocationTabs}}"
+            },
+            "deps": "js/awHeaderService"
+        },
+        "narrowModeChangeAction": {
+            "actionType": "JSFunction",
+            "method": "narrowModeChange",
+            "deps": "js/aw.narrowMode.service",
+            "inputData": {
+                "eventData": "{{data.eventMap['narrowModeChangeEvent']}}",
+                "layoutSummaryOnlyStyle": "{{data.layoutSummaryOnlyStyle}}",
+                "headerTitle": "{{data.headerTitle}}",
+                "preNarrowTitle": "{{data.preNarrowTitle}}"
+            },
+            "outputData": {
+                "layoutSummaryOnlyStyle": "result.layoutSummaryOnlyStyle",
+                "headerTitle": "result.headerTitle",
+                "preNarrowTitle": "result.preNarrowTitle"
+            }
+        },
+        "narrowSummaryLocationTitleClickAction": {
+            "actionType": "JSFunction",
+            "method": "narrowSummaryLocationTitleClick",
+            "deps": "js/aw.narrowMode.service",
+            "inputData": {
+                "layoutSummaryOnlyStyle": "{{data.layoutSummaryOnlyStyle}}",
+                "headerTitle": "{{data.headerTitle}}",
+                "preNarrowTitle": "{{data.preNarrowTitle}}"
+            },
+            "outputData": {
+                "layoutSummaryOnlyStyle": "result.layoutSummaryOnlyStyle",
+                "headerTitle": "result.headerTitle",
+                "preNarrowTitle": "result.preNarrowTitle"
+            }
+        }
+    },
+    "dataProviders": {},
+    "functions": {},
+    "onEvent": [ {
+            "eventId": "aw.windowResize",
+            "action": "checkNarrowMode"
+        },
+        {
+            "eventId": "refreshBreadCrumb",
+            "cacheEventData": true,
+            "action": "updateBreadcrumbAction"
+        },
+        {
+            "eventId": "resetBreadCrumb",
+            "action": "resetBreadcrumbAction"
+        },
+        {
+            "eventId": "appCtx.update",
+            "condition": "name === 'location.titles'",
+            "action": "updateTitles"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'state' ",
+            "action": "updateTabs"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'state' ",
+            "action": "constructAndUpdateTitles"
+        },
+        {
+            "eventId": "narrowModeChangeEvent",
+            "cacheEventData": true,
+            "action": "narrowModeChangeAction"
+        },
+        {
+            "eventId": "narrowSummaryLocationTitleClickEvent",
+            "action": "narrowSummaryLocationTitleClickAction"
+        }
+    ],
+    "i18n": {},
+    "messages": {},
+    "conditions": {
+        "isTaskbarFullScreen": {
+            "expression": "ctx.taskbarfullscreen && ctx.taskbarfullscreen === 'true'"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "registerLocationContextAndConstructHeader"
+    }
+}

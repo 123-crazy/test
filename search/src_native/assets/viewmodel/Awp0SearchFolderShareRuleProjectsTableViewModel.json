@@ -1,0 +1,160 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-search-box.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-flex-row.directive"
+    ],
+    "data": {
+        "projectsTableSearchBox": {
+            "displayName": "{{i18n.orgTreeFilterText}}",
+            "type": "STRING"
+        },
+        "projectsTableSearchBoxPlaceHolder": {
+            "dbValue": "{{i18n.orgTreeFilterText}}"
+        }
+    },
+    "actions": {
+        "loadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2017-05-ProjectLevelSecurity",
+            "method": "getProjectsForAssignOrRemove",
+            "inputData": {
+                "projectsInput": [ {
+                    "user": "{{ctx.user}}",
+                    "selectedObjects": [ {
+                        "uid": "{{ctx.xrtSummaryContextObject.uid}}",
+                        "type": "{{ctx.xrtSummaryContextObject.type}}"
+                    } ],
+                    "assignedObjects": [],
+                    "filterText": "{{data.projectsTableSearchBox.dbValue}}",
+                    "isAceContext": false,
+                    "paginationInfo": {
+                        "startIndexForAvailableProjects": "{{data.dataProviders.gridDataProvider.startIndex}}",
+                        "maxToReturnForAvailableProjects": "{{function:getDefaultPageSize}}"
+                    }
+                } ]
+            },
+            "outputData": {
+                "projects": "availableProjectList"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "searchFolderShareRuleProjectList.refresh"
+                    }
+                ]
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "TC_Project",
+                        "properties":
+                        [
+                            {
+                                "name": "project_id"
+                            },
+
+                            {
+                                "name": "project_name"
+                            },
+                            {
+                                "name": "icon"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        },
+        "doGridDataProvider": {
+            "actionType": "dataProvider",
+            "method": "gridDataProvider"
+        },
+        "plTableClientRefresh": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "gridProjectsView.plTable.clientRefresh"
+                } ]
+            }
+        },
+        "disableRemoveButton": {
+            "actionType": "JSFunction",
+            "method": "disableButton",
+            "inputData": {
+                "buttonName": "remove",
+                "dataProvider": "{{data.dataProviders.gridDataProvider}}"
+            },
+            "deps": "js/Awp0SearchFolderShareRuleService"
+        }
+    },
+    "dataProviders": {
+        "gridDataProvider": {
+            "action": "loadData",
+            "response": "{{data.projects}}",
+            "totalFound": "{{data.projects.length}}",
+            "selectionModelMode": "multiple",
+            "ctx.searchFolder.projects.totalFound": "{{data.projects.length}}"
+        }
+    },
+    "columnProviders": {
+        "clientScopeUI": {
+            "columns": [
+                {
+                    "name": "project_name",
+                    "width": 160,
+                    "displayName": "{{i18n.projectName}}",
+                    "enableColumnHiding": false
+                },
+                {
+                    "name": "project_id",
+                    "displayName": "{{i18n.projectId}}",
+                    "enableColumnHiding": false
+                }
+            ],
+            "sortCriteria": "{{ctx.sublocation.sortCriteria}}"
+        }
+    },
+    "grids": {
+        "gridProjectsView": {
+            "dataProvider": "gridDataProvider",
+            "columnProvider": "clientScopeUI",
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": false
+            }
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize":
+        {
+            "functionName": "getDefaultPageSize",
+            "parameters": [
+                "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "searchFolderShareRuleProjectList.refresh",
+            "action": "plTableClientRefresh"
+        },
+        {
+            "eventId": "gridDataProvider.selectionChangeEvent",
+            "action": "disableRemoveButton"
+        }
+    ],
+    "i18n": {
+        "orgTreeFilterText": [ "ProjmgmtConstants" ],
+        "projectName": [ "SearchMessages" ],
+        "projectId": [ "SearchMessages" ]
+    }
+}

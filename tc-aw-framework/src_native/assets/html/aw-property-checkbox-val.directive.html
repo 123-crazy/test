@@ -1,0 +1,26 @@
+<aw-property-error>
+    <span ng-class="{'aw-widgets-propertyError': errorApi.errorMsg, 'disabled': !prop.isEnabled}">
+        <div class="afx-checkbox" ng-class="{
+            'afx-checkbox-label-side': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_SIDE',
+            'afx-checkbox-label-right': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_RIGHT',
+            'afx-checkbox-label-top': prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_TOP' }">
+            <label class="aw-jswidgets-checkboxWrapper">
+                <span class="hidden">{{prop.propertyDisplayName}}</span>
+                <input type="checkbox" aria-label="{{prop.propertyDisplayName}}" aria-required="{{prop.isRequired}}" id="{{prop.name + $id}}" class="aw-jswidgets-checkboxButton"
+                    auto-focus="prop.autofocus"
+                    ng-model="prop.dbValue" ng-change="changeFunction()"
+                    aw-widget-initialize aw-autofocus ng-disabled="!prop.isEnabled"
+                    ng-keydown="evalKey($event)" ng-attr-tabindex="{{prop.tabIndex}}" action="action"/>
+                <span class="afx-checkbox-md-style">
+                    <span class="check"></span>
+                </span>
+            </label>
+        </div>
+        <label ng-show="prop.propertyLabelDisplay == 'PROPERTY_LABEL_AT_RIGHT'"
+            class="aw-jswidgets-checkboxLabel" for="{{prop.name + $id}}"
+            ng-class="{'afx-property-required': prop.isRequired && prop.propertyDisplayName && prop.propertyLabelDisplay=='PROPERTY_LABEL_AT_RIGHT'}"
+            >{{prop.propertyDisplayName}}
+        </label>
+        <span ng-show="showRequired()" class="aw-jswidgets-standaloneRequired">{{prop.propertyRequiredText}}</span>
+    </span>
+</aw-property-error>

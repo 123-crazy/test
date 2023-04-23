@@ -1,0 +1,19 @@
+<div class="aw-tcWidgets-inContextSearchRecipeContainer" title="{{prop.searchResultCategory}}">
+    <div class="aw-uiWidgets-inContextSearchRecipeContent">
+        <div class="aw-tcWidgets-inContextSearchRecipeLabelValueContainer">
+            <div class="aw-tcWidgets-inContextSearchRecipeLabel inactive">{{prop.searchResultCategory}}:</div>
+            <div class="aw-tcWidgets-inContextSearchRecipeValue" ng-if="prop.filterValues.length === 1" title="{{prop.filterValues[0].name}}">{{prop.filterValues[0].name}}</div>
+            <a class="aw-tcWidgets-inContextSearchRecipeLink aw-aria-border aw-aria-border" ng-if="prop.filterValues.length > 1" ng-click="openObjectRecipes()" tabindex="0" ng-keydown="openObjectRecipesKeyPress($event)">{{prop.filterValues.length}} {{i18n.selectedCount}}</a>
+        </div>
+        <aw-icon icon-id="cmdDelete" class="aw-commands-commandIconButton aw-aria-border" title="{{i18n.remove}}" ng-if="prop.filterValues.length != 0" ng-click="removeObjectSet($event, true, null)" tabindex="0" ng-keydown="removeBreadcrumbAddPanelKeyPress($event)"></aw-icon>
+    </div>
+    <div>
+        <div ng-if="prop.filterValues.length > 1" ng-repeat="filterVal in prop.filterValues" ng-show="showObjectRecipes">
+            <div class="aw-tcWidgets-inContextSearchRecipeLabelValueContainer" title="{{filterVal.name}}">
+                <div class="aw-tcWidgets-inContextSearchRecipeLabel inactive invisible">{{prop.searchResultCategory}}: </div>
+                <div class="aw-tcWidgets-inContextSearchRecipeValue">{{filterVal.name}}</div>
+            </div>
+            <aw-icon icon-id="cmdDelete" class="aw-commands-commandIconButton aw-aria-border" title="{{i18n.remove}}" ng-click="removeObjectSet($event, false, filterVal)" tabindex="0" ng-keydown="clearBreadcrumbAddPanelKeyPress($event, filterVal)"></aw-icon>
+        </div>
+    </div>
+</div>

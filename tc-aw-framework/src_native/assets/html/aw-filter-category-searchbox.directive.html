@@ -1,0 +1,10 @@
+<div class="aw-ui-filterCategorySearchBoxWidget" visible-when="!disableTypeAheadFacetSearch">
+    <div class="aw-ui-filterCategorySearchBoxWrapper aw-layout-flexRow" category="category">
+        <input type="text" id="{{index}}" placeholder="{{filterText}}" aria-label="{{filterText}}" ng-model="category.filterBy" ng-keyup="evalKeyup($event)" autocomplete="off" />
+    </div>
+</div>
+<div class="aw-uiwidgets-searchBoxContainer" visible-when="disableTypeAheadFacetSearch" ng-class="{'aw-uiwidgets-searchBoxContainerFocus':focused}">
+    <input type="text" ng-model="category.filterCriteria" placeholder="{{filterText}}" aria-label="{{filterText}}" class="aw-uiwidgets-searchBox" ng-keyup="evalKeyup($event)" ng-focus="setFocus( true )" ng-blur="setFocus( false )" />
+    <aw-icon class='aw-uiwidgets-searchResetIcon aw-aria-border' icon-id='cmdClearText' ng-click='reset()' tabindex="0" ng-keydown="clearFilterCategoryKeyPress($event)" ng-if='category.filterCriteria && category.filterCriteria.length>0' extended-tooltip='{"extendedTooltipContent": "{{resetText}}"}'></aw-icon>
+    <aw-icon class="aw-uiwidgets-searchBoxIcon aw-aria-border" ng-click="evalSearchIconClick()" tabindex="0" ng-keydown="performSearchFilterCategoryKeyPress($event)" icon-id="cmdSearch"></aw-icon>
+</div>

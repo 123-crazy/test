@@ -1,0 +1,13 @@
+<ul class="aw-ui-tree">
+    <li class="aw-ui-treeNode" ng-repeat="node in tree">
+        <div class="aw-ui-treeNode-valueContainer">
+            <aw-property-image name="miscExpandedTree" class="expanded" ng-click="collapse(node)" ng-show="(node.children.length > 0)&&(node.expanded)"></aw-property-image>
+            <aw-property-image name="miscExpandedTree" class="collapsed" ng-click="expand(node)" ng-show="(node.children.length > 0)&&(!node.expanded)"></aw-property-image>
+            <span class="aw-ui-nodeFiller" ng-show="(!node.children)||(node.children.length==0)"></span>
+            <span class="aw-ui-treeNodeValue" ng-class="{'aw-state-selected': node.selected}" ng-click="toggleSelection(node)" aw-transclude></span>
+        </div>
+        <aw-node tree="node.children" ng-show="node.expanded">
+            <span class="aw-ui-treeNodeValue" ng-class="{'aw-state-selected': node.selected}" aw-transclude></span>
+        </aw-node>
+    </li>
+</ul>

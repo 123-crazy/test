@@ -1,0 +1,67 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-init.directive",
+        "js/aw-label.directive",
+        "js/aw-date.directive",
+        "js/aw-column.directive",
+        "js/aw-icon.directive",
+        "js/aw-enter-key.directive"
+    ],
+    "data": {
+        "title": {
+            "displayName": "{{i18n.dateFilterTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        }
+    },
+    "i18n": {
+        "dateFilterTitle": [ "UIMessages" ],
+        "invalidDate": [ "UIMessages" ]
+    },
+    "actions": {
+        "filterAction": {
+            "actionType": "JSFunction",
+            "method": "doDateFiltering",
+            "inputData": {
+                "column": "{{data.context.column}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "eventData": {
+                    "columnName": "{{data.context.column.field}}",
+                    "startDate": "{{data.context.column.filter.startDate.dbValue}}",
+                    "endDate": "{{data.context.column.filter.endDate.dbValue}}"
+                },
+                "viewModelData": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "pltable.columnFilterApplied",
+                    "condition": "data.context.filterError !== true && data.context.filterNoAction !== true",
+                    "eventData": {
+                        "gridId": "{{data.context.gridId}}",
+                        "columnName": "{{data.context.column.field}}"
+                    }
+                }, {
+                    "name": "pltable.columnFilterApplied",
+                    "condition": "data.context.filterError !== true && data.context.filterNoAction === true",
+                    "eventData": {}
+                } ]
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "dateFilterInputChanged": {
+            "actionType": "JSFunction",
+            "method": "dateFilterInputChanged",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModelData": "{{data}}"
+            },
+            "deps": "js/awColumnFilterService"
+        }
+    }
+}

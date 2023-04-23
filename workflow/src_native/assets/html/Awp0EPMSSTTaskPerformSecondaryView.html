@@ -1,0 +1,37 @@
+<div class="aw-layout-flexColumn aw-layout-include aw-workflow-performTaskPanel">
+    <aw-panel-body>
+        <aw-widget  prop="data.taskName" hint="label"></aw-widget>
+        <aw-widget  prop="data.description" hint="label" visible-when="conditions.showInstructions"></aw-widget>
+        <aw-widget  prop="data.workflowDescription" hint="label" visible-when="conditions.showWorkflowDescription"></aw-widget>
+        <aw-command-panel-section caption="i18n.reviewers" anchor="data.profileCommands" context="data" exist-when="conditions.isProfileExistOnTask">
+            <aw-list dataprovider="data.dataProviders.reviewProfileSignoffProvider">
+                <aw-include name="Awp0SignoffProfileCellContent" exist-when="item.modelType.typeHierarchyArray.indexOf( 'EPMSignoffProfile' ) > -1" sub-panel-context="item"></aw-include>
+                <aw-include name="Awp0SignoffCellContent" exist-when="item.modelType.typeHierarchyArray.indexOf( 'Signoff' ) > -1" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-command-panel-section caption="i18n.reviewers" anchor="data.sectionCommands" context="data" exist-when="!conditions.isProfileExistOnTask">
+            <aw-list dataprovider="data.dataProviders.reviewAdhocSignoffProvider">
+                <aw-include name="Awp0SignoffCellContent" exist-when="item.modelType.typeHierarchyArray.indexOf( 'Signoff' ) > -1" sub-panel-context="item"></aw-include>
+                <aw-include name="Awp0WorkflowRequiredCellContent" exist-when="!(item.modelType.typeHierarchyArray.indexOf( 'Signoff' ) > -1)" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-command-panel-section caption="i18n.additionalReviewers" anchor="data.sectionCommands" context="data" exist-when="conditions.isProfileExistOnTask">
+            <aw-list dataprovider="data.dataProviders.reviewAdhocSignoffProvider">
+                <aw-include name="Awp0SignoffCellContent" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-command-panel-section>
+        <aw-panel-section caption="i18n.minimumParticipation">
+            <aw-radiobutton  prop="data.quorumOptions" enable-when="conditions.enableQuorumEditBox"></aw-radiobutton>
+            <aw-numeric id="sstPercentQuorumValue" prop="data.percentQuorumValue" visible-when="conditions.isPercentQuorum" enable-when="conditions.enableQuorumEditBox"></aw-numeric>
+            <aw-numeric id="sstNumericQuorumValue" prop="data.numericQuorumValue" visible-when="conditions.isNumericQuorum" enable-when="conditions.enableQuorumEditBox"></aw-numeric>
+            <aw-break></aw-break>
+            <aw-checkbox prop="data.waitForReviewers" visible-when="conditions.showCheckBox"></aw-checkbox>
+            <aw-checkbox prop="data.waitForReviewershide" visible-when="conditions.hideCheckBox" enable-when="conditions.showCheckBox"></aw-checkbox>
+        </aw-panel-section>
+        <aw-widget prop="data.comments" hint="textarea"></aw-widget>
+        <aw-password prop="data.password" visible-when="conditions.isSecureTask"></aw-password>
+    </aw-panel-body>
+    <aw-panel-footer visible-when="conditions.isValidToComplete">
+        <aw-button action="verifySaveTaskAndComplete" visible-when="conditions.isValidToComplete"><aw-i18n>i18n.complete</aw-i18n></aw-button>
+    </aw-panel-footer>
+</div>

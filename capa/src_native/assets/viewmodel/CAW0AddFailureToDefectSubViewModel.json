@@ -1,0 +1,276 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-search-box.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "*"
+        },
+        "searchFilterPanels": [ {
+                "tabKey": "results",
+                "panelId": "failureResultsTabPageSub",
+                "name": "{{i18n.results}}",
+                "visibleWhen": "data.visibleSearchFilterPanelTabKeys.indexOf('results')>-1 "
+            },
+            {
+                "tabKey": "filters",
+                "panelId": "failureFiltersTabPageSub",
+                "name": "{{i18n.filterTabTitle}}",
+                "visibleWhen": "data.visibleSearchFilterPanelTabKeys.indexOf('filters')>-1 "
+            }
+        ],
+        "visibleSearchFilterPanelTabKeys": "[ 'results', 'filters' ]",
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        }
+    },
+    "actions": {
+        "createFailureRelationWithDefect": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.selected}}",
+                    "secondaryObject": "{{data.eventMap['performSearch.selectionChangeEvent'].selectedObjects[0]}}",
+                    "relationType": "CAW0RelatedFailure",
+                    "clientId": "CreateObject",
+                    "userData": ""
+                } ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "successMessage"
+                } ],
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "replaceFailureRelationWithDefect": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.pselected}}",
+                    "secondaryObject": "{{data.eventMap['performSearch.selectionChangeEvent'].selectedObjects[0]}}",
+                    "relationType": "CAW0RelatedFailure",
+                    "clientId": "CreateObject",
+                    "userData": ""
+                } ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "successMessageForReplace"
+                } ]
+            }
+        },
+        "updateSelectedFailure": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedFailure",
+            "inputData": {
+                "data": "{{data.eventData}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "deleteAndCreateFailureRelationWithDefect": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2014-10-DataManagement",
+            "method": "removeChildren",
+            "inputData": {
+                "inputData": [ {
+                    "clientId": "",
+                    "parentObj": "{{ctx.pselected}}",
+                    "childrenObj": [ "{{ctx.selected}}" ],
+                    "propertyName": "CAW0RelatedFailure"
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "caw0.replaceFailureRelationWithDefect"
+                    }
+                ]
+            },
+            "actionMessages": {
+               "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "presetFilter": {
+            "actionType": "JSFunction",
+            "method": "presetFilter",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "initSearch"
+                } ]
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "findSubBusinessObjectsAndInvokeSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "evalConditionForDefaultRelation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "getDefaultRelationforSearch",
+                    "condition": "data.targetObject && data.relationList.length>1"
+                } ]
+            }
+        },
+        "getDefaultRelationforSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-DataManagement",
+            "method": "getDefaultRelation",
+            "inputData": {
+                "input": [ {
+                    "primaryType": "{{data.targetObject.type}}",
+                    "secondaryType": "{{data.eventData.selectedObjects[0].type}}"
+                } ]
+            },
+            "outputData": {
+                "defaultRelation": "output[0].defaultRelation"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.updateRelationList"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "presetFilter"
+    },
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showSearchFilterPanel": {
+            "expression": "data.showSearchFilter != undefined && data.showSearchFilter == true"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "initSearch",
+            "action": "search"
+        },
+        {
+            "eventId": "performSearch.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "evalConditionForDefaultRelation"
+        },
+        {
+            "eventId": "getDefaultRelationforSearch",
+            "action": "getDefaultRelationforSearch"
+        },
+        {
+            "eventId": "failureListProvider.selectionChangeEvent",
+            "action": "updateSelectedFailure",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "caw0.replaceFailureRelationWithDefect",
+            "action": "replaceFailureRelationWithDefect"
+        }
+    ],
+    "i18n": {
+        "addFailureToDefect": [ "CAW0CapaMessages" ],
+        "addPanelTitle": [ "TCUICommandPanelsMessages" ],
+        "addButtonTitle": [ "TCUICommandPanelsMessages" ],
+        "caw0add": [
+            "CAW0CapaMessages"
+        ],
+        "results": [
+            "UIMessages"
+        ],
+        "filterTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ]
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    }
+}

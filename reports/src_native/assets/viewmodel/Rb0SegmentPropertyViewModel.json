@@ -1,0 +1,117 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-radiobutton.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "clearRelationSegment": {
+            "actionType": "JSFunction",
+            "method": "clearRelationSegment",
+            "inputData": {
+                "data": "{{subPanelContext}}",
+                "checkboxVal": "{{data.bomExpansionCheckbox}}"
+            },
+            "deps": "js/configureItemReportService"
+        },
+        "populateSegmentDataWithBomInfo": {
+            "actionType": "JSFunction",
+            "method": "populateSegmentDataWithBomInfo",
+            "inputData": {
+                "data": "{{subPanelContext}}",
+                "checkboxVal": "{{data.bomExpansionCheckbox}}"
+            },
+            "deps": "js/configureItemReportService"
+        },
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "initSegmentPropertyVM",
+            "inputData": {
+                "checkboxEnProp": "{{data.checkboxEnableProp}}",
+                "bomInSegment": "{{subPanelContext.bomInSegment}}",
+                "bomExpansionCheckbox": "{{data.bomExpansionCheckbox}}"
+            },
+            "deps": "js/configureItemReportService"
+        },
+        "doToggleCheckboxVisibilityWhenTrue": {
+            "actionType": "JSFunction",
+            "method": "toggleCheckboxVisibilityWhenTrue",
+            "inputData": {
+                "checkboxEnProp": "{{data.checkboxEnableProp}}",
+                "bomExpansionCheckbox": "{{data.bomExpansionCheckbox}}"
+            },
+            "deps": "js/configureItemReportService"
+        },
+        "doToggleCheckboxVisibilityWhenFalse": {
+            "actionType": "JSFunction",
+            "method": "toggleCheckboxVisibilityWhenFalse",
+            "inputData": {
+                "checkboxEnProp": "{{data.checkboxEnableProp}}",
+                "bomExpansionCheckbox": "{{data.bomExpansionCheckbox}}"
+            },
+            "deps": "js/configureItemReportService"
+        }
+    },
+    "data": {
+        "bomExpansionCheckbox": {
+            "displayName": "{{i18n.expandStructureLabel}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": "{{i18n.expandStructureLabel}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "checkboxEnableProp": {
+            "dbValue": true
+        },
+        "fnd0NewDirectionValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.forward}}",
+                    "propInternalValue": "true"
+                },
+                {
+                    "propDisplayValue": "{{i18n.backward}}",
+                    "propInternalValue": "false"
+                }
+            ]
+        }
+    },
+    "conditions": {
+        "addBomExpansionValid": {
+            "expression": "subPanelContext.props.fnd0Direction.dbValue && data.checkboxEnableProp.dbValue"
+        },
+        "bomExpansionCheckboxNotChecked": {
+            "expression": "!data.bomExpansionCheckbox.dbValue"
+        },
+        "showBomSegmentCheckbox": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion === 14 && ctx.tcSessionData.tcMinorVersion >= 1) && subPanelContext.index === 1"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    },
+    "onEvent": [
+        {
+            "eventId": "rb0BomInSegmentCheckboxIsTrue",
+            "action": "doToggleCheckboxVisibilityWhenTrue"
+        },
+        {
+            "eventId": "rb0BomInSegmentCheckboxIsFalse",
+            "action": "doToggleCheckboxVisibilityWhenFalse"
+        }
+    ],
+    "i18n":
+    {
+        "expandStructureLabel":
+        [
+            "ReportChartMessages"
+        ],
+        "forward": [ "ReportChartMessages" ],
+        "backward": [ "ReportChartMessages" ]
+    }
+}

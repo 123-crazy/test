@@ -1,0 +1,65 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "orgBreadCrumbProvider"
+        },
+        "buildCrumbs":
+        {
+            "actionType": "JSFunction",
+            "method": "buildNavigateBreadcrumb",
+            "inputData":
+            {
+               "totalFound": "{{ctx.search.totalFound}}",
+               "selectedObjects": "{{ctx.mselected}}"
+            },
+            "outputData":
+            {
+                "crumbs": "crumbs"
+            },
+            "deps": "js/userMgmtService"
+        },
+        "onSelect":
+        {
+            "actionType": "JSFunction",
+            "method": "onSelectCrumb",
+            "inputData":
+            {
+               "crumb": "{{data.eventData}}"
+            },
+            "deps": "js/userMgmtService"
+        }
+    },
+    "dataProviders":
+    {
+        "orgBreadCrumbProvider":
+        {
+            "action": "buildCrumbs",
+            "response": "{{data.crumbs}}",
+            "totalFound": "{{data.crumbs.length}}"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "orgBreadCrumb.selectCrumb",
+            "action": "onSelect",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "orgBreadCrumb.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "orgBreadCrumb.refresh",
+            "action": "reveal"
+        }
+    ]
+}

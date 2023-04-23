@@ -1,0 +1,33 @@
+<aw-command-panel caption="i18n.filterString">
+    <aw-panel-body>
+        <aw-panel-section>
+            <span class="aw-activecollab-feedFilterPanelClearAll">
+                <aw-link  prop="data.feedFilterPanelClearAll" action="clearAllAction"></aw-link>
+            </span>
+            <div aw-repeat="prop : data.ac0Filters2">
+                <aw-widget prop="prop" exist-when="prop.hint !=='checkboxoptionlov'"></aw-widget>
+                <aw-checkbox-multiselect prop="prop" exist-when="prop.hint ==='checkboxoptionlov'"></aw-checkbox-multiselect>
+            </div>
+
+
+            <aw-widget prop="data.ac0Filters3.ac0IsPrivate"></aw-widget>
+            <div aw-repeat="prop : data.ac0Filters3" visible-when="ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'">
+                <!--
+                <aw-widget prop="prop" exist-when="prop.hint !=='checkboxoptionlov'"></aw-widget>
+                -->
+                <aw-checkbox-multiselect prop="prop" exist-when="prop.propertyName === 'ac0Priority'"></aw-checkbox-multiselect>
+            </div>
+            <div aw-repeat="prop : data.ac0Filters3" visible-when="ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'">
+                <aw-checkbox-multiselect prop="prop" exist-when="prop.propertyName === 'ac0Status'"></aw-checkbox-multiselect>
+            </div>
+            <aw-widget prop="data.ac0Filters1.dateCreatedBefore"></aw-widget>
+            <aw-widget prop="data.ac0Filters1.dateCreatedAfter"></aw-widget>
+
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-button action="doFeedFilter">
+            <aw-i18n>i18n.applyFeedFilters</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

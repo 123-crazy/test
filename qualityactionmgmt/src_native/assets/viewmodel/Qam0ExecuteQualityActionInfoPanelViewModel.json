@@ -1,0 +1,236 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-textarea.directive",
+        "js/visible-when.directive",
+        "js/aw-break.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "activate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:executeQualityActionOnInfoPanel}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "loadUpdateObjectCtxEvent"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{ctx.selected}}" ]
+                        }
+                    },
+                    {
+                        "name": "commentActivate"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "failure": [
+                    {
+                    "message": "SOAFailureMsg"
+                    }
+                ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "confirm": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:executeQualityActionOnInfoPanel}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "loadUpdateObjectCtxEvent"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{ctx.selected}}" ]
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "complete": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:executeQualityActionOnInfoPanel}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "loadUpdateObjectCtxEvent"
+                    },
+                    {
+                        "condition" : "!(ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation' && ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Optimization') && !(ctx.locationContext['ActiveWorkspace:SubLocation'] === 'showObject' && ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Optimization')",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{ctx.selected}}" ]
+                        }
+                    },
+                    {
+                        "condition" : "(ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityFmeaSublocation' && ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Optimization') || (ctx.locationContext['ActiveWorkspace:SubLocation'] === 'showObject' && ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Optimization')",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "relatedModified": [
+                                "{{ctx.pselected}}",
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "makeCommentNonEditableOnInfoPanelEvent"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "failure": [
+                    {
+                    "message": "SOAFailureMsg"
+                    }
+                ]
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "makeCommentNonEditableOnInfoPanel": {
+            "actionType": "JSFunction",
+            "method": "makeCommentNonEditableOnInfoPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "commentActivate": {
+            "actionType": "JSFunction",
+            "method": "commentActivate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        },
+        "loadUpdateObjectCtx": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "loadObjects",
+            "inputData":
+            {
+                "uids": ["{{ctx.selected.uid}}"]
+            },
+            "outputData":
+            {
+                "modelObjects": "modelObjects",
+                "plainObject": "plain"
+            },
+             "events":
+            {
+                "success":
+                [
+                    {
+                        "name":"UpdateObjectCtxEvent"
+                    }
+                ]
+             },
+            "deps": "soa/dataManagementService"
+        },
+        "updateObjectCtx": {
+            "actionType": "JSFunction",
+            "method": "UpdateObjectCtx",
+            "inputData": {
+                "modelObjects": "{{data.modelObjects}}",
+                "plainObject": "{{data.plainObject}}"
+            },
+            "deps": "js/Qam0QualityActionService"
+        }
+    },
+
+    "data": {
+        "comment": {
+            "displayName": "{{i18n.comment}}",
+            "type": "STRING",
+            "isRequired": "false"
+        },
+        "isActive": {}
+    },
+    "onEvent": [ {
+            "eventId": "Qam0ExecuteQualityActionInfoPanel.contentLoaded",
+            "action": "makeCommentNonEditableOnInfoPanel"
+        },
+        {
+            "eventId": "makeCommentNonEditableOnInfoPanelEvent",
+            "action": "makeCommentNonEditableOnInfoPanel"
+        },
+        {
+            "eventId": "commentActivate",
+            "action": "commentActivate"
+        },
+        {
+            "eventId": "loadUpdateObjectCtxEvent",
+            "action": "loadUpdateObjectCtx"
+        },
+        {
+            "eventId": "UpdateObjectCtxEvent",
+            "action": "updateObjectCtx"
+        }
+    ],
+
+    "functions": {
+        "executeQualityActionOnInfoPanel": {
+            "functionName": "executeQualityActionOnInfoPanel",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isActive": {
+            "expression": "!ctx.editInProgress && ctx.INFO_PANEL_CONTEXT && ctx.selected.props.qam0QualityActionStatus.dbValues[0] !== 'Draft' && ctx.selected.props.qam0QualityActionStatus.dbValues[0] !== 'Template'"
+        },
+        "isInDraftState": {
+            "expression": "!ctx.editInProgress && ctx.INFO_PANEL_CONTEXT && ( ctx.selected.modelType.typeHierarchyArray.indexOf('Qam0QualityAction') > -1  &&  ctx.selected.props.qam0QualityActionStatus.dbValues[ 0 ] === 'Draft')"
+        },
+        "isConfirmationRequired": {
+            "expression": "!ctx.editInProgress && ctx.INFO_PANEL_CONTEXT && ( ctx.selected.modelType.typeHierarchyArray.indexOf('Qam0QualityAction') > -1  &&  (ctx.selected.props.qam0QualityActionStatus.dbValues[0] === 'Active' && ctx.selected.props.qam0ConfirmationRequired.dbValues[0] === '1'))"
+        },
+        "isConfirmationNotRequired": {
+            "expression": "!ctx.editInProgress && ctx.INFO_PANEL_CONTEXT && ( ctx.selected.modelType.typeHierarchyArray.indexOf('Qam0QualityAction') > -1  && ( (ctx.selected.props.qam0QualityActionStatus.dbValues[0] === 'Active' && (ctx.selected.props.qam0ConfirmationRequired.dbValues[0] === '0' || ctx.selected.props.qam0ConfirmationRequired.dbValues[0] === null ) )  || (ctx.selected.props.qam0QualityActionStatus.dbValues[0] === 'Confirmed') ) )"
+        }
+    },
+    "messages": {
+        "SOAFailureMsg": {
+           "messageType": "ERROR",
+           "messageText": "{{errorCode}}"
+         }
+    },
+    "i18n": {
+        "activateQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "confirmQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "completeQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "comment" : [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

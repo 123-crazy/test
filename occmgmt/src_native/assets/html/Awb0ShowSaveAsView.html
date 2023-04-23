@@ -1,0 +1,23 @@
+<aw-command-panel caption="i18n.saveas">
+    <aw-form name="saveAsPanelForm">
+        <aw-panel-body>
+            <aw-tab-set tabs="data.tabsModel.dbValues"></aw-tab-set>
+        </aw-panel-body>
+    </aw-form>
+
+    <aw-panel-footer>
+        <aw-checkbox prop="data.selectChildrenToDuplicate" action="enableDisableUIContent" visible-when="conditions.isDuplicateVisible"></aw-checkbox>
+        <aw-button action="revise" visible-when="saveAsPanelForm.$valid&&conditions.isReviseVisible">
+            <aw-i18n>i18n.save</aw-i18n>
+        </aw-button>
+        <aw-button action="saveas" visible-when="saveAsPanelForm.$valid&&data.selectedTab.panelId=='saveAsNew' && !data.selectChildrenToDuplicate.dbValue">
+            <aw-i18n>i18n.save</aw-i18n>
+        </aw-button>
+        <aw-button action="saveAsBaseline" visible-when="saveAsPanelForm.$valid&&conditions.isSaveVisible">
+            <aw-i18n>i18n.save</aw-i18n>
+        </aw-button>
+        <aw-button action="enableDuplicateMode" visible-when="saveAsPanelForm.$valid&&data.selectChildrenToDuplicate.dbValue">
+            <aw-i18n>i18n.select</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

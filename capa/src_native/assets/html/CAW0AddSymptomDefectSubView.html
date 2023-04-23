@@ -1,0 +1,26 @@
+<aw-panel-header>
+    <aw-panel-section caption="i18n.toTitle">
+        <aw-default-cell vmo="ctx.xrtSummaryContextObject"></aw-default-cell>
+    </aw-panel-section>
+</aw-panel-header>
+<aw-panel-body exist-when="!data.isObjectTypeSelected">
+    <aw-panel-section caption="i18n.objectType">
+        <aw-type-selector prop="data.filterBox" include="CAW0Defect" load-sub-types="true" override-id="IssueAndCapa">
+        </aw-type-selector>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-body exist-when="data.isObjectTypeSelected">
+    <aw-title-link prop="ctx.type_name" action="clearSelectedType"></aw-title-link>
+    <aw-xrt type="CREATE" object-type="CAW0Defect"></aw-xrt>
+    <aw-command-panel-section exist-when="ctx.tcSessionData.tcMajorVersion >= 13" caption="i18n.failure" anchor="data.addFailureCommand" context="data">
+        <aw-list dataprovider="data.dataProviders.getFailureProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <!-- panel-footer button for New tab -->
+    <aw-button default="true" action="createObject" visible-when="data.object_name.dbValue !=='' && data.object_name.dbValue !==null && data.object_name.dbValue !== undefined">
+        <aw-i18n>i18n.addButtonTitle</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

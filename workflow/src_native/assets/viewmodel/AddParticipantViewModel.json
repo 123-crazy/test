@@ -1,0 +1,151 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":
+    {
+        "addParticipants": {
+            "actionType": "JSFunction",
+            "method": "getAdaptedObjects",
+            "inputData": {
+                "sourceObjects": [
+                    "{{ctx.xrtSummaryContextObject}}"
+                ]
+            },
+            "outputData": {
+                "selectedObj": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "workflow.addParticipants"
+                    }
+                ]
+            },
+            "deps": "js/adapterService"
+        },
+        "addParticipantsInternal":
+        {
+            "actionType": "JSFunction",
+            "method": "addParticipants",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx" : "{{ctx}}"
+            },
+
+            "deps": "js/AddParticipant"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "setPin": {
+            "actionType": "JSFunction",
+            "method": "setPinnedToForm",
+            "inputData": {
+                "pinnedToForm": "{{data.pinnedToForm}}",
+                "unpinnedToForm": "{{data.unpinnedToForm}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "setUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPinnedToForm",
+            "inputData": {
+                "pinnedToForm": "{{data.pinnedToForm}}",
+                "unpinnedToForm": "{{data.unpinnedToForm}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "unRegisterParticipantContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "multiParticipantDataMap"
+            }
+        }
+    },
+
+    "data": {
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "workflowPanelPinCommands": "workflow_oneStepPinCommands"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "appCtx.register",
+            "condition": "conditions.checkSelectionChange",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "workflow.addParticipants",
+            "action": "addParticipantsInternal"
+        },
+        {
+            "eventId": "workflow.panelSetPin",
+            "action": "setPin"
+        },
+        {
+            "eventId": "workflow.panelSetUnPin",
+            "action": "setUnPin"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "AddParticipant.contentUnloaded",
+            "action": "unRegisterParticipantContext"
+        }
+    ],
+    "conditions":
+    {
+        "isValidToAdd":
+        {
+            "expression": "data.selectedObjects != null && data.selectedObjects.length > 0"
+        },
+        "checkSelectionChange":
+        {
+            "expression": "name == 'selected' && data.selectedObj[0].uid !== ctx.selected.uid"
+        }
+    },
+    "i18n":
+    {
+        "Add_Title": [ "WorkflowCommandPanelsMessages"]
+    }
+
+}

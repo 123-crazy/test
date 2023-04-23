@@ -1,0 +1,56 @@
+<aw-panel>
+    <aw-panel-body>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-panel-section caption="i18n.task">
+                <aw-label prop="data.name"></aw-label>
+                <aw-label prop="data.status" exist-when="conditions.isOnlyTaskObjectSelected"></aw-label>
+            </aw-panel-section>
+        </div>
+        <div class="aw-workflow-panelSectionTitle">
+            <aw-panel-section caption="i18n.assignments">
+                <aw-command-panel-section id="assigner" exist-when="conditions.isTaskObjectSelected && conditions.isMultiUserTaskSelected" caption="i18n.Assigner" anchor="data.addUsersOnPanelAnchor" context="data.dataProviders.assignerDataProvider">
+                    <aw-list dataprovider="data.dataProviders.assignerDataProvider" show-drop-area="true">
+                        <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                    </aw-list>
+                </aw-command-panel-section>
+                <aw-command-panel-section id="assignee" exist-when="conditions.isTaskObjectSelected && !conditions.isMultiUserTaskSelected" caption="i18n.assignee" anchor="data.addUsersOnPanelAnchor" context="data.dataProviders.assignerDataProvider">
+                    <aw-list dataprovider="data.dataProviders.assignerDataProvider" show-drop-area="true" name="assignerDataProvider">
+                        <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                    </aw-list>
+                </aw-command-panel-section>
+                <aw-command-panel-section id="reviewers" exist-when="conditions.isReviewOrAckOrRouteTaskSelected" caption="i18n.addReviewerLabelText" anchor="data.addUsersOnPanelAnchor" context="data.dataProviders.reviewersDataProvider">
+                    <aw-list dataprovider="data.dataProviders.reviewersDataProvider" show-drop-area="true">
+                        <aw-include name="Awp0SignoffProfileCellContent" exist-when="item.modelType.typeHierarchyArray.indexOf( 'EPMSignoffProfile' ) > -1" sub-panel-context="item"></aw-include>
+                        <aw-include name="Awp0UserPanelCell" sub-panel-context="item" exist-when="item.type && item.type !== 'EPMSignoffProfile'"></aw-include>
+                        <aw-include name="Awp0WorkflowRequiredCellContent" exist-when="!item.type" sub-panel-context="item"></aw-include>
+                    </aw-list>
+                </aw-command-panel-section>
+                <aw-command-panel-section id="additionalReviewers" exist-when="ctx.taskAssignmentCtx.selectedTaskObject.isProfileExist && (conditions.isReviewOrAckOrRouteTaskSelected)" caption="i18n.additionalReviewers" anchor="data.addUsersOnPanelAnchor" context="data.dataProviders.adhocReviewersDataProvider">
+                        <aw-list dataprovider="data.dataProviders.adhocReviewersDataProvider" show-drop-area="true">
+                            <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                        </aw-list>
+                    </aw-command-panel-section>
+                <aw-command-panel-section id="acknowledgers" exist-when="conditions.isRouteTaskSelected" caption="i18n.Acknowledgers" anchor="data.addUsersOnPanelAnchor" context="data.dataProviders.acknowledgersDataProvider">
+                    <aw-list dataprovider="data.dataProviders.acknowledgersDataProvider" show-drop-area="true">
+                        <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                    </aw-list>
+                </aw-command-panel-section>
+                <aw-command-panel-section id="notifyees" exist-when="conditions.isRouteTaskSelected" caption="i18n.Notifyees" anchor="data.addUsersOnPanelAnchor" context="data.dataProviders.notifyeesDataProvider">
+                    <aw-list dataprovider="data.dataProviders.notifyeesDataProvider" show-drop-area="true">
+                        <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                    </aw-list>
+                </aw-command-panel-section>
+                <aw-command-panel-section id="{{processAssignmentParticipant.internalName}}" caption="{{processAssignmentParticipant.displayName}}" aw-repeat="processAssignmentParticipant : ctx.taskAssignmentCtx.panelContext.selectionBasedParticipants" anchor="data.addTaskParticipantAssignmentOnPanelAnchor" context="processAssignmentParticipant">
+                    <aw-list dataprovider="data.dataProviders[processAssignmentParticipant.internalName]" show-drop-area="true">
+                        <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+                    </aw-list>
+                </aw-command-panel-section>
+            </aw-panel-section>
+        </div>
+    </aw-panel-body>
+</aw-panel>
+<aw-panel-footer>
+    <aw-button action="updateTaskAssignments" visible-when="conditions.isValidToUpdateAssignment">
+        <aw-i18n>i18n.modify</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

@@ -1,0 +1,18 @@
+<div class="aw-layout-headerContext">
+    <aw-flex-row height="3f" exist-when="anchor" class="aw-user-settings-anchor">
+        <aw-flex-column width="10" justify="center">
+            <div class="aw-user-settings-anchor-label" exist-when="ctx.showUserSettingsBar == 'true'">{{anchor.dockUserSettingsLabel.displayName}}</div>
+        </aw-flex-column>
+        <aw-flex-column align-content="end">
+            <aw-icon-button exist-when="ctx.showUserSettingsBar != 'true' && !ctx.awSidenavConfig.globalSidenavContext.globalNavigationSideNav.pinned" command="anchor.undockUserSettingsWhileLHNUnPinnedIconButton"></aw-icon-button>
+            <aw-icon-button exist-when="ctx.showUserSettingsBar != 'true' && ctx.awSidenavConfig.globalSidenavContext.globalNavigationSideNav.pinned" command="anchor.undockUserSettingsWhileLHNPinnedIconButton"></aw-icon-button>
+            <aw-icon-button exist-when="ctx.showUserSettingsBar == 'true'" command="anchor.dockUserSettingsIconButton"></aw-icon-button>
+        </aw-flex-column>
+    </aw-flex-row>
+    <aw-context-control anchor='headerContextPosition'>
+        <div aw-repeat="result : contributedViews">
+            <aw-include name="{{result}}"></aw-include>
+        </div>
+    </aw-context-control>
+    <a class="aw-headerContext-more" ng-show="showMoreLink" aw-click="onMoreClick()" title="{{moreLinkText}}">{{moreLinkText}}</a>
+</div>

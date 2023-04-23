@@ -1,0 +1,238 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-widget.directive",
+        "js/aw-source-editor.directive",
+        "js/aw-label.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-row.directive",
+        "js/aw-command-bar.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "messageName":
+        {
+            "displayName": "{{i18n.messageName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.name}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.name}}"
+        },
+        "actionName":
+        {
+            "displayName": "{{i18n.actionName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.name}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.name}}"
+        },
+        "messageText":
+        {
+            "displayName": "{{i18n.messageText}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.messageDef.messageText}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.messageDef.messageText}}",
+            "anchor": "aw_i18nEditRemoveLocaleAnchor"
+        },
+        "configJson": {
+            "language": "json",
+            "automaticLayout": true,
+            "minimap": {
+                "enabled": false
+            },
+            "formatOnType": true,
+            "lineNumbers": "off",
+            "folding": false,
+            "lineDecorationsWidth": 0
+        },
+        "condition":
+        {
+            "displayName": "{{i18n.condition}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.actionDef.condition}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.actionDef.condition}}"
+        },
+        "messageType":
+        {
+            "displayName": "{{i18n.messageType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEnabled": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.messageDef.messageType}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.messageDef.messageType}}"
+        },
+        "actionType":
+        {
+            "displayName": "{{i18n.actionType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEnabled": "false",
+            "isEditable": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.type}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.type}}"
+        },
+        "actionTypeMessageText":
+        {
+            "displayName": "{{i18n.messageText}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.actionDef.inputData.message}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.actionDef.inputData.message}}"
+        },
+        "messageKey":
+        {
+            "displayName": "{{i18n.messageView}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.messageDef.messageKey}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.messageDef.messageKey}}"
+        },
+        "messageTextParams":
+        {
+            "displayName": "{{i18n.messageTextParams}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.messageDef.messageTextParams}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.messageDef.messageTextParams}}"
+        },
+        "messageDataLabel": {
+            "displayName": "{{i18n.messageData}}",
+            "type": "STRING",
+            "isEditable": false,
+            "dispValue": "",
+            "dbValue": ""
+        },
+        "messageData":
+        {
+            "displayName": "{{i18n.messageData}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.messageDef.messageData}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.messageDef.messageData}}"
+        },
+        "messageExpression":
+        {
+            "displayName": "{{i18n.expression}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 128,
+            "renderingHint": "textbox",
+            "dbValue":"{{ctx.graph.selected.model.modelObject.messageDef.expression}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.messageDef.expression}}"
+        }
+    },
+    "actions": {
+        "applyActionProperties": {
+            "actionType": "JSFunction",
+            "method": "applyActionProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "retrieveI18nAndSetAnchor": {
+            "actionType": "JSFunction",
+            "method": "setI18nValueAndAnchor",
+            "inputData": {
+                "prop": "{{data.messageText}}",
+                "viewModelId": "{{ctx.state.params.viewModelId}}",
+                "msgdef": "{{ctx.graph.selected.model.modelObject.messageDef.messageText}}",
+                "i18nSource": "{{ctx.graph.selected.model.modelObject.messageDef.i18nSource}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "refreshProperties": {
+            "actionType": "JSFunction",
+            "method": "refreshMessageProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "removeMessageText": {
+            "actionType": "JSFunction",
+            "method": "removeMessageText",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "removeMessageTextChangeType": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "removeMessageText"
+                },
+                {
+                    "action": "refreshProperties"
+                }
+            ]
+        }
+    },
+    "dataProviders":
+    {
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "retrieveI18nAndSetAnchor",
+            "criteria": {
+                "panelId": "messageProperties"
+            }
+        },
+        {
+            "eventId": "appCtx.register",
+            "action": "refreshProperties",
+            "condition": "name === 'graph' && target === 'selected' && ( value.model.category === 'showInfoMessage' || value.model.category === 'showErrorMessage' || value.model.category === 'showWarningMessage' )"
+        },
+        {
+            "eventId": "actionBuilder.refreshActionProperties",
+            "action": "removeMessageTextChangeType"
+        }
+    ],
+    "conditions": {
+    },
+    "i18n": {
+        "properties": [ "propEditorMessages" ],
+        "condition": [ "ActionBuilderMessages" ],
+        "messageName": [ "ActionBuilderMessages" ],
+        "messageType": [ "ActionBuilderMessages" ],
+        "actionName": [ "ActionBuilderMessages" ],
+        "actionType": [ "ActionBuilderMessages" ],
+        "messageText": [ "ActionBuilderMessages" ],
+        "messageView": [ "ActionBuilderMessages" ],
+        "messageTextParams": [ "ActionBuilderMessages" ],
+        "messageData": [ "ActionBuilderMessages" ],
+        "expression": [ "ActionBuilderMessages" ],
+        "updateParams": [ "ActionBuilderMessages" ],
+        "actionProperties": [ "ActionBuilderMessages" ]
+    }
+}

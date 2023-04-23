@@ -1,0 +1,113 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",        
+        "js/aw-panel-footer.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ], 
+   
+    "actions":
+    {
+        "getObjectFromBreadCrumb":
+        {
+            "actionType": "JSFunction",
+            "method": "getObjectFromBreadCrumb",
+            "inputData": 
+            {
+            
+            },
+            "deps": "js/um0AddInAnOrganizationService"
+        },
+        
+        "add":
+        {
+            "actionType": "JSFunction",
+            "method": "addAdminObjects",
+            "inputData": 
+            {
+                "selectedPanelId": "{{data.selectedTab.panelId}}",
+                "isGroupRadioButtonSelected":  false,
+                "searchResults":  "{{data.dataProviders.doSearchForSWASearchTab.selectedObjects}}"
+            },
+            "deps": "js/um0AddInAnOrganizationService"
+        },
+        
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "classifyPanel.panelCloseSuccessful"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    
+    "conditions":
+    {
+        "isValidToAddAdminObjects": 
+        {
+            "expression": "((data.modelPropRole.props.role_name.uiValue.length>0) || (data.modelPropUser.props.user_name.uiValue.length>0 && data.modelPropUser.props.user_id.uiValue.length>0 && data.modelPropUser.props.os_username.uiValue.length>0 && data.modelPropUser.props.default_group.uiValue.length>0 && data.modelPropUser.props.status.uiValue.length>0 && data.modelPropUser.props.license_level.uiValue.length>0)) || (data.selectedTab.panelId==='OrganizationSearchTab' && data.dataProviders.doSearchForSWASearchTab.selectedObjects.length>0)" 
+        }
+    },
+
+    "onEvent": 
+    [
+      {  
+           "eventId": "awPanel.reveal",
+           "action": "getObjectFromBreadCrumb"
+        },
+        {
+            "eventId": "awPanel.selectionChange",
+            "action": "closePanel"
+        } 
+    ], 
+    
+    "data": 
+    {
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "tabKey": "new",
+                    "panelId": "SecondaryWorkAreaNewTab",
+                    "name": "{{i18n.NewTab}}",
+                    "selectedTab": true
+                },
+                {
+                    "tabKey": "search",
+                    "panelId": "SecondaryWorkAreaSearchTab",
+                    "name": "{{i18n.SearchTab}}",
+                    "recreatePanel": false
+                }
+            ]
+        }
+    },
+    
+    "i18n":
+    {
+        "AddTitle": [ "UsermanagementCommandPanelMessages" ],
+        "NewTab": [ "UsermanagementCommandPanelMessages" ],
+        "SearchTab": [ "UsermanagementCommandPanelMessages" ],
+        "AddButton": [ "UsermanagementCommandPanelMessages" ]
+    }
+}

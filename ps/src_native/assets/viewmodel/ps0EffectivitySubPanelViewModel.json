@@ -1,0 +1,116 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-init.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-label.directive",
+        "js/aw-listbox.directive",
+        "js/aw-textbox.directive",
+        "js/aw-date.directive",
+        "js/aw-datetime.directive",
+        "js/aw-icon-button.directive",
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-click.directive",
+        "js/aw-property-image.directive"
+    ],
+    "data": {
+        "unitRangeText": {
+            "displayName": "{{i18n.unitEffectivity}}",
+            "type": "STRING",
+            "dbValue": "",
+            "isRequired": "true"
+        },
+        "dateOrUnitEffectivityTypeRadioButton": {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.dateEffectivity}}",
+            "propertyRadioFalseText": "{{i18n.unitEffectivity}}",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "startDate": {
+            "dbValue": "",
+            "type": "DATETIME",
+            "isRequired": "true",
+            "displayName": "{{i18n.startDate}}"
+        },
+        "endDate": {
+            "dbValue": "",
+            "type": "DATETIME",
+            "isRequired": "false"
+        },
+        "endDateList": {
+            "type": "STRING",
+            "dbValue": [
+                { "propDisplayValue": "{{i18n.dateEffectivity}}", "propInternalValue": "Date" },
+                { "propDisplayValue": "{{i18n.upText}}", "propInternalValue": "UP" },
+                { "propDisplayValue": "{{i18n.soText}}", "propInternalValue": "SO" }
+            ]
+        },
+        "endDateOptions": {
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true,
+            "displayName": "{{i18n.endDate}}",
+            "isEditable": "true"
+        },
+        "endItemLabel": {
+            "displayName": "{{i18n.endItemMessage}}",
+            "type": "STRING"
+        },
+        "endItemRequiredLabel": {
+            "displayName": "{{i18n.endItemRequired}}",
+            "type": "STRING"
+        },
+        "endItemVal": {
+            "type": "STRING",
+            "uiValue": "{{ctx.expressionEffectivity.author.endItem.uiValue}}",
+            "displayName": "{{i18n.endItemMessage}}"
+        },
+        "typeFilter": "ItemRevision"
+    },
+    "conditions": {
+        "startDateChangedCondition": {
+            "expression": "data.startDate.dbValue",
+            "trackValues": true
+        },
+        "endDateChangedCondition": {
+            "expression": "data.endDate.dbValue",
+            "trackValues": true
+        },
+        "endDateOptionsChangedCondition": {
+            "expression": "data.endDateOptions.dbValue",
+            "trackValues": true
+        },
+        "unitRangeTextChangedCondition": {
+            "expression": "data.unitRangeText.dbValue",
+            "trackValues": true
+        },
+        "isUnitEffectivityApplicable": {
+            "expression": "!data.dateOrUnitEffectivityTypeRadioButton.dbValue||ctx.expressionEffectivity.isOnlyUnitEffectivityApplicable"
+        },
+        "isValidUnitRange": {
+            "expression": "conditions.isUnitEffectivityApplicable && data.unitRangeText.dbValue!=='' && data.unitRangeText.validationCriteria && data.unitRangeText.validationCriteria[0]===null && data.unitRangeText.validationCriteria[1]===null"
+        },
+        "isValidDateRange": {
+            "expression": "!conditions.isUnitEffectivityApplicable && data.startDate.validationCriteria && data.startDate.validationCriteria[0]===null && ((data.endDateOptions.dbValue==='Date' && data.startDate.dateApi.dateValue!='' && data.endDate.dateApi.dateValue!=='')||((data.endDateOptions.dbValue==='UP'|| data.endDateOptions.dbValue==='SO') && data.startDate.dateApi.dateValue!=''))"
+        },
+        "isAddOrEditButtonVisible": {
+            "expression": "conditions.isValidUnitRange || conditions.isValidDateRange"
+        }
+    },
+    "i18n": {
+        "addButtonTitle": [ "TCUICommandPanelsMessages" ],
+        "dateEffectivity": [ "PSConstants" ],
+        "unitEffectivityTooltip": [ "PSConstants" ],
+        "endDate": [ "PSConstants" ],
+        "endItemMessage": [ "PSConstants" ],
+        "endItemRequired": [ "PSConstants" ],
+        "soText": [ "OccurrenceManagementConstants" ],
+        "startDate": [ "PSConstants" ],
+        "unitEffectivity": [ "PSConstants" ],
+        "upText": [ "OccurrenceManagementConstants" ],
+        "replaceElementBtn": [ "OccurrenceManagementConstants" ]
+    }
+}

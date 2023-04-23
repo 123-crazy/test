@@ -1,0 +1,77 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+    ],
+    "actions":{
+        "psi0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "psi0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Psi0AuthorDependencies.psi0SetPin",
+            "cacheEventData": true,
+            "action": "psi0SetPin"
+        },
+        {
+            "eventId": "Psi0AuthorDependencies.psi0SetUnPin",
+            "cacheEventData": true,
+            "action": "psi0SetUnPin"
+        }
+    ],
+    "data":{
+       "pinnedToForm": {
+           "type": "BOOLEAN",
+           "dbValue": true
+       },
+       "unpinnedToForm": {
+           "type": "BOOLEAN",
+           "dbValue": false
+       },
+       "isPanelPinned": {
+           "type": "BOOLEAN",
+           "dbValue": false
+       },
+       "psi0SetPinDependencies": "psi0_oneStepPinDependencyCommands"
+    },
+    "conditions":{
+        "ispinned":
+        {
+            "expression": "data.unpinnedToForm.dbValue"
+        }
+    },
+    "messages": {
+
+    },
+    "i18n": {
+        "authorDependencies": [
+            "PrgScheduleManagerMessages"
+        ],
+        "dependencies": [
+            "PrgScheduleManagerMessages"
+        ]
+    }
+}

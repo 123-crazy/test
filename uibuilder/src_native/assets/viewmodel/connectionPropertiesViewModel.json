@@ -1,0 +1,87 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "connectionType": {
+            "displayName": "{{i18n.objectType}}",
+            "type": "STRING",
+            "isRequired": true,
+            "dataProvider": "typeListProvider",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.displayName}}",
+            "dbValue": "{{ctx.graph.selected.model.modelObject.type}}",
+            "isSelectOnly": true,
+            "emptyLOVEntry": false
+        },
+        "typeListValues": [
+            {
+                "propDisplayValue": "{{i18n.successInfo}}",
+                "propInternalValue": "success"
+            },
+            {
+                "propDisplayValue": "{{i18n.failure}}",
+                "propInternalValue": "failure"
+            }
+        ]
+    },
+    "actions": {
+        "setSuccessType": {
+            "actionType": "JSFunction",
+            "method": "validateEdgeSupportsFailure",
+            "deps": "js/validateFlowService",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            }
+        },
+        "applyActionProperties": {
+            "actionType": "JSFunction",
+            "method": "applyActionProperties",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        }
+    },
+    "dataProviders": {
+        "typeListProvider": {
+            "response": "{{data.typeListValues}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "setSuccessType",
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {},
+    "i18n": {
+        "updateParams": [
+            "ActionBuilderMessages"
+        ],
+        "connectionProperties": [
+            "ActionBuilderMessages"
+        ],
+        "failure": [
+            "ActionBuilderMessages"
+        ],
+        "successInfo": [
+            "UIMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "setSuccessType"
+    }
+}

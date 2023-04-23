@@ -1,0 +1,121 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive" ,
+        "js/aw-repeat.directive",
+        "js/aw-filter-category.directive"
+    ],
+
+    "actions":
+    {
+        "updateCategoryResults":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCategoryResults",
+            "inputData":
+            {
+                "category":"{{ctx.search.valueCategory}}"
+            },
+            "deps":"js/filterPanelService"
+        },
+        "updateFilterData":
+        {
+            "actionType": "JSFunction",
+            "method": "updateFilterData",
+            "inputData":
+            {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "filterList": "{{data.preferences.RV1_DARB_Filter_Properties}}"
+            },
+
+            "deps": "js/Rv1RelationBrowserLegendService"
+        },
+        "selectFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "selectFilter",
+            "inputData":
+            {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}",
+                "category": "{{category}}",
+                "filter": "{{filter}}"
+            },
+            "deps": "js/Rv1RelationBrowserLegendService"
+        },
+        "cacheProperties":
+        {
+            "actionType": "JSFunctionAsync",
+            "method": "cacheProperties",
+            "inputData":
+            {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Rv1RelationsBrowser.propertiesLoaded"
+                } ]
+            },
+            "deps": "js/Rv1RelationBrowserLegendService"
+        }
+    },
+
+    "data":
+    {
+        "selectedFilters":[]
+    },
+
+    "functions":
+    {
+
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "cacheProperties"
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.propertiesLoaded",
+            "action": "updateFilterData"
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.itemsRemoved",
+            "action": "updateFilterData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "Rv1RelationsBrowser.itemsAdded",
+            "action": "updateFilterData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.visibilityChanged",
+            "action": "updateFilterData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "filterPanel.updateRefineCategoriesAfterUpdate",
+            "action":"updateCategoryResults"
+        }
+    ],
+
+    "conditions": {
+
+    },
+
+    "preferences":
+    [
+        "RV1_DARB_Filter_Properties"
+    ],
+
+    "i18n":
+    {
+
+    }
+}

@@ -1,0 +1,156 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive"
+    ],
+    "actions": {
+
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "treeLoadInput": "request.treeLoadInput"
+            },
+            "outputData": {},
+            "deps": "js/Arm0HTMLSpecTemplateTree"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.htmlSpecDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0HTMLSpecTemplateTree"
+        },
+        "validateSelection": {
+            "actionType": "JSFunction",
+            "method": "validateSelection",
+            "inputData": {
+                "selectedObject": "{{data.dataProviders.htmlSpecDataProvider.selectedObjects[0]}}"
+            },
+            "deps": "js/Arm0HTMLSpecTemplateTree"
+        },
+        "expandNode": {
+            "actionType": "JSFunction",
+            "method": "expandNode",
+            "inputData": {
+                "data": "{{data}}",
+                "parentObjectUid": "{{data.eventData.parentObjectUid}}"
+            },
+            "deps": "js/Arm0HTMLSpecTemplateTree"
+        },
+        "refreshTreeDataProvider": {
+            "actionType": "dataProvider",
+            "method": "htmlSpecDataProvider"
+        },
+        "selectTreeObjForCrossProb":
+        {
+            "actionType": "JSFunction",
+            "method": "selectTreeObjForCrossProb",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/Arm0HTMLSpecTemplateTree"
+        }
+    },
+    "data": {
+
+        "treeData": {
+
+            "Name of document": "Alenia Small",
+            "Specification Type": "Requirement Specification",
+            "SubTypes": [ { "typeName": "Requirement", "displayTypeName": "Requirement" }, { "typeName": "Paragraph", "displayTypeName": "Paragraph" }, { "typeName": "Test", "displayTypeName": "Test" } ],
+            "level": 0,
+            "uniqueID": "uniqueID1",
+            "Word_file_Ticket": "file ticket for the word file in case of re-preview",
+            "children": []
+        },
+        "maxTreeLevel": {
+            "displayName": "",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "htmlSpecDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "inputData": {
+
+                "accessMode": "tree"
+            }
+        }
+
+    },
+    "columnProviders": {
+        "htmlSpecColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "htmlSpecTreeTable": {
+            "dataProvider": "htmlSpecDataProvider",
+            "columnProvider": "htmlSpecColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "useStaticFirstCol": true,
+                "enableDragAndDrop": false,
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        }
+    },
+
+    "onEvent": [
+
+        {
+            "eventId": "htmlSpecDataProvider.selectionChangeEvent",
+            "action": "validateSelection"
+        },
+
+        {
+            "eventId": "importPreview.refreshTreeDataProvider",
+            "action": "refreshTreeDataProvider"
+        },
+        {
+
+            "eventId": "aceElementsSelectionUpdatedEvent",
+            "action": "selectTreeObjForCrossProb",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "cacheEventData": true
+        },
+        {
+
+            "eventId": "Arm0HTMLSpecTemplateTree.expandNode",
+            "action": "expandNode",
+            "cacheEventData": true
+        }
+
+    ],
+    "i18n": {
+        "nameLabel":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "specType":[
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

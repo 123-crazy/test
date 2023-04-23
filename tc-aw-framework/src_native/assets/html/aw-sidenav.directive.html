@@ -1,0 +1,23 @@
+<aside aria-live="polite" aria-label="i18n.taskPanel" class="aw-layout-flexColumnContainer aw-sidenav-layoutContainer aw-sidenav-{{width.toLowerCase()}} aw-sidenav-vertical-{{height.toLowerCase()}} aw-sidenav-{{slide.toLowerCase()}}" ng-class="{
+'aw-sidenav-expand': sidenavOpened,
+'invisible': !sidenavOpened,
+'aw-sidenav-transition': isAnimationDisabled,
+'aw-sidenav-leftBackground': !isLeftToRight,
+'aw-sidenav-rightBackground': isLeftToRight,
+'aw-sidenav-float-right': configProperties.isFloatPanel() && !isLeftToRight,
+'aw-sidenav-float-left': configProperties.isFloatPanel() && isLeftToRight,
+'autoclose afx-accent-background': isPinnable }">
+    <div class="aw-sidenav-resizer" exist-when="isPinnable" visible-when="sidenavOpened">
+        <aw-property-image id="globalNavResize" name="uiPrimeNavGripper"></aw-property-image>
+    </div>
+    <div ng-class="pinned ? 'pinned':'unpinned' " exist-when="isPinnable && sidenavOpened">
+        <div class="sidenav-pin-row">
+            <div class="sidenav-pin-col">
+                <aw-property-image name="uiPin" tabindex= "0" ng-keydown="onKeyDown($event)" class="aw-aria-border" ng-click="togglePinState($event)"></aw-property-image>
+            </div>
+        </div>
+    </div>
+    <div class="aw-layout-declarativePanelRoot aw-layout-panel" ng-transclude>
+        <aw-include ng-if="view" name="{{view}}"></aw-include>
+    </div>
+</aside>

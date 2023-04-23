@@ -1,0 +1,153 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-togglebutton.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+
+    "actions":{
+        "selectDelayFiltering": {
+            "actionType": "JSFunction",
+            "method": "updateDelayFilteringToggle",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "toggle": "{{data.delayFiltering.dbValue}}"
+            },
+            "deps":"js/filterSettingsService"
+        },
+        "applySettings": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "setDelayedApplyPreference"
+                },
+                {
+                    "action": "navigateToMainPanel"
+                }
+            ]
+        },
+        "getDelayedApplyPreference":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Administration-2012-09-PreferenceManagement",
+            "method": "getPreferences",
+            "inputData":
+            {
+                "preferenceNames": [ "AWC_Discovery_Delayed_Filter_Apply" ],
+                "includePreferenceDescriptions": false
+            },
+            "outputData":
+            {
+                "delayFiltering":"{{function:processPreferenceResponse}}"
+            },
+
+            "deps":"js/filterSettingsService"
+
+        },
+        "setDelayedApplyPreference":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Administration-2012-09-PreferenceManagement",
+            "method": "setPreferences2",
+            "inputData": {
+                "preferenceInput": [ {
+                    "preferenceName": "AWC_Discovery_Delayed_Filter_Apply",
+                    "values": [ "{{data.delayedApplyUpdatedValue}}" ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "filterPanel.toggleDelayedApply",
+                    "eventData":  {
+                        "toggleValue": "{{data.delayFiltering.dbValue}}"
+                    }
+                } ]
+            }
+        },
+        "navigateToMainPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Awb0DiscoveryFilterCommandSubPanel",
+                            "title": ""
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "functions": {
+        "processPreferenceResponse": {
+            "functionName": "processPreferenceResponse",
+            "parameters": [
+                "{{data}}", "{{response}}"]
+        }
+
+    },
+    "data":
+    {
+        "delayFiltering": {
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": false,
+            "displayName" : "{{i18n.delayFiltering}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "autoUpdateTooltip": {
+            "view": "extendedTooltipDefault"
+        },
+        "autoUpdateTooltipContext": {
+            "title": "{{i18n.delayFiltering}}",
+            "description": "{{i18n.autoUpdateDesc}}"
+        }
+    },
+
+    "conditions": {
+        "isValidToApply": {
+            "expression": "data.delayFiltering.dbValue !== data.initialToggleValue"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "getDelayedApplyPreference",
+            "criteria":
+            {
+                "panelId" : "Awb0FilterPanelSettings"
+            }
+        },
+        {
+            "eventId": "closePanel",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "criteria": {
+                "destPanelId": "Awb0FilterPanelSettings"
+            },
+            "action": "getDelayedApplyPreference"
+        }
+    ],
+
+    "i18n":
+    {
+        "applyButtonTitle": [ "OccurrenceManagementSubsetConstants" ],
+        "delayFiltering": ["OccurrenceManagementSubsetConstants"],
+        "autoUpdateDesc" : ["OccurrenceManagementSubsetConstants"],
+        "filter" :  ["OccurrenceManagementConstants"]
+    }
+}

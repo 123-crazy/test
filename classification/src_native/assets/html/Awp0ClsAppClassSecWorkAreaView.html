@@ -1,0 +1,46 @@
+<aw-panel-body class="aw-clsadmin-nodes">
+    <aw-flex-row height="fill" visible-when="ctx.clsAdmin.isCSTNode === true && ctx.clsAdmin.isGroupNode === false">
+        <aw-column width="100%">
+            <aw-panel-section caption="i18n.classProperties" collapsed="false">
+                <aw-widget prop="item" aw-repeat="item : ctx.clsAdmin.nodeClassProperties"></aw-widget>
+            </aw-panel-section>
+            <aw-flex-row height="fill">
+                <aw-column width="100%" visible-when="data.hasBlocks === true">
+                    <aw-command-panel-section class="aw-clspanel-propertyGroupSection" caption="i18n.propertyGroups" collapsed="false" >
+                        <aw-search-box class="aw-search-searchbox" data="data" prop="data.propGroupFilter"
+                             placeholder="data.propGroupFilterText" action="filterPropGroups" change-action="filterPropGroups">
+                        </aw-search-box>
+                            <aw-cls-property-group-tree-section class="aw-cls-fullview-properties" nodes="data.attr_anno">
+                        </aw-cls-property-group-tree-section>
+                    </aw-command-panel-section>
+                </aw-column>
+                <aw-column width="100%" class="aw-clsadmin-float" visible-when="data.attr_anno.length > 0">
+                    <!-- Attributes Panel -->
+                    <aw-command-panel-section caption="{{data.caption}}" anchor="data.classifyPropCommands"  collapsed="false"
+                    class="aw-clspanel-propSection" id="aw-clspanel-propSection">
+                    <!-- Properties Header -->
+                    <aw-search-box class="aw-search-searchbox" data="data" prop="data.propFilter"
+                        placeholder="data.propFilterText" action="filterProperties" change-action="filterProperties">
+                    </aw-search-box>
+
+                    <!-- Properties Section -->
+                    <div class="aw-base-scrollPanel">
+                        <div visible-when="data.attributesVisible" class="aw-cls-fullViewProperties">
+                            <aw-cls-properties attributes="data.filteredAttr_anno" view="data.panelMode" showallprop="data.showAllProp" exist-when="data.isFiltered === false"></aw-cls-properties>
+                            <aw-cls-properties attributes="data.filteredAttributes" view="data.panelMode" showallprop="data.showAllProp" exist-when="data.isFiltered === true"></aw-cls-properties>
+                        </div>
+                    </div>
+                </aw-command-panel-section>
+                </aw-column>
+                <aw-column width="100%" visible-when="ctx.attributeProperties.length > 0">
+                    <aw-panel-section caption="{{i18n.attrProp}}" visible-when="ctx.attributeProperties.length > 0"
+                        collapsed="false">
+                        <aw-widget prop="item" aw-repeat="item : ctx.attributeProperties"></aw-widget>
+                    </aw-panel-section>
+                </aw-column>
+            </aw-flex-row>
+        </aw-column>
+    </aw-flex-row>
+    <aw-i18n visible-when="ctx.clsAdmin.isGroupNode === true && ctx.clsAdmin.isCSTNode === false">i18n.SMLRAC</aw-i18n>
+    <aw-i18n visible-when="ctx.clsAdmin.isGroupNode === true && ctx.clsAdmin.isCSTNode === true">i18n.GRPNODE</aw-i18n>
+</aw-panel-body>

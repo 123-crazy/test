@@ -1,0 +1,26 @@
+
+  <aw-form name="createInputs" context="data" >
+    <aw-panel-body>
+      <aw-listbox prop="data.worksetType" list="data.worksetTypeList" exist-when="data.worksetTypeList.length>1"></aw-listbox>
+      <aw-row exist-when="data.worksetTypeList.length==1">
+          <aw-column width="5">
+              <aw-label prop="data.worksetType" ></aw-label>
+          </aw-column>
+          <aw-column width="4" >
+          </aw-column>
+      </aw-row>
+      <aw-break></aw-break>
+      <aw-xrt type="CREATE" object-type="{{data.worksetType.dbValue}}" exist-when="data.worksetType.dbValue"></aw-xrt>
+      <aw-command-panel-section caption="i18n.projectsSectionTitle" anchor="data.widgetProjectSectionCommands" >
+        <aw-list dataprovider="data.dataProviders.getAssignedProjectsProvider" has-floating-cell-commands=false>
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    </aw-panel-body>
+  </aw-form>
+  <aw-panel-footer>
+    <aw-button action="triggerBackgroundSBM" visible-when="createInputs.$valid  && data.activeView!=='assignProjectSub'" >
+       <aw-i18n>i18n.Add</aw-i18n>
+    </aw-button>
+  </aw-panel-footer>
+

@@ -1,0 +1,34 @@
+<aw-command-panel caption="i18n.filter">
+
+    <div exist-when="ctx.MatrixContext.activeFilterView === 'TRACELINK'" class="aw-layout-panelBody">
+        <aw-filter-category category="item" search-action="selectTracelinkTypeFilterAction"
+            aw-repeat="item:data.tracelinkTypeList track by $index"
+            exist-when="data.tracelinkTypeList && data.tracelinkTypeList.length>0">
+        </aw-filter-category>
+    </div>
+
+    <aw-flex-column exist-when="ctx[data.contextKey] && ctx[data.contextKey].context.productContextInfo"
+        visible-when="(ctx.MatrixContext.activeFilterView === 'ROW' || ctx.MatrixContext.activeFilterView === 'COLUMN' || ctx.MatrixContext.activeFilterView === 'ROW_COLUMN') && conditions.ifNoSubPanelOpenedUnderDiscoveryFilter">
+        <aw-flex-row class="aw-filter-commands" height="3f">
+            <aw-flex-column width="12" align-content="end">
+                <aw-command-bar anchor="recipeCommandSlot" context="data" alignment="HORIZONTAL">
+                </aw-command-bar>
+            </aw-flex-column>
+        </aw-flex-row>
+
+        <aw-flex-row height="2f">
+            <div class="aw-richtexteditor-matrixFilterPanelContextLabel">{{ctx.MatrixContext.activeFilterViewObjectName}}</div>
+        </aw-flex-row>
+
+        <aw-flex-row >
+            <aw-command-sub-panel aw-init="data.activeView='Awb0DiscoveryFilterCommandSubPanel'" panel-id="Awb0DiscoveryFilterCommandSubPanel" visible-when="data.activeView=='Awb0DiscoveryFilterCommandSubPanel'" ></aw-command-sub-panel>
+        </aw-flex-row>
+    </aw-flex-column>
+
+    <!--Filter Button-->
+    <aw-panel-footer visible-when="conditions.ifNoSubPanelOpenedUnderDiscoveryFilter">
+        <aw-button action="applyMatrixFilter" visible-when="conditions.isRMFilterButtonVisible">
+            <aw-i18n>i18n.filterButtonTitle</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

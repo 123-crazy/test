@@ -1,0 +1,1065 @@
+{
+    "schemaVersion":"1.0.0",
+    "imports":
+    [
+        "js/visible-when.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/aw-radiobutton.directive",
+        "js/exist-when.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel.directive",
+        "js/aw-flex-row.directive",
+        "js/enable-when.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+
+    "actions":{
+        "closePopup": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "inputData": {
+                "popupId": "{{data.popupId}}"
+            },
+            "deps": "js/popupService"
+        },
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "targetObjects": "{{ctx.workflow_process_candidates.workFlowObjects}}",
+                "isSubProcessCase": true
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+        },
+
+        "getValidTemplates":
+        {
+            "actionType": "JSFunction",
+            "method": "getValidTemplates",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "getFiltered": "{{function:getFiltered}}"
+            },
+
+            "outputData":
+            {
+                "templates": ""
+            },
+
+            "deps": "js/Awp0NewWorkflowProcess"
+
+        },
+        "getProcessParticipantAssignments":
+        {
+            "actionType": "JSFunction",
+            "method": "checkForAssignmentSection",
+            "inputData":
+            {
+               "data": "{{data}}",
+               "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+
+        },
+
+        "getProcessParticipantAssignmentsInternal": {
+            "actionType": "JSFunctionAsync",
+            "method": "getProperties",
+            "deps": "soa/dataManagementService",
+            "inputData": {
+                "uids": ["{{data.workflowTemplates.dbValue.uid}}"],
+                "propNames": ["fnd0OptionalParticipants", "fnd0RequiredParticipants","assignment_lists","fnd0StoreParticipantsOnJob"]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowProcessAssignement.propertiesLoaded"
+                    }
+                ]
+            }
+        },
+
+        "populateProcessParticipants":
+        {
+            "actionType": "JSFunction",
+            "method": "populateParticipantPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "workflowTemplate": "{{data.workflowTemplates.dbValue}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps":"js/Awp0NewWorkflowProcess"
+        },
+        "enableTheFlagForDifferentTemplateSelected": {
+            "actionType": "JSFunction",
+            "method": "enableTheFlagForDifferentTemplateSelected",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps":"js/Awp0NewWorkflowProcess"
+
+        },
+
+        "submit":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2008-06-Workflow",
+            "method": "createInstance",
+            "inputData":
+            {
+                "startImmediately": true,
+                "observerKey": "",
+                "name": "{{data.workFlowName.dbValue}}",
+                "subject": "",
+                "description": "{{data.description.dbValue}}",
+                "contextData":
+                {
+                    "processTemplate": "{{data.workflowTemplates.dbValue.props.template_name.dbValues[0]}}",
+                    "attachmentCount": "{{ctx.workflow_process_candidates.workFlowObjects.length}}",
+                    "attachments": "{{function:getUids}}",
+                    "attachmentTypes": "{{function:getAttachmentTypes}}",
+                    "dependencyTask": "{{function:getDependentTaskObject}}"
+                }
+            },
+            "outputData":
+            {
+                "errorMsg": "{{function:populateErrorMessageOnNewWorkflowProcess}}",
+                "createdProcess":"ServiceData.created"
+            },
+            "deps": "js/Awp0NewWorkflowProcess",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "submissionSuccessful",
+                        "eventData": {
+                            "createChangeData": "{{data}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.clientfx.tcui.xrt.showObjectLocation' && ctx.xrtSummaryContextObject",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name":"workflow.updateTaskCount"
+                    },
+                    {
+                        "name": "workflow.updateWorkflowGraphCtx",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation' && ctx.xrtSummaryContextObject && ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Workflow' && ctx.xrtSummaryContextObject.uid !== ctx.selected.uid"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation' && ctx.xrtSummaryContextObject"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation' && !ctx.xrtSummaryContextObject && ctx.selected"
+                    },
+                    {
+                        "name": "workflow.closePopupPanel"
+                    }
+                ],
+
+                "failure":
+                [
+                    {
+                        "name": "newWorkflowProcess.submissionFailed",
+                        "eventData":
+                        {
+                            "eventData": "{{data.errorMsg}}"
+                        }
+                    },
+                    {
+                        "name": "workflow.closePopupPanel",
+                        "condition": "(errorCode.code==33352) || (data.createdProcess && data.createdProcess.length>0) "
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.clientfx.tcui.xrt.showObjectLocation' && ctx.xrtSummaryContextObject",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "workflow.updateWorkflowGraphCtx",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation' && ctx.xrtSummaryContextObject && ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Workflow' && ctx.xrtSummaryContextObject.uid !== ctx.selected.uid"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation' && ctx.xrtSummaryContextObject"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "data.createdProcess && ctx.locationContext['ActiveWorkspace:Location'] === 'com.siemens.splm.client.inbox.tasksLocation' && !ctx.xrtSummaryContextObject && ctx.selected"
+                    }
+                ]
+            },
+
+            "actionMessages":
+            {
+                "success":
+                [
+                    {
+                        "condition": "ctx.workflow_process_candidates.workFlowObjects.length==1",
+                        "message": "singleSubmitToSubWorkflowSuccess"
+                    },
+
+                    {
+                        "condition": "ctx.workflow_process_candidates.workFlowObjects.length>1",
+                        "message": "submitToSubWorkflowSuccess"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "condition": "data.errorMsg && data.errorMsg.length > 0 && errorCode.code === 33352",
+                        "message": "subProcessCreationBackgroundError"
+                    },
+                    {
+                        "condition": "data.errorMsg && data.errorMsg.length > 0 && errorCode.code !== 33352",
+                        "message": "subProcessCreationError"
+                    }
+                ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "resetValue": {
+            "actionType": "JSFunction",
+            "method": "resetValue",
+            "inputData":
+            {
+                "input": "{{data}}"
+            },
+
+            "deps": "js/Awp0NewWorkflowProcess"
+        },
+        "submitToHostAction":
+        {
+            "actionType": "JSFunction",
+            "method": "sendEventToHost",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+        },
+         "initDataProvider": {
+            "actionType": "dataProvider",
+            "method": "attachTargets"
+        },
+        "registerReferences": {
+            "actionType": "JSFunction",
+            "method": "registerReferences",
+            "inputData": {
+                "context": "{{ctx}}"
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "openUserPickerPanel": {
+            "actionType": "JSFunction",
+            "method": "openUserPickerPanel",
+            "inputData": {
+                "eventData": "{{data.eventMap['awPanelSection.collapse']}}",
+                "ctx":"{{ctx}}",
+                "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "togglePanels"
+                    }
+                ]
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+
+        },
+        "closeCategoriesPanel": {
+            "actionType": "JSFunction",
+            "method": "closeCategoriesPanel",
+            "inputData": {
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+
+        },
+        "collapseGivenSectionDynamic": {
+            "actionType": "JSFunction",
+            "method": "collapseGivenSection",
+            "inputData": {
+                "data": "{{data}}",
+                "panel": "assignmentSectionDynamic"
+
+            },
+            "deps": "js/Awp0TasksUtils"
+        },
+        "collapseGivenSectionNonDynamic": {
+            "actionType": "JSFunction",
+            "method": "collapseGivenSection",
+            "inputData": {
+                "data": "{{data}}",
+                "panel": "assignmentSectionNonDynamic"
+
+            },
+            "deps": "js/Awp0TasksUtils"
+        },
+        "closePopupPanel": {
+            "actionType": "JSFunction",
+            "method": "hidePopupPanel",
+            "inputData": {
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "submitToWorkflow.resetCtxValuesForUserPickerAndCategoriesPanel"
+                    },
+                    {
+                        "name": "closeAddTargetPanel"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowPopupService"
+        },
+        "resetCtxValuesForUserPickerAndCategoriesPanel": {
+            "actionType": "JSFunction",
+            "method": "resetCtxValuesForUserPickerAndCategoriesPanel",
+            "inputData": {
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+
+        },
+        "toggleAddTargetCommand": {
+            "actionType": "JSFunction",
+            "method": "toggleAddTargetCommand",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "toggleAddReferenceCommand": {
+            "actionType": "JSFunction",
+            "method": "toggleAddReferenceCommand",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "closeAddTargetPanel": {
+            "actionType": "JSFunction",
+            "method": "closeAddPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "targetReference": "Target"
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "closeAddReferencePanel": {
+            "actionType": "JSFunction",
+            "method": "closeAddPanel",
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "targetReference": "Reference"
+            }
+        },
+        "openAddTargetPanel": {
+            "actionType": "JSFunction",
+            "method": "openAddPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}",
+                "targetReference": "Target"
+            },
+            "events": {
+                "success": [ {
+                    "name": "panelOpened"
+                } ]
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "openAddReferencePanel": {
+            "actionType": "JSFunction",
+            "method": "openAddPanel",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}",
+                "targetReference": "Reference"
+            },
+            "events": {
+                "success": [ {
+                    "name": "panelOpened"
+                } ]
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "unRegisterContext": {
+            "actionType": "JSFunction",
+            "method": "unregisterContext",
+            "inputData": {
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+        },
+        "registerAddCommandCtx": {
+            "actionType": "JSFunction",
+            "method": "registerAddCommandCtx",
+            "inputData": {
+                "eventData": "{{data.eventMap['awCommandPanelSection.collapse']}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "closePanel"
+                } ]
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "clearReferenceSelections": {
+            "actionType": "JSFunction",
+            "method": "clearSelections",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.attachReferences}}"
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "clearTargetSelections": {
+            "actionType": "JSFunction",
+            "method": "clearSelections",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.attachTargets}}"
+            },
+            "deps": "js/Awp0ReferenceInSubmitToWorkflow"
+        },
+        "updateAssignmentTable": {
+            "actionType": "JSFunction",
+            "method": "updateAssignmentTable",
+            "inputData":
+            {
+                "data": "{{ctx.messageData}}",
+                "palDataMap": "{{ctx.taskAssignmentCtx.panelContext}}",
+                "selectedTask": "{{ctx.taskAssignmentCtx.selectedTaskObject}}",
+                "context": "{{ctx}}",
+                "selectedObject": "{{ctx.taskAssignmentCtx.treeDataProvider.selectedObjects[0]}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflow.refreshPanel"
+                    },
+                    {
+                        "name": "openAddTargetAfterSavePrompt"
+                    }
+                ]
+            }
+        },
+        "updateAssignmentTable2": {
+            "actionType": "JSFunction",
+            "method": "updateAssignmentTable",
+            "inputData":
+            {
+                "data": "{{ctx.messageData}}",
+                "palDataMap": "{{ctx.taskAssignmentCtx.panelContext}}",
+                "selectedTask": "{{ctx.taskAssignmentCtx.selectedTaskObject}}",
+                "context": "{{ctx}}",
+                "selectedObject": "{{ctx.taskAssignmentCtx.treeDataProvider.selectedObjects[0]}}"
+            },
+            "deps": "js/Awp0WorkflowAssignmentPanelService",
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflow.refreshPanel"
+                    },
+                    {
+                        "name": "openAddReferenceAfterSavePrompt"
+                    }
+                ]
+            }
+        },
+        "updateWorkflowGraphCtx": {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isSubProcessCreation",
+                "value": true
+            }
+        },
+        "getRootTargetAttachment": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "columnFilters": [],
+                    "providerName": "Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "parentUid" : "{{ctx.selected.uid}}",
+                        "objectSet": "root_target_attachments.WorkspaceObject,root_target_attachments.ItemRevision"
+                    },
+                    "searchFilterFieldSortType" : "",
+                    "startIndex": "{{data.dataProviders.attachTargets.startIndex}}",
+                    "searchSortCriteria": [{"fieldName": "object_string", "sortDirection": "ASC"}]
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Awp0XRTObjectSetRow",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0Target"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalTargetsFound": "totalFound",
+                "totalTargetsLoaded": "totalLoaded",
+                "targetSearchResults": "{{function:getWorkflowProcessTargets}}"
+            },
+            "deps": "js/Awp0NewWorkflowProcess"
+        }
+    },
+    "preferences":
+    [
+        "CR_allow_alternate_procedures",
+        "WRKFLW_use_legacy_template_filter",
+        "WRKFLW_add_template_name_for_new_process"
+    ],
+
+
+    "data": {
+        "processAssignment":
+        {
+            "propertyDisplayName": "{{i18n.assignments}}",
+            "uiValue": "{{i18n.assignments}}"
+        },
+        "allowAlternateProcedures":
+        {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "propertyRadioTrueText": "{{i18n.All}}",
+            "propertyRadioFalseText": "{{i18n.Assigned}}",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "isAllowAlternateProcedures":
+        {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+
+        "workflowTemplates":
+        {
+            "displayName": "{{i18n.Workflow_Template}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+
+        "workFlowName":
+        {
+            "displayName": "{{i18n.Workflow_Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "maxLength": 128
+        },
+
+        "description":
+        {
+            "displayName": "{{i18n.Description}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "maxLength": 240,
+            "numberOfLines": 3,
+            "dbValue": ""
+        },
+        "addObjectCommands":"awp0_WorfklowAddTargetsCommands",
+        "isAddButtonVisible": true,
+        "processTargetAnchor": "workflow_process_attachment_anchor",
+        "processReferenceAnchor": "workflow_reference_anchor"
+    },
+    "dataProviders": {
+        "attachReferences":{
+            "response": "{{ctx.workflow_process_references.workFlowObjects}}",
+            "totalFound": "{{ctx.workflow_process_references.workFlowObjects.length}}",
+            "totalLoaded": "{{ctx.workflow_process_references.workFlowObjects.length}}",
+            "selectionModelMode": "multiple"
+        },
+        "attachTargets": {
+            "action": "getRootTargetAttachment",
+            "response": "{{data.targetSearchResults}}",
+            "totalFound": "{{data.totalTargetsFound}}",
+            "totalLoaded": "{{data.totalTargetsLoaded}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+
+    "messages":
+    {
+        "singleSubmitToSubWorkflowSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.singleSubmitToSubWorkflowSuccess}}",
+            "messageTextParams":
+            [
+                "{{ctx.workflow_process_candidates.workFlowObjects[0].props.object_string.dbValues[0]}}"
+            ]
+        },
+
+        "submitToSubWorkflowSuccess":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.submitToSubWorkflowSuccess}}",
+            "messageTextParams":
+            [
+                "{{ctx.workflow_process_candidates.workFlowObjects.length}}"
+            ]
+        },
+        "subProcessCreationError":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.serverError}}",
+            "messageTextParams": [
+                "{{data.errorMsg}}"
+            ]
+        },
+        "subProcessCreationBackgroundError":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.serverError}}",
+            "messageTextParams": [
+                "{{data.errorMsg}}"
+            ]
+        },
+        "saveOrDiscardWarningMsg": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.panelModificationWarningMsg}}",
+            "messageTextParams": [
+                "{{ctx.taskAssignmentCtx.panelContext.selectedTaskObject}}"
+            ],
+            "navigationOptions": [
+                {
+                    "option": "Discard",
+                    "text": "{{i18n.discard}}",
+                    "action": "openAddTargetPanel"
+                },
+                {
+                    "option": "Modify",
+                    "text": "{{i18n.modify}}",
+                    "action": "updateAssignmentTable"
+                }
+            ]
+        },
+        "saveOrDiscardWarningMsg2": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.panelModificationWarningMsg}}",
+            "messageTextParams": [
+                "{{ctx.taskAssignmentCtx.panelContext.selectedTaskObject}}"
+            ],
+            "navigationOptions": [
+                {
+                    "option": "Discard",
+                    "text": "{{i18n.discard}}",
+                    "action": "openAddReferencePanel"
+                },
+                {
+                    "option": "Modify",
+                    "text": "{{i18n.modify}}",
+                    "action": "updateAssignmentTable2"
+                }
+            ]
+        }
+    },
+
+    "functions":
+    {
+        "getFiltered":
+        {
+            "functionName": "getFiltered",
+            "parameters":
+            [
+                "{{data.allowAlternateProcedures.dbValue}}"
+            ]
+        },
+        "getUids":
+        {
+            "functionName": "getUids",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx.workflow_process_candidates.workFlowObjects}}",
+                "{{data.processAssignmentParticipants}}",
+                "{{ctx.taskAssignmentCtx.taskAssignmentDataObject}}",
+                "{{ctx}}",
+                "{{ctx.workflow_process_references.workFlowObjects}}"
+            ]
+        },
+
+        "getAttachmentTypes":
+        {
+            "functionName": "getAttachmentTypes",
+            "parameters":
+            [
+                "{{ctx.workflow_process_candidates.workFlowObjects}}",
+                "{{data.processAssignmentParticipants}}",
+                "{{data}}",
+                "{{ctx.workflow_process_references.workFlowObjects}}"
+            ]
+        },
+        "getDependentTaskObject": {
+            "functionName": "getDependentTaskObject",
+            "parameters":
+            [
+                "{{ctx.selected}}"
+            ]
+        },
+        "getWorkflowProcessTargets": {
+            "functionName": "getWorkflowProcessTargets",
+            "parameters":
+            [
+            ]
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "workflowProcessAssignement.getProperties",
+            "action": "getProcessParticipantAssignmentsInternal"
+        },
+        {
+            "eventId": "Awp0AdhocSubProcess.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Awp0AdhocSubProcessSub"
+            },
+            "action": "initDataProvider"
+        },
+        {
+            "eventId": "workflowProcessAssignement.propertiesLoaded",
+            "action": "populateProcessParticipants"
+        },
+        {
+            "eventId": "submissionSuccessful",
+            "action": "submitToHostAction"
+        },
+        {
+            "eventId": "newWorkflowProcess.submissionSuccessful",
+            "action": "resetValue"
+        },
+        {
+            "eventId": "newWorkflowProcess.submissionFailed",
+            "action": "resetValue"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "submitToWorkflow.closePopup",
+            "action": "closePopup",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awPanelSection.collapse",
+            "cacheEventData": true,
+            "action": "openUserPickerPanel"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "closeCategoriesPanel",
+            "criteria": {
+                "condition": "conditions.palChangeCondition"
+            }
+        },
+        {
+            "eventId": "workflow.closePopupPanel",
+            "action": "closePopupPanel"
+        },
+        {
+            "eventId":"submitToWorkflow.resetCtxValuesForUserPickerAndCategoriesPanel",
+            "action":"resetCtxValuesForUserPickerAndCategoriesPanel"
+        },
+        {
+            "eventId": "workflow.updateWorkflowGraphCtx",
+            "action": "updateWorkflowGraphCtx"
+        },
+        {
+            "eventId":"openAddTarget",
+            "condition": "!ctx.openCategoriesPanel",
+            "action":"openAddTargetPanel"
+        },
+        {
+            "eventId":"workflow.openAddReferencePanel",
+            "condition": "!ctx.openCategoriesPanel",
+            "action":"openAddReferencePanel"
+        },
+        {
+            "eventId":"workflow.openAddReferencePanel",
+            "condition": "ctx.openCategoriesPanel && !ctx.assignmentsChanged",
+            "action":"openAddReferencePanel"
+        },
+        {
+            "eventId":"workflow.openAddReferencePanel",
+            "condition": "ctx.openCategoriesPanel && ctx.assignmentsChanged",
+            "message":"saveOrDiscardWarningMsg2"
+        },
+        {
+            "eventId":"openAddTarget",
+            "condition": "ctx.openCategoriesPanel && ctx.assignmentsChanged",
+            "message":"saveOrDiscardWarningMsg"
+        },
+        {
+            "eventId":"openAddTarget",
+            "condition": "ctx.openCategoriesPanel && !ctx.assignmentsChanged",
+            "action":"openAddTargetPanel"
+        },
+        {
+            "eventId": "panelOpened",
+            "condition": "(ctx.openUserPickerPanel || ctx.openCategoriesPanel) && !ctx.isDynamicParticipantAssignmentPresent",
+            "action": "collapseGivenSectionNonDynamic"
+        },
+        {
+            "eventId": "panelOpened",
+            "condition": "(ctx.openUserPickerPanel || ctx.openCategoriesPanel) && ctx.isDynamicParticipantAssignmentPresent",
+            "action": "collapseGivenSectionDynamic"
+        },
+        {
+            "eventId": "panelOpened",
+            "condition": "ctx.openAddTargetPanel",
+            "action": "clearReferenceSelections"
+        },
+        {
+            "eventId": "panelOpened",
+            "condition": "ctx.openAddReferencePanel",
+            "action": "clearTargetSelections"
+        },
+        {
+            "eventId": "openAddTargetAfterSavePrompt",
+            "action":"openAddTargetPanel"
+        },
+        {
+            "eventId": "openAddReferenceAfterSavePrompt",
+            "action": "openAddReferencePanel"
+        },
+        {
+            "eventId":"closeAddTargetPanelPopup",
+            "action":"closeAddTargetPanel"
+        },
+        {
+            "eventId": "closePanel",
+            "condition": "ctx.openAddTargetPanel && data.eventMap['awCommandPanelSection.collapse'] && data.eventMap['awCommandPanelSection.collapse'].name === 'Targets'",
+            "cacheEventData": true,
+            "action": "closeAddTargetPanel"
+        },
+        {
+            "eventId": "closePanel",
+            "condition": "ctx.openAddReferencePanel && data.eventMap['awCommandPanelSection.collapse'] && data.eventMap['awCommandPanelSection.collapse'].name === 'References'",
+            "cacheEventData": true,
+            "action": "closeAddReferencePanel"
+        },
+        {
+            "eventId": "awCommandPanelSection.collapse",
+            "condition": "!ctx.openAddTargetPanel || !ctx.openAddReferencePanel",
+            "cacheEventData": true,
+            "action": "registerAddCommandCtx"
+        },
+        {
+            "eventId":"workflow.openAddReferencePanel",
+            "action":"registerReferences"
+        },
+        {
+            "eventId": "togglePanels",
+            "action": "toggleAddTargetCommand"
+        },
+        {
+            "eventId": "togglePanels",
+            "action": "toggleAddReferenceCommand"
+        }
+    ],
+    "lifecycleHooks": {
+        "onUnmount": "unRegisterContext"
+    },
+    "conditions":
+    {
+        "isAllowAlternateProcedures": {
+            "expression": "data.isAllowAlternateProcedures.dbValue"
+        },
+        "isAllowAlternateProcedureEnable": {
+            "expression": "data.isAllowAlternateProcedures.dbValue && ctx.workflow_process_candidates.workFlowObjects.length > 0"
+        },
+        "isValidToSubmit": {
+            "expression": "data.workFlowName.dbValue && data.workflowTemplates.dbValue!='No Template Available' && data.workflowTemplates.dbValue!='' && !data.submitActionInProgress"
+        },
+        "palChangeCondition": {
+            "expression": "data.palList.dbValue",
+            "trackValues": true
+        }
+    },
+
+    "i18n":
+    {
+        "assignments":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "Submit":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "singleSubmitToSubWorkflowSuccess":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "submitToSubWorkflowSuccess":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "none":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "Workflow_Title":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "Workflow":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "Workflow_Name":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "Workflow_Template":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "Description":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "All":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+
+        "Assigned":
+        [
+            "WorkflowCommandPanelsMessages"
+        ],
+        "addReviewerLabelText":
+        [
+            "InboxMessages"
+        ],
+        "required": ["InboxMessages"],
+        "additionalReviewers": [ "InboxMessages" ],
+        "assignee": ["WorkflowCommandPanelsMessages"],
+        "targets": ["WorkflowCommandPanelsMessages"],
+        "notifyLabel": ["InboxMessages"],
+        "acknowledge": ["InboxMessages"],
+        "references": [ "WorkflowDesignerMessages" ],
+        "serverError": ["WorkflowCommandPanelsMessages"],
+        "analystTypeName": ["PlantDataManagementConstants"],
+        "responsibleUser": ["PlantDataManagementConstants"],
+        "changeSpecialistTypeName": ["PlantDataManagementConstants"],
+        "implementer": ["PlantDataManagementConstants"],
+        "modify": [ 
+            "WorkflowCommandPanelsMessages" 
+        ],
+        "discard": [
+            "InboxMessages"
+        ],
+        "panelModificationWarningMsg": [
+            "WorkflowCommandPanelsMessages"
+        ]
+    }
+}

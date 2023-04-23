@@ -1,0 +1,120 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "ports": {
+        "pwaSelection": {
+            "syncObject": {}
+        }
+    },
+    "actions":
+    {
+        "updatePWASelectionPort": {
+            "actionType": "Sync",
+            "inputData": {
+                "port": "pwaSelection",
+                "syncObject": "{{data.eventData.selectedObjects}}"
+            }
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "loadData": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($searchInput:SearchInput){favorites(searchInput:$searchInput){totalFound totalLoaded results{cell_properties thumbnailURL hasThumbnail uid cellHeader1 cellHeader2 type typeHierarchy typeIconURL indicators{image tooltip} props navigation}}}",
+                    "variables": {
+                        "searchInput": {
+                            "maxToLoad": 50,
+                            "maxToReturn": 50,
+                            "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                            "cursor": {
+                                "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}",
+                                "endIndex": 0,
+                                "startReached": false,
+                                "endReached": false
+                            },
+                            "inflateProperties": false
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [{
+                "id": "search",
+                "responseObjs": "data.favorites.results"
+            }],
+            "outputData": {
+                "totalFound": "data.favorites.totalFound",
+                "searchResults": "data.favorites.results",
+                "ctx.search.totalFound": "data.favorites.totalFound",
+                "ctx.search.totalLoaded": "data.favorites.totalLoaded"
+            }
+        },
+        "refreshSublocation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "condition": "ctx.sublocation.clientScopeURI === 'Awp0MyFavorites'",
+                    "name": "primaryWorkarea.reset"
+                } ]
+            }
+        }
+    },
+
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+
+    "dataParseDefinitions": {
+        "search": {
+            "cellHeader1": "{{response.cellHeader1}}",
+            "cellHeader2": "{{response.cellHeader2}}",
+            "cellProperties": "{{response.cell_properties}}",
+            "thumbnailURL": "{{response.thumbnailURL}}",
+            "type": "{{response.type}}",
+            "typeHierarchy": "{{response.typeHierarchy}}",
+            "typeIconURL": "{{response.typeIconURL}}",
+            "hasThumbnail": "{{response.hasThumbnail}}",
+            "identifier": "{{response.uid}}",
+            "indicators": "{{response.indicators}}",
+            "navigation": "{{response.navigation}}",
+            "props": "{{response.props}}"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "favoritesGQLList.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "favorites.changed",
+            "action": "refreshSublocation"
+        },
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "action": "updatePWASelectionPort",
+            "cacheEventData": true
+        }
+    ]
+}

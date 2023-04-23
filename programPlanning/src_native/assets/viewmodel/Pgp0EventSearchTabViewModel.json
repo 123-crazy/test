@@ -1,0 +1,194 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-search-box.directive",
+        "js/aw-tab-set.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "searchFilterPanels": [
+            {
+                "tabKey": "results",
+                "panelId": "resultsTabPageSub",
+                "name": "{{i18n.results}}",
+                "visibleWhen": "true"
+            },
+            {
+                "tabKey": "filters",
+                "panelId": "filtersTabPageSub",
+                "name": "{{i18n.filterTabTitle}}",
+                "visibleWhen": "true"
+            }
+        ],
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        }
+    },
+    "actions": {
+        "processEventSelection": {
+            "actionType": "JSFunction",
+            "method": "getSelectedEvent",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "selectedEvent": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "launchShowCreateTypesEvent"
+                }]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "findSubBusinessObjectsAndInvokeSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "evalConditionForDefaultRelation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "getDefaultRelationforSearch",
+                        "condition": "data.targetObject"
+                    }
+                ]
+            }
+        },
+        "getDefaultRelationforSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-12-DataManagement",
+            "method": "getDefaultRelation",
+            "inputData": {
+                "input": [
+                    {
+                        "primaryType": "{{data.targetObject.type}}",
+                        "secondaryType": "{{data.eventData.selectedObjects[0].type}}"
+                    }
+                ]
+            },
+            "outputData": {
+                "defaultRelation": "output[0].defaultRelation"
+            },
+            "events": {
+                "success": [ {
+                    "name": "relations.updateRelationList2"
+                } ],
+                "failure": [ {
+                    "name": "relations.updateRelationList2"
+                } ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateRelationList": {
+            "actionType": "JSFunctionAsync",
+            "method": "updateRelationList",
+            "inputData": {
+                "data": "{{data}}",
+                "type": "{{data.eventData.selectedObjects[0].type}}",
+                "sourceObjectSet":"{{ctx.panelContext.objectSetSource}}"
+            },
+            "outputData": {
+                "relationList": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "relationList.updated2"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "updateRecentTypes": {
+            "actionType": "JSFunction",
+            "method": "updateRecentUsedTypes",
+            "inputData": {
+                "recentTypeName": "{{data.secondaryType}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "launchShowCreateTypesEventAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "ShowCreateTypesEvent",
+                        "recreatePanel": false
+                    }
+                } ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "launchShowCreateTypesEvent",
+            "action": "launchShowCreateTypesEventAction"
+        },
+        {
+            "eventId": "performSearch.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "evalConditionForDefaultRelation"
+        },
+        {
+            "eventId": "getDefaultRelationforSearch",
+            "action": "getDefaultRelationforSearch"
+        },
+        {
+            "eventId": "relations.updateRelationList2",
+            "action": "updateRelationList"
+        },
+        {
+            "eventId": "relationList.updated2",
+            "action": "updateRecentTypes"
+        } ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "showSearchFilterPanel": {
+            "expression": "data.showSearchFilter != undefined && data.showSearchFilter == true"
+        },
+        "isEventSelected": {
+                "expression": "data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+    "i18n": {
+        "results": [
+            "UIMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ],
+        "pgp0EventResults": [ "ProgramPlanningCommandPanelsMessages" ],
+        "filterTabTitle": [ "ProgramPlanningCommandPanelsMessages" ],
+        "addButtonCommandTitle": [ "ProgramPlanningCommandPanelsMessages" ]
+    }
+}

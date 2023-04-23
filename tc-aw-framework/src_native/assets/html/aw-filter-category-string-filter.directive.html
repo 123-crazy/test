@@ -1,0 +1,29 @@
+<div  title="{{category.displayName}}" >
+    <div ng-class="{'aw-search-inContentSearchBox':disableTypeAheadFacetSearch}" ng-if="category.showFilterText">
+        <aw-filter-category-searchbox  ng-class="{'aw-search-searchBox':disableTypeAheadFacetSearch}" category="category" index="category.index" disable-type-ahead-facet-search="disableTypeAheadFacetSearch"
+            filter-action="filterAction" >
+        </aw-filter-category-searchbox>
+    </div>
+    <aw-filter-category-contents
+        search-action="searchAction"
+        filter="item"
+        category= "category"
+        ng-repeat="item in category.results">
+    </aw-filter-category-contents >
+    <div ng-if="category.filterCount == 0 || ( category.filterCount > 0 && category.results.length == 0 )" class="aw-ui-filterNameLabel">
+        {{noFiltersText}}
+    </div>
+    <div class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled aw-aria-border"
+        ng-show="category.numberOfFiltersShown>category.defaultFilterValueDisplayCount"
+        title="{{lessText}}" tabindex="0" ng-keydown="lessFilterKeyPress($event)" ng-click="toggleFiltersSoa(false)"
+        ng-if="category.results && category.results.length > category.defaultFilterValueDisplayCount">
+        {{lessText}}
+        </div>
+        <div class="aw-ui-filterNameLabelMore aw-base-normal aw-ui-filterCategoryLabelEnabled aw-aria-border"
+            ng-show="category.hasMoreFacetValues || category.filterValues.length >= category.numberOfFiltersShown && category.filterValues.length > category.defaultFilterValueDisplayCount"
+        title="{{moreText}}" tabindex="0" ng-keydown="moreFilterKeyPress($event)" ng-click="toggleFiltersSoa(true)"
+        ng-if="category.results && category.results.length >= category.defaultFilterValueDisplayCount  && category.showMoreFilter || category.hasMoreFacetValues" >
+        {{moreText}}
+    </div>
+</div>
+

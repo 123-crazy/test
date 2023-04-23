@@ -1,0 +1,134 @@
+{
+    "imports": [
+        "js/aw-include.directive",
+        "js/aw-button.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/enable-when.directive"
+    ],
+    "actions": {
+        "downloadFile": {
+            "actionType": "JSFunctionAsync",
+            "deps": "js/command.service",
+            "method": "executeCommand",
+            "inputData": {
+                "0": "Awp0ShowObjectCellDataset",
+                "1": "",
+                "2": "",
+                "3": {
+                    "vmo": "{{data.subPanelContext.selected}}"
+                }
+            }
+        },
+        "restoreVersionHandler": {
+            "actionType": "batchJob",
+            "steps": [ {
+                "action": "restoreVersion"
+            }, {
+                "action": "notifyVmoChange"
+            } ]
+        },
+        "restoreVersion": {
+            "actionType": "JSFunctionAsync",
+            "deps": "js/fileVersion.service",
+            "method": "restoreFileVersion",
+            "inputData": {
+                "0": {
+                    "target": "{{ctx.panelContext.vmo}}",
+                    "parent": "{{ctx.panelContext.parent}}",
+                    "version": "{{data.subPanelContext.selected}}"
+                }
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "restoreFailureMessage"
+                } ]
+            }
+        },
+        "onSelectionChange": {
+            "actionType": "batchJob",
+            "steps": [ {
+                "action": "updatePanelContext"
+            }, {
+                "action": "updateSubPanelContext"
+            }, {
+                "action": "notifyVmoChange"
+            } ]
+        },
+        "updatePanelContext": {
+            "actionType": "JSFunction",
+            "deps": "js/appCtxService",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "0": "panelContext",
+                "1": {
+                    "vmo": "{{ctx.selected}}",
+                    "parent": "{{ctx.pselected}}"
+                }
+            }
+        },
+        "updateSubPanelContext": {
+            "actionType": "JSFunction",
+            "deps": "lodash",
+            "method": "set",
+            "inputData": {
+                "0": "{{data.subPanelContext}}",
+                "1": "vmo",
+                "2": "{{ctx.selected}}"
+            }
+        },
+        "notifyVmoChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "datasetVersionsToRenderUpdate",
+                    "excludeLocalDataCtx": true,
+                    "eventData": {}
+                } ]
+            }
+        }
+    },
+    "data": {
+        "subPanelContext": {
+            "vmo": "{{ctx.panelContext.vmo}}",
+            "selected": ""
+        }
+    },
+    "i18n": {
+        "DownloadVersionButton": [
+            "FileVersionsMessages"
+        ],
+        "RestoreVersionButton": [
+            "FileVersionsMessages"
+        ],
+        "FileVersionsPanelHeader": [
+            "FileVersionsMessages"
+        ],
+        "RestoreFailureMessage": [
+            "FileVersionsMessages"
+        ]
+    },
+    "onEvent": [ {
+        "eventId": "appCtx.register",
+        "condition": "name === 'mselected'",
+        "action": "onSelectionChange"
+    } ],
+    "messages": {
+        "restoreFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.RestoreFailureMessage}}",
+            "messageTextParams": []
+        }
+    },
+    "conditions": {
+        "isPanelObjectModifiable": {
+            "expression": "!ctx.panelContext.vmo.props.checked_out_user.dbValue || ctx.panelContext.vmo.props.checked_out_user.dbValue === ctx.user.uid"
+        },
+        "isPreviousRevisionSelected": {
+            "expression": "data.subPanelContext.selected && data.subPanelContext.selected.props.revision_number.dbValue !== data.subPanelContext.vmo.props.revision_number.dbValue"
+        }
+    },
+    "schemaVersion": "1.0.0"
+}

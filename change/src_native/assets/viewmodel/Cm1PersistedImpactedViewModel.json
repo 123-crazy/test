@@ -1,0 +1,346 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-splm-table.directive",
+        "js/exist-when.directive",
+        "js/aw-command-bar.directive"
+    ],
+    "actions": {
+        "setContextObj": {
+            "actionType": "JSFunction",
+            "method": "setDropTargetOnPersistedImpactedTable",
+            "inputData": {
+                "inContextData": "{{data}}"
+            },
+            "deps": "js/Cm1ImpactedWidgetService"
+
+        },
+        "initializePersistedImpactedTable": {
+            "actionType": "JSFunction",
+            "method": "initializePersistedImpactedTable",
+            "inputData": {
+                "inContextData": "{{data}}"
+            },
+            "deps": "js/Cm1ImpactedWidgetService"
+        },
+        "loadPersistedImpacted": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "CMImpactedTable",
+                    "operationType": "as_configured"
+                },
+                "searchInput": {
+                    "startIndex": "{{data.dataProviders.persistedImpactedDataProvider.startIndex}}",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Cm1LineageImpactedProvider",
+                    "columnFilters": "{{data.columnProviders.persistedImpactedColumnProvider.columnFilters}}",
+                    "searchCriteria": {
+                        "parentUid": "{{subPanelContext.selectedChangeObjectUid}}",
+                        "returnAllImpacted": "true"
+                    },
+                    "searchFilterFieldSortType": "Alphabetical",
+                    "searchSortCriteria": "{{data.columnProviders.persistedImpactedColumnProvider.sortCriteria}}"
+                },
+                "inflateProperties": true
+            },
+            "outputData": {
+                "totalFoundImpacted": "totalFound",
+                "searchResultsImpacted": "{{json:searchResultsJSON}}",
+                "dataProviders.persistedImpactedDataProvider.columnConfig": "columnConfig"
+            },
+            "deps": "js/Cm1ImpactedWidgetService",
+            "events": {
+                "success": [
+                    {
+                        "name": "initializePersistedImpactedTable"
+                    }
+                ]
+            }
+        },
+        "resetPersistedImpactedTable": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "persistedImpactedGrid.plTable.reload"
+                    }
+                ]
+            }
+        },
+        "calculateColorIndicatorForPersistedImpacted": {
+            "actionType": "JSFunction",
+            "method": "calculateColorIndicatorForPersistedImpacted",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Cm1ImpactedWidgetService"
+        },
+        "processPersistedImpactedTableSelection": {
+            "actionType": "JSFunction",
+            "method": "processPersistedImpactedTableSelection",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Cm1ImpactedWidgetService"
+        },
+        "impactAnalysisTableRefreshTable": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "condition": "commandContext.name === persistedImpactedDataProvider",
+                        "name": "persistedImpactedGrid.plTable.clientRefresh"
+                    }
+                ]
+            }
+        },
+        "calculateColorIndicatorForProbableImpacted": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "calculateColorIndicatorForProbableImpacted"
+                    }
+                ]
+            }
+        },
+        "calculateColorIndicatorForRelObjectImpacted": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "calculateColorIndicatorForRelObjectImpacted"
+                    }
+                ]
+            }
+        },
+        "setProbableImpactedTableSelection": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "setProbableImpactedTableSelection"
+                    }
+                ]
+            }
+        },
+        "deSelectRelationBrowserGraph": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "deSelectRelationBrowserGraph"
+                    }
+                ]
+            }
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "CMImpactedTable",
+                    "columnConfigId": "{{data.dataProviders.persistedImpactedDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.persistedImpactedDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {}
+        },
+        "resetColumnConfig" : {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [{
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos":
+                        [{
+                            "clientScopeURI": "CMImpactedTable",
+                            "operationType": "configured",
+                            "columnsToExclude": []
+                        }],
+                    "businessObjects": [{}]
+                }]
+            },
+            "outputData": {
+                "dataProviders.persistedImpactedDataProvider.resetColumnConfigs": "columnConfigurations"
+            }
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "getFilterFacets": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-12-Finder",
+            "method": "getFilterValues",
+            "inputData": {
+                "filterFacetInput": {
+                    "columnFilters": "{{filterFacetInput.columnFilters}}",
+                    "columnName": "{{filterFacetInput.column.field}}",
+                    "maxToReturn": "{{filterFacetInput.maxToReturn}}",
+                    "providerName":"Awp0ObjectSetRowProvider",
+                    "searchCriteria": {
+                        "parentUid": "{{ctx.ImpactsViewData.selectedChangeObjectUid}}",
+                        "objectSet": "CMHasImpactedItem.WorkspaceObject"
+                    },
+                    "searchFilterMap":  "{{ctx.search.activeFilterMap}}",
+                    "startIndex": "{{filterFacetInput.startIndex}}"
+                }
+            },
+            "headerState": {
+                "unloadObjects": false
+            },
+            "outputData": {
+                "filterFacetResults": "{{json:facetValues}}"
+            }
+        }
+    },
+    "lifecycleHooks":{
+       "onMount":"setContextObj"
+    },
+    "functions": {
+        "getCreateInputToCreteImpactedRelation": {
+            "functionName": "getCreateInputToCreteImpactedRelation",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "onEvent": [
+
+        {
+            "eventId": "persistedImpactedDataProvider.modelObjectsUpdated",
+            "action": "calculateColorIndicatorForProbableImpacted"
+        },
+        {
+            "eventId": "persistedImpactedDataProvider.modelObjectsUpdated",
+            "action": "calculateColorIndicatorForRelObjectImpacted",
+            "condition": "!conditions.isRelatedObjectsTableDeselectedAll"
+        },
+        {
+            "eventId": "persistedImpactedDataProvider.modelObjectsUpdated",
+            "action": "setProbableImpactedTableSelection"
+        },
+        {
+            "eventId": "persistedImpactedDataProvider.modelObjectsUpdated",
+            "action": "calculateColorIndicatorForPersistedImpacted"
+        },
+        {
+            "eventId": "persistedImpactedDataProvider.selectionChangeEvent",
+            "action": "deSelectRelationBrowserGraph"
+        },
+        {
+            "eventId": "persistedImpactedDataProvider.selectionChangeEvent",
+            "action": "processPersistedImpactedTableSelection"
+        },
+        {
+            "eventId": "persistedImpactedDataProvider.selectionChangeEvent",
+            "action": "setProbableImpactedTableSelection",
+            "condition": "conditions.isRelatedAndImpactedTableDeselected"
+        },
+        {
+            "eventId": "resetPersistedImpactedTable.refreshTable",
+            "action": "resetPersistedImpactedTable"
+        },
+        {
+            "eventId": "impactAnalysisTable.refreshTable",
+            "action": "impactAnalysisTableRefreshTable"
+        },
+        {
+            "eventId": "initializePersistedImpactedTable",
+            "action": "initializePersistedImpactedTable"
+        },
+        {
+            "eventId": "calculateColorIndicatorForPersistedImpacted",
+            "action": "calculateColorIndicatorForPersistedImpacted"
+        },
+        {
+            "eventId": "cutRelationForPersistedSelection",
+            "action": "processPersistedImpactedTableSelection"
+        },
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        }
+
+    ],
+    "conditions": {
+        "isRelatedObjectsTableDeselectedAll": {
+            "expression": "data.dataProviders.relationImpactedDataProvider.selectedObjects.length === 0"
+        },
+        "isRelatedAndImpactedTableDeselected": {
+            "expression": "ctx.ImpactsViewData.dataProviders.relationImpactedDataProvider.selectedObjects.length === 0 && data.dataProviders.persistedImpactedDataProvider.selectedObjects.length === 0  && ctx.ImpactsViewData.dataProviders.probableImpactedDataProvider.selectedObjects.length !== 1"
+        },
+        "isLoadImpactedTable": {
+            "expression": "subPanelContext.probableImpactedTableLoaded.dbValue === true ||ctx.ImpactsViewMode === 'RelationView'"
+        }
+    },
+    "data": {},
+    "columnProviders": {
+        "persistedImpactedColumnProvider": {
+            "columns": [{}],
+            "saveColumnAndLoadAction" : "saveColumnConfigLoadData",
+            "resetColumnAction" : "resetColumnConfig"
+        }
+    },
+    "dataProviders": {
+        "persistedImpactedDataProvider": {
+            "action": "loadPersistedImpacted",
+            "response": "{{data.searchResultsImpacted}}",
+            "totalFound": "{{data.totalFoundImpacted}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands",
+            "filterFacetAction": "getFilterFacets",
+            "filterFacetResults": "{{data.filterFacetResults}}"
+        }
+    },
+    "grids": {
+        "persistedImpactedGrid": {
+            "dataProvider": "persistedImpactedDataProvider",
+            "columnProvider": "persistedImpactedColumnProvider",
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enablePinning": true,
+                "maxRowsToShow": 17,
+                "enableSorting": true,
+                "isFilteringEnabled": true
+            }
+        }
+    },
+    "i18n": {
+        "TwistieTooltipCollapsed": [
+            "ChangeMessages"
+        ],
+        "TwistieTooltipExpanded": [
+            "ChangeMessages"
+        ],
+        "persistedImpactesTitle": [
+            "ChangeMessages"
+        ]
+    }
+}

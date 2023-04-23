@@ -1,0 +1,237 @@
+{
+  "name": "tcoo",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "Awp0CoShare": {
+        "iconId": "cmdShareCheckout",
+        "isGroup": false,
+        "title": "{{i18n.coShareCommandTitle}}"
+      },
+      "Awp0TcooAddUsers": {
+        "iconId": "cmdAdd",
+        "isGroup": false,
+        "title": "{{i18n.addSelected}}"
+      },
+      "Awp0TcooRemoveUsers": {
+        "iconId": "cmdRemove",
+        "isGroup": false,
+        "title": "{{i18n.removeSelected}}"
+      }
+    },
+    "commandHandlers": {
+      "Awp0CoShareCmdHandler": {
+        "id": "Awp0CoShare",
+        "action": "setContextVariableForShare",
+        "activeWhen": true,
+        "visibleWhen": {
+          "condition": "conditions.Awp0CoShareCmdVisibleCond"
+        },
+        "enableWhen": {
+          "condition": "conditions.Awp0CoShareCmdEnableCond"
+        }
+      },
+      "tcooAwp0CheckinHandler": {
+        "id": "Awp0Checkin",
+        "action": "preCheckinTcooViewer",
+        "activeWhen": {
+          "condition": "conditions.tcooAwp0CheckinCmdActiveCondition"
+        },
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.tcooAwp0CheckinCmdEnableCondition"
+        }
+      },
+      "tcooUvCheckinHandler": {
+        "id": "uvCheckin",
+        "action": "preCheckinTcooViewer",
+        "activeWhen": {
+          "condition": "conditions.tcooCheckinCmdActiveCondition"
+        },
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.tcooCheckinCmdEnableCondition"
+        }
+      },
+      "tcooAwp0CancelCheckoutHandler": {
+        "id": "Awp0CancelCheckout",
+        "action": "preCancelCheckoutTcooViewer",
+        "activeWhen": {
+          "condition": "conditions.tcooAwp0CheckinCmdActiveCondition"
+        },
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.tcooAwp0CheckinCmdEnableCondition"
+        }
+      },
+      "tcooUvCancelCheckoutHandler": {
+        "id": "uvCancelCheckout",
+        "action": "preCancelCheckoutTcooViewer",
+        "activeWhen": {
+          "condition": "conditions.tcooCheckinCmdActiveCondition"
+        },
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.tcooCheckinCmdEnableCondition"
+        }
+      },
+      "Awp0TcooAddUsersHandler": {
+        "id": "Awp0TcooAddUsers",
+        "action": "addSelectedUsers",
+        "activeWhen": true,
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.isValidToAdd"
+        }
+      },
+      "Awp0TcooRemoveUsersHandler": {
+        "id": "Awp0TcooRemoveUsers",
+        "action": "removeSelectedUsers",
+        "activeWhen": true,
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.isValidToRemove"
+        }
+      }
+    },
+    "commandPlacements": {
+      "Awp0CoShareDisplay": {
+        "id": "Awp0CoShare",
+        "uiAnchor": "aw_universalViewer",
+        "priority": 1000
+      },
+      "Awp0TcooAddUsersCmdPlacement": {
+        "id": "Awp0TcooAddUsers",
+        "uiAnchor": "awp0_tcooAddUsersCmdAnchor",
+        "priority": 10
+      },
+      "Awp0TcooRemoveUsersCmdPlacement": {
+        "id": "Awp0TcooRemoveUsers",
+        "uiAnchor": "awp0_tcooRemoveUsersCmdAnchor",
+        "priority": 10
+      }
+    },
+    "actions": {
+      "setContextVariableForShare": {
+        "actionType": "JSFunction",
+        "method": "setContextVariableForShare",
+        "deps": "js/Awp0CoShare",
+        "inputData": {
+          "ctx": "{{ctx}}"
+        }
+      },
+      "preCheckinTcooViewer": {
+        "actionType": "Event",
+        "method": "Event",
+        "deps": "js/aw-tcoo-viewer.controller",
+        "inputData": {
+          "events": [
+            {
+              "name": "uvCommand.executed",
+              "eventData": {
+                "callback": "preCheckin",
+                "vmo": "{{ctx.viewerContext.vmo}}"
+              }
+            }
+          ]
+        }
+      },
+      "preCancelCheckoutTcooViewer": {
+        "actionType": "Event",
+        "method": "Event",
+        "deps": "js/aw-tcoo-viewer.controller",
+        "inputData": {
+          "events": [
+            {
+              "name": "uvCommand.executed",
+              "eventData": {
+                "callback": "preCancelCheckout",
+                "vmo": "{{ctx.viewerContext.vmo}}"
+              }
+            }
+          ]
+        },
+        "policy": {
+          "types": [
+            {
+              "name": "Dataset",
+              "properties": [
+                {
+                  "name": "is_modifiable"
+                },
+                {
+                  "name": "fnd0IsCheckoutable"
+                },
+                {
+                  "name": "last_mod_date"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "addSelectedUsers": {
+        "actionType": "JSFunction",
+        "method": "addSelectedUsers",
+        "deps": "js/tcooUserPanelService",
+        "inputData": {
+          "data": "{{commandContext}}"
+        }
+      },
+      "removeSelectedUsers": {
+        "actionType": "JSFunction",
+        "method": "removeSelectedUsers",
+        "deps": "js/tcooUserPanelService",
+        "inputData": {
+          "data": "{{commandContext}}"
+        }
+      }
+    },
+    "conditions": {
+      "Awp0CoShareCmdVisibleCond": {
+        "expression": "(ctx.tcSessionData.tcMajorVersion > 12 || (ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion >= 2 ) ) && ctx.viewerContext.type === 'aw-tcoo-viewer' && ctx.selected.type !== 'Signoff'"
+      },
+      "Awp0CoShareCmdEnableCond": {
+        "expression": "ctx.viewerContext.type === 'aw-tcoo-viewer' && ctx.selected.type !== 'Signoff' && ctx.selected.props.checked_out.dbValues[0] === ' ' && ctx.viewerContext.vmo.props.checked_out.dbValues[0] === ' ' && ctx.selected.props.fnd0InProcess && ctx.selected.props.fnd0InProcess.dbValues[0] === '0' && (ctx.selected.props.date_released === undefined || ctx.selected.props.date_released.dbValues[0] === null)"
+      },
+      "tcooCheckinCmdActiveCondition": {
+        "expression": "ctx.viewerContext.type === 'aw-tcoo-viewer' && ctx.viewerContext.vmo.props.checked_out_user.dbValues[0] === ctx.user.uid"
+      },
+      "tcooCheckinCmdEnableCondition": {
+        "expression": "ctx.viewerContext.type === 'aw-tcoo-viewer' && ctx.viewerContext.vmo.props.checked_out_user.dbValues[0] === ctx.user.uid && !(ctx.viewerContext.vmo.props.fnd0MyWorkflowTasks && ctx.viewerContext.vmo.props.fnd0MyWorkflowTasks.uiValues && ctx.viewerContext.vmo.props.fnd0MyWorkflowTasks.uiValues[0]==='Co-Author Document')"
+      },
+      "tcooAwp0CheckinCmdActiveCondition": {
+        "expression": "ctx.viewerContext.type === 'aw-tcoo-viewer' && ctx.visibleServerCommands.Awp0Checkin === true && ctx.viewerContext.preRefreshTcooViewer === true"
+      },
+      "tcooAwp0CheckinCmdEnableCondition": {
+        "expression": "ctx.viewerContext.type === 'aw-tcoo-viewer' && ctx.selected.props.checked_out_user.dbValues[0] === ctx.user.uid && !(ctx.selected.props.fnd0MyWorkflowTasks && ctx.selected.props.fnd0MyWorkflowTasks.uiValues && ctx.selected.props.fnd0MyWorkflowTasks.uiValues[0]==='Co-Author Document')"
+      },
+      "isValidToAdd": {
+        "expression": "commandContext.dataProviders.userPerformSearch.selectedObjects !== undefined && commandContext.dataProviders.userPerformSearch.selectedObjects.length > 0"
+      },
+      "isValidToRemove": {
+        "expression": "commandContext.dataProviders.getUsers.selectedObjects !== undefined && commandContext.dataProviders.getUsers.selectedObjects.length > 0"
+      }
+    },
+    "i18n": {
+      "coShareCommandTitle": [
+        "tcooMessages"
+      ],
+      "addSelected": [
+        "tcooMessages"
+      ],
+      "removeSelected": [
+        "tcooMessages"
+      ]
+    }
+  }
+}

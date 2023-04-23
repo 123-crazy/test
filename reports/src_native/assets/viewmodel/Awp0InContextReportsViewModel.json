@@ -1,0 +1,250 @@
+{
+    "schemaVersion" : "1.0.0",
+"imports":
+    [
+        "js/aw-command-sub-panel.directive",
+        "js/aw-command-panel.directive"
+    ],
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Reports-2008-06-CrfReports",
+            "method": "getReportDefinitions",
+            "inputData":
+            {
+                "inputCriteria": "{{function:getreportdefinitionsoainput}}"
+            },
+
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "ReportDefinition",
+                        "properties":
+                        [
+                            {
+                                "name": "rd_style_sheets",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+
+                            {
+                                "name": "rd_source"
+                            },
+
+                            {
+                                "name": "rd_name"
+                            },
+
+                            {
+                                "name": "rd_type"
+                            },
+
+                            {
+                                "name": "rd_id"
+                            },
+
+                            {
+                                "name": "rd_parameters"
+                            },
+
+                            {
+                                "name": "rd_param_values"
+                            },
+                            {
+                                "name": "fnd0IsAsync"
+                            },
+                            {
+                                "name": "rd_class"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "reportdef": "{{function:processResponseToStoreReportDefs}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "updateListViewModelStatus"
+                    }
+                ]
+            },
+            "deps": "js/Awp0InContextReportsService"
+
+        },
+        "setPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPinnedToForm",
+            "inputData":
+            {
+                "pinnedToForm": "{{data.pinnedToForm}}",
+                "unpinnedToForm": "{{data.unpinnedToForm}}"
+            },
+
+            "outputData":
+            {
+
+            },
+
+            "deps": "js/Awp0SummaryReportsService"
+        },
+
+        "setUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPinnedToForm",
+            "inputData":
+            {
+                "pinnedToForm": "{{data.pinnedToForm}}",
+                "unpinnedToForm": "{{data.unpinnedToForm}}"
+            },
+
+            "outputData":
+            {
+
+            },
+
+            "deps": "js/Awp0SummaryReportsService"
+        },
+        "loadListViewModel":
+        {
+            "actionType": "JSFunction",
+            "method": "loadListViewModel",
+            "inputData":
+            {
+            },
+
+            "outputData":
+            {
+            },
+
+            "deps": "js/Awp0InContextReportsService"
+        },
+        "cleanctxonpanelclose":
+        {
+            "actionType": "JSFunction",
+            "method": "cleanctxonpanelclose",
+            "inputData":
+            {
+            },
+            "outputData":
+            {
+            },
+            "deps": "js/Awp0InContextReportsService"
+        },
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+
+    "data":
+    {
+        "generateReportPanelPinCommands":"generateReportPanel_oneStepPinCommands",
+
+        "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+   },
+
+   "functions":
+   {
+       "getreportdefinitionsoainput":
+       {
+           "functionName": "getreportdefinitionsoainput",
+           "parameters":
+           [
+               "{{data}}",
+               "{{ctx.mselected}}"
+           ]
+       },
+
+       "processResponseToStoreReportDefs":
+       {
+           "functionName": "processResponseToStoreReportDefs",
+           "parameters":[
+
+           ]
+       }
+   },
+
+    "messages":
+    {
+
+    },
+
+      "onEvent":
+      [
+        {
+            "eventId": "generateReportPanelCommand.generateReportPanelSetPin",
+            "action": "setPin"
+        },
+        {
+            "eventId": "generateReportPanelCommand.generateReportPanelSetUnPin",
+            "action": "setUnPin"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "updateListViewModelStatus",
+            "action": "loadListViewModel"
+        },
+        {
+            "eventId": "Awp0InContextReports.contentUnloaded",
+            "action": "cleanctxonpanelclose"
+        }
+     ],
+
+    "i18n":
+    {
+        "inContextReportPanelTitle":
+        [
+            "ReportMessages"
+        ]
+    }
+}

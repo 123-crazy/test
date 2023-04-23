@@ -1,0 +1,174 @@
+<div class="aw-clspanel-pair">
+    <div class="aw-clspanel-propertyContainer" ng-if="data.showAllProp || prop[0].uiValue.length > 0 || data.panelMode !== -1">
+
+        <!-- Label -->
+        <div ng-class="{'aw-clspanel-propertyLabelAnno': !data.isPanel && (prop[0].type !== 'BOOLEAN' || (prop[0].type === 'BOOLEAN' && data.panelMode === -1)),
+                        'aw-clspanel-propertyLabelAnnoCreatePanel': data.isPanel === true}" ng-style="{'width': getAttrWidth(), 'min-width': getAttrWidth()}" ng-click="selectNode(attribute, $event)">
+            <div ng-if="!(data.panelMode !== -1 && prop[0].type === 'BOOLEAN')" ng-class="{'aw-clspanel-propertyLabelField': !data.isPanel}">
+                <aw-property-label class="aw-clspanel-propertyLabel" aw-class="{'aw-state-selected': prop[0].selected }" prop="prop[0]" ng-if="prop[0].labelProps.length === 0 && (prop[1].propertyDisplayName === '' || (prop[1].propertyDisplayName !== '' && ctx.clsTab.classifyShowAnnotations===false && ctx.locationContext['ActiveWorkspace:SubLocation'] !== 'clsNodes' ))"
+                    ng-style="{'padding-left': propalign, 'margin-right': annoalign}" ng-click="selectNode(attribute)"></aw-property-label>
+                <aw-property-label class="aw-clspanel-propertyLabel" aw-class="{'aw-state-selected': prop[0].selected }" prop="prop[0]" ng-if="prop[0].labelProps.length === 0 && (prop[1].propertyDisplayName !== '' && (prop[1].propertyDisplayName !== '' && ctx.clsTab.classifyShowAnnotations===false && ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes' ))"
+                    ng-style="{'padding-left': propalign, 'margin-right': annoalign}" ng-click="selectNode(attribute)"></aw-property-label>
+                <aw-property-label class="aw-clspanel-propertyLabel" prop="prop[0]" ng-if="prop[0].labelProps.length > 0 && (prop[1].propertyDisplayName === '' || (prop[1].propertyDisplayName !== '' && ctx.clsTab.classifyShowAnnotations===false && ctx.locationContext['ActiveWorkspace:SubLocation'] !== 'clsNodes' ))"
+                    ng-style="{'padding-left': propalign, 'margin-right': annoalign}" extended-tooltip-context="prop" extended-tooltip="data.showLabelTooltip"></aw-property-label>
+                <div class="aw-clspanel-propertyLabel aw-widgets-propertyLabel" ng-class="{'afx-property-required': prop[0].isRequired && prop[1].propertyDisplayName !== ''}" ng-if="prop[0].labelProps.length === 0 && prop[1].propertyDisplayName !== '' && (ctx.clsTab.classifyShowAnnotations===true || data.isPanel === true)"
+                    ng-style="{'padding-left': propalign, 'margin-right': annoalign}">{{prop[0].propertyDisplayName}}
+                </div>
+                <div class="aw-clspanel-propertyLabel aw-widgets-propertyLabel" ng-class="{'afx-property-required': prop[0].isRequired && prop[1].propertyDisplayName !== ''}" ng-if="prop[0].labelProps.length > 0 && prop[1].propertyDisplayName !== '' && (ctx.clsTab.classifyShowAnnotations===true || data.isPanel === true) "
+                    ng-style="{'padding-left': propalign, 'margin-right': annoalign}" extended-tooltip-context="prop" extended-tooltip="data.showLabelTooltip">
+                    {{prop[0].propertyDisplayName}}</div>
+            </div>
+            <!-- Annotation -->
+            <aw-property-label class="aw-clspanel-propertyAnnotationLabel" prop="prop[1]" ng-if="prop[1].propertyDisplayName !== '' && (prop[0].type !== 'BOOLEAN' || (prop[0].type === 'BOOLEAN' && data.panelMode === -1))
+                        && (ctx.clsTab.classifyShowAnnotations===true || data.isPanel === true)"></aw-property-label>
+        </div>
+        <div ng-if="data.isPanel" class="aw-cls-unit">{{prop[2].propertyDisplayName}}</div>
+        <!-- Value -->
+        <div class="aw-widgets-propertyLabelTopValueContainer" ng-if="!data.isPanel &&
+                prop[0].metricFormat.formatDefinition.formatType<5 && prop[0].type !== 'BOOLEAN'" ng-class="{ 'aw-clspanel-extendedPropBool': prop[0].type === 'BOOLEAN' && data.panelMode !== -1,
+                'aw-clspanel-extendedPropEdit': prop[0].type !== 'BOOLEAN' && data.panelMode === 1,
+                'aw-clspanel-extendedPropCreate': prop[0].type !== 'BOOLEAN' && data.panelMode === 0,
+                'aw-clspanel-extendedProp': data.panelMode === -1}" ng-style="{'padding-left': prop[0].type === 'BOOLEAN' && data.panelMode !== -1 ? propalign : '0px', 'margin-right': prop[0].type === 'BOOLEAN' && data.panelMode !== -1 ? annoalign : '0px',
+                            'width': getAttrValueWidth()}">
+            <!-- non-required fields-->
+            <div ng-if="(prop[0].isRequired !== true)" class="aw-jswidgets-propertyVal" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint"></aw-property-val>
+            </div>
+
+            <!-- non-checkbox fields which are required -->
+            <div ng-if="(prop[0].isRequired === true && prop[0].type !== 'BOOLEAN')" class="aw-jswidgets-propertyVal" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint"></aw-property-val>
+            </div>
+
+            <!-- checkbox fields which are required -->
+            <div ng-if="(prop[0].isRequired === true && prop[0].type === 'BOOLEAN')" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint"></aw-property-val>
+            </div>
+        </div>
+
+        <!-- Value - Boolean -->
+        <div class="aw-clspanel-fullViewFlexBox" ng-if="!data.isPanel && prop[0].metricFormat.formatDefinition.formatType<5 && prop[0].type === 'BOOLEAN'">
+            <div class="aw-widgets-propertyLabelTopValueContainer" ng-if="!data.isPanel &&
+                    prop[0].metricFormat.formatDefinition.formatType<5 && prop[0].type === 'BOOLEAN'" ng-class="{ 'aw-clspanel-extendedPropBool': prop[0].type === 'BOOLEAN' && data.panelMode !== -1,
+                    'aw-clspanel-extendedPropEdit': prop[0].type !== 'BOOLEAN' && data.panelMode === 1,
+                    'aw-clspanel-extendedPropCreate': prop[0].type !== 'BOOLEAN' && data.panelMode === 0,
+                    'aw-clspanel-extendedProp': data.panelMode === -1}" ng-style="{'padding-left': prop[0].type === 'BOOLEAN' && data.panelMode !== -1 ? propalign : '0px', 'margin-right': prop[0].type === 'BOOLEAN' && data.panelMode !== -1 ? annoalign : '0px'}">
+                <!-- non-required fields-->
+                <div ng-if="(prop[0].isRequired !== true)" class="aw-jswidgets-propertyVal" ng-controller="awPropertyController">
+                    <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint"></aw-property-val>
+                </div>
+
+                <!-- checkbox fields which are required -->
+                <div ng-if="(prop[0].isRequired === true && prop[0].type === 'BOOLEAN')" ng-controller="awPropertyController">
+                        <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint"></aw-property-val>
+                </div>
+
+                <!-- Annotation for boolean in create/edit mode-->
+                <div ng-if="prop[0].type === 'BOOLEAN' && data.panelMode !== -1 && !data.isPanel && ctx.clsTab.classifyShowAnnotations===true" ng-class="{ 'aw-clspanel-propertyAnnotationLabelBool': (!ctx.classifyFullscreen || ctx.classifyFullscreen === false) && ctx.locationContext['ActiveWorkspace:SubLocation'] !== 'showObject',
+                'aw-clspanel-propertyAnnotationLabelBoolOpen': (!ctx.classifyFullscreen || ctx.classifyFullscreen === false) && ctx.locationContext['ActiveWorkspace:SubLocation'] === 'showObject',
+                'aw-clspanel-propertyAnnotationLabelBoolFS': ctx.classifyFullscreen===true }">
+                {{prop[1].propertyDisplayName}}
+                </div>
+            </div>
+        </div>
+
+        <!-- unique classes REQUIRED in complex aw-property-val for cucumber to be able to find element -->
+        <div class="aw-widgets-propertyLabelTopValueContainer" ng-if="!data.isPanel" ng-class="{
+                'aw-clspanel-complexExtendedPropEdit': prop[0].type !== 'BOOLEAN' && data.panelMode === 1,
+                'aw-clspanel-complexExtendedPropCreate': prop[0].type !== 'BOOLEAN' && data.panelMode === 0,
+                'aw-clspanel-complexExtendedProp': data.panelMode === -1}">
+            <!-- Axis -->
+            <div ng-if="(prop[0].isRequired !== true && prop[0].metricFormat.formatDefinition.formatType === 9) " ng-controller="awPropertyController">
+                <div class="aw-clspanel-complex">
+                    <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-x"></aw-property-val>
+                    <aw-property-val prop="prop[3]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-y"></aw-property-val>
+                    <aw-property-val prop="prop[4]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-z"></aw-property-val>
+                </div>
+                <div class="aw-clspanel-complex">
+                    <aw-property-val prop="prop[5]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-rx"></aw-property-val>
+                    <aw-property-val prop="prop[6]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-ry"></aw-property-val>
+                    <aw-property-val prop="prop[7]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-rz"></aw-property-val>
+                </div>
+            </div>
+            <!-- Position -->
+            <div ng-if="prop[0].metricFormat.formatDefinition.formatType === 8" class="aw-clspanel-complex" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-x"></aw-property-val>
+                <aw-property-val prop="prop[3]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-y"></aw-property-val>
+                <aw-property-val prop="prop[4]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-z"></aw-property-val>
+            </div>
+            <!-- Value_Range -->
+            <div ng-if="prop[0].metricFormat.formatDefinition.formatType === 5" class="aw-clspanel-complex" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-min"></aw-property-val>
+                <aw-property-val prop="prop[3]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-max"></aw-property-val>
+            </div>
+            <!-- Value_With_Tolerance -->
+            <div ng-if="prop[0].metricFormat.formatDefinition.formatType === 6" class="aw-clspanel-complex" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-nom"></aw-property-val>
+                <aw-property-val prop="prop[3]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-min"></aw-property-val>
+                <aw-property-val prop="prop[4]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-max"></aw-property-val>
+            </div>
+            <!-- Level -->
+            <div ng-if="prop[0].metricFormat.formatDefinition.formatType === 7 " class="aw-clspanel-complex" ng-controller="awPropertyController">
+                <aw-property-val prop="prop[0]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-nom"></aw-property-val>
+                <aw-property-val prop="prop[3]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-typ"></aw-property-val>
+                <aw-property-val prop="prop[4]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-min"></aw-property-val>
+                <aw-property-val prop="prop[5]" modifiable="$parent.modifiable" hint="$parent.hint" class="aw-complex-max"></aw-property-val>
+            </div>
+        </div>
+
+        <!-- Edit mode -->
+        <div ng-if="!data.isPanel" ng-class="{ 'aw-clspanel-unitDiv': (prop.length <= 3 || prop[0].metricFormat.formatDefinition.formatType === 7) && !data.blockDefinitionMapResponse,
+        'aw-clspanel-unitDivTwoProps': prop.length === 4 &&  prop[0].metricFormat.formatDefinition.formatType !== 7 && !data.blockDefinitionMapResponse,
+        'aw-clspanel-unitDivThreePropsOrMore': prop.length > 4 &&  prop[0].metricFormat.formatDefinition.formatType !== 7 && !data.blockDefinitionMapResponse,
+        'aw-clspanel-unitDivBlockInterior': data.blockDefinitionMapResponse }">
+            <div class="aw-jswidgets-propertyVal" ng-controller="awPropertyController" exist-when="data.panelMode !== -1">
+                <aw-icon class="aw-uiwidgets-searchBoxIcon" icon-id="cmdCreateGroup" ng-click="generateCardinalBlocks()" exist-when="cardinalattribute && prop[0].isEditable" title="{{data.i18n.createInstances}}">
+                </aw-icon>
+            </div>
+            <div exist-when="prop[2].propertyDisplayName.length > 0 && prop[2].names">
+                <div ng-if="data.panelMode !== -1" style="margin-left: 5px; margin-top: 5px">
+                    <aw-cls-list display="prop[2].display" current-value="prop[2]" available-intent-values="prop[2].lovApi" attribute="prop" data="data" parent="parentattribute" class="aw-clspanel-list" style="white-space: nowrap">{{prop[2].propertyDisplayName}}</aw-cls-list>
+                </div>
+                <div ng-if="data.panelMode === -1">
+                    <aw-cls-list display="prop[2].display" current-value="prop[2]" available-intent-values="prop[2].lovApi" attribute="prop" data="data" parent="parentattribute" class="aw-clspanel-list" style="white-space: nowrap">{{prop[2].propertyDisplayName}}</aw-cls-list>
+                </div>
+            </div>
+            <div class="aw-clspanel-propertyUnits" ng-class="{ 'aw-clspanel-propertyUnitsEdit': prop[0].isEditable }" exist-when="prop[2].propertyDisplayName.length > 0 && !prop[2].names">{{prop[2].propertyDisplayName}}
+            </div>
+            <aw-icon class="aw-clspanel-showMinMax" icon-id="homeHelp" exist-when="( data.panelMode !== -1 && prop[0].minMaxMsg.length > 0 ) && prop.length <= 3" extended-tooltip-context="prop" extended-tooltip="data.showMinMaxTooltip"></aw-icon>
+            <aw-icon class="aw-clspanel-showComplexMinMax" icon-id="homeHelp" exist-when="prop.length > 3" extended-tooltip-context="prop" extended-tooltip="data.showMinMaxTooltip"></aw-icon>
+        </div>
+    </div>
+    <div class='aw-clspanel-extendedPropPanel' ng-class="{'aw-clspanel-extendedPropPanel':prop[1].propertyDisplayName === ''}" ng-if="data.isPanel === true">
+        <div class="aw-widgets-propertyLabelTopValueContainer">
+            <div class="aw-jswidgets-propertyVal" ng-controller="awPropertyController">
+                <aw-property-val prop="$parent.prop[0]" modifiable="$parent.modifiable" hint="$parent.hint" ng-class="{ 'aw-clspanel-propertyLabelAnnoPanel': prop[0].type === 'BOOLEAN' && data.panelMode !== -1}">
+                </aw-property-val>
+                <!-- Annotation -->
+                <span class="aw-clspanel-propertyAnnotationLabelPanel" ng-if="prop[0].type === 'BOOLEAN' && data.panelMode !== -1">{{prop[1].propertyDisplayName}}</span>
+                <aw-icon class="aw-uiwidgets-searchBoxIcon" icon-id="cmdCreateGroup" ng-click="generateCardinalBlocks()" exist-when="cardinalattribute && prop[0].isEditable" title="{{data.i18n.createInstances}}">
+                </aw-icon>
+            </div>
+        </div>
+        <div class="aw-clspanel-minMaxLabelContainer" exist-when="prop[0].isEditable">
+            <!-- Metric -->
+            <div visible-when="data.unitSystem.dbValue">
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMin" visible-when="prop[0].metricFormat.minimumValue && !prop[0].metricFormat.maximumValue">{{data.i18n.minimumConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMax" visible-when="!prop[0].metricFormat.minimumValue && prop[0].metricFormat.maximumValue">{{data.i18n.maximumConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelRange" visible-when="prop[0].metricFormat.minimumValue && prop[0].metricFormat.maximumValue">{{data.i18n.rangeConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMinValue">{{prop[0].metricFormat.minimumValue}}</label>
+                <label class="aw-clspanel-minMaxLabel" ng-if="prop[0].metricFormat.minimumValue && prop[0].metricFormat.maximumValue">{{data.i18n.dashConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMaxValue">{{prop[0].metricFormat.maximumValue}}</label>
+            </div>
+            <!-- NonMetric -->
+            <div visible-when="!data.unitSystem.dbValue">
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMin" visible-when="prop[0].nonMetricFormat.minimumValue && !prop[0].nonMetricFormat.maximumValue">{{data.i18n.minimumConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMax" visible-when="!prop[0].nonMetricFormat.minimumValue && prop[0].nonMetricFormat.maximumValue">{{data.i18n.maximumConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelRange" visible-when="prop[0].nonMetricFormat.minimumValue && prop[0].nonMetricFormat.maximumValue">{{data.i18n.rangeConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMinValue">{{prop[0].nonMetricFormat.minimumValue}}</label>
+                <label class="aw-clspanel-minMaxLabel" ng-if="prop[0].nonMetricFormat.minimumValue && prop[0].nonMetricFormat.maximumValue">{{data.i18n.dashConstraintLabel}}</label>
+                <label class="aw-clspanel-minMaxLabel aw-clspanel-minMaxLabelMaxValue">{{prop[0].nonMetricFormat.maximumValue}}</label>
+            </div>
+        </div>
+    </div>
+</div>

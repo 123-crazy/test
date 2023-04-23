@@ -1,0 +1,59 @@
+
+<div class="aw-layout-declarativePanelRoot aw-layout-panel aw-search-folder">
+    <div class="aw-layout-flexRow aw-layout-flexRowContainer">
+        <div class="aw-layout-flexColumn aw-search-folderColumn">
+            <div class="aw-layout-panelSectionTitle aw-layout-flexRow aw-layout-flexRowContainer">
+                <div><label title="{{i18n.searchFolderSearch}}">{{i18n.searchFolderSearch}}</label></div>
+                <div class="aw-xrt-objectSetToolbar aw-search-searchFolderButtons">
+                    <aw-toolbar first-anchor="dummy" second-anchor="aw_SearchFolderRule" orientation="HORIZONTAL" context="subPanelContext"></aw-toolbar>
+                </div>
+            </div>
+            <div>&nbsp;</div>
+            <div>
+                <span class="aw-widgets-propertyNonEditValue" exist-when="!(ctx.searchFolder.isEditMode === true) && ctx.searchFolder.awp0SearchType === 'Unknown'">{{i18n.noRuleFound}}</span>
+            </div>
+            <div exist-when="!(ctx.searchFolder.isEditMode === true) && ctx.searchFolder.searchFilters && ctx.searchFolder.awp0SearchType !== 'Unknown'">
+                <aw-include name="Awp0SearchFolderRuleCriteriaAndFilters" sub-panel-context="data"></aw-include>
+            </div>
+            <div>
+                <div exist-when="ctx.searchFolder.isEditMode === true && !(ctx.searchFolder.useRule === 'savedSearch') && (ctx.searchFolder.awp0SearchType === 'Unknown' || ctx.searchFolder.useRule === 'newRule')">
+                    <aw-checkbox class="aw-search-settings" prop="data.isAdvancedSearch" action="setAdvancedSearch"></aw-checkbox>
+                </div>
+                <div exist-when="ctx.searchFolder.isEditMode === true && !(ctx.searchFolder.useRule === 'savedSearch') && !(ctx.searchFolder.awp0SearchType === 'Awp0SavedQuerySearchProvider')">
+                    <aw-search-box class="aw-search-searchBox" prop="data.searchBox" exist-when="!(data.isAdvancedSearch.dbValue === true)" placeholder="data.searchBoxPlaceHolder" action="doFulltextSearch"></aw-search-box>
+                </div>
+                <div exist-when="ctx.searchFolder.isEditMode === true && !(ctx.searchFolder.useRule === 'savedSearch') && (ctx.searchFolder.awp0SearchType === 'Unknown' || ctx.searchFolder.useRule === 'newRule')">
+                    <aw-include name="Awp0SearchFolderRuleFulltext" exist-when="!(data.isAdvancedSearch.dbValue === true) && ctx.searchResponseInfo.searchFilterCategories" sub-panel-context="data"></aw-include>
+                    <aw-include name="Awp0SearchFolderRuleAdvanced" exist-when="data.isAdvancedSearch.dbValue === true" sub-panel-context="data"></aw-include>
+                </div>
+            </div>
+            <div exist-when="ctx.searchFolder.isEditMode === true && ctx.searchFolder.useRule === 'savedSearch'">
+                <div class="aw-widgets-propertyContainer">
+                    <aw-property-label prop="data.awp0SavedSearchName"></aw-property-label>
+                    <aw-property-lov-val prop="data.awp0SavedSearchName"></aw-property-lov-val>
+                </div>
+            </div>
+            <div exist-when="ctx.searchFolder.isEditMode === true && ctx.searchFolder.useRule !== 'newRule' && ctx.searchFolder.awp0SearchType !== 'Unknown'" class="aw-layout-flexColumn">
+                <aw-include name="Awp0SearchFolderRuleFulltext" exist-when="ctx.searchFolder.awp0SearchType === 'Awp0FullTextSearchProvider'" sub-panel-context="data"></aw-include>
+                <aw-include name="Awp0SearchFolderRuleAdvanced" exist-when="ctx.searchFolder.awp0SearchType === 'Awp0SavedQuerySearchProvider'" sub-panel-context="data"></aw-include>
+            </div>
+        </div>
+         <div class="aw-search-ruleSection aw-search-folderSectionSpace">
+
+        </div>
+        <div class="aw-layout-flexColumn aw-search-folderColumn">
+            <div class="aw-layout-panelSectionTitle aw-layout-flexRow">
+                <div>
+                    <label title="{{i18n.searchFolderResults}}">{{i18n.searchFolderResults}}</label>
+                </div>
+                <div exist-when="ctx.searchFolder.awp0SearchType !== 'Unknown' && ctx.searchFolder.totalFound >= 0">
+                    <label class="aw-search-folderCount aw-search-sectionCountBlock">({{ctx.searchFolder.totalFound}})</label>
+                </div>
+            </div>
+            <div>
+                <aw-include name="Awp0SearchFolderResults" exist-when="ctx.searchFolder.searchCriteria && (ctx.searchFolder.awp0SearchType !== 'Unknown' || ctx.searchFolder.isEditMode === true && ctx.searchFolder.useRule === 'newRule')" sub-panel-context="data"></aw-include>
+            </div>
+        </div>
+    </div>
+</div>
+

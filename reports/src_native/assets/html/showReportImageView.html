@@ -1,0 +1,87 @@
+<aw-row visible-when="conditions.dispInstructions">
+    <aw-panel visible-when="conditions.dispInstructions">
+        <aw-row>
+            <aw-column width="8">
+                <aw-label class="aw-reports-instructionsLabel" id="instructionswidget" prop="data.instructionsTitle" visible-when="ctx.state.params.reportType === '4'"></aw-label>
+                <aw-label class="aw-reports-instructionsLabel" id="iteminstrutionswidget" prop="data.itemInstructions" visible-when="ctx.state.params.reportType === '1'"></aw-label>
+            </aw-column>
+            <aw-column width="4"></aw-column>
+        </aw-row>
+    </aw-panel>
+</aw-row>
+<aw-row visible-when="conditions.shouldShowFilterChips">
+    <aw-chip-list dataprovider="data.dataProviders.filtersDataProvider" action="removeFilterAction" ui-icon-action="removeFilterAction"></aw-chip-list>
+</aw-row>
+<aw-row visible-when="!conditions.dispInstructions" height="60%">
+    <aw-panel>
+        <aw-panel-header class="aw-reports-chartContainer">
+            <aw-row>
+                <aw-column width="4">
+                    <aw-label prop="data.totalFoundString" visible-when="conditions.totalFoundDone" id="totalFoundLabel"></aw-label>
+                    <aw-label prop="data.timeOfRequest" visible-when="conditions.totalFoundDone" id="timeOfRequestLabel"></aw-label>
+                    <aw-label prop="data.appliedRevRule" visible-when="conditions.showRevRule" id="appliedRevRuleLabel"></aw-label>
+                    <aw-link class="aw-reports-reportSourceName" prop="data.reportSource" action="goToSource" visible-when="conditions.showSourceLink"></aw-link>
+                </aw-column>
+                <aw-column width="4">
+                    <aw-label class="aw-reports-titleLabel" prop="data.title" id="titleReport" visible-when="conditions.titleChosen"></aw-label>
+                </aw-column>
+                <aw-column width="4" class="aw-reports-viewerCommands">
+                    <aw-command-bar anchor="reportViewerCommands" overflow="true" alignment="HORIZONTAL"></aw-command-bar>
+                </aw-column>
+            </aw-row>
+        </aw-panel-header>
+        <aw-panel-body class="aw-reports-chartContainer">
+            <aw-row exist-when="conditions.oneCharts" height="fill">
+                <!-- when only first chart is selected -->
+                <aw-column width="12" exist-when="conditions.dataReady1" visible-when="conditions.chartReadyGen1">
+                    <aw-label prop="data.noChartData" exist-when="data.chart1NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart1" exist-when="!data.chart1NoData" name="Chart1Section" id="Chart1Section"></aw-chart>
+                </aw-column>
+                <!-- when only second chart is selected -->
+                <aw-column width="12" exist-when="conditions.dataReady2" visible-when="conditions.chartReadyGen2">
+                    <aw-label prop="data.noChartData" exist-when="data.chart2NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart2" exist-when="!data.chart2NoData" name="Chart2Section" id="Chart2Section"></aw-chart>
+                </aw-column>
+                <!-- when only third chart is selected -->
+                <aw-column width="12" exist-when="conditions.dataReady3" visible-when="conditions.chartReadyGen3">
+                    <aw-label prop="data.noChartData" exist-when="data.chart3NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart3" exist-when="!data.chart3NoData" name="Chart3Section" id="Chart3Section"></aw-chart>
+                </aw-column>
+            </aw-row>
+            <aw-row exist-when="conditions.twoCharts" height="fill">
+                <!-- conditions to show two charts layout -->
+                <aw-column width="6" exist-when="conditions.dataReady1" visible-when="conditions.chartReadyGen1">
+                    <aw-label prop="data.noChartData" exist-when="data.chart1NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart1" exist-when="!data.chart1NoData" name="Chart1Section" id="Chart1Section"></aw-chart>
+                </aw-column>
+                <aw-column width="6" exist-when="conditions.dataReady2" visible-when="conditions.chartReadyGen2">
+                    <aw-label prop="data.noChartData" exist-when="data.chart2NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart2" exist-when="!data.chart2NoData" name="Chart2Section" id="Chart2Section">
+                    </aw-chart>
+                </aw-column>
+                <aw-column width="6" exist-when="conditions.dataReady3" visible-when="conditions.chartReadyGen3">
+                    <aw-label prop="data.noChartData" exist-when="data.chart3NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart3" exist-when="!data.chart3NoData" name="Chart3Section" id="Chart3Section"></aw-chart>
+                </aw-column>
+            </aw-row>
+            <aw-row exist-when="conditions.threeCharts" height="fill">
+                <aw-column width="4">
+                    <aw-label prop="data.noChartData" exist-when="data.chart1NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart1" exist-when="conditions.dataReady1 && !data.chart1NoData" visible-when="conditions.chartReadyGen1" name="Chart1Section" id="Chart1Section"></aw-chart>
+                </aw-column>
+                <aw-column width="4">
+                    <aw-label prop="data.noChartData" exist-when="data.chart2NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart2" exist-when="conditions.dataReady2 && !data.chart2NoData" visible-when="conditions.chartReadyGen2" name="Chart2Section" id="Chart2Section"></aw-chart>
+                </aw-column>
+                <aw-column width="4">
+                    <aw-label prop="data.noChartData" exist-when="data.chart3NoData"></aw-label>
+                    <aw-chart chart-provider="data.chartProviders.genericChart3" exist-when="conditions.dataReady3 && !data.chart3NoData" visible-when="conditions.chartReadyGen3" name="Chart3Section" id="Chart3Section"></aw-chart>
+                </aw-column>
+            </aw-row>
+        </aw-panel-body>
+    </aw-panel>
+</aw-row>
+<!-- will display table in this position when there is at least on chart -->
+<aw-row exist-when="(( data.dataIsReady && data.dataIsReadyTable && !ctx.updateTable && data.numCharts > 0) || (data.dataIsReady && data.dataIsReadyTable && !ctx.updateTable && data.numCharts === 0))" height="40%">
+    <aw-splm-table gridid="gridView"></aw-splm-table>
+</aw-row>

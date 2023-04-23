@@ -1,0 +1,239 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-init.directive"
+
+    ],
+
+    "actions":
+    {
+         "refreshTracelinkDataProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "tracelinkObjects"
+        },
+
+        "Arm0MarkAndSuspectSubPanelAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Arm0MarkAndSuspectSub",
+                            "title": "{{data.i18n.selectedLinkedItems}}",
+                            "supportGoBack": true,
+                            "isolateMode": false
+                        }
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                  {
+                    "name":"Arm0MarkAndSuspectSub.contentLoaded"
+                   }
+                 ]
+            }
+        },
+        "NavigateToArm0MarkAndSuspectPanelAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Arm0MarkAndSuspect",
+                            "supportGoBack": true,
+                            "isolateMode": false
+                        }
+                    }
+                ]
+            }
+        },
+        "ShowTracelinks":{
+            "actionType": "JSFunction",
+            "method": "ShowTracelinks",
+            "deps": "js/Arm0MarkAndSuspect",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "refreshDataProvider":{
+            "actionType": "dataProvider",
+            "method": "SelectedItemList"
+        },
+        "updateSelection":{
+            "actionType": "JSFunction",
+            "method": "updateSelection",
+            "deps": "js/Arm0MarkAndSuspect",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "setArm0MarkAndSuspectMainData":{
+            "actionType": "JSFunction",
+            "method": "setArm0MarkAndSuspectMainData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                  {
+                    "name":"Arm0MarkAndSuspectMain.refreshDataProvider"
+                   }
+                 ]
+            },
+            "deps": "js/Arm0MarkAndSuspect"
+        },
+        "autoMultiSelectAction": {
+            "actionType": "JSFunction",
+            "method": "dataProviderEnableMultiSelect",
+            "deps": "js/dataProviderFactory",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.tracelinkObjects}}"
+            }
+        }
+    },
+
+    "data":
+    {
+        "arrTracelinkedItems": {
+            "isArray": "true",
+            "dbValue":
+            [
+            ]
+        }
+    },
+    "dataProviders": {
+        "SelectedItemList": {
+            "commands":
+            {
+                "showTracelinks":
+                {
+                    "id": "miscCollapse",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "action":"ShowTracelinks",
+                    "displayOption": "ALWAYS",
+                    "position": "MIDDLE_RIGHT"
+                }
+
+            },
+            "response": "{{data.selectedObj}}",
+            "selectionModelMode": "single"
+        },
+        "tracelinkObjects":{
+            "response": "{{data.arrTracelinkedItems.dbValue}}",
+            "selectionModelMode": "multiple",
+            "selectionModel": {
+                "multiSelectEnabled": true
+            }
+        }
+
+    },
+    "functions":
+     {
+         "createMapAsPerSelection":{
+            "functionName": "createMapAsPerSelection",
+            "parameters": [ "{{data}}" ]
+         },
+         "getDueDate": {
+            "functionName": "getDueDate",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+     },
+
+    "conditions":
+    {
+    },
+
+    "messages":
+    {
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Arm0MarkAndSuspectMain.contentLoaded",
+            "action": "setArm0MarkAndSuspectMainData"
+        },
+        {
+            "eventId": "Arm0MarkAndSuspectMain.contentLoaded",
+            "action": "autoMultiSelectAction"
+        },
+        {
+            "eventId": "Arm0MarkAndSuspectMain.refreshTracelinkDataProvider",
+            "action": "refreshTracelinkDataProvider"
+        },
+        {
+            "eventId": "Arm0MarkAndSuspectMain.refreshDataProvider",
+            "action": "refreshDataProvider"
+        },
+        {
+            "eventId": "Arm0MarkAndSuspect.showTracelinkPanel",
+            "action": "Arm0MarkAndSuspectSubPanelAction"
+        },
+        {
+            "eventId": "Arm0MarkAndSuspectSub.contentLoaded",
+            "action": "updateSelection"
+        },
+        {
+            "eventId": "Arm0MarkAndSuspect.NavigateToArm0MarkAndSuspectPanelAction",
+            "action": "NavigateToArm0MarkAndSuspectPanelAction"
+        }
+    ],
+    "i18n":
+    {
+        "clearPreviousSuspects":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "notifyLinks":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "dueDate30Days": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "dueDate60Days": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "customDate": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "noDueDate": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "date":[
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "dueDate":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "MarkSuspect": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "dateModified": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "SelectItemsToBeNotified": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "selectedLinkedItems":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "notificationForSuspectRaised":[
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

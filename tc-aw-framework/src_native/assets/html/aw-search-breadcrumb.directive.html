@@ -1,0 +1,56 @@
+<div class="aw-layout-breadCrumbs">
+    <div  class="aw-layout-flexRow">
+        <div class="aw-search-resultsCountArea">
+            <span ng-if="provider.title && !isShapeSearchContext()" title="{{provider.title}}" role="region" aria-label="{{provider.title}}" aria-live="polite" >{{provider.title}}</span>
+            <span ng-if="provider.title && isShapeSearchContext()" title="{{provider.title.part1}}">{{provider.title.part1}}</span>
+            <a ng-click="doit()" ng-if="provider.title && isShapeSearchContext()">{{provider.title.seedObjectLink}}</a>
+            <span ng-if="provider.title && isShapeSearchContext()" title="{{provider.title.part2}}">{{provider.title.part2}}</span>
+        </div>
+   </div>
+   <div class="aw-layout-fxbreadCrumbs aw-layout-flexColumn">
+       <div  class="aw-layout-flexRow">
+       <div class="aw-layout-overflowAtStart" exist-when="provider && provider.crumbs && provider.crumbs.length>0 && showOverflowAtStart">
+           <div class="aw-layout-flexRow">
+           <span>
+               <aw-property-image ng-click="onOverflowChevronClick($event)" tabindex="0" ng-keydown="onOverflowChevronClickKeyPress($event)" class="aw-jswidget-controlArrowNoFloat aw-widgets-overflowChevronIcon aw-aria-border" name="miscChevronLeftDouble" ></aw-property-image>
+               <aw-popup-panel class="aw-widgets-overflowChevronPopup">
+                    <aw-scrollpanel>
+                        <div class="aw-widgets-breadcrumbChevronPopup afx-content-background"  ng-class="{'aw-widgets-breadcrumbMS': isIE}">
+                            <ul class="aw-widgets-cellListWidget aw-layout-flexColumnContainer">
+                                <li class="aw-widgets-cellListItem aw-widgets-cellTop" aw-repeat="crumb : provider.overflowCrumbList | orderBy: 'indexBreadCrumb'">
+                                    <span class="aw-widgets-crumbCategoryLabel" title="{{crumb.displayName}}">{{crumb.displayName}}</span>
+                                    <a exist-when="!crumb.selectedCrumb" class="aw-widgets-crumbLink aw-widgets-breadCrumbOverflow aw-aria-border" title="{{crumb.value}}" ng-click="provider.onSelect(crumb)" tabindex="0" ng-keydown="breadcrumbOnSelectKeyPress($event, crumb)">{{crumb.value}}</a>
+                                    <span exist-when="crumb.selectedCrumb" class="aw-widgets-selectedCrumb aw-widgets-breadCrumbOverflow" title="{{crumb.value}}">{{crumb.value}}</span>
+                                    <span exist-when="crumb.showRemoveButton"><aw-property-image class="aw-widgets-removeCrumb aw-aria-border" role="button" aria-label="{{i18n.breadcrumbRemove}}" name="miscRemoveBreadcrumb" ng-click="provider.onRemove(crumb)" ng-keydown="removeBreadcrumbKeyPress($event, crumb)" tabindex="0"></aw-property-image></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </aw-scrollpanel>
+               </aw-popup-panel>
+           </span>
+           </div>
+       </div>
+           <div aw-repeat="crumb : provider.crumbs" class="aw-layout-eachCrumb" >
+               <div class="aw-layout-flexRow">
+                   <div exist-when="!crumb.selectedCrumb && !crumb.willOverflow">
+                       <span class="aw-widgets-crumbCategoryLabel" exist-when="crumb.displayName" title="{{crumb.displayName}}">{{crumb.displayName}}</span>
+                       <a class="aw-widgets-crumbLink aw-widgets-breadCrumbOverflow aw-aria-border" title="{{crumb.value}}" ng-click="provider.onSelect(crumb)" tabindex="0" ng-keydown="breadcrumbOnSelectKeyPress($event, crumb)">{{crumb.value}}</a>
+                       <span exist-when="crumb.showRemoveButton" ><aw-property-image class="aw-widgets-removeCrumb aw-aria-border" role="button" aria-label="{{i18n.breadcrumbRemove}}" name="miscRemoveBreadcrumb" ng-click="provider.onRemove(crumb)" tabindex="0" ng-keydown="removeBreadcrumbKeyPress($event, crumb)" ></aw-property-image></span>
+                   </div>
+                   <div exist-when="crumb.selectedCrumb && !crumb.willOverflow">
+                       <span class="aw-widgets-crumbCategoryLabel" exist-when="crumb.displayName" title="{{crumb.displayName}}">{{crumb.displayName}}</span>
+                       <span class="aw-widgets-selectedCrumb aw-widgets-breadCrumbOverflow aw-aria-border" title="{{crumb.value}}">{{crumb.value}}</span>
+                       <span exist-when="crumb.showRemoveButton" ><aw-property-image class="aw-widgets-removeCrumb aw-aria-border" role="button" aria-label="{{i18n.breadcrumbRemove}}" name="miscRemoveBreadcrumb" ng-click="provider.onRemove(crumb)" tabindex="0" ng-keydown="removeBreadcrumbKeyPress($event, crumb)" ></aw-property-image></span>
+                   </div>
+                   <span  exist-when="crumb.showArrow && !crumb.overflowIconPosition  && !crumb.willOverflow">
+                           <div visible-when="data.loading" class="aw-layout-contentLabel">{{loadingMsg}}</div>
+                           <ng-include visible-when="!data.loading" src="popuplist" ></ng-include>
+                   </span>
+               </div>
+           </div>
+           <div exist-when="provider && provider.crumbs && provider.crumbs.length>0">
+             <a class="aw-widgets-clearCrumbLink aw-aria-border" ng-click="provider.clear()" role="button" tabindex="0" aw-autofocus auto-focus="provider && provider.crumbs && provider.crumbs.length>0" ng-keydown="clearBreadcrumbKeyPress($event)">{{clearBreadCrumb}}</a>
+           </div>
+       </div>
+   </div>
+</div>

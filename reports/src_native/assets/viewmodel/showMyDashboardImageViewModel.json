@@ -1,0 +1,95 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-include.directive",
+        "js/aw-label.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "imageDataProvider"
+        },
+        "getReportDefinitionsForTileView": {
+            "actionType": "JSFunction",
+            "method": "getReportDefinitionsForTileView",
+            "inputData": {
+                "data": "{{data}}",
+                "startIndex": "{{data.dataProviders.imageDataProvider.startIndex}}",
+                "subPanelContext" : "{{subPanelContext}}"
+            },
+            "outputData": {
+                "searchResults": "reportdefinitions",
+                "dataProviders.imageDataProvider.cursorObject": "cursor",
+                "showLastUpdateTime": "showLastUpdateTm"
+            },
+            "deps": "js/showMyDashboardService"
+        }
+    },
+    "data": {
+        "listOfReportConfigs": [],
+        "dashboardLastRefresh":{
+                "displayName": "{{i18n.dashboardLastRefresh}}",
+                "type": "STRING",
+                "isRequired": "false",
+                "isEditable": "false",
+                "dbValue": "Time",
+                "dispValue": "Time"
+            }
+    },
+    "dataProviders": {
+        "imageDataProvider": {
+            "action": "getReportDefinitionsForTileView",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.searchResults.length}}",
+            "selectionModelMode": "none"
+        }
+    },
+    "functions": {
+        "getReportDefinitionSOAInput": {
+            "functionName": "getReportDefinitionSOAInput",
+            "parameters": [
+                "{{data}}",
+                "{{subPanelContext}}"
+            ]
+        },
+        "getCursorObject": {
+            "functionName": "getCursorObject",
+            "parameters": []
+        }
+    },
+    "preferences": [
+        "REPORT_AW_MyDashboard_TC_Report",
+        "REPORT_AW_MyDashboard_PageSize"
+    ],
+    "onEvent": [ {
+            "eventId": "showMyDashboardImage.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "showMyDashboard.collectAllReportDefData",
+            "action": "collectAllReportDefData"
+        },
+        {
+            "eventId": "showMyDashboard.reportTilInitializeClickListner",
+            "action": "reportTilInitializeClickListner"
+        }
+    ],
+    "i18n": {
+        "dashboardLastRefresh": [ "ReportChartMessages" ],
+        "rep_month_Jan": [ "ReportChartMessages" ],
+        "rep_month_Feb": [ "ReportChartMessages" ],
+        "rep_month_Mar": [ "ReportChartMessages" ],
+        "rep_month_Apr": [ "ReportChartMessages" ],
+        "rep_month_May": [ "ReportChartMessages" ],
+        "rep_month_Jun": [ "ReportChartMessages" ],
+        "rep_month_Jul": [ "ReportChartMessages" ],
+        "rep_month_Aug": [ "ReportChartMessages" ],
+        "rep_month_Sep": [ "ReportChartMessages" ],
+        "rep_month_Oct": [ "ReportChartMessages" ],
+        "rep_month_Nov": [ "ReportChartMessages" ],
+        "rep_month_Dec": [ "ReportChartMessages" ]
+    }
+}

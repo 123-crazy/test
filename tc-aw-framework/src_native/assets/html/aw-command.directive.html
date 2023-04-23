@@ -1,0 +1,14 @@
+<button type="button" button-id="{{::command.commandId}}" class="aw-commands-commandIconButton
+    {{::command.alignment === 'VERTICAL' ? 'aw-commands-commandWrapperVertical' : ''}}
+    {{::command.alignment === 'HORIZONTAL' ? 'aw-commands-commandWrapperHorizontal' : ''}}
+    aw-commandId-{{::command.commandId}}" ng-class="{'disabled' : command.enabled === false, 'aw-state-selected': command.isSelected || popupOpen}" ng-disabled="command.enabled === false" title="{{command.extendedTooltip ? undefined : command.title}}" extended-tooltip-options="{isCommand: true,alignment : '{{alignment}}'}" extended-tooltip-context="command" extended-tooltip="{{command.extendedTooltip}}" aw-click="ctrl.executeCommand($event)" aw-click-options="{ debounceDoubleClick: true }" aria-label="{{command.title}}" aria-haspopup="{{command.isGroupCommand}}">
+    <div class="aw-commandIcon" ng-class="[{'aw-widgets-groupCommand': command.isGroupCommand }]">
+        <aw-pic class="aw-commands-svg aw-widget-thumbnail" icon-id="command.iconId"></aw-pic>
+        <div class="aw-widgets-groupCommandStack" ng-if="command.isGroupCommand">
+            <aw-icon icon-id="miscDownArrow_uxRefresh"></aw-icon>
+        </div>
+        <div class="aw-commands-cellDecorator"></div>
+        <div class="aw-commands-narrowCommandText" ng-show="::showLabel">{{command.title}}</div>
+    </div>
+    <div class="aw-commands-showIconLabel aw-commands-commandIconButtonText">{{command.title}}</div>
+</button>

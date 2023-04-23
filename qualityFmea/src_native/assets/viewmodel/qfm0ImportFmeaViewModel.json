@@ -1,0 +1,278 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-file-upload.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-label.directive",
+        "js/aw-icon.directive",
+        "js/aw-image.directive",
+        "js/exist-when.directive",
+        "js/aw-listbox.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-init.directive"
+    ],
+    "data": {
+        "qfm0SelectFile": {
+            "displayName": "{{i18n.qfm0ImportFmeaSelectFile}}",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "qfm0ImportFmeaHelptooltipView": {
+            "view": "qfm0ImportFmeaHelpTooltip"
+        },
+        "qfm0FmeaGuideLineObject": {
+            "displayName": "{{i18n.qfm0FmeaGuideLineObject}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true"
+        }
+    },
+    "actions": {
+        "updateFormData1": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "name",
+                    "value": "{{data.fileName}}"
+                },
+                "data": "{{data}}"
+            },
+            "deps": "js/declUtils"
+        },
+        "getFMSFileTciket": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-FileManagement",
+            "method": "getTransientFileTicketsForUpload",
+            "inputData": {
+                "transientFileInfos": [ {
+                    "fileName": "{{data.fileName}}",
+                    "isBinary": true,
+                    "deleteFlag": true
+                } ]
+            },
+
+            "outputData": {
+                "fmsTicket": "transientFileTicketInfos[0].ticket"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "fmsTicket.update"
+                } ]
+            }
+        },
+        "updateFormData": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "importTemplate.gotTransientFileTicket"
+                } ]
+            },
+            "deps": "js/declUtils"
+        },
+        "uploadFile": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+
+                    "data": "{{data.formData}}"
+                }
+            },
+            "events": {
+                "success": [ {
+                        "name": "qfm0importFmeaInProgressMessage"
+                    },
+                    {
+                        "name": "qfm0closeImportPanel"
+                    },
+                    {
+                        "name": "fmsTicket.ImportFmea"
+                    }
+                ]
+            }
+        },
+        "importFmeaFromXml": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-FmeaManager-2022-06-FMEADataManagement",
+            "method": "importFmeaMSRXML",
+            "inputData": {
+                "input": "{{function:getImportFmeaFromMsrXMLInput}}",
+                "runInBackground": true
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                }],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            },
+            "deps": "js/qfm0ImportFmeaService"
+        },
+        "loadAttachLov": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-06-LOV",
+            "method": "getAttachedLOVs",
+            "inputData": {
+                "inputs": [ {
+                    "typeName": "Qfm0FMEANode",
+                    "propNames": [
+                        "qfm0FMEAGuideline"
+                    ]
+                } ]
+            },
+            "outputData": {
+                "fmeaGuideLineObjectLovUID": "{{function:getFmeaGuideLineObjectLovUID}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "loadListOfFMEATypes"
+                } ]
+            },
+            "deps": "js/qfm0ImportFmeaService"
+        },
+        "loadListOfFMEATypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "lovInput": {
+                        "owningObject": {
+                            "uid": "{{data.fmeaGuideLineObjectLovUID}}",
+                            "type": "Qfm0FMEANode"
+                        },
+                        "boName": "Qfm0FMEANode",
+                        "operationName": "Create"
+                    },
+                    "propertyName": "qfm0FMEAGuideline",
+                    "filterData": {
+                        "filterString": "",
+                        "maxResults": 0,
+                        "numberToReturn": 10000,
+                        "sortPropertyName": "",
+                        "order": 1
+                    }
+                }
+            },
+            "outputData": {
+                "listOfFMEATypes": "{{function:getLOVList}}"
+            },
+            "deps": "js/qfm0FmeaManagerUtils"
+        },
+        "qfm0importFmeaInProgressMessage": {
+            "actionType": "JSFunction",
+            "method": "showInProgressMessage",
+            "inputData": {
+                "data": "{{data.fileName}}"
+            },
+            "outputData": {},
+            "deps": "js/qfm0ImportFmeaService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "functions": {
+        "getImportFmeaFromMsrXMLInput": {
+            "functionName": "getImportFmeaFromMsrXMLInput",
+            "parameters": [
+                "{{data.qfm0FmeaGuideLineObject.dbValue}}",
+                "{{data.fmsTicket}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "fmsTicket.update",
+            "action": "updateFormData"
+        },
+        {
+            "eventId": "importTemplate.gotTransientFileTicket",
+            "action": "uploadFile"
+        },
+        {
+            "eventId": "fmsTicket.ImportFmea",
+            "action": "importFmeaFromXml"
+        },
+        {
+            "eventId": "importTemplate.openLogFile",
+            "action": "openLogFile"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadAttachLov"
+        },
+        {
+            "eventId": "loadListOfFMEATypes",
+            "action": "loadListOfFMEATypes"
+        },
+        {
+            "eventId": "qfm0importFmeaInProgressMessage",
+            "action": "qfm0importFmeaInProgressMessage"
+        },
+        {
+            "eventId": "qfm0closeImportPanel",
+            "action": "closePanel"
+        }
+    ],
+    "conditions": {
+        "qfm0IsValidToImport": {
+            "expression": "data.fileName !== null && data.fileName !== '' && data.validFile === true"
+        }
+    },
+    "i18n": {
+        "qfm0ImportFmea": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Import": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0ImportFmeaSelectFile": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0FmeaGuideLineObject": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0ImportFmeaLocationLabel": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

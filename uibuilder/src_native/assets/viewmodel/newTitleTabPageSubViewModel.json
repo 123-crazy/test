@@ -1,0 +1,56 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "query($input: I18NRef!){i18n(input:$input){en cs_CZ de es fr it ja_JP ko_KR pl_PL pt_BR ru_RU zh_CN zh_TW}}",
+                    "variables": {
+                        "input": {
+                            "key": "{{ctx.panelContext.titleKey}}",
+                            "source": "{{ctx.panelContext.titleSource}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData":
+            {
+                "titlesData": "{{function:convertLocaleStringToVMProps}}"
+            },
+            "deps": "js/localizationPanelService"
+        }
+    },
+    "data":
+    {
+    },
+    "functions": {
+        "convertLocaleStringToVMProps": {
+            "functionName": "convertLocaleStringToVMProps",
+            "parameters": [
+                "{{ctx.panelContext.titleKey}}",
+                "{{ctx.panelContext.titleSource}}",
+                "{{ctx.panelContext.dbValue}}",
+                "{{ctx.selected.uid}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "newTitleTabPageSub"
+            },
+            "action": "reveal"
+        }
+    ]
+}

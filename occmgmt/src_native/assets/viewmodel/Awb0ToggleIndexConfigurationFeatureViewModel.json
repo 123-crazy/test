@@ -1,0 +1,110 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ 
+                "js/aw-panel-section.directive",
+                "js/visible-when.directive",
+                "js/aw-checkbox.directive"
+               ], 
+                 
+    "actions": 
+    {
+        "initializeToggleIndexConfigurationSection":
+        {
+            "actionType": "dataProvider",
+            "method": "initializeToggleIndexConfigurationInfo"
+        },
+        
+        "initializeToggleIndexConfigurationInfo":
+        {
+            "actionType": "JSFunction",
+            "method": "getInitialToggleIndexConfigurationData",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+        "deps": "js/toggleIndexConfigurationService"
+        },
+        
+       "toggleIndexConfiguration":
+       {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awConfigPanel.applyIndexedConfigurationToggled",
+                        "eventData": 
+                        {
+                            "toggleValue": "{{data.occmgmtIndexUpdateDateLabelText.dbValue}}"
+                        },
+                        "condition":"data.occmgmtIndexUpdateDateLabelText.dbValue != data.isFullTextFeatureSupported"
+                    }
+                ]
+            }
+       },
+       "performToggleIndexConfiguration":
+       {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": 
+            {
+                "path": "aceActiveContext.context.configContext",
+                "value":{
+                    "useProductIndex": "{{data.occmgmtIndexUpdateDateLabelText.dbValue}}",
+                    "startFreshNavigation": true    
+                }
+            },
+            "deps": "js/appCtxService"
+        }    
+                 
+    },
+    
+    "dataProviders": 
+    {
+        "initializeToggleIndexConfigurationInfo": 
+        {
+            "action": "initializeToggleIndexConfigurationInfo"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeToggleIndexConfigurationSection"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeToggleIndexConfigurationSection"
+        },
+        {
+           "eventId": "awConfigPanel.applyIndexedConfigurationToggled",
+           "action": "performToggleIndexConfiguration"
+        }             
+    ],
+    
+    "messages": 
+    {
+    },
+    
+    "data":
+    {
+        "currentIndexDate":
+        {
+            "uiValue": "{{data.currentIndexDate}}",
+            "type": "STRING"            
+        },
+        "occmgmtIndexUpdateDateLabelText": 
+        {
+            "dbValue": "{{ctx.aceActiveContext.context.supportedFeatures.Awb0FullTextSearchFeature}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    
+    "i18n": 
+    {   
+        "occmgmtIndexUpdateDateLabelText": ["OccurrenceManagementConstants"]
+    }
+}

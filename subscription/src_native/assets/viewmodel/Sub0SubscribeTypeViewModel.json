@@ -1,0 +1,325 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-type-cell.directive",
+        "js/aw-list-filter.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": ["getRecentTypesProvider","SubscribableTypeProvider"]
+        },
+        "getRecentUsedTypes": {
+            "actionType": "JSFunction",
+            "method": "getRecentUsedTypes",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [
+                    {
+                        "name": "setPinCommandsEvent"
+                    }
+                ]
+            },
+            "deps": "js/subscriptionRecentTypesService"
+        },
+        "setPinCommandsAction": {
+            "actionType": "JSFunction",
+            "method": "setPinCommands",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Sub0SubscribeCommandPanelService"
+        },
+        "listExistingSubscription": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Sub0Subscribe",
+                "location": "aw_toolsAndInfo",
+                "context": "{{data}}"
+            }
+        },
+        "getSubscribableTypes":{
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method":"performSearch",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "Awp0SearchResults",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": "intersection"
+                },
+                "searchInput":
+                {
+                    "attributesToInflate": [ "parent_types", "type_name" ],
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Sub0SubscribleTypesProvider",
+                    "searchCriteria": {
+                        "childTypeOption": "subtypes",
+                        "matchPattern": "{{data.filterType.dbValue}}"
+                    },
+                    "startIndex": "{{data.dataProviders.SubscribableTypeProvider.startIndex}}"
+                }
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            }
+        },
+        "loadCreatePanel": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Sub0CreateSubscription",
+                "location": "aw_toolsAndInfo",
+                "context": "{{data}}"
+            }
+        },
+        "loadDataForTypes": {
+            "actionType": "JSFunction",
+            "method": "loadData",
+            "deps": "js/Sub0SubscribeCommandPanelService",
+            "inputData": {
+                "provider": "{{data.dataProviders.SubscribableTypeProvider.selectedObjects}}"
+            },
+            "outputData": {
+                "ctx.selectedFollowType": "selection[0]",
+                "ctx.mselectedFollowType": "selection"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "findTypeSubscriptions",
+                        "condition": "ctx.mselectedFollowType.length>0"
+                    }
+                ]
+            }
+        },
+        "loadDataForRecentTypes": {
+            "actionType": "JSFunction",
+            "method": "loadData",
+            "deps": "js/Sub0SubscribeCommandPanelService",
+            "inputData": {
+                "provider": "{{data.dataProviders.getRecentTypesProvider.selectedObjects}}"
+            },
+            "outputData": {
+                "ctx.selectedFollowType": "selection[0]",
+                "ctx.mselectedFollowType": "selection"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "findTypeSubscriptions",
+                        "condition": "ctx.mselectedFollowType.length>0"
+                    }
+                ]
+            }
+        },
+        "findSubscriptionsForTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Notification-2015-03-SubscriptionManagement",
+            "method": "findSubscriptions",
+            "deps": "js/Sub0SubscribeCommandPanelService",
+            "inputData": {
+                "input": {
+                    "subscriber": "{{ctx.user}}",
+                    "target": "{{ctx.selectedFollowType}}"
+                }
+            },
+            "outputData": {
+                "ctx.subscriptions": "subscriptions",
+                "ctx.subscriptions.uids": "ServiceData.updated",
+                "ctx.subscriptionCtx": "{{function:loadSubscriptionCtx}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "listSubscriptions",
+                        "condition": "ctx.subscriptions.length>0"
+                    },
+                    {
+                        "name": "activateCreatePanel",
+                        "condition": "!ctx.subscriptions"
+                    }
+                ]
+            }
+        },
+        "Sub0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Sub0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "data": {
+        "addSubscriptionCommands": "sub0_addSubscriptionCommands",
+        "Sub0PinCommands": "Sub0_oneStepPinCommands",
+        "filterType": {
+            "type": "STRING",
+            "requiredText": "{{i18n.FILTER_TEXT}}"
+        },
+        "moreLink": {
+            "displayName": "{{i18n.MORE_LINK_TEXT}}"
+        },
+        "loadingText": {
+            "displayName": "{{i18n.LOADING_TEXT}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false",
+            "dbValue": "",
+            "dispValue": ""
+        }
+    },
+    "dataProviders": {
+        "getRecentTypesProvider": {
+            "action": "getRecentUsedTypes",
+            "response": "{{data.recentUsedTypes}}",
+            "totalFound": "{{data.recentUsedTypes.length}}",
+            "selectionModelMode": "single"
+        },
+        "SubscribableTypeProvider": {
+            "action": "getSubscribableTypes",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Sub0SubscribeType"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "setPinCommandsEvent",
+            "action": "setPinCommandsAction"
+        },
+        {
+            "eventId": "SubscribableTypeProvider.selectionChangeEvent",
+            "action": "loadDataForTypes"
+        },
+        {
+            "eventId": "findTypeSubscriptions",
+            "action": "findSubscriptionsForTypes"
+        },
+        {
+            "eventId": "getRecentTypesProvider.selectionChangeEvent",
+            "action": "loadDataForRecentTypes"
+        },
+        {
+            "eventId": "listSubscriptions",
+            "action": "listExistingSubscription"
+        },
+        {
+            "eventId": "activateCreatePanel",
+            "action": "loadCreatePanel"
+        },
+        {
+            "eventId": "createSubscription.Sub0SetPin",
+            "cacheEventData": true,
+            "action": "Sub0SetPin"
+        },
+        {
+            "eventId": "createSubscription.Sub0SetUnPin",
+            "cacheEventData": true,
+            "action": "Sub0SetUnPin"
+        }
+    ],
+    "conditions": {
+        "moreLinkShown": {
+            "expression": "ctx.addObject.moreLinkShown && data.isMoreLinkShown && data.maxRecentTypeCount<=0"
+        }
+    },
+    "i18n": {
+        "mySybscriptionsTitle": [
+            "SubscriptionMessages"
+        ],
+        "usePeriodicDigestLabel": [
+            "SubscriptionMessages"
+        ],
+        "emailNotificationText": [
+            "SubscriptionMessages"
+        ],
+        "newsfeedNotificationText": [
+            "SubscriptionMessages"
+        ],
+        "allNotificationsText": [
+            "SubscriptionMessages"
+        ],
+        "notificationMethodTitle": [
+            "SubscriptionMessages"
+        ],
+        "followCommandTitle": [
+            "SubscriptionMessages"
+        ],
+        "followCondAddText": [
+            "SubscriptionMessages"
+        ],
+        "followTypeCommandTitle": [
+            "SubscriptionMessages"
+        ],
+        "createObjectRecentTypesTitle": [
+            "ISimulationMessages"
+        ],
+        "type": [
+            "ISimulationMessages"
+        ],
+        "noRecentTypesFound": [
+            "ISimulationMessages"
+        ],
+        "back": [
+            "ISimulationMessages"
+        ],
+        "LOADING_TEXT": [
+            "BaseMessages"
+        ],
+        "MORE_LINK_TEXT": [
+            "BaseMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "FILTER_TEXT": [
+            "BaseMessages"
+        ],
+        "datasetType": [
+            "awAddDirectiveMessages"
+        ],
+        "recentSectionTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "otherSectionTitle": [
+            "awAddDirectiveMessages"
+        ]
+    }
+}

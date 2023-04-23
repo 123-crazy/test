@@ -1,0 +1,969 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "save": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.modifyI18N",
+                        "condition": "!conditions.isCreateI18N"
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.createI18N",
+                        "condition": "(conditions.isCreateI18NForPanelBuilder || conditions.isCreateI18NForActionBuilder) && !conditions.isCommandsSubLocation"
+                    },
+                    {
+                        "name":"i18nAddUpdateSubPanel.createI18NForCommandTitle",
+                        "condition":"conditions.isCommandsSubLocation && conditions.isCreateI18NForTitle"
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.createI18NForDescription",
+                        "condition": "conditions.isCreateI18NForDescription"
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.createI18NForSelectedTitle",
+                        "condition": "conditions.isCreateI18NForSelectedTitle"
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.createI18NForSelectedDescription",
+                        "condition": "conditions.isCreateI18NForSelectedDescription"
+                    }
+                ]
+            }
+        },
+        "updateSelectedObject": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedObjectProps",
+            "inputData":
+            {
+                "propName": "{{data.eventData.propName}}",
+                "propValue": "{{data.eventData.propValue}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "modifyI18N": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($keyI18N:I18NRef!, $messages:[MessageInput]!){updateI18NMessage(input:{keyI18N:$keyI18N messages:$messages}){titleKey:key titleSource:source value}}",
+                    "variables": {
+                        "keyI18N":{
+                            "key": "{{ctx.panelContext.titleKey}}",
+                            "source": "{{ctx.panelContext.titleSource}}"
+                        },
+                        "messages": [
+                            {
+                                "locale": "{{data.titlesData[2].propertyName}}",
+                                "message": "{{data.titlesData[2].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[3].propertyName}}",
+                                "message": "{{data.titlesData[3].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[4].propertyName}}",
+                                "message": "{{data.titlesData[4].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[5].propertyName}}",
+                                "message": "{{data.titlesData[5].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[6].propertyName}}",
+                                "message": "{{data.titlesData[6].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[7].propertyName}}",
+                                "message": "{{data.titlesData[7].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[8].propertyName}}",
+                                "message": "{{data.titlesData[8].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[9].propertyName}}",
+                                "message": "{{data.titlesData[9].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[10].propertyName}}",
+                                "message": "{{data.titlesData[10].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[11].propertyName}}",
+                                "message": "{{data.titlesData[11].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[12].propertyName}}",
+                                "message": "{{data.titlesData[12].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[13].propertyName}}",
+                                "message": "{{data.titlesData[13].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[14].propertyName}}",
+                                "message": "{{data.titlesData[14].uiValue}}"
+                            }
+                        ]
+                    }
+                },
+                "endPoint": "darsi/graphql"
+            },
+            "outputData": {
+                "updatedCommandTitle": "data.updateI18NMessage",
+                "updatedI18NData": "data"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "{{ctx.panelContext.propertyName}}",
+                            "propValue": "{{data.updatedCommandTitle}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateI18NCaptionProperty",
+                        "eventData": {
+                            "vmProp": "{{ctx.panelContext.prop}}",
+                            "updatedI18NData": "{{data.updatedI18NData}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChange"
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChangeI18N"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0CommandBuilder'||ctx.sublocation.clientScopeURI==='Awp0Toolbars'",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.wysiwyg && ctx.wysiwyg.state && ctx.wysiwyg.state.current.name==='wysiwygCanvas'",
+                        "eventData": {
+                            "destPanelId": "wysPropPanel",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    }
+                ]
+            }
+        },
+        "createI18N": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($keyI18N:I18NRef!, $messages:[MessageInput]!){addI18NMessage(input:{keyI18N:$keyI18N messages:$messages}){titleKey:key titleSource:source value}}",
+                    "variables": {
+                        "keyI18N":{
+                            "key": "{{data.titlesData[0].dbValue}}",
+                            "source": "{{data.titlesData[1].dbValue}}"
+                        },
+                        "messages": [
+                            {
+                                "locale": "{{data.titlesData[2].propertyName}}",
+                                "message": "{{data.titlesData[2].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[3].propertyName}}",
+                                "message": "{{data.titlesData[3].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[4].propertyName}}",
+                                "message": "{{data.titlesData[4].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[5].propertyName}}",
+                                "message": "{{data.titlesData[5].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[6].propertyName}}",
+                                "message": "{{data.titlesData[6].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[7].propertyName}}",
+                                "message": "{{data.titlesData[7].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[8].propertyName}}",
+                                "message": "{{data.titlesData[8].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[9].propertyName}}",
+                                "message": "{{data.titlesData[9].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[10].propertyName}}",
+                                "message": "{{data.titlesData[10].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[11].propertyName}}",
+                                "message": "{{data.titlesData[11].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[12].propertyName}}",
+                                "message": "{{data.titlesData[12].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[13].propertyName}}",
+                                "message": "{{data.titlesData[13].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[14].propertyName}}",
+                                "message": "{{data.titlesData[14].uiValue}}"
+                            }
+                        ],
+                        "commandID": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "darsi/graphql"
+            },
+            "outputData": {
+                "addedI18NMessage": "data.addI18NMessage",
+                "updatedI18NData": "data"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "{{ctx.panelContext.propertyName}}",
+                            "propValue": "{{data.updatedCommandTitle}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateI18NCaptionProperty",
+                        "eventData": {
+                            "vmProp": "{{ctx.panelContext.prop}}",
+                            "updatedI18NData": "{{data.updatedI18NData}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0CommandBuilder'||ctx.sublocation.clientScopeURI==='Awp0Toolbars'",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.wysiwyg && ctx.wysiwyg.state && ctx.wysiwyg.state.current.name==='wysiwygCanvas'",
+                        "eventData": {
+                            "destPanelId": "wysPropPanel",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChangeI18N"
+                    }
+                ]
+            }
+        },
+        "createI18NForCommandTitle": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($keyI18N:I18NRef!, $messages:[MessageInput]!, $commandID:ID!){addI18NMessage(input:{keyI18N:$keyI18N messages:$messages}){titleKey:key titleSource:source value}updateCommandTitle(input:{id:$commandID title:$keyI18N}){id title{value titleKey:key titleSource:source}}}",
+                    "variables": {
+                        "keyI18N":{
+                            "key": "{{data.titlesData[0].dbValue}}",
+                            "source": "{{data.titlesData[1].dbValue}}"
+                        },
+                        "messages": [
+                            {
+                                "locale": "{{data.titlesData[2].propertyName}}",
+                                "message": "{{data.titlesData[2].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[3].propertyName}}",
+                                "message": "{{data.titlesData[3].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[4].propertyName}}",
+                                "message": "{{data.titlesData[4].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[5].propertyName}}",
+                                "message": "{{data.titlesData[5].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[6].propertyName}}",
+                                "message": "{{data.titlesData[6].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[7].propertyName}}",
+                                "message": "{{data.titlesData[7].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[8].propertyName}}",
+                                "message": "{{data.titlesData[8].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[9].propertyName}}",
+                                "message": "{{data.titlesData[9].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[10].propertyName}}",
+                                "message": "{{data.titlesData[10].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[11].propertyName}}",
+                                "message": "{{data.titlesData[11].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[12].propertyName}}",
+                                "message": "{{data.titlesData[12].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[13].propertyName}}",
+                                "message": "{{data.titlesData[13].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[14].propertyName}}",
+                                "message": "{{data.titlesData[14].uiValue}}"
+                            }
+                        ],
+                        "commandID": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "darsi/graphql"
+            },
+            "outputData": {
+                "addedI18NMessage": "data.addI18NMessage",
+                "updatedCommandTitle": "data.updateCommandTitle.title",
+                "updatedI18NData": "data"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "{{ctx.panelContext.propertyName}}",
+                            "propValue": "{{data.updatedCommandTitle}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateI18NCaptionProperty",
+                        "eventData": {
+                            "vmProp": "{{ctx.panelContext.prop}}",
+                            "updatedI18NData": "{{data.updatedI18NData}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0CommandBuilder'||ctx.sublocation.clientScopeURI==='Awp0Toolbars'",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.wysiwyg && ctx.wysiwyg.state && ctx.wysiwyg.state.current.name==='wysiwygCanvas'",
+                        "eventData": {
+                            "destPanelId": "wysPropPanel",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChangeI18N"
+                    }
+                ]
+            }
+        },
+        "createI18NForDescription": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($keyI18N:I18NRef!, $messages:[MessageInput]!, $commandID:ID!){addI18NMessage(input:{keyI18N:$keyI18N messages:$messages}){titleKey:key titleSource:source value}updateCommandDescription(input:{id:$commandID title:$keyI18N}){id description{value titleKey:key titleSource:source}}}",
+                    "variables": {
+                        "keyI18N":{
+                            "key": "{{data.titlesData[0].dbValue}}",
+                            "source": "{{data.titlesData[1].dbValue}}"
+                        },
+                        "messages": [
+                            {
+                                "locale": "{{data.titlesData[2].propertyName}}",
+                                "message": "{{data.titlesData[2].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[3].propertyName}}",
+                                "message": "{{data.titlesData[3].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[4].propertyName}}",
+                                "message": "{{data.titlesData[4].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[5].propertyName}}",
+                                "message": "{{data.titlesData[5].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[6].propertyName}}",
+                                "message": "{{data.titlesData[6].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[7].propertyName}}",
+                                "message": "{{data.titlesData[7].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[8].propertyName}}",
+                                "message": "{{data.titlesData[8].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[9].propertyName}}",
+                                "message": "{{data.titlesData[9].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[10].propertyName}}",
+                                "message": "{{data.titlesData[10].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[11].propertyName}}",
+                                "message": "{{data.titlesData[11].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[12].propertyName}}",
+                                "message": "{{data.titlesData[12].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[13].propertyName}}",
+                                "message": "{{data.titlesData[13].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[14].propertyName}}",
+                                "message": "{{data.titlesData[14].uiValue}}"
+                            }
+                        ],
+                        "commandID": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "darsi/graphql"
+            },
+            "outputData": {
+                "addedI18NMessage": "data.addI18NMessage",
+                "updatedCommandDescription": "data.updateCommandDescription.description",
+                "updatedI18NData": "data"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "{{ctx.panelContext.propertyName}}",
+                            "propValue": "{{data.updatedCommandDescription}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateI18NCaptionProperty",
+                        "eventData": {
+                            "vmProp": "{{ctx.panelContext.prop}}",
+                            "updatedI18NData": "{{data.updatedI18NData}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0CommandBuilder'||ctx.sublocation.clientScopeURI==='Awp0Toolbars'",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.wysiwyg && ctx.wysiwyg.state && ctx.wysiwyg.state.current.name==='wysiwygCanvas'",
+                        "eventData": {
+                            "destPanelId": "wysPropPanel",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'",
+                        "eventData": {
+                            "destPanelId": "messageProperties",
+                            "id": "backButton"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChangeI18N"
+                    }
+                ]
+            }
+        },
+        "createI18NForSelectedTitle": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($keyI18N:I18NRef!, $messages:[MessageInput]!, $commandID:ID!){addI18NMessage(input:{keyI18N:$keyI18N messages:$messages}){titleKey:key titleSource:source value}updateCommandSelectedTitle(input:{id:$commandID title:$keyI18N}){id selectedTitle{value selectedTKey:key selectedTSource:source}}}",
+                    "variables": {
+                        "keyI18N":{
+                            "key": "{{data.titlesData[0].dbValue}}",
+                            "source": "{{data.titlesData[1].dbValue}}"
+                        },
+                        "messages": [
+                            {
+                                "locale": "{{data.titlesData[2].propertyName}}",
+                                "message": "{{data.titlesData[2].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[3].propertyName}}",
+                                "message": "{{data.titlesData[3].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[4].propertyName}}",
+                                "message": "{{data.titlesData[4].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[5].propertyName}}",
+                                "message": "{{data.titlesData[5].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[6].propertyName}}",
+                                "message": "{{data.titlesData[6].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[7].propertyName}}",
+                                "message": "{{data.titlesData[7].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[8].propertyName}}",
+                                "message": "{{data.titlesData[8].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[9].propertyName}}",
+                                "message": "{{data.titlesData[9].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[10].propertyName}}",
+                                "message": "{{data.titlesData[10].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[11].propertyName}}",
+                                "message": "{{data.titlesData[11].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[12].propertyName}}",
+                                "message": "{{data.titlesData[12].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[13].propertyName}}",
+                                "message": "{{data.titlesData[13].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[14].propertyName}}",
+                                "message": "{{data.titlesData[14].uiValue}}"
+                            }
+                        ],
+                        "commandID": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "darsi/graphql"
+            },
+            "outputData": {
+                "addedI18NMessage": "data.addI18NMessage",
+                "updatedCommandTitle": "data.updateCommandSelectedTitle.selectedTitle"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "{{ctx.panelContext.propertyName}}",
+                            "propValue": "{{data.updatedCommandTitle}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChangeI18N"
+                    }
+                ]
+            }
+        },
+        "createI18NForSelectedDescription": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($keyI18N:I18NRef!, $messages:[MessageInput]!, $commandID:ID!){addI18NMessage(input:{keyI18N:$keyI18N messages:$messages}){titleKey:key titleSource:source value}updateCommandSelectedDescription(input:{id:$commandID title:$keyI18N}){id selectedDescription{value selectedTKey:key selectedTSource:source}}}",
+                    "variables": {
+                        "keyI18N":{
+                            "key": "{{data.titlesData[0].dbValue}}",
+                            "source": "{{data.titlesData[1].dbValue}}"
+                        },
+                        "messages": [
+                            {
+                                "locale": "{{data.titlesData[2].propertyName}}",
+                                "message": "{{data.titlesData[2].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[3].propertyName}}",
+                                "message": "{{data.titlesData[3].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[4].propertyName}}",
+                                "message": "{{data.titlesData[4].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[5].propertyName}}",
+                                "message": "{{data.titlesData[5].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[6].propertyName}}",
+                                "message": "{{data.titlesData[6].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[7].propertyName}}",
+                                "message": "{{data.titlesData[7].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[8].propertyName}}",
+                                "message": "{{data.titlesData[8].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[9].propertyName}}",
+                                "message": "{{data.titlesData[9].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[10].propertyName}}",
+                                "message": "{{data.titlesData[10].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[11].propertyName}}",
+                                "message": "{{data.titlesData[11].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[12].propertyName}}",
+                                "message": "{{data.titlesData[12].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[13].propertyName}}",
+                                "message": "{{data.titlesData[13].uiValue}}"
+                            },
+                            {
+                                "locale": "{{data.titlesData[14].propertyName}}",
+                                "message": "{{data.titlesData[14].uiValue}}"
+                            }
+                        ],
+                        "commandID": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "darsi/graphql"
+            },
+            "outputData": {
+                "addedI18NMessage": "data.addI18NMessage",
+                "updatedCommandDescription": "data.updateCommandSelectedDescription.selectedDescription"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "i18nAddUpdateSubPanel.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "{{ctx.panelContext.propertyName}}",
+                            "propValue": "{{data.updatedCommandDescription}}"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "i18nAddUpdateSubPanel.notifyConfigChangeI18N"
+                    }
+                ]
+            }
+        },
+        "notifyConfigChangeI18N": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "i18n"
+            },
+            "deps": "js/configurationService"
+        },
+        "updateI18NProperty": {
+            "actionType": "JSFunction",
+            "method": "updateI18NProperty",
+            "inputData": {
+                "vmProp": "{{data.eventData.vmProp}}",
+                "updatedI18NData": "{{data.eventData.updatedI18NData}}"
+            },
+            "deps": "js/localizationPanelService"
+        }
+    },
+    "data":
+    {
+        "commandID": {
+            "displayName": "{{i18n.id}}",
+            "type": "STRING",
+            "isEditable": false,
+            "dispValue": "{{ctx.selected.uid}}",
+            "dbValue": "{{ctx.selected.uid}}"
+        },
+        "existingI18nTitle": {
+            "displayName": "{{i18n.existingTitle}}",
+            "type": "STRING",
+            "isEditable": true,
+            "hasLov": true,
+            "dispValue": "",
+            "dbValue": "",
+            "dataProvider": "getCommandTitleI18NDP",
+            "isSelectOnly": true
+        },
+        "i18nModes":
+        [
+            {
+                "tabKey": "new",
+                "panelId": "newTitleTabPageSub",
+                "name": "{{i18n.newTabTitle}}",
+                "recreatePanel": true,
+                "visibleWhen": "ctx.panelContext.anchor === 'aw_i18nAddLocaleAnchor' || ctx.panelContext.anchor === 'aw_cmdSelectedTitleCreateAction'"
+            },
+            {
+                "tabKey": "existing",
+                "panelId": "existingTitleTabPageSub",
+                "name": "{{i18n.existingTabTitle}}",
+                "recreatePanel": true
+            }
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "i18nAddUpdateSubPanel.updateSelectedObject",
+            "cacheEventData": true,
+            "action": "updateSelectedObject",
+            "condition": "conditions.isCommandBuilderLocation"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.notifyConfigChange",
+            "action": "notifyConfigChange",
+            "condition": "conditions.isCommandBuilderLocation"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.modifyI18N",
+            "action": "modifyI18N"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.createI18N",
+            "action": "createI18N"
+        },
+        {
+            "eventId":"i18nAddUpdateSubPanel.createI18NForCommandTitle",
+            "action":"createI18NForCommandTitle"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.createI18NForDescription",
+            "action": "createI18NForDescription"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.createI18NForSelectedTitle",
+            "action": "createI18NForSelectedTitle"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.createI18NForSelectedDescription",
+            "action": "createI18NForSelectedDescription"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.notifyConfigChangeI18N",
+            "action": "notifyConfigChangeI18N"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.updateI18NCaptionProperty",
+            "cacheEventData": true,
+            "action": "updateI18NProperty",
+            "condition": "conditions.isValidPanelBuilderState"
+        },
+        {
+            "eventId": "i18nAddUpdateSubPanel.updateI18NCaptionProperty",
+            "cacheEventData": true,
+            "action": "updateI18NProperty",
+            "condition": "conditions.isActionBuilderLocation"
+        }
+    ],
+    "conditions": {
+        "isValidToSave": {
+            "expression": "data.titlesData[0].dbValue && data.titlesData[0].dbValue !=='' && data.titlesData[1].dbValue && data.titlesData[1].dbValue !=='' && data.titlesData[2].dbValue && data.titlesData[2].dbValue !==''"
+        },
+        "isTitle": {
+            "expression": "ctx.panelContext.propertyName === 'title'"
+        },
+        "isDescription": {
+            "expression": "ctx.panelContext.propertyName === 'description'"
+        },
+        "isSelectedTitle": {
+            "expression": "ctx.panelContext.propertyName === 'selectedTitle'"
+        },
+        "isSelectedDescription": {
+            "expression": "ctx.panelContext.propertyName === 'selectedDescription'"
+        },
+        "isCreateI18N": {
+            "expression": "ctx.panelContext.titleKey === ''"
+        },
+        "isCreateI18NForTitle": {
+            "expression": "conditions.isCreateI18N === true && conditions.isTitle === true"
+        },
+        "isCreateI18NForDescription": {
+            "expression": "conditions.isCreateI18N === true && conditions.isDescription === true"
+        },
+        "isValidPanelBuilderState": {
+            "expression": "ctx.wysiwyg && ctx.wysiwyg.state && ctx.wysiwyg.state.current.name==='wysiwygCanvas'"
+        },
+        "isActionBuilderLocation": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions' || ctx.sublocation.clientScopeURI === 'Awp0Actions'"
+        },
+        "isCreateI18NForPanelBuilder": {
+            "expression": "conditions.isCreateI18N === true && conditions.isValidPanelBuilderState"
+        },
+        "isCreateI18NForActionBuilder": {
+            "expression": "conditions.isCreateI18N === true && conditions.isActionBuilderLocation"
+        },
+        "isCreateI18NForSelectedTitle": {
+            "expression": "conditions.isCreateI18N === true && conditions.isSelectedTitle === true"
+        },
+        "isCreateI18NForSelectedDescription": {
+            "expression": "conditions.isCreateI18N === true && conditions.isSelectedDescription === true"
+        },
+        "isToolbarsSubLocation": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0Toolbars'"
+        },
+        "isCommandsSubLocation": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0CommandBuilder'"
+        },
+        "isCommandBuilderLocation": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0CommandBuilder' || ctx.sublocation.clientScopeURI === 'Awp0Toolbars'"
+        }
+    },
+    "i18n": {
+        "save": [ "XRTMessages" ],
+        "key": [ "CommandBuilderMessages" ],
+        "source": [ "CommandBuilderMessages" ],
+        "id": [ "CommandBuilderMessages" ],
+        "selectExisting": [ "CommandBuilderMessages" ],
+        "newTabTitle": [ "awAddDirectiveMessages" ],
+        "existingTabTitle": [ "CommandBuilderMessages" ],
+        "addLocalization": [ "CommandBuilderMessages" ],
+        "editLocalization": [ "CommandBuilderMessages" ]
+    }
+}

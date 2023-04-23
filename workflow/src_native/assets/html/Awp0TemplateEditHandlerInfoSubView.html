@@ -1,0 +1,25 @@
+<aw-panel-body>
+    <aw-listbox prop="data.actionTypeLOV" list="data.actionTypeValues" visible-when="conditions.isTemplateInEditMode"></aw-listbox>
+    <aw-listbox prop="data.actionTypeLOVReadOnly" list="data.actionTypeLOVReadOnly" visible-when="!conditions.isTemplateInEditMode"></aw-listbox>
+    <aw-break></aw-break>
+    <aw-flex-row height="2.3f">
+            <aw-flex-column width="fill">
+                    <aw-listbox  prop="data.handlerName" list="data.handlerName"></aw-listbox>
+            </aw-flex-column>
+            <aw-flex-column width="4f">
+                    <aw-command-bar anchor="aw_ActionHandlerHelpCommandAnchor" alignment="HORIZONTAL" exist-when="ctx.selectedHandler.type ==='EPMHandler'"></aw-command-bar>
+                    <aw-command-bar anchor="aw_RuleHandlerHelpCommandAnchor" alignment="HORIZONTAL" exist-when="ctx.selectedHandler.type ==='EPMBRHandler'"></aw-command-bar>
+            </aw-flex-column>
+        </aw-flex-row>
+    <aw-break></aw-break>
+    <aw-command-panel-section caption="i18n.arguments" anchor="data.addArguments" context="data">
+    </aw-command-panel-section>
+    <aw-workflow-handler-table>
+        <aw-splm-table gridid="argumentsAndValuesTableinPanel"></aw-splm-table>
+       </aw-workflow-handler-table>
+       <aw-break></aw-break>
+       <aw-textbox prop="data.hint" exist-when="ctx.argumentsPanelData.handlerData !=='' && ctx.argumentsPanelData.handlerData.required_one_of.length > 0"></aw-textbox>
+</aw-panel-body>
+<aw-panel-footer>
+   <aw-button action="updateHandler" visible-when="conditions.isTemplateInEditMode"><aw-i18n>i18n.save</aw-i18n></aw-button>
+</aw-panel-footer>

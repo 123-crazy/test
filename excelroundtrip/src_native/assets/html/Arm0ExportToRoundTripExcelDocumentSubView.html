@@ -1,0 +1,27 @@
+<aw-panel-body class="aw-layout-flexColumnContainer">
+    <aw-panel-section  caption="i18n.settingsLabel" name="PanelSectionSettings" visible-when="conditions.showSettingsSection">
+        <aw-checkbox prop="data.docStructure" visible-when="ctx.aceActiveContext && ctx.mselected.length === 1"> </aw-checkbox>
+        <aw-checkbox prop="data.idHyperlink"> </aw-checkbox>
+        <aw-checkbox prop="data.outlineNumbers" visible-when="ctx.aceActiveContext && ctx.mselected.length === 1"> </aw-checkbox>   
+    </aw-panel-section>
+    <aw-panel-section caption="i18n.selectExportProperties" name="PanelSectionProperties">
+        <aw-column width="0.5f"></aw-column>
+        <aw-column width="fill">
+            <aw-radiobutton prop="data.exportExcelOptions" visible-when="conditions.showRadioButton"></aw-radiobutton>
+            <aw-listbox prop="data.excelTemplates" visible-when="data.exportExcelOptions.dbValue" list="data.excelTemplatesList"></aw-listbox>
+        </aw-column>
+    </aw-panel-section>
+    <aw-command-panel-section caption="i18n.selectedcolmns" anchor="data.selectedcolmnsSubCommands" visible-when="!data.exportExcelOptions.dbValue" context="data">
+        <div class="aw-base-scrollPanel">
+            <aw-list dataprovider="data.dataProviders.exportColumnList">
+                <div class="aw-widgets-cellListWidget">{{item.propertyDisplayName}}</div>
+            </aw-list>
+        </div>
+    </aw-command-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-checkbox prop="data.runInBackgroundExcelExport"></aw-checkbox>
+    <aw-button enable-when="!ctx.isExcelRoundTripExportEventProgressing && !data.isExportColumnEmpty.dbValue" action="updateCtxAndExportExcel">
+        <aw-i18n>i18n.export</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

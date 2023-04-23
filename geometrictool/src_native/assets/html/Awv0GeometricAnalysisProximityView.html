@@ -1,0 +1,31 @@
+<aw-command-panel caption="i18n.proximityTabText" >
+    <aw-panel-body>
+        <aw-command-panel-section caption="i18n.seedPartsText" anchor="data.addRemoveCommands" context="data"></aw-command-panel-section>
+        <aw-i18n visible-when="!conditions.hasTargets">i18n.emptyTargetList</aw-i18n>
+        <!-- Hide list to avoid No results Found from f/w. Check with them.  -->
+        <aw-list dataprovider="data.dataProviders.proximitySearchPanelDataProvider" visible-when="conditions.hasTargets">
+            <aw-occmgmt-cell vmo="item"></aw-occmgmt-cell>
+        </aw-list>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-row height="7f">
+            <aw-row height="4f">
+                <aw-column width="9">
+                    <aw-numeric prop="data.targetRange" exist-when="conditions.hasTargets" ></aw-numeric>
+                </aw-column>
+                <aw-column width="1.5">
+                    <aw-row height="2f" justify="bottom">
+                            <aw-column >
+                        <aw-label prop="data.proximityUnitText" visible-when="conditions.hasTargets"> </aw-label>
+                    </aw-column>
+                    </aw-row>
+                </aw-column>
+            </aw-row>
+            <aw-row height="3f">
+                <aw-button visible-when="!conditions.invalidProximityRangeValue && conditions.hasTargets" action="executeProximitySearch">
+                    <aw-i18n>i18n.filterButtonText</aw-i18n>
+                </aw-button>
+            </aw-row>
+        </aw-row>
+    </aw-panel-footer>
+</aw-command-panel>

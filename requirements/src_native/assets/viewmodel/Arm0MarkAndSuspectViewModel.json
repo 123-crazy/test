@@ -1,0 +1,122 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-textarea.directive",
+        "js/aw-default-cell.directive",
+        "js/enable-when.directive",
+        "js/aw-property-error.directive",
+        "js/aw-date.directive"
+    ],
+    "actions": {
+        "sendToMarkSuspect":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2020-05-SpecNavigation",
+            "method": "markSuspect",
+            "inputData":
+            {
+                "inputData":
+                {
+                    "suspectObjectsMap": "{{function:createMapAsPerSelection}}",
+                    "note": "{{data.comment.dbValue}}",
+                    "dueDate": "{{function:getDueDate}}",
+                    "removePrevNotifications": "{{data.removePreviousNotifications.dbValue}}",
+                    "isRunInBackground": true,
+                    "requestPref": {}
+
+                }
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                 ]
+            },
+           "deps":"js/Arm0MarkAndSuspect"
+        },
+        "populateDateLovOptions": {
+            "actionType": "JSFunction",
+            "method": "populateDateLovOptions",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0MarkAndSuspect"
+        }
+
+    },
+    "data": {
+        "comment": {
+            "displayName": "{{i18n.comments}}",
+            "type": "STRING",
+            "maxLength": 180,
+            "dbValue":""
+        },
+        "removePreviousNotifications":
+        {
+            "displayName": "{{i18n.clearPreviousSuspects}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "lovDateProp":{
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov":true,
+            "displayName": "{{i18n.dueDate}}",
+            "dbValue": ""
+        },
+        "lovDatePropOptions":{
+            "type": "STRING",
+            "dbValue":
+            [
+
+            ]
+        },
+        "customDateProp":{
+            "dbValue": "",
+            "isRequired": "false",
+            "type": "DATE",
+            "displayName": "{{i18n.date}}",
+            "labelPosition": "NO_PROPERTY_LABEL"
+        }
+    },
+
+    "onEvent":
+    [
+
+    ],
+    "functions":
+     {
+
+     },
+    "i18n": {
+        "MarkSuspect": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "comments": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "reviewLable": [
+            "RequirementsCommandPanelsMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onInit": "populateDateLovOptions"
+    }
+}

@@ -1,0 +1,116 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "performSearch": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "searchInput": {
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Acp0CharsRulesAndNCProvider",
+                    "searchCriteria": {
+                        "type": "{{function:getCurrentType}}",
+                        "searchString": "{{ctx.search.criteria.searchString}}"
+                    },
+                    "searchSortCriteria": [
+                        {
+                            "fieldName": "creation_date",
+                            "sortDirection": "DESC"
+                        }
+                    ],
+                    "startIndex": "{{data.dataProviders.loadPartDataProvider.startIndex}}"
+                }
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalLoaded": "totalLoaded",
+                "totalFound": "totalFound"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "processPWASelection"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "updateSelectionInPWA": {
+            "actionType": "JSFunction",
+            "method": "processPWASelection",
+            "inputData": {
+                "results": "{{data.searchResults}}",
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "selectionChanged": {
+            "actionType": "JSFunction",
+            "method": "addQueryParamsToBrowserURL",
+            "inputData": {
+                "data": "{{data}}",
+                "selectionModel": "{{data.dataProviders.listDataProvider.selectionModel}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils2"
+        }
+    },
+    "data": {},
+    "dataProviders": {
+        "listDataProvider": {
+            "action": "performSearch",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [
+                        "aw_oneStep"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getCurrentType": {
+            "functionName": "getCurrentType"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "reveal"
+    },
+    "onEvent": [
+        {
+            "eventId": "processPWASelection",
+            "cacheEventData": true,
+            "action": "updateSelectionInPWA"
+        },
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "selectionChanged"
+        }
+    ]
+}

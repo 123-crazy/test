@@ -1,0 +1,179 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "setEffectivity": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-OccMgmt-2020-12-EffectivityManagement",
+            "method": "setEffectivity",
+            "inputData": {
+                "effectivityDataInput": {
+                    "effectivityData": [ {
+                        "inputObject": {
+                            "uid": "{{ctx.selected.uid}}",
+                            "type": "{{ctx.selected.type}}"
+                        },
+                        "effectivity": "{{function:getEffectivityDataForAddOrUpdate}}"
+                    } ]
+                }
+            },
+            "outputData": {
+                "setEffectivitySoaResponse": "",
+                "partialErrors": "partialErrors",
+                "errorMessage": "{{function:processPartialErrors}}",
+                "objectConfigured": "updated",
+                "objectUnconfigured": "deleted"
+            },
+            "events": {
+                "success": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "ps0DisplayEffectivities",
+                        "configured": "{{data.objectConfigured}}"
+                    },
+                    "condition": "data.objectConfigured && data.objectConfigured.includes(ctx.selected.uid)"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "failedToAddEffectivityMessage"
+                } ]
+            },
+            "deps": "js/expressionEffectivityService"
+        },
+        "updateEndItemValue": {
+            "actionType": "JSFunction",
+            "method": "updateEndItemValue",
+            "inputData": {
+                "data": "{{data}}",
+                "effectivityType": "expressionEffectivity"
+            },
+            "deps": "js/effectivityUtils"
+        },
+        "initialize": {
+            "actionType": "JSFunction",
+            "method": "initializeAddPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/expressionEffectivityService"
+        },
+        "attachStartDateConditionDynamically": {
+            "actionType": "JSFunction",
+            "method": "attachStartDateConditionDynamically",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityUtils"
+        },
+        "attachUnitRangeConditionDynamically": {
+            "actionType": "JSFunction",
+            "method": "attachUnitRangeConditionDynamically",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityUtils"
+        },
+        "validateDateCriteria": {
+            "actionType": "JSFunction",
+            "method": "validateDateCriteria",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityUtils"
+        },
+        "validateUnitCriteria": {
+            "actionType": "JSFunction",
+            "method": "validateUnitCriteria",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityUtils"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "messages": {
+        "failedToAddEffectivityMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "conditions": {
+        "closeExpEffectivityPanel": {
+            "expression": "ctx.mselected.length > 0 && data.activeView==='ps0AddEffectivity'"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "ps0Effectivity.updateEndItemValue",
+            "action": "updateEndItemValue"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "ps0EffectivitySubPanel"
+            },
+            "action": "initialize"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "ps0EffectivitySubPanel"
+            },
+            "action": "attachStartDateConditionDynamically"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "ps0EffectivitySubPanel"
+            },
+            "action": "attachUnitRangeConditionDynamically"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "validateDateCriteria",
+            "condition": "(data.startDate.valueUpdated===true || data.endDate.valueUpdated===true) && (condition==='conditions.startDateChangedCondition'||condition==='conditions.endDateChangedCondition'||condition==='conditions.endDateOptionsChangedCondition')",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "validateUnitCriteria",
+            "condition": "condition==='conditions.unitRangeTextChangedCondition'",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "condition": "conditions.closeExpEffectivityPanel",
+            "action": "closePanel"
+        }
+    ],
+    "functions": {
+        "getEffectivityDataForAddOrUpdate": {
+            "functionName": "getEffectivityDataForAddOrUpdate",
+            "parameters": [ "{{data}}", "{{data.dataProviders.getEffectivity.viewModelCollection.loadedVMObjects}}" ]
+        },
+        "processPartialErrors": {
+            "functionName": "processPartialErrors",
+            "parameters": [ "{{setEffectivitySoaResponse}}" ]
+        }
+    },
+    "i18n": {
+        "addButtonTitle": [ "TCUICommandPanelsMessages" ]
+    }
+}

@@ -1,0 +1,22 @@
+<aw-panel-body class="aw-widgets-propertyRule">
+    <aw-flex-row height="2f">
+        <aw-flex-column width="fill">
+        </aw-flex-column>
+    </aw-flex-row>
+    <aw-listbox prop="data.setFieldType" list="data.setFieldTypeList.dbValue" action="changeFiledTypes"></aw-listbox>
+    <aw-textbox prop="data.setFieldTypeTextValue" exist-when="!data.mapOfTypeDescriptions[data.setFieldType.dbValue]"></aw-textbox>
+    <aw-listbox prop="data.setFieldTypeValue" list="data.setFieldTypeValueList.dbValue" exist-when="data.mapOfTypeDescriptions[data.setFieldType.dbValue]"></aw-listbox>
+    <aw-listbox prop="data.advanceConditionProcessingType" list="data.advanceCProcessingTypeList.dbValue" action="addConditionProcessing"></aw-listbox>
+    <aw-list dataprovider="data.dataProviders.addPropConditionListProvider" exist-when="data.advanceConditionProcessingType.dbValue !== 'ALWAYS'">
+        <aw-include name="Arm0AddRulesCell" sub-panel-context="item"></aw-include>
+    </aw-list>
+    <aw-icon-button button-type="button" class="aw-layout-right" exist-when="data.advanceConditionProcessingType.dbValue !== 'ALWAYS'" command="data.addPropCondition.dbValue[0]"></aw-icon-button>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="addPropRule" visible-when="conditions.isAddPropRuleVisible"  aw-class="{'disabled': !(awPanelBody.$valid) }">
+        <aw-i18n>i18n.Add</aw-i18n>
+    </aw-button>
+    <aw-button action="updatePropRule" visible-when="conditions.isUpdatePropRuleVisible" aw-class="{'disabled': !(awPanelBody.$valid) }">
+        <aw-i18n>i18n.update</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

@@ -1,0 +1,134 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "createObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addObject.startCreateObject"
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObjectuid": "ServiceData.created[0]"
+            }
+        },
+        "setCreateRelationType": {
+            "actionType": "JSFunction",
+            "method": "setCreateRelationType",
+            "inputData": {
+                "data": "{{data}}",
+                "location": "qam0ExecutionReference"
+            },
+            "deps": "js/Qam0AddQualityActionService"
+        },
+        "setExecutionReference": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": [
+                    {
+                        "object": "{{ctx.selected}}",
+                        "timestamp": "",
+                        "vecNameVal": [
+                            {
+                                "name": "qam0ExecutionReference",
+                                "values": [
+                                    "{{data.sourceObjects[0].uid}}"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": "{{ctx.xrtSummaryContextObject}}"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "SOAFailureMessage"
+                } ]
+            }
+        },
+        "completeEventClosePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "messages": {
+        "SOAFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "setCreateRelationType"
+        },
+        {
+            "eventId": "gwt.CreateOrAddObjectCompleteEvent",
+            "action": "completeEventClosePanel"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        }
+    },
+    "i18n": {
+        "assign": [
+            "QualityActionMgmtMessages"
+        ],
+        "assignExecutionReferenceTitle": [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

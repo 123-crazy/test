@@ -1,0 +1,34 @@
+<div class="aw-notificationAlert-popupbody">
+    <div visible-when="ctx.unreadMessageCount==0 || ctx.unreadMessageCount==''">
+            <aw-i18n class="aw-notificationAlert-noNotificationMessageLabel">i18n.noNotificationMsg</aw-i18n>
+    </div>
+    <div visible-when="ctx.unreadMessageCount!=0 || ctx.unreadMessageCount!=''">
+        <div aw-repeat="app : subPanelContext.messageObjects" visible-when="app.appType.count!=0">
+            <!--Notification App Type messages-->
+            <div  class="aw-layout-flexRow">
+                <aw-link class="aw-layout-flex aw-notificationAlert-appHeader" action="redirectToNewsFeed" prop="app.appType"></aw-link>
+                <aw-link class="aw-layout-justifyFlexEnd aw-notificationAlert-appHeader" action="clearMessages" context="app.lineItems" prop="data.clearLink"></aw-link>
+            </div>
+            <ul>
+                <li class="aw-notification-cellListItem" aw-repeat="linkObject : app.linkObjects">
+                    <!-- Notification message -->
+                    <!--aw-notification-cell-content vmo="item" group="app"></aw-notification-cell-content-->
+                    <div class="aw-widgets-cellListCellTitleBlock">
+                        <h3 title="{{linkObject.lineItem.header}}" class="aw-notificationAlert-cellHeaderLabel" id="CellTitle">{{linkObject.lineItem.header}}</h3>
+                    </div>
+                    <div id="cellProperties">
+                        <div class="aw-widgets-cellListCellProperties">
+                            <aw-link class="aw-notificationAlert-subjectLink" prop="linkObject" command-id="Awp0OpenLineItem"></aw-link>
+                        </div>
+                        <div class="aw-widgets-cellListCellProperties">
+                            <label class="aw-notificationAlert-propertyCellLabel">{{linkObject.lineItem.sentDateHeader}}:</label>
+                            <label class="aw-notificationAlert-propertyCellValue" title="{{linkObject.lineItem.sentDateValue}}">{{linkObject.lineItem.sentDateValue}}</label>
+                        </div>
+                    </div>
+                    <aw-visual-indicator vmo="linkObject.lineItem"></aw-visual-indicator>
+                </li>
+            </ul>
+            <aw-break> </aw-break>
+        </div>
+    </div>
+</div>

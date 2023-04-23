@@ -1,0 +1,143 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-init.directive",
+        "js/aw-search-box.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-link-with-popup-menu.directive"
+    ],
+    "data": {
+        "title": {
+            "displayName": "{{i18n.textFilterTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "searchBoxPlaceHolder": {
+            "dbValue": "{{i18n.searchText}}"
+        }
+    },
+    "i18n": {
+        "clearButtonTitle": [
+            "UIMessages"
+        ],
+        "textFilterTitle": [
+            "UIMessages"
+        ],
+        "containsOperation": [
+            "UIMessages"
+        ],
+        "notContainsOperation": [
+            "UIMessages"
+        ],
+        "startsWithOperation": [
+            "UIMessages"
+        ],
+        "endsWithOperation": [
+            "UIMessages"
+        ],
+        "equalsOperation": [
+            "UIMessages"
+        ],
+        "notEqualsOperation": [
+            "UIMessages"
+        ],
+        "FILTER_TEXT": [
+            "BaseMessages"
+        ],
+        "searchText": [
+            "UIMessages"
+        ]
+    },
+    "actions": {
+        "filterAction": {
+            "actionType": "JSFunction",
+            "method": "doTextFiltering",
+            "inputData": {
+                "column": "{{data.context.column}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "eventData": {
+                    "columnName": "{{data.context.column.field}}",
+                    "operation": "{{data.context.column.filter.operation.dbValue}}",
+                    "textValue": "{{data.context.column.filter.textValue.dbValue}}"
+                },
+                "viewModelData": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "pltable.columnFilterApplied",
+                        "condition": "data.context.filterError !== true && data.context.filterNoAction !== true",
+                        "eventData": {
+                            "gridId": "{{data.context.gridId}}",
+                            "columnName": "{{data.context.column.field}}"
+                        }
+                    },
+                    {
+                        "name": "pltable.columnFilterApplied",
+                        "condition": "data.context.filterError !== true && data.context.filterNoAction === true",
+                        "eventData": {}
+                    }
+                ]
+            },
+            "deps": "js/awColumnFilterService"
+        },
+        "textFilterInputChanged": {
+            "actionType": "JSFunction",
+            "method": "textFilterInputChanged",
+            "inputData": {
+                "gridId": "{{data.context.gridId}}",
+                "column": "{{data.context.column}}",
+                "dataProvider": "{{data.context.dataProvider}}",
+                "columnProvider": "{{data.context.columnProvider}}",
+                "viewModelData": "{{data}}"
+            },
+            "deps": "js/awColumnFilterService"
+        }
+    },
+    "dataProviders": {
+        "operationsDataProvider": {
+            "dataProviderType": "Static",
+            "response": [
+                {
+                    "staticDisplayValue": "{{i18n.containsOperation}}",
+                    "staticElementObject": "contains",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.notContainsOperation}}",
+                    "staticElementObject": "notContains",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.startsWithOperation}}",
+                    "staticElementObject": "startsWith",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.endsWithOperation}}",
+                    "staticElementObject": "endsWith",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.equalsOperation}}",
+                    "staticElementObject": "equals",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.notEqualsOperation}}",
+                    "staticElementObject": "notEquals",
+                    "selected": false
+                }
+            ],
+            "totalFound": 6
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awlinkPopup.selected",
+            "action": "textFilterInputChanged"
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+<aw-command-panel caption="data.contextTitle.uiValue">
+            
+    <aw-form name="createInputs">
+        <aw-panel-body>
+            <aw-panel-section exist-when="data.swcTypeList.length == 1">
+                <aw-widget prop="data.swcType"></aw-widget>
+            </aw-panel-section>
+        
+            <aw-panel-section visible-when="data.swcTypeList.length > 1">
+                <aw-listbox prop="data.swcType" list="data.swcTypeList" ></aw-listbox>
+            </aw-panel-section>   
+        
+            <aw-panel-section exist-when="data.swcType.dbValue">
+                <aw-xrt type="CREATE" exist-when="data.swcContainerNames.indexOf( data.swcType.dbValue ) > -1" object-type="{{data.swcType.dbValue}}"></aw-xrt>
+            </aw-panel-section>        
+        </aw-panel-body>
+    </aw-form>
+    
+    <aw-panel-footer>
+        <aw-button action="initiateCreateSWCAction" visible-when="createInputs.$valid">
+            {{data.buttonText.uiValue}}
+        </aw-button>
+    </aw-panel-footer>
+    
+</aw-command-panel>

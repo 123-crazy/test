@@ -1,0 +1,64 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "data": {
+        "visibleTabs": "palette,search"
+    },
+    "actions": {
+        "openInViewSelectedElement": {
+            "actionType": "JSFunction",
+            "method": "navigateWithGivenParams",
+            "inputData": {
+                "urlParamsMap": "{{ctx.panelContext.context.urlParams}}",
+                "urlParamsWithValue": {
+                    "rootQueryParamKey": "{{data.sourceObjects[0].uid}}"
+                }
+            },
+            "events": {
+
+                "success": [ {
+                        "name": "productChangedEvent"
+                    },
+                    {
+                        "name": "openInView.closePanel"
+                    }
+                ]
+            },
+            "deps": "js/occmgmtNavigationService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "onEvent": [ {
+
+        "eventId": "openInView.closePanel",
+        "action": "closePanel"
+
+    } ],
+    "conditions": {
+        "isSingleElementSelected": {
+            "expression": "(data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length === 1 || ctx.getFavoriteProvider.selectedObjects.length ===1 || ctx.getRecentObjsProvider.selectedObjects.length === 1 )) || (data.selectedTab.panelId==='resultsTabPageSub' && data.dataProviders.performSearch.selectedObjects.length === 1 )"
+        }
+    },
+    "i18n": {
+        "openInView": [ "occmgmtSplitViewsConstants" ],
+        "openInViewBtn": [ "occmgmtSplitViewsConstants" ]
+    }
+}

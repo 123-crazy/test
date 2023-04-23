@@ -1,0 +1,158 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-listbox.directive",
+        "js/aw-break.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data":{
+            "displayLevelList": [
+                {
+                    "propDisplayValue": "{{i18n.CurrentLevel}}",
+                    "propInternalValue": 1
+                },
+                {
+                    "propDisplayValue": "{{i18n.AllLevels}}",
+                    "propInternalValue": -1
+                }
+            ],
+            "ALIGNED": {
+                "displayName": "{{i18n.AlignedIndiTitle}}",
+                "type": "BOOLEAN",
+                "isRequired": "false",
+                "isEditable": "true",
+                "dbValue": true,
+                "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+            },
+            "NOTALIGNED": {
+                "displayName": "{{i18n.NotAlignedIndiTitle}}",
+                "type": "BOOLEAN",
+                "isRequired": "false",
+                "isEditable": "true",
+                "dbValue": true,
+                "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+            },
+            "displayLevel":{
+                "displayName":"",
+                "type":"STRING",
+                "isEditable": "true",
+                "dbValue": "1",
+                "hasLov":"true"
+            },
+            "runInBackground":{
+                "displayName":"{{i18n.runInBackground}}",
+                "type": "BOOLEAN",
+                "isRequired": "false",
+                "isEditable": "true",
+                "dispValue": "",
+                "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+                "dbValue":false
+             },
+             "defaultMatchTypes":["FULL_MATCH","MISSING_SOURCE","MISSING_TARGET"]
+    },
+    "actions": {
+        "updateAlignmentCheckSettingsInCtx":{
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path": "cbaContext.alignmentCheckContext",
+                "value": {
+                    "alignmentCheckSettingInfo":{
+                        "displayOptions":{
+                            "ALIGNED": "{{data.ALIGNED}}",
+                            "NOTALIGNED": "{{data.NOTALIGNED}}"
+                        },
+                        "displayLevel": "{{data.displayLevel}}"
+                    }
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "setAlignmentCheckSettings":{
+            "actionType": "JSFunction",
+            "method": "setAlignmentCheckSettings",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/CadBomOccAlignmentCheckService"
+        },
+        "alignmentCheckAction":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "updateAlignmentCheckSettingsInCtx"
+                },
+                {
+                    "action": "executeAlignmentCheckAction"
+                }
+            ]
+        },
+        "executeAlignmentCheckAction":{
+            "actionType": "JSFunction",
+            "method": "executeAlignmentCheck",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "deps": "js/CadBomOccAlignmentCheckService"
+        },
+        "closePanel": 
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": 
+            {
+                "events": 
+                [
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "onEvent": [       
+        {
+            "eventId": "EntCBAAlignmentCheckSettings.closePanel",
+            "action": "closePanel",
+            "cacheEventData": true
+        }
+    ],
+    "lifecycleHooks": {
+        "onMount": "setAlignmentCheckSettings"
+    },
+    "conditions": {
+        "isAlignmentCheckSettingInContext": {
+            "expression": "ctx.cbaContext === undefined || ctx.cbaContext.alignmentCheckContext.alignmentCheckSettingInfo === undefined"
+        },
+        "isBackgroundOptionAvailable":{
+            "expression" : "data.displayLevel.dbValue < 0"
+        },
+        "isValidInputForCheckOptions": {
+            "expression" : "data.ALIGNED.dbValue === true || data.NOTALIGNED.dbValue === true"
+        }
+    },
+    "i18n": 
+    {
+        "Awb0EntCBAAlignmentCheckSettings": ["CadBomAlignmentConstants"],
+        "Check": ["CadBomAlignmentConstants"],
+        "AlignedIndiTitle": ["CadBomAlignmentConstants"],
+        "NotAlignedIndiTitle": ["CadBomAlignmentConstants"],
+        "CurrentLevel": ["CadBomAlignmentConstants"],
+        "AllLevels": ["CadBomAlignmentConstants"],
+        "Display": ["CadBomAlignmentConstants"],
+        "runInBackground": ["CadBomAlignmentConstants"]
+    }
+}

@@ -1,0 +1,147 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/exist-when.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-popup-panel.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+
+    "actions": {
+
+        "getCurrentContexts": {
+            "actionType": "JSFunction",
+            "method": "getCurrentContexts",
+            "outputData": {
+                "currentContexts": ""
+            },
+            "deps": "js/contextConfigurationService"
+        },
+
+        "fetchAllProductsBelongingToContextAndLaunchPopup": {
+            "actionType": "dataProvider",
+            "method": "getAllProductsUnderContext"
+        },
+
+        "getAllProductsUnderContext": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2022-06-OccurrenceManagement",
+            "method": "getOccurrences4",
+            "inputData": {
+                "inputData": {
+                    "product": {
+                        "uid": "{{ctx.aceActiveContext.context.workingContextObj.uid}}",
+                        "type": "{{ctx.aceActiveContext.context.workingContextObj.type}}"
+                    },
+                    "config": {
+                        "productContext": {
+                            "uid": "{{ctx.aceActiveContext.context.productContextInfo.uid}}",
+                            "type": "{{ctx.aceActiveContext.context.productContextInfo.type}}"
+                        }
+                    },
+                    "requestPref": {
+                        "displayMode": [ "List" ]
+                    }
+                }
+            },
+            "outputData": {
+                "allProducts": "parentChildrenInfos[0].childrenInfo",
+                "totalFound": "parentChildrenInfos[0].childrenInfo.length"
+            },
+            "events": {
+                "success": [ {
+                    "name": "awConfigPanel.launchContextPopup"
+                } ]
+            },
+            "deps": "js/contextConfigurationService"
+        },
+
+        "launchContextPopup": {
+            "actionType": "JSFunction",
+            "method": "launchPopup",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/contextConfigurationService"
+        },
+
+        "openProductSelectedFromPopup": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "awConfigPanel.selectionInContextChanged",
+                        "eventData": {
+                            "productToSelect": "{{data.dataProviders.getAllProductsUnderContext.selectedObjects[0]}}"
+                        }
+                    },
+                    {
+                        "name": "awPopupWidget.close"
+                    }
+                ]
+            }
+        },
+
+        "applyContextChange": {
+            "actionType": "JSFunction",
+            "method": "updateContextState",
+            "inputData": {
+                "contextKey": "{{ctx.aceActiveContext.key}}",
+                "newState": {
+                    "c_uid": "{{data.eventData.productToSelect.uid}}"
+                },
+                "mergeWithCurrentState": true
+            },
+            "deps": "js/contextStateMgmtService"
+        }
+    },
+
+    "dataProviders": {
+        "getCurrentContextData": {
+            "action": "getCurrentContexts",
+            "response": "{{data.currentContexts}}",
+            "uidInResponse": "dbValues[0]",
+            "selectionModelMode": "single"
+        },
+        "getAllProductsUnderContext": {
+            "action": "getAllProductsUnderContext",
+            "totalFound": "{{data.totalFound}}",
+            "response": "{{data.allProducts}}",
+            "uidInResponse": "occurrence.uid",
+            "selectionModelMode": "single"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "getCurrentContextData"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "getCurrentContextData"
+        },
+        {
+            "eventId": "getCurrentContextData.selectionChangeEvent",
+            "condition": "ctx.aceActiveContext.context.isOpenedUnderAContext && ctx.aceActiveContext.context.elementToPCIMapCount > 1",
+            "action": "fetchAllProductsBelongingToContextAndLaunchPopup"
+        },
+        {
+            "eventId": "awConfigPanel.launchContextPopup",
+            "action": "launchContextPopup"
+        },
+        {
+            "eventId": "getAllProductsUnderContext.selectionChangeEvent",
+            "action": "openProductSelectedFromPopup"
+        },
+        {
+            "eventId": "awConfigPanel.selectionInContextChanged",
+            "cacheEventData": true,
+            "action": "applyContextChange"
+        }
+    ],
+
+    "i18n": {
+        "contextTitle": [ "OccurrenceManagementConstants" ]
+    }
+}

@@ -1,0 +1,190 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[ "js/aw-panel-body.directive",
+                "js/aw-splm-table.directive",
+                "js/aw-textbox.directive",
+                "js/aw-break.directive",
+                "js/aw-row.directive"
+    ],
+
+    "data" :
+    {
+        "nameBox":{
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "dbValue": "",
+            "isRequired": "true",
+            "maxLength":128
+        }
+    },
+
+    "actions": {
+        "doGridDataProvider": {
+            "actionType": "dataProvider",
+            "method": "effGroupDataProvider"
+        },
+        "loadData": {
+            "actionType": "JSFunction",
+            "method": "loadEffectivityGroupTableData",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.effGroupDataProvider}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "searchIndex": "searchIndex"
+            },
+            "deps": "js/effectivityGroupTableService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadEffectivityTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.effGroupDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityGroupTableService"
+        },
+        "populateInitialData": {
+            "actionType": "JSFunction",
+            "method": "populateInitialData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityGroupTableService"
+        },
+        "setTableEditable": {
+            "actionType": "JSFunction",
+            "method": "setTableEditable",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.effGroupDataProvider}}"
+            },
+            "deps": "js/effectivityGroupTableService"
+        },
+        "updateEndItem": {
+            "actionType": "JSFunction",
+            "method": "updateEndItem",
+            "inputData": {
+                "eventData":"{{data.eventData}}",
+                "actionType":"Author",
+                "message": "{{data.i18n.errorMessageEndItemGroupEff}}"
+            },
+            "deps": "js/effectivityGroupTableService"
+        },
+        "getEndItemProperties": {
+            "actionType": "JSFunction",
+            "method": "getProperties",
+            "inputData": {
+                "uids": [ "{{data.eventData.selectedObjects[0].props.items_tag.dbValue}}" ],
+                "propNames": [ "object_string" ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "effectivity.endItemPropLoaded",
+                        "eventData":
+                        {
+                            "property": "{{ctx.panelContext.viewModelProperty}}",
+                            "selectedObjects": "{{data.sourceObjects}}"
+                        }
+                    }
+                ]
+            },
+            "deps": "soa/dataManagementService"
+        },
+        "clearEffGrpTable": {
+            "actionType": "JSFunction",
+            "method": "clearEffGrpTable",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/effectivityGroupTableService"
+        }
+    },
+
+    "dataProviders": {
+        "effGroupDataProvider": {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "editContext": "TABLE_CONTEXT",
+            "inputData": {
+                "selectionModelMode": "single"
+            }
+        }
+    },
+
+    "columnProviders": {
+        "effGroupColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "frozenColumnIndex": -1,
+            "columns": "{{data.columns}}",
+            "soaEnabled": false,
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "groupeffTable": {
+            "dataProvider": "effGroupDataProvider",
+            "columnProvider": "effGroupColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": false,
+                "enableSorting": false,
+                "enableGridMenu": false
+            }
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "groupeffTable.plTable.loadMorePages",
+            "action": "setTableEditable"
+        },
+        {
+            "eventId": "groupeffTable.initialized",
+            "action": "doGridDataProvider"
+        },
+        {
+            "eventId": "effGroupDataProvider.resetScroll",
+            "action": "populateInitialData"
+        },
+        {
+            "eventId": "effectivity.endItemPropLoaded",
+            "cacheEventData": true,
+            "action": "updateEndItem"
+        },
+        {
+            "eventId": "referenceProperty.update",
+            "cacheEventData": true,
+            "action": "getEndItemProperties"
+        },
+        {
+            "eventId": "awTab.selected",
+            "condition": "scope.selectedTab.panelId === 'AuthorGroupEffectivity'",
+            "cacheEventData": true,
+            "action": "clearEffGrpTable"
+        }
+    ],
+
+    "conditions":
+    {
+        "isNewAuthorPanelSelected":{
+            "expression":"$parent.ctx.elementEffectivity.selectedPanel == 'NEW'"
+        }
+    },
+
+    "i18n":
+    {
+        "name":[ "OccurrenceManagementConstants" ],
+        "units":[ "OccurrenceManagementConstants" ],
+        "endItem":[ "OccurrenceManagementConstants" ],
+        "addElementBtn":[ "OccurrenceManagementConstants" ],
+        "errorMessageEndItemGroupEff":["OccurrenceManagementMessages"]
+    }
+}

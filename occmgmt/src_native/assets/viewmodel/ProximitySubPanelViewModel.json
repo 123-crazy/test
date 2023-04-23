@@ -1,0 +1,214 @@
+{
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-label.directive",
+        "js/aw-numeric.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-i18n.directive",
+        "js/aw-link.directive",
+        "js/aw-break.directive"
+    ],
+    "data": {
+        "target": {
+            "displayName": "{{i18n.targetPropLabel}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false"
+        },
+        "distance": {
+            "displayName": "{{i18n.distancePropLabel}}",
+            "type": "DOUBLE",
+            "isRequired": "true",
+            "isEditable": "true"
+        },
+        "validTargetsForProximity": {
+            "isArray": "true",
+            "dbValue": []
+        },
+        "displayNSelected": {
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+
+        },
+        "isExpanded": {
+            "type": "BOOLEAN",
+            "isEditable": "true",
+            "isRequired": "false",
+            "dbValue": false
+    }
+},
+    "actions": {
+        "initialiseProximityPanel": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "getDistanceText"
+                },
+                {
+                    "action": "loadData"
+                },
+                {
+                    "action": "getNSelectedText" ,
+                   "condition":"conditions.shouldDisplayLink"
+
+                }
+            ]
+        },
+        "getDistanceText": {
+            "actionType": "JSFunction",
+            "method": "getDistanceText",
+            "outputData": {
+                "distance.propertyRequiredText": ""
+            },
+            "deps": "js/proximityFilterService"
+        },
+        "loadData": {
+            "actionType": "dataProvider",
+            "method": "selectedObjects"
+        },
+        "populateValidTargets": {
+            "actionType": "JSFunction",
+            "method": "getValidProximityTarget",
+            "outputData": {
+                "validTargetsForProximity": ""
+            },
+            "deps": "js/proximityFilterService"
+        },
+        "invokeProximityAction":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "updateJitterFreeContextState"
+                },
+                {
+                    "action": "setProximity"
+                },
+                {
+                    "action": "navigateOnAdd"
+                }
+            ]
+        },
+        "updateJitterFreeContextState": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.retainTreeExpansionStateInJitterFreeWay",
+                "value": true
+            },
+            "deps": "js/appCtxService"
+        },
+        "setProximity": {
+            "actionType": "JSFunction",
+            "method": "applyProximityFilterInRecipe",
+            "inputData": {
+                "distanceValue": "{{data.distance.dbValue}}",
+                "validTargets": "{{data.validTargetsForProximity}}"
+            },
+            "deps": "js/proximityFilterService"
+        },
+        "navigateOnAdd": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Awb0DiscoveryFilterCommandSubPanel",
+                            "title": ""
+                        }
+                    }
+                ]
+            }
+        },
+        "postPWASelectionChangeAction":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "loadData"
+                },
+                {
+                    "action": "getNSelectedText" ,
+                   "condition":"conditions.shouldDisplayLink"
+
+                }
+            ]
+        },
+        "getNSelectedText": {
+            "actionType": "JSFunction",
+            "method": "getNSelectedText",
+            "inputData": {
+                "data": "{{data.i18n.displayNSelected}}",
+                "validTargets": "{{data.validTargetsForProximity}}"
+            },
+            "outputData": {
+                "displayNSelected.propertyDisplayName":""
+            },
+            "deps": "js/proximityFilterService"
+
+        },
+        "expandSelection": {
+            "actionType": "JSFunction",
+            "method": "toggleExpand",
+            "inputData": {
+                "value": "{{data.isExpanded.dbValue}}"
+            },
+            "outputData": {
+                "isExpanded.dbValue":""
+            },
+            "deps": "js/proximityFilterService"
+
+        }
+    },
+    "dataProviders": {
+        "selectedObjects": {
+            "action": "populateValidTargets",
+            "response": "{{data.validTargetsForProximity}}",
+            "totalFound": "{{data.validTargetsForProximity.length}}",
+            "selectionModelMode": "none"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "ProximitySubPanel"
+            },
+            "action": "initialiseProximityPanel"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+
+            "action": "postPWASelectionChangeAction"
+        }
+    ],
+    "conditions": {
+        "isDistanceSpecificed": {
+            "expression": "(data.distance.dbValue !== undefined  && data.distance.dbValue != null  && data.distance.dbValue !== '' && data.distance.dbValue >= 0 && data.validTargetsForProximity.length >0)"
+        },
+        "shouldDisplayLink": {
+            "expression": "data.validTargetsForProximity && data.validTargetsForProximity.length >5"
+        }
+    },
+    "i18n": {
+        "targetPropLabel": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "distancePropLabel": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "Add": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "displayNSelected": [
+            "OccurrenceManagementSubsetConstants"
+        ],
+        "negativeValidationError": [
+            "OccurrenceManagementSubsetConstants"
+         ]
+    }
+}

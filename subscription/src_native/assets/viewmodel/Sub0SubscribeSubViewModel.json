@@ -1,0 +1,117 @@
+{
+   "schemaVersion" : "1.0.0",
+   "imports":
+    [
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive"
+      ],
+
+    "actions":
+    {
+        "reveal": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addObjectEvent"
+                    },
+                    {
+                        "name": "setPinCommandsEvent"
+                    }
+                ]
+            }
+        },
+        "addObjectAction":{
+            "actionType": "JSFunction",
+            "method": "addObject",
+            "inputData":{
+                "data":"{{data}}",
+                "newColor":"{{ctx.subscriptions}}",
+                "dataProvider":"{{data.dataProviders.list_subscription}}"
+             },
+             "deps":"js/Sub0SubscribeCommandPanelService"
+         },
+        "setPinCommandsAction":{
+            "actionType": "JSFunction",
+            "method": "setPinCommands",
+            "inputData":
+            {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Sub0SubscribeCommandPanelService"
+         },
+        "Sub0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Sub0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "data":
+    {
+        "addSubscriptionCommands":"sub0_addSubscriptionCommands",
+        "Sub0PinCommands":"Sub0_oneStepPinCommands"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Sub0SubscribeSub"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "createSubscription.Sub0SetPin",
+            "cacheEventData": true,
+            "action": "Sub0SetPin"
+        },
+        {
+            "eventId": "createSubscription.Sub0SetUnPin",
+            "cacheEventData": true,
+            "action": "Sub0SetUnPin"
+        },
+        {
+            "eventId": "setPinCommandsEvent",
+            "action": "setPinCommandsAction"
+        },
+        {
+            "eventId": "addObjectEvent",
+            "action": "addObjectAction"
+        }
+    ],
+    "dataProviders": {
+        "list_subscription": {
+            "commandsAnchor":"aw_subscriptionShowObjectCellCommandAction"
+        }
+    },
+    "i18n" :
+    {
+        "mySybscriptionsTitle":["SubscriptionMessages"],
+        "usePeriodicDigestLabel" :["SubscriptionMessages"],
+        "emailNotificationText" :["SubscriptionMessages"],
+        "newsfeedNotificationText" :["SubscriptionMessages"],
+        "allNotificationsText" :["SubscriptionMessages"],
+        "notificationMethodTitle":["SubscriptionMessages"],
+        "followCommandTitle":["SubscriptionMessages"],
+        "followCondAddText":["SubscriptionMessages"]
+    }
+
+}

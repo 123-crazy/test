@@ -1,0 +1,77 @@
+{
+    "schemaVersion" : "1.0.0",
+"imports":
+    [
+
+        "js/aw-panel.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-i18n.directive",
+        "js/aw-date.directive",
+        "js/aw-separator.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-body.directive",
+        "js/enable-when.directive",
+        "js/aw-break.directive"
+    ],
+    "actions":
+    {
+        "goToDateApply": {
+            "actionType": "JSFunction",
+            "method": "goToDate",
+            "inputData": {
+                "data": "{{data}}",
+                "isToday": false
+            },
+            "events": {
+                "success": [ {
+                    "name": "hideGoToOptionsPopup"
+                } ]
+            },
+            "deps": "js/Timeline/uiTimelineUtils"
+        },
+        "hideGoToOptionsPopup": {
+            "actionType": "JSFunction",
+            "method": "hide",
+            "deps": "js/popupService"
+        }
+
+    },
+    "data":
+    {
+        "enterDate": {
+            "displayName": "{{i18n.Pgp0Date}}",
+            "type": "DATE",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+
+    },
+    "onEvent": [
+        {
+            "eventId": "hideGoToOptionsPopup",
+            "action": "hideGoToOptionsPopup"
+        }
+    ],
+    "conditions":{
+        "buttonEnable": {
+            "expression": "data.enterDate.dbValue"
+        }
+    },
+    "i18n":
+    {
+        "Pgp0Date": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0Go": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0GoToOutOfBoundAfter": [
+            "ProgramPlanningCommandPanelsMessages"
+        ],
+        "Pgp0GoToOutOfBoundBefore": [
+            "ProgramPlanningCommandPanelsMessages"
+        ]
+    }
+}

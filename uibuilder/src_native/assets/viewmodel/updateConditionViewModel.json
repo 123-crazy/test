@@ -1,0 +1,125 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-widget.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-source-editor.directive",
+        "js/exist-when.directive",
+        "js/aw-label.directive",
+        "js/aw-row.directive"
+    ],
+    "data": {
+        "ID": {
+            "displayName": "{{i18n.id}}",
+            "type": "STRING",
+            "isEditable": false,
+            "isRequired": true,
+            "dispValue": "{{ctx.panelContext.uiValue}}",
+            "dbValue": "{{ctx.panelContext.dbValue}}"
+        },
+        "content": {
+            "displayName": "{{i18n.content}}",
+            "type": "STRING",
+            "isEditable": true,
+            "dispValue": "",
+            "dbValue": ""
+        },
+        "configText": {
+            "language": "text",
+            "automaticLayout": true,
+            "minimap": {
+                "enabled": false
+            },
+            "wordWrap": "bounded",
+            "formatOnType": true
+        },
+        "configJson": {
+            "language": "json",
+            "automaticLayout": true,
+            "minimap": {
+                "enabled": false
+            },
+            "formatOnType": true
+        }
+    },
+    "actions": {
+        "reveal": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($id:ID!){condition(id: $id){id expression{string object}}}",
+                    "variables": {
+                        "id": "{{ctx.panelContext.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "conditionDef": "data.condition.expression",
+                "conditionLoaded": true
+            }
+        },
+        "save": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($object:JSON,$string:String){updateCommandCondition(input:{id:\"{{data.ID.dbValue}}\",object:$object,string:$string}){id expression{string object}}}",
+                    "variables": "{{data.conditionDef}}"
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "updateCondition.notifyConfigChange"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "updateCondition.notifyConfigChange",
+            "action": "notifyConfigChange"
+        }
+    ],
+    "conditions": {
+        "isValidToSave": {
+            "expression": "data.ID.dbValue && data.ID.dbValue !=''"
+        }
+    },
+    "i18n": {
+        "EditCondition": [
+            "CommandBuilderMessages"
+        ],
+        "id": [
+            "CommandBuilderMessages"
+        ],
+        "content": [
+            "CommandBuilderMessages"
+        ],
+        "save": [
+            "XRTMessages"
+        ]
+    }
+}

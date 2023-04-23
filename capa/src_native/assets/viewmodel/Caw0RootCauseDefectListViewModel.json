@@ -1,0 +1,86 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "loadSymptomDefects": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForPrimary",
+            "inputData": {
+                "primaryObjects": [ {
+                    "uid": "{{ctx.xrtSummaryContextObject.uid}}",
+                    "type": "C2CapaRevision"
+                } ],
+                "pref": {
+                    "expItemRev": false,
+                    "returnRelations": false,
+                    "info": [ {
+                        "relationTypeName": "CPA0RootCause",
+                        "otherSideObjectTypes": ""
+                    } ]
+                }
+            },
+            "outputData": {
+                "defectList": "{{function:processSecondaryObject}}",
+                "totalFound": "data.defectList.length"
+            },
+            "deps": "js/CAW0RootCauseDataService"
+        },
+        "caw0SetSelectedRootCauseDefect": {
+            "actionType": "JSFunction",
+            "method": "caw0SetSelectedRootCauseDefect",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "CorrectiveActionsTable.plTable.reload"
+                },
+                {
+                    "name": "ImplCorrectiveActionsTable.plTable.reload"
+                } ]
+            },
+            "deps": "js/CAW0AddQualityActionsService"
+        }
+    },
+    "dataProviders": {
+        "loadSymptomDefectsProvider": {
+            "action": "loadSymptomDefects",
+            "response": "{{data.defectList}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "loadSymptomDefectsProvider"
+    },
+    "onEvent": [
+        {
+            "eventId": "loadSymptomDefectsProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "caw0SetSelectedRootCauseDefect"
+        }
+    ]
+}

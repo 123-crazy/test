@@ -1,0 +1,29 @@
+<div class="wys-propPanel-propContainers" aw-repeat="child : vmo">
+    <aw-row exist-when="child.isI18nSupported === 'true'">
+        <aw-widget hint="textbox" prop="child.vmProp" class="aw-layout-flexRow"></aw-widget>
+        <aw-command-bar anchor="{{child.vmProp.anchor}}" class="aw-commandbuilder-openButton" context="child.vmProp" alignment="HORIZONTAL"></aw-command-bar>
+    </aw-row>
+
+    <aw-widget hint="editLov" prop="child.vmProp" class="aw-layout-flexRow" exist-when="child.isActionProperty === 'true'"></aw-widget>
+
+    <aw-textbox prop="child.vmProp" exist-when="child.renderingHint ==='textbox' && child.isI18nSupported !== 'true'"></aw-textbox>
+
+    <aw-textarea prop="child.vmProp" exist-when="child.renderingHint ==='textarea'"></aw-textarea>
+
+    <aw-checkbox prop="child.vmProp" exist-when="child.renderingHint ==='checkbox'"></aw-checkbox>
+
+    <aw-radiobutton prop="child.vmProp" exist-when="child.renderingHint ==='radio'" list="child.defaultValues"></aw-radiobutton>
+
+    <aw-date prop="child.vmProp" exist-when="child.renderingHint ==='date'"></aw-date>
+
+    <aw-togglebutton prop="child.vmProp" exist-when="child.renderingHint ==='togglebutton'"></aw-togglebutton>
+
+    <aw-row exist-when="child.renderingHint ==='table'">
+        <aw-column>
+            <aw-splm-table gridid="mockEditorGrid" exist-when="child.renderingHint ==='table'"></aw-splm-table>
+            <aw-command-bar anchor="wys_add" alignment="HORIZONTAL" context="child.vmProp"></aw-command-bar>
+        </aw-column>
+    </aw-row>
+
+    <wysiwyg-prop vmo="child.children" exist-when="child.children"></wysiwyg-prop>
+</div>

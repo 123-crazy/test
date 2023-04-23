@@ -1,0 +1,166 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-row.directive"
+    ],
+    "actions": {
+        "revealPanelUserEventsConfig": {
+            "actionType": "batchJob",
+            "steps":[
+                {
+                    "action":"doconfiguredEventTypesProvider"
+                },
+                {
+                    "action":"doavailableEventTypesProvider"
+                }
+            ]
+        },
+        "getConfiguredEventTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-04-Session",
+            "method": "getPreferences2",
+            "inputData": {
+                "preferenceNames": [
+                    {
+                        "scope": "User",
+                        "names": [
+                            "SAW1_followMultiEventConfiguredEventTypes"
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "userConfiguredEventList": "{{function:getConfiguredEventTypesFunction}}"
+            },
+            "deps": "js/Saw1NotificationService"
+        },
+        "searchAllSubscribableEventTypes": {
+            "actionType": "JSFunction",
+            "method": "getAvailableEvents",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "availableEvents": ""
+            },
+            "deps": "js/Saw1NotificationService"
+        },
+        "addEventToUserConfiguredEvents": {
+            "actionType": "JSFunction",
+            "method": "addEventToUserConfiguredEvents",
+            "deps": "js/Saw1NotificationService",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "allDataProvider.reset",
+                        "condition": "data.dataProviders.availableEventTypesProvider.selectedObjects.length > 0"
+                    }
+                ]
+            }
+        },  
+        "removeEventFromUserConfiguredEvents": {
+            "actionType": "JSFunction",
+            "method": "removeEventFromUserConfiguredEvents",
+            "deps": "js/Saw1NotificationService",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "allDataProvider.reset",
+                        "condition": "data.dataProviders.configuredEventTypesProvider.selectedObjects.length > 0"
+                    }
+                ]
+            }
+        },        
+        "doavailableEventTypesProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "availableEventTypesProvider"
+        },
+        "doconfiguredEventTypesProvider":
+        {
+            "actionType": "dataProvider",
+            "method": "configuredEventTypesProvider"
+        }
+    },
+    "functions":
+    {
+        "getConfiguredEventTypesFunction":
+        {
+            "functionName": "getConfiguredEventTypes",
+            "parameters":
+            [
+                "{{data}}",
+                "{{ctx.panelContext.eventTypeNames}}",
+                "{{ctx.panelContext.statusList}}",
+                "{{ctx.panelContext.priorityList}}"
+            ]
+        }
+    },
+
+    "messages": {        
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1UserEventsConfig"
+            },
+            "action": "revealPanelUserEventsConfig"
+        },        
+        {
+            "eventId": "Saw1EventAddCellCmdEvent",
+            "action": "addEventToUserConfiguredEvents"
+        },
+        {
+            "eventId": "Saw1EventRemoveCellCmdEvent",
+            "action": "removeEventFromUserConfiguredEvents"
+        },
+        {
+            "eventId": "allDataProvider.reset",
+            "action": "revealPanelUserEventsConfig"
+        }
+    ],
+    "data": {
+        "eventRemoveCellCommand": "saw1_eventRemoveCellCommandAction",
+        "eventAddCellCommand": "saw1_eventAddCellCommandAction"
+        
+    },
+    "i18n": {
+        "selectedEventsSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "availableEventsSectionTitle": [
+            "ScheduleManagerMessages"
+        ]
+    },
+    "conditions": {},
+    "dataProviders": {
+        "availableEventTypesProvider": {
+            "action": "searchAllSubscribableEventTypes",
+            "response": "{{data.availableEvents}}",
+            "totalLoaded": "{{data.availableEvents.length}}",
+            "totalFound": "{{data.availableEvents.length}}",
+            "selectionModelMode": "multiple"
+        },
+        "configuredEventTypesProvider": {
+            "action": "getConfiguredEventTypes",
+            "response": "{{data.userConfiguredEventList}}",
+            "totalLoaded": "{{data.userConfiguredEventList.length}}",
+            "totalFound": "{{data.userConfiguredEventList.length}}",
+            "selectionModelMode": "multiple"
+        }
+    }
+}

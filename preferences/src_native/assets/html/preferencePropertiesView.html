@@ -1,0 +1,57 @@
+<div class="aw-preferences-layoutColumn">
+    <div class="aw-preferences-propertiesSectionContainer">
+        <aw-panel>
+            <aw-panel-body class="aw-preferences-wrapColumns">
+                <aw-column width="55%">
+                    <!-- Beginning of Definition Panel Section -->
+                    <aw-panel-section caption="i18n.definitionPropSectionHdr" collapsed="false">
+                        <aw-break></aw-break>
+                        <!-- Name, Product Area, Description -->
+                        <aw-widget prop="data.preferenceInfo.props.fnd0PreferenceName"> </aw-widget>
+                        <aw-widget prop="data.preferenceInfo.props.fnd0ProductArea"> </aw-widget>
+                        <aw-widget prop="data.preferenceInfo.props.fnd0Description"> </aw-widget>
+                        <aw-break></aw-break>
+
+                        <!-- Protection Scope, Environment Enabled, Preference location, type, MultiValued -->
+                        <aw-widget prop="data.preferenceInfo.props.fnd0ProtectionScope"> </aw-widget>
+                        <aw-widget exist-when="!ctx.tcadmconsole.preferences.editInProgress" prop="data.preferenceInfo.props.fnd0Environment"></aw-widget>
+                        <aw-property-label exist-when="ctx.tcadmconsole.preferences.editInProgress" prop="data.fnd0EnvironmentLabelProp"></aw-property-label>
+                        <aw-widget exist-when="ctx.tcadmconsole.preferences.editInProgress" prop="data.preferenceInfo.props.fnd0EditEnvironment"></aw-widget>
+                        <aw-widget prop="data.preferenceInfo.props.fnd0Location"> </aw-widget>
+                        <aw-widget prop="data.preferenceInfo.props.fnd0ValueType"> </aw-widget>
+                        <aw-widget prop="data.preferenceInfo.props.fnd0IsMultiValue"> </aw-widget>
+                    </aw-panel-section>
+                </aw-column>
+                <aw-column width="45%">
+                    <!-- Beginning of Values Panel Section -->
+                    <aw-panel-section caption="i18n.Values" collapsed="false" class="aw-preferences-properties">
+                        <aw-property-label exist-when="!ctx.tcadmconsole.preferences.editInProgress" prop="data.valuesTitle">
+                        </aw-property-label>
+                        <div class="aw-widgets-propertyNonEditValue">
+                            <div class="aw-jswidgets-arrayValueCellListItem aw-preferences-value"
+                                exist-when="!ctx.tcadmconsole.preferences.editInProgress"
+                                aw-repeat="val : data.preferenceInfo.props.fnd0PreferenceValues.displayValues track by $index">{{val}}
+                            </div>
+                        </div>
+                        <aw-widget exist-when="ctx.tcadmconsole.preferences.editInProgress"
+                            prop="data.preferenceInfo.props.fnd0PreferenceValues"> </aw-widget>
+                    </aw-panel-section>
+                </aw-column>
+            </aw-panel-body>
+        </aw-panel>
+    </div>
+    <div class="aw-preferences-editButtonsContainer">
+        <aw-button class="aw-preferences-editButtons" action="startEditPreference" exist-when="conditions.showEditButton">
+            <aw-i18n>i18n.startEdit</aw-i18n>
+        </aw-button>
+        <aw-button class="aw-preferences-editButtons" action="cancelPreferenceEdits" button-type="negative" exist-when="conditions.showCancelButton">
+            <aw-i18n>i18n.cancelEdit</aw-i18n>
+        </aw-button>
+        <aw-button class="aw-preferences-editButtons" action="savePreferenceEdits" exist-when="conditions.showSaveButton">
+            <aw-i18n>i18n.saveEdit</aw-i18n>
+        </aw-button>
+        <aw-button button-type="disabled" class="aw-preferences-editButtons" action="savePreferenceEdits" exist-when="conditions.showDisabledSaveButton">
+            <aw-i18n>i18n.saveEdit</aw-i18n>
+        </aw-button>
+    </div>
+</div>

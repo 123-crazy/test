@@ -1,0 +1,103 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [ 
+                "js/aw-panel-section.directive",
+                "js/aw-checkbox.directive"
+               ],
+               
+    "actions":
+    {
+        "initializePackSimilarElements":
+        {
+            "actionType": "dataProvider",
+            "method": "initializePackSimilarElementsInfo"
+        },
+        "initializePackSimilarElementsInfo":
+        {
+            "actionType": "JSFunction",
+            "method": "getInitialPackSimilarElementsConfigurationData",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/packSimilarElementsService"
+        },
+        
+        "togglePackSimilarElements":
+        {
+            "actionType" : "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [       
+                    {
+                        "name": "awConfigPanel.applyPackSimilarElementsToggled",
+                        "eventData": 
+                        {
+                            "toggleValue": "{{data.packSimilarElements.dbValue}}"
+                        },
+                        "condition":"ctx.aceActiveContext.context.productContextInfo.props.awb0PackSimilarElements.dbValues[0] != data.packSimilarElements.dbValue"
+                    }
+                ]
+            }
+        },
+
+        "performTogglePackSimilarElements":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": 
+            {
+                "path": "aceActiveContext.context.configContext",
+                "value":{
+                    "packSimilarElements": "{{data.packSimilarElements.dbValue}}",
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "var_uids": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "de": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "ue": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffUnitNo.dbValues[0]}}",
+                    "ei_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffEndItem.dbValues[0]}}",
+                    "startFreshNavigation": true    
+                }
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "data" :
+    {
+        "packSimilarElements" :
+        {
+            "displayName": "{{i18n.packSimilarElementsText}}",
+            "dbValue" : true,
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "dataProviders": 
+    {
+        "initializePackSimilarElementsInfo": 
+        {
+            "action": "initializePackSimilarElementsInfo"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializePackSimilarElements"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializePackSimilarElements"
+        },
+        {
+           "eventId": "awConfigPanel.applyPackSimilarElementsToggled",
+           "action": "performTogglePackSimilarElements"
+        }  
+    ],
+    "i18n": 
+    {
+        "packSimilarElementsText": ["OccurrenceManagementConstants"]
+    }
+} 

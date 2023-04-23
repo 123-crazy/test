@@ -1,0 +1,399 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [],
+    "data": {},
+    "dataProviders": {
+        "getAllowedTypesLOV": {
+            "initializeAction": "loadObjectTypesAction",
+            "nextAction": "loadObjectTypesAction",
+            "previousAction": "loadObjectTypesAction",
+            "validateAction": "validateSelectedType",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "valid": "true"
+        },
+        "getRefObjectsDataProvider": {
+            "initializeAction": "getRefObjectsAction",
+            "nextAction": "getRefObjectsAction",
+            "previousAction": "getRefObjectsAction",
+            "validateAction": "validateRefObjectAction",
+            "response": "{{data.refObjects}}",
+            "totalFound": "{{data.totalObjectsFound}}"
+        }
+    },
+    "actions": {
+        "loadObjectTypesAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadAllowedTypesJs",
+            "inputData": {
+                "prop": "{{$parent.prop}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "{{function:convertObjSearchResponseToLovEntries}}",
+                "endIndex": "endIndex"
+            },
+            "deps": "js/aceInlineAuthoringHandler"
+        },
+        "validateSelectedType": {
+            "actionType": "JSFunction",
+            "method": "validateSelectedType",
+            "inputData": {
+                "prop": "{{$parent.prop}}"
+            },
+            "deps": "js/aceInlineAuthoringHandler"
+        },
+        "validateRefObjectAction": {
+            "actionType": "JSFunction",
+            "method": "validateRefObject",
+            "inputData": {
+                "prop": "{{$parent.prop}}"
+            },
+            "deps": "js/aceInlineAuthoringHandler"
+        },
+        "getInfoForAddElementAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceManagement",
+            "method": "getInfoForAddElement3",
+            "inputData": {
+                "getInfoForElementIn": {
+                    "parentElement": {
+                        "uid": "{{data.parentElement.uid}}",
+                        "type": "{{data.parentElement.type}}"
+                    },
+                    "fetchAllowedOccRevTypes": "{{data.fetchAllowedOccRevTypes}}"
+                }
+            },
+            "outputData": {
+                "allowedTypeInfo": "{{function:extractAllowedTypesInfoFromResponse}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "aceInlineAuth.getViewModelForCreate",
+                    "eventData": {
+                        "preferredType": "{{data.allowedTypeInfo.preferredType}}"
+                    }
+                } ]
+            },
+            "deps": "js/aceInlineAuthoringHandler"
+        },
+        "getViewModelForCreateAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-DataManagement",
+            "method": "getViewModelForCreate",
+            "inputData": {
+                "input": {
+                    "businessObjectType": "{{data.eventData.preferredType}}",
+                    "propertyNames": "{{data.propertyNames}}",
+                    "parent": {
+                        "uid": "{{data.parentElement.uid}}",
+                        "type": "{{data.parentElement.type}}"
+                    }
+                }
+            },
+            "outputData": {
+                "getViewModelForCreateResponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "aceInlineAuth.processAddRow",
+                    "eventData": {
+                        "getViewModelForCreateResponse": "{{data.getViewModelForCreateResponse}}",
+                        "data": "{{data}}"
+                    }
+                } ],
+                "failure": [ {
+                    "name": "aceInlineAuth.clearInlineEdits"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "genericInlineAuthFailure"
+                } ]
+            },
+            "deps": "js/addElementService"
+        },
+        "createAndAddElement": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2016-09-DataManagement",
+            "method": "createAttachAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{data.creatIn}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObjectsForInline}}"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "aceInlineAuth.objectCreated"
+                } ],
+                "failure": [ {
+                        "name": "addObject.addOprfailed"
+                    },
+                    {
+                        "name": "aceInlineAuth.objectCreated",
+                        "condition": "data.createdObject.length>0"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "genericInlineAuthFailure"
+                } ]
+            },
+            "deps": "js/aceInlineAuthoringUtils"
+        },
+        "addElements": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2021-06-OccurrenceManagement",
+            "method": "addObject3",
+            "inputData": {
+                "input": {
+                    "objectsToBeAdded": "{{function:getElementsToAdd}}",
+                    "parentElement": "{{ctx.aceActiveContext.context.addElementInput.parentElement}}",
+                    "siblingElement": "{{ctx.aceActiveContext.context.addElementInput.siblingElement}}",
+                    "inputCtxt": {
+                        "productContext": "{{ctx.aceActiveContext.context.productContextInfo}}"
+                    },
+                    "sortCriteria": {
+                        "propertyName": "{{ctx.aceActiveContext.context.sortCriteria[0].fieldName}}",
+                        "sortingOrder": "{{ctx.aceActiveContext.context.sortCriteria[0].sortDirection}}"
+                    },
+                    "addObjectIntent": "",
+                    "fetchPagedOccurrences": "{{ctx.aceActiveContext.context.addElementInput.fetchPagedOccurrences}}",
+                    "requestPref": {
+                        "displayMode": [ "{{function:getDisplayMode}}" ],
+                        "structExpanded": [ "{{function:getExpandedValue}}" ]
+                    },
+                    "numberOfElements": 1,
+                    "createInputs": "{{data.elementCreateInputs}}"
+                }
+            },
+            "outputData": {
+                "addElementResponse": "",
+                "totalObjectsAdded": "{{function:getTotalNumberOfChildrenAdded}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "aceInlineAuth.clearCreatedElementField"
+                    },
+                    {
+                        "name": "aceInlineAuth.removeInlineRow",
+                        "condition": "_internal.conditionStates.areNewElementsAdded && ctx.aceActiveContext.inlineAuthoringContext!==undefined"
+                    },
+                    {
+                        "name": "aceInlineAuth.performPostRemove",
+                        "condition": "_internal.conditionStates.areNewElementsAdded && ctx.aceActiveContext.inlineAuthoringContext!==undefined"
+                    },
+                    {
+                        "name": "aceInlineAuth.clearInlineEdits"
+                    }
+                ],
+                "failure": [ {
+                        "name": "aceInlineAuth.clearCreatedElementField"
+                    },
+                    {
+                        "name": "addElement.elementsAdded",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedChildElements}}",
+                            "addElementResponse": "{{data.addElementResponse}}",
+                            "viewToReact": "{{ctx.aceActiveContext.key}}"
+                        },
+                        "condition": "_internal.conditionStates.areNewElementsAdded "
+                    },
+                    {
+                        "name": "aceElementsSelectionUpdatedEvent",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedChildElements}}"
+                        },
+                        "condition": "_internal.conditionStates.areNewElementsAdded "
+                    },
+                    {
+                        "name": "addElement.updateSelectionInPWA",
+                        "eventData": {
+                            "objectToSelect": "{{ctx.aceActiveContext.context.addElement.parent.uid}}"
+                        },
+                        "condition": "_internal.conditionStates.areNewElementsAdded && ctx.aceActiveContext.context.addElementInput.parentElement.uid !== ctx.aceActiveContext.context.addElement.parent.uid"
+                    },
+                    {
+                        "name": "addElement.elementsAddedToSelectedElementFromPWA",
+                        "condition": "_internal.conditionStates.areNewElementsAdded && _internal.conditionStates.addingToSelectedElementFromPWA"
+                    },
+                    {
+                        "name": "aceInlineAuth.clearInlineEdits"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "genericInlineAuthFailure"
+                } ]
+            },
+            "deps": "js/addElementService"
+        },
+        "clearCreatedElementField": {
+            "actionType": "JSFunction",
+            "method": "clearCreatedElementField",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addElementService"
+        },
+        "removeRowAction": {
+            "actionType": "JSFunction",
+            "method": "removeRow",
+            "inputData": {
+                "targetObjects": "{{function:getNewlyAddedChildElements}}"
+            },
+            "deps": "js/aceInlineAuthoringHandler"
+        },
+        "clearInlineEditsAction": {
+            "actionType": "JSFunction",
+            "method": "clearInlineEdits",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceInlineAuthoringHandler"
+        },
+        "performPostRemoveAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "addElement.elementsAdded",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedChildElements}}",
+                            "addElementResponse": "{{data.addElementResponse}}",
+                            "viewToReact": "{{ctx.aceActiveContext.key}}"
+                        }
+                    },
+                    {
+                        "name": "aceElementsSelectionUpdatedEvent",
+                        "eventData": {
+                            "objectsToSelect": "{{function:getNewlyAddedChildElements}}"
+                        }
+                    },
+                    {
+                        "name": "addElement.updateSelectionInPWA",
+                        "eventData": {
+                            "objectToSelect": "{{ctx.aceActiveContext.context.addElement.parent.uid}}"
+                        },
+                        "condition": " ctx.aceActiveContext.context.addElementInput.parentElement.uid !== ctx.aceActiveContext.context.addElement.parent.uid"
+                    },
+                    {
+                        "name": "addElement.elementsAddedToSelectedElementFromPWA",
+                        "condition": " _internal.conditionStates.addingToSelectedElementFromPWA"
+                    }
+                ]
+            },
+            "deps": "js/addElementService"
+        },
+        "getRefObjectsAction": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadRefObjects",
+            "inputData": {
+                "prop": "{{$parent.prop}}"
+            },
+            "outputData": {
+                "totalObjectsFound": "totalFound",
+                "refObjects": "{{function:convertSolrSearchResponseToLovEntries}}",
+                "endIndex": "endIndex"
+            },
+            "deps": "js/aceInlineAuthoringUtils"
+        }
+    },
+    "messages": {
+        "genericInlineAuthFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "aceInlineAuth.getViewModelForCreate",
+            "cacheEventData": true,
+            "action": "getViewModelForCreateAction"
+        },
+        {
+            "eventId": "aceInlineAuth.objectCreated",
+            "cacheEventData": true,
+            "action": "addElements"
+        },
+        {
+            "eventId": "aceInlineAuth.clearCreatedElementField",
+            "action": "clearCreatedElementField"
+        },
+        {
+            "eventId": "aceInlineAuth.clearInlineEdits",
+            "action": "clearInlineEditsAction"
+        },
+        {
+            "eventId": "aceInlineAuth.removeInlineRow",
+            "action": "removeRowAction"
+        },
+        {
+            "eventId": "aceInlineAuth.performPostRemove",
+            "action": "performPostRemoveAction"
+        }
+    ],
+    "conditions": {
+        "areNewElementsAdded": {
+            "expression": "data.totalObjectsAdded>0"
+        },
+        "isTreeMode": {
+            "expression": "ctx.ViewModeContext && (ctx.ViewModeContext.ViewModeContext === 'TreeView' || ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView')"
+        },
+        "addingToSelectedElementFromPWA": {
+            "expression": "ctx.aceActiveContext.context.openedElement.uid !== ctx.aceActiveContext.context.addElement.parent.uid"
+        },
+        "addingToOpenedElement": {
+            "expression": "ctx.aceActiveContext.context.openedElement.uid === ctx.aceActiveContext.context.addElement.parent.uid"
+        }
+    },
+    "functions": {
+        "extractAllowedTypesInfoFromResponse": {
+            "functionName": "extractAllowedTypesInfoFromResponse",
+            "parameters": []
+        },
+        "getElementsToAdd": {
+            "functionName": "getElementsToAdd",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getTotalNumberOfChildrenAdded": {
+            "functionName": "getTotalNumberOfChildrenAdded",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getDisplayMode": {
+            "functionName": "getDisplayMode"
+        },
+        "getExpandedValue": {
+            "functionName": "getExpandedValue",
+            "parameters": []
+        },
+        "getNewlyAddedChildElements": {
+            "functionName": "getNewlyAddedChildElements",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "convertSolrSearchResponseToLovEntries": {
+            "functionName": "convertSolrSearchResponseToLovEntries",
+            "parameters": []
+        },
+        "convertObjSearchResponseToLovEntries": {
+            "functionName": "convertObjSearchResponseToLovEntries",
+            "parameters": []
+        },
+        "getCreatedObjectsForInline": {
+            "functionName": "getCreatedObjectsForInline",
+            "parameters": [
+                "{{response}}"
+            ]
+        }
+    }
+}

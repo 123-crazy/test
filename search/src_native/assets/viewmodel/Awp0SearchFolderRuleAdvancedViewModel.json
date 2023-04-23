@@ -1,0 +1,188 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-property-lov-val.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox-multiselect.directive",
+        "js/aw-repeat.directive",
+        "js/aw-link.directive",
+        "js/aw-advsearch-lov-val.directive",
+        "js/aw-flex-row.directive"
+    ],
+    "data": {
+        "awp0AdvancedQueryName": {},
+        "referencingSavedQuery": {
+            "displayName": "{{i18n.searchCriteria}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.searchFolder.searchCriteria.queryUID}}",
+            "dispValue": "{{ctx.searchFolder.savedQueryName}}"
+        },
+        "searchCriteria": {
+            "type": "STRING"
+        },
+        "advancedSearchClearAll": {
+            "displayName": "{{i18n.advancedSearchClearAll}}",
+            "type": "STRING"
+        }
+    },
+    "actions":
+    {
+        "save":
+        {
+            "actionType": "JSFunction",
+            "method": "editActiveFolder",
+            "inputData": {
+                "parentFolderUID": "",
+                "searchFolderUID": "{{ctx.searchFolder.uid}}",
+                "reportDefinitionUID": "{{function:getReportDefinitionUID}}",
+                "searchCriteria":"{{function:getReportDefinitionCriteriaForSave}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "updateSearchFolder":
+        {
+            "actionType": "JSFunction",
+            "method": "setNonEditMode",
+            "inputData":
+            {
+                "data":"{{data}}",
+                "searchFolderCtx":"{{ctx.searchFolder}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "reviewAndExecuteAdvancedSavedSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "doAdvancedSearch",
+            "inputData":
+            {
+                "data":"{{data}}",
+                "forceRefresh": true
+            },
+            "deps": "js/searchFolderService"
+        },
+        "updateAdvancedSearchContextForSearchFolder":
+        {
+            "actionType": "JSFunction",
+            "method": "updateAdvancedSearchContextForSearchFolder",
+            "inputData":
+            {
+                "searchFolderCtx": "{{ctx.searchFolder}}",
+                "data" : "{{data}}"
+            },
+            "deps": "js/searchFolderService"
+        },
+        "clearAllAction":
+        {
+            "actionType": "JSFunction",
+            "method": "clearAllAction",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/advancedSearchService"
+        },
+        "loadSavedQueryViewModel":
+        {
+            "actionType": "JSFunction",
+            "method": "getAdvancedSearchViewModelFromServer",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/searchFolderService"
+        }
+    },
+    "preferences": [
+        "AWC_DefaultPageSize"
+    ],
+    "functions": {
+        "getDefaultPageSize":
+        {
+            "functionName": "getDefaultPageSize",
+            "parameters":
+            [
+                 "{{data.preferences.AWC_DefaultPageSize}}"
+            ]
+        },
+        "getActualSearchFilterCategories": {
+            "functionName": "getActualSearchFilterCategories",
+            "parameters": ["{{data}}"]
+        },
+        "getReportDefinitionCriteriaForSave":
+        {
+            "functionName": "getReportDefinitionCriteriaForSave",
+            "parameters":
+            [
+                "{{ctx.searchFolder}}",
+                 "{{data}}"
+            ]
+        },
+        "getReportDefinitionUID": {
+            "functionName": "getReportDefinitionUID",
+            "parameters":
+            [
+                "{{ctx.searchFolder.props.awp0SearchDefinition.dbValue}}"
+            ]
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "Awp0SearchFolderRuleAdvanced.contentLoaded",
+            "action": "updateAdvancedSearchContextForSearchFolder"
+        },
+        {
+            "eventId": "searchFolder.revealAdvancedSearchPanel",
+            "action": "updateAdvancedSearchContextForSearchFolder",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "loadSavedQueryViewModel",
+            "action": "loadSavedQueryViewModel"
+        },
+        {
+            "eventId": "searchFolder.save",
+            "action": "save"
+        },
+        {
+            "eventId": "searchFolder.update",
+            "action": "updateSearchFolder"
+        }
+    ],
+     "conditions":
+    {
+        "showSavedQuery":{
+            "expression": "ctx.searchFolder.useRule === 'newRule'"
+        },
+        "showExecuteAdvancedSavedSearchButton":{
+            "expression": "data.awp0AdvancedQueryName && data.awp0AdvancedQueryName.dbValue[0]"
+        },
+        "showAdvancedSavedSearchAttributes":{
+            "expression": "data.awp0AdvancedQueryName && data.awp0AdvancedQueryName.dbValue[0]"
+        },
+        "showClearAll":{
+            "expression": "data.awp0AdvancedQueryAttributes || ctx.searchFolder.searchFilters.length > 0"
+        }
+    },
+
+    "i18n":
+    {
+        "searchCriteria": [ "SearchMessages" ],
+        "advancedSearch": ["SearchMessages"],
+        "reviewAndExecuteAdvancedSavedSearch": ["SearchMessages"],
+        "searchBtn": ["SearchMessages"],
+        "searchString": ["SearchMessages"],
+        "advancedSearchClearAll": ["SearchMessages"]
+    }
+
+}

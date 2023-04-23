@@ -1,0 +1,464 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-listbox.directive",
+        "js/aw-break.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-label.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "compareOption": {
+            "displayName": "{{i18n.CompareOptions}}",
+            "type": "INTEGER",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": "{{ctx.compareContext.depth}}",
+            "dispValue": "{{ctx.compareContext.initDispValue}}"
+        },
+        "FULL_MATCH": {
+            "displayName": "{{i18n.MatchedTitle}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.compareContext.displayOptions.MatchType.FULL_MATCH}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "PARTIAL_MATCH": {
+            "displayName": "{{i18n.DifferentTitle}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.isPartialMatchChecked}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "MISSING_TARGET": {
+            "displayName": "{{i18n.UniqueSourceTitle}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.isMissingTargetChecked}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "MISSING_SOURCE": {
+            "displayName": "{{i18n.UniqueTargetTitle}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.isMissingSourceChecked}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "AC_DYNAMIC_IDIC": {
+            "displayName": "{{i18n.DynamicEquivalenceTitle}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{conditions.isDynamicEquivalenceChecked}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "actionLabel": {
+            "displayName": "{{i18n.Action}}",
+            "type": "STRING",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "uiValue": "{{i18n.Action}}"
+        },
+        "timestampLabel": {
+            "displayName": "{{i18n.Time}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.compareContext.timestampOfStoredResults}}",
+            "dispValue": "{{ctx.compareContext.timestampOfStoredResults}}"
+        },
+        "backgroundOption": {
+            "displayName": "{{i18n.BackgroundOption}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": ""
+        },
+        "isLicensePresent": false
+    },
+    "dataProviders": {
+        "getSourceDiffResults": {
+            "initializeAction": "getSourceDifferences",
+            "nextAction": "getNextSourceDifferences",
+            "response": "{{data.sourceDifferences}}",
+            "totalFound": "{{data.srcTotalFound}}",
+            "selectionModelMode": "single",
+            "inputData": {
+                "selectionModel": "{{ctx.occmgmtContext.pwaSelectionModel}}"
+            },
+            "focusAction": "fakeAction"
+        },
+
+        "getTargetDiffResults": {
+            "initializeAction": "getTargetDifferences",
+            "nextAction": "getNextTargetDifferences",
+            "response": "{{data.targetDifferences}}",
+            "totalFound": "{{data.trgTotalFound}}",
+            "selectionModelMode": "single",
+            "inputData": {
+                "selectionModel": "{{ctx.occmgmtContext2.pwaSelectionModel}}"
+            },
+            "focusAction": "fakeAction"
+        }
+    },
+    "actions": {
+        "revealCompareOptions": {
+            "actionType": "JSFunctionAsync",
+            "method": "getCompareOptions",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/awStructureCompareOptionsService"
+        },
+        "resetCompareContext": {
+            "actionType": "JSFunction",
+            "method": "resetCompareContext",
+            "deps": "js/structureCompareService"
+        },
+        "resetMultiLevelCompare2": {
+            "actionType": "JSFunction",
+            "method": "resetMultiLevelCompare",
+            "deps": "js/awStructureCompareService"
+        },
+        "getSourceDifferences": {
+            "actionType": "JSFunction",
+            "method": "getFirstSourceDifferences",
+            "inputData": {
+                "cursorObject": "{{data.dataProviders.getSourceDiffResults.cursorObject}}"
+            },
+            "outputData": {
+                "sourceDifferences": "sourceDifferences",
+                "totalFound": "totalFound",
+                "dataProviders.getSourceDiffResults.cursorObject": "cursorObject"
+            },
+            "deps": "js/awStructureCompareDiffService"
+        },
+        "getTargetDifferences": {
+            "actionType": "JSFunction",
+            "method": "getFirstTargetDifferences",
+            "inputData": {
+                "cursorObject": "{{data.dataProviders.getTargetDiffResults.cursorObject}}"
+            },
+            "outputData": {
+                "targetDifferences": "targetDifferences",
+                "totalFound": "totalFound",
+                "dataProviders.getTargetDiffResults.cursorObject": "cursorObject"
+            },
+            "deps": "js/awStructureCompareDiffService"
+        },
+        "getNextSourceDifferences": {
+            "actionType": "JSFunction",
+            "method": "getNextSourceDifferences",
+            "inputData": {
+                "cursorObject": "{{data.dataProviders.getSourceDiffResults.cursorObject}}"
+            },
+            "outputData": {
+                "sourceDifferences": "sourceDifferences",
+                "totalFound": "totalFound",
+                "dataProviders.getSourceDiffResults.cursorObject": "cursorObject"
+            },
+            "deps": "js/awStructureCompareDiffService"
+        },
+        "getNextTargetDifferences": {
+            "actionType": "JSFunction",
+            "method": "getNextTargetDifferences",
+            "inputData": {
+                "cursorObject": "{{data.dataProviders.getTargetDiffResults.cursorObject}}"
+            },
+            "outputData": {
+                "targetDifferences": "targetDifferences",
+                "totalFound": "totalFound",
+                "dataProviders.getTargetDiffResults.cursorObject": "cursorObject"
+            },
+            "deps": "js/awStructureCompareDiffService"
+        },
+        "fakeAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "fakeEvent"
+                } ]
+            }
+        },
+        "revealSourceDiff": {
+            "actionType": "dataProvider",
+            "method": "getSourceDiffResults"
+        },
+        "revealTargetDiff": {
+            "actionType": "dataProvider",
+            "method": "getTargetDiffResults"
+        },
+        "performCompare": {
+            "actionType": "JSFunction",
+            "method": "executeFromComparePanel",
+            "inputData": {
+                "usrSelectedDepth": "{{data.compareOption.dbValue}}",
+                "backgroundOption": "{{data.backgroundOption.dbValue}}"
+            },
+            "outputData": {},
+            "deps": "js/structureCompareService",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "performCompareFailure"
+                    }
+                ]
+            }
+        },
+        "handleSourceSelectionModel": {
+            "actionType": "JSFunction",
+            "method": "navigateDifferences",
+            "inputData": {
+                "gridLocation": 1,
+                "selection": "{{data.dataProviders.getSourceDiffResults.selectedObjects}}",
+                "triggeredFromDiffPanel": true
+            },
+            "deps": "js/awStructureCompareService"
+        },
+        "handleTargetSelectionModel": {
+            "actionType": "JSFunction",
+            "method": "navigateDifferences",
+            "inputData": {
+                "gridLocation": 2,
+                "selection": "{{data.dataProviders.getTargetDiffResults.selectedObjects}}",
+                "triggeredFromDiffPanel": true
+            },
+            "deps": "js/awStructureCompareService"
+        },
+        "resetCompareOptions": {
+            "actionType": "JSFunction",
+            "method": "resetCompareOption",
+            "outputData": {
+                "data.backgroundOption.dbValue": "oldOptionValue"
+            },
+            "deps": "js/structureCompareService"
+        },
+        "focusSourceDiffResults": {
+            "actionType": "JSFunction",
+            "method": "focusDiffResults",
+            "inputData": {
+                "gridLocation": 1,
+                "dataProvider": "{{data.dataProviders.getSourceDiffResults}}"
+            },
+            "deps": "js/awStructureCompareService"
+        },
+        "focusTargetDiffResults": {
+            "actionType": "JSFunction",
+            "method": "focusDiffResults",
+            "inputData": {
+                "gridLocation": 2,
+                "dataProvider": "{{data.dataProviders.getTargetDiffResults}}"
+            },
+            "deps": "js/awStructureCompareService"
+        },
+        "updateFullMatch": {
+            "actionType": "JSFunction",
+            "method": "updateMatchTypes",
+            "inputData": {
+                "property": "{{data.FULL_MATCH}}"
+            },
+            "deps": "js/awStructureCompareOptionsService"
+        },
+        "updatePartialMatch": {
+            "actionType": "JSFunction",
+            "method": "updateMatchTypes",
+            "inputData": {
+                "property": "{{data.PARTIAL_MATCH}}"
+            },
+            "deps": "js/awStructureCompareOptionsService"
+        },
+        "updateMissingSource": {
+            "actionType": "JSFunction",
+            "method": "updateMatchTypes",
+            "inputData": {
+                "property": "{{data.MISSING_SOURCE}}"
+            },
+            "deps": "js/awStructureCompareOptionsService"
+        },
+        "updateMissingTarget": {
+            "actionType": "JSFunction",
+            "method": "updateMatchTypes",
+            "inputData": {
+                "property": "{{data.MISSING_TARGET}}"
+            },
+            "deps": "js/awStructureCompareOptionsService"
+        },
+        "updateDynamicIDIC": {
+            "actionType": "JSFunction",
+            "method": "updateEquivalenceTypes",
+            "inputData": {
+                "property": "{{data.AC_DYNAMIC_IDIC}}"
+            },
+            "deps": "js/awStructureCompareOptionsService"
+        },
+        "setUpCompareContext": {
+            "actionType": "JSFunction",
+            "method": "setUpCompareContext",
+            "deps": "js/structureCompareService"
+        }
+    },
+    "conditions": {
+        "isInCompareMode": {
+            "expression": "ctx.compareContext != undefined && ( ctx.compareContext.isInCompareMode || ctx.compareContext.isInMultiLevelCompare)"
+        },
+        "isPartialMatchChecked": {
+            "expression": "ctx.compareContext.displayOptions.MatchType.PARTIAL_MATCH"
+        },
+        "isMissingTargetChecked": {
+            "expression": "ctx.compareContext.displayOptions.MatchType.MISSING_TARGET"
+        },
+        "isMissingSourceChecked": {
+            "expression": "ctx.compareContext.displayOptions.MatchType.MISSING_SOURCE"
+        },
+        "isDynamicEquivalenceChecked": {
+            "expression": "ctx.compareContext.displayOptions.Equivalence.AC_DYNAMIC_IDIC"
+        },
+        "isEquivalenceSectionVisible": {
+            "expression": "data.isLicensePresent"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Awb0Compare.contentLoaded",
+            "action": "setUpCompareContext"
+        },
+        {
+            "eventId": "Awb0Compare.contentLoaded",
+            "condition": "conditions.isInCompareMode",
+            "action": "revealSourceDiff"
+        },
+        {
+            "eventId": "Awb0Compare.contentLoaded",
+            "condition": "conditions.isInCompareMode",
+            "action": "revealTargetDiff"
+        },
+        {
+            "eventId": "getSourceDiffResults.reset",
+            "action": "revealSourceDiff"
+        },
+        {
+            "eventId": "getTargetDiffResults.reset",
+            "action": "revealTargetDiff"
+        },
+        {
+            "eventId": "getSourceDiffResults.selectionChangeEvent",
+            "action": "handleSourceSelectionModel"
+        },
+        {
+            "eventId": "getTargetDiffResults.selectionChangeEvent",
+            "action": "handleTargetSelectionModel"
+        },
+        {
+            "eventId": "comparePanel.compareOptionsReset",
+            "action": "resetCompareOptions"
+        },
+        {
+            "eventId": "getSourceDiffResults.focusSelection",
+            "action": "focusSourceDiffResults"
+        },
+        {
+            "eventId": "getTargetDiffResults.focusSelection",
+            "action": "focusTargetDiffResults"
+        },
+        {
+            "eventId": "revealComparePanel",
+            "action": "revealCompareOptions"
+        }
+    ],
+    "messages": {
+        "performCompareFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "StructureCompareDifferenceTitle": [
+            "StructureCompareConstants"
+        ],
+        "SingleLevelCompare": [
+            "StructureCompareConstants"
+        ],
+        "MultiLevelCompare": [
+            "StructureCompareConstants"
+        ],
+        "ComponentLevelCompare": [
+            "StructureCompareConstants"
+        ],
+        "compareButtonTitle": [
+            "StructureCompareConstants"
+        ],
+        "Action": [
+            "StructureCompareConstants"
+        ],
+        "noDifferences": [
+            "StructureCompareConstants"
+        ],
+        "CompareOptions": [
+            "StructureCompareConstants"
+        ],
+        "BackgroundOption": [
+            "StructureCompareConstants"
+        ],
+        "Time": [
+            "StructureCompareConstants"
+        ],
+        "totalDifferences": [
+            "StructureCompareConstants"
+        ],
+        "LevelsTitle": [
+            "StructureCompareConstants"
+        ],
+        "DisplayTitle": [
+            "StructureCompareConstants"
+        ],
+        "EquivalenceTitle": [
+            "StructureCompareConstants"
+        ],
+        "resultsTitle": [
+            "StructureCompareConstants"
+        ],
+        "MatchedTitle": [
+            "StructureCompareConstants"
+        ],
+        "DifferentTitle": [
+            "StructureCompareConstants"
+        ],
+        "UniqueSourceTitle": [
+            "StructureCompareConstants"
+        ],
+        "UniqueTargetTitle": [
+            "StructureCompareConstants"
+        ],
+        "DynamicEquivalenceTitle": [
+            "StructureCompareConstants"
+        ],
+        "compareTitle": [
+            "CompareSplitViewConstants"
+        ],
+        "RevisionRule": [
+            "CompareSplitViewConstants"
+        ],
+        "emptyCompareResults": [
+            "CompareSplitViewConstants"
+        ]
+    }
+}

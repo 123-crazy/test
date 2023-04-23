@@ -1,0 +1,63 @@
+<aw-command-panel caption="i18n.Aqc0AddCharSpecificationTitle" anchor="data.Aqc0pinCommands" context="data">
+    <aw-panel-body>
+        <aw-widget class="aw-qualitycharacteristicsmanager-awWidget" prop="data.objectName"
+            exist-when="ctx.isTC13_2OnwardsSupported"></aw-widget>
+        <aw-xrt class="aw-qualitycharacteristicsmanager-createXrtPanel" type="CREATE"
+            object-type="{{data.createObject.type}}"></aw-xrt>
+        <div exist-when="ctx.isClassificationPropSupported">
+            <aw-listbox class="aw-qualitycharacteristicsmanager-listBox" prop="data.qc0Criticality"
+                list="data.qc0CriticalityList"></aw-listbox>
+        </div>
+        <div exist-when="ctx.isOkConditionPropSupported">
+            <aw-widget class="aw-qualitycharacteristicsmanager-awWidget"
+                exist-when="data.objCreateInfo.createType =='Qc0AttributiveCharSpec'" prop="data.qc0OkDescription">
+            </aw-widget>
+            <aw-widget class="aw-qualitycharacteristicsmanager-awWidget"
+                exist-when="data.objCreateInfo.createType =='Qc0AttributiveCharSpec'" prop="data.qc0NokDescription">
+            </aw-widget>
+        </div>
+        <aw-listbox class="aw-qualitycharacteristicsmanager-listBox"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec' && ctx.isLimitationSupported"
+            prop="data.qc0limitation" list="data.limitationList"></aw-listbox>
+        <aw-listbox class="aw-qualitycharacteristicsmanager-listBox"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec'" prop="data.qc0UnitOfMeasure"
+            list="data.unitOfMeasureList"></aw-listbox>
+        <aw-widget class="aw-qualitycharacteristicsmanager-awWidget"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec'" prop="data.qc0NominalValue"></aw-widget>
+        <aw-listbox class="aw-qualitycharacteristicsmanager-listBox"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec' && ctx.isToleranceTypeSupported"
+            prop="data.qc0ToleranceType" list="data.ToleranceTypeList"></aw-listbox>
+        <aw-widget class="aw-qualitycharacteristicsmanager-awWidget"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec' && data.qc0limitation.dbValue !='Up'"
+            prop="data.qc0UpperTolerance"></aw-widget>
+        <aw-widget class="aw-qualitycharacteristicsmanager-awWidget"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec' && (data.qc0limitation.dbValue =='Both Sides' || data.qc0limitation.dbValue =='Up')"
+            prop="data.qc0LowerTolerance"></aw-widget>
+        <aw-widget class="aw-qualitycharacteristicsmanager-awWidget"
+            exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec' && !ctx.isLimitationSupported"
+            prop="data.qc0LowerTolerance"></aw-widget>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <div exist-when="ctx.isTC13_2OnwardsSupported">
+            <aw-button action="createCharSpecVar" visible-when="(awPanelBody.$valid)"
+                exist-when="data.objCreateInfo.createType =='Qc0VariableCharSpec'">
+                <aw-i18n>i18n.addButtonTitle</aw-i18n>
+            </aw-button>
+            <aw-button action="createCharSpecAtt" visible-when="(awPanelBody.$valid)"
+                exist-when="data.objCreateInfo.createType =='Qc0AttributiveCharSpec'">
+                <aw-i18n>i18n.addButtonTitle</aw-i18n>
+            </aw-button>
+            <aw-button action="createCharSpecVis" visible-when="(awPanelBody.$valid)"
+                exist-when="data.objCreateInfo.createType =='Qc0VisualCharSpec'">
+                <aw-i18n>i18n.addButtonTitle</aw-i18n>
+            </aw-button>
+        </div>
+    </aw-panel-footer>
+    <aw-panel-footer>
+        <div exist-when="!ctx.isTC13_2OnwardsSupported">
+            <aw-button action="generateNextValuesAndSubmit" visible-when="(awPanelBody.$valid)">
+                <aw-i18n>i18n.addButtonTitle</aw-i18n>
+            </aw-button>
+        </div>
+    </aw-panel-footer>
+</aw-command-panel>

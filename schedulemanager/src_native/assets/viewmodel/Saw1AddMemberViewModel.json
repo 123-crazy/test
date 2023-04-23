@@ -1,0 +1,145 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-listbox.directive",
+        "js/visible-when.directive",
+        "js/aw-break.directive"
+    ],
+    "actions": {
+      "add": {
+        "actionType": "Event",
+        "method": "Event",
+        "inputData": {
+            "events": [
+                {
+                    "condition": "data.selectedTab.panelId ==='UserSub'",
+                    "name": "addUser"
+                },
+                {
+                    "condition": "data.selectedTab.panelId ==='Saw1AddResourcePoolToSchedule'",
+                    "name": "assignResourcePoolSOA"
+                },
+                {
+                    "condition": "data.selectedTab.panelId ==='Saw1AddDisciplinesToSchedule'",
+                    "name": "addDisciplinesToScheduleEvent"
+                }
+            ]
+        }
+    },
+    "saw1SetPin": {
+        "actionType": "JSFunction",
+        "method": "setPin",
+        "inputData": {
+            "data": "{{data.eventData.data}}"
+        },
+        "outputData": {},
+        "deps": "js/addObjectUtils"
+    },
+    "saw1SetUnPin": {
+        "actionType": "JSFunction",
+        "method": "setUnPin",
+        "inputData": {
+            "data": "{{data.eventData.data}}"
+        },
+        "outputData": {},
+        "deps": "js/addObjectUtils"
+    }
+    },
+    "data": {
+    "membershipData": {
+            "displayName": "{{i18n.role}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": "{{i18n.participant}}"
+    },
+    "membershipDataValues": {
+        "type": "STRING",
+        "dbValue": [
+            {
+                "propDisplayValue": "{{i18n.participant}}",
+                "propInternalValue": "{{i18n.participant}}"
+            },
+            {
+                "propDisplayValue": "{{i18n.observer}}",
+                "propInternalValue": "{{i18n.observer}}"
+            },
+            {
+                "propDisplayValue": "{{i18n.coordinator}}",
+                "propInternalValue": "{{i18n.coordinator}}"
+            }
+        ]
+     },
+     "saw1Pincommands":"saw1_oneStepPinCommands",
+        "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    
+    "messages": {
+        "AddMemberComplete": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addMemberSuccessful}}",
+            "messageTextParams": [
+                "{{data.userObject.props.user_name.dbValues[0]}}"
+            ]
+        }
+    },
+
+    "conditions": {
+        "isValidToAdd": {
+         "expression": "(data.dataProviders.getResourcePool.selectedObjects.length > 0 && data.selectedTab.panelId === 'Saw1AddResourcePoolToSchedule') || (data.dataProviders.userPerformSearch.selectedObjects.length > 0 && data.selectedTab.panelId === 'UserSub') || (data.dataProviders.getDisciplines.selectedObjects.length > 0 && data.selectedTab.panelId === 'Saw1AddDisciplinesToSchedule') "
+        },
+        "showList":{
+          "expression": "data.selectedTab.panelId !=='Saw1AddDisciplinesToSchedule'"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetPin",
+            "cacheEventData": true,
+            "action": "saw1SetPin"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetUnPin",
+            "cacheEventData": true,
+            "action": "saw1SetUnPin"
+        }
+    ],
+    "i18n": {
+        "users": [
+            "ScheduleManagerMessages"
+        ],
+        "addButtonText": [
+            "ScheduleManagerMessages"
+        ],
+        "observer": [
+            "ScheduleManagerMessages"
+        ],
+        "coordinator": [
+            "ScheduleManagerMessages"
+        ],
+        "participant": [
+            "ScheduleManagerMessages"
+        ],
+        "role": [
+            "ScheduleManagerMessages"
+        ],
+        "add": [
+          "ScheduleManagerMessages"
+        ]
+    }
+}

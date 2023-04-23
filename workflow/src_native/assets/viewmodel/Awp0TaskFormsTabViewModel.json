@@ -1,0 +1,248 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-workflow-handler-table.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": [
+                    "{{ctx.selected}}"
+                ],
+                "attributes": [
+                    "template_name",
+                    "action_handlers",
+                    "complete_action_rules"
+                ]
+            },
+            "policy": {
+                "types": [ {
+                        "name": "EPMTaskTemplate",
+                        "properties": [
+                            {
+                                "name": "template_name"
+                            },
+                            {
+                                "name": "object_desc"
+                            },
+                            {
+                                "name": "fnd0Instructions"
+                            },
+                            {
+                                "name": "action_handlers",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "complete_action_rules",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+
+                        ]
+                    },
+                    {
+                        "name": "EPMHandler",
+                        "properties":
+                        [
+                           {
+                              "name": "arguments"
+                           },
+                           {
+                                "name": "parent_action_type"
+                           },
+                           {
+                                "name": "handler_name"
+                           }
+                        ]
+                    },
+                    {
+                        "name": "EPMBusinessRule",
+                        "properties": [ {
+                                "name": "rule_handlers",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "object_name"
+                            },
+                            {
+                                "name": "rule_quorum"
+                            },
+                            {
+                                "name":"action"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "epmTaskTemplate.formPropertiesLoaded"
+                    }
+                ]
+            },
+            "deps": "js/Awp0WorkflowTemplateFormService"
+        },
+        "populateFormTableData": {
+            "actionType": "JSFunction",
+            "method": "populateFormTableData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "selection": "{{ctx.selected}}",
+                "dataProvider": "{{data.dataProviders.formDataProvider}}"
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            },
+            "deps": "js/Awp0WorkflowTemplateFormService"
+        },
+        "reloadPanel" : {
+            "actionType": "JSFunction",
+            "method": "reloadPanel",
+            "inputData":
+            {
+                "selection": "{{ctx.selected}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateFormService"
+        },
+        "formHandlerRowSelectionAction":
+        {
+            "actionType": "JSFunction",
+            "method": "formHandlerRowSelection",
+            "inputData":
+            {
+               "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0WorkflowTemplateFormService"
+        }
+    },
+    "functions": {
+    },
+    "columnProviders": {
+        "tableColumnProvider" : {
+            "soaEnabled": false,
+            "sortCriteria": [],
+            "columns": [
+                {
+                    "name": "formType",
+                    "displayName": "{{i18n.formType}}",
+                    "minWidth": 100,
+                    "width": 300,
+                    "pinnedLeft": false,
+                    "isTableCommand":false,
+                    "enableColumnHiding": false
+                },
+                {
+                    "name": "formName",
+                    "displayName": "{{i18n.formName}}",
+                    "width": 350,
+                    "isTreeNavigation": false,
+                    "isTableCommand" : false,
+                    "minWidth" : 100,
+                    "enableColumnHiding": false
+                },
+                {
+                    "name": "description",
+                    "displayName": "{{i18n.Description}}",
+                    "width": 350,
+                    "isTreeNavigation": false,
+                    "isTableCommand" : false,
+                    "minWidth" : 100,
+                    "enableColumnHiding": false
+                },
+                {
+                    "name": "target",
+                    "displayName": "{{i18n.attachAs}}",
+                    "width": 350,
+                    "isTreeNavigation": false,
+                    "isTableCommand" : false,
+                    "minWidth" : 100,
+                    "enableColumnHiding": false
+                }
+            ]
+        }
+    },
+    "dataProviders": {
+        "formDataProvider": {
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "searchIndex": "{{data.searchIndex}}"
+        }
+    },
+
+    "grids": {
+        "formHandlerTable": {
+            "columnProvider": "tableColumnProvider",
+            "dataProvider": "formDataProvider",
+            "enableArrangeMenu": false,
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        }
+    },
+    "data": {
+        "formAnchor": "aw_workflowFormsAnchor"
+    },
+    "onEvent": [
+        {
+            "eventId": "Awp0TaskFormsTab.contentLoaded",
+            "condition": "ctx.selected",
+            "action": "reveal"
+        },
+        {
+            "eventId": "epmTaskTemplate.formPropertiesLoaded",
+            "action": "populateFormTableData"
+        },
+        {
+            "eventId": "workflowDesigner.tabReload",
+            "action": "reloadPanel"
+        },
+        {
+            "eventId": "formDataProvider.selectionChangeEvent",
+            "action": "formHandlerRowSelectionAction"
+        },
+        {
+            "eventId": "workflowGraph.selectionChanged",
+            "action": "reveal"
+        }
+    ],
+    "i18n": {
+        "action_type": [ "WorkflowDesignerMessages" ],
+        "formType": [ "WorkflowDesignerMessages" ],
+        "Description": [ "WorkflowCommandPanelsMessages" ],
+        "attachAs": [ "WorkflowDesignerMessages" ],
+        "taskStarted": [ "WorkflowDesignerMessages" ],
+        "taskPerformed": [ "WorkflowDesignerMessages" ],
+        "formName": [ "WorkflowDesignerMessages" ],
+        "target": [ "WorkflowDesignerMessages" ],
+        "reference": [ "WorkflowDesignerMessages" ],
+        "forms": [ "WorkflowDesignerMessages" ]
+    }
+}

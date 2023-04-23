@@ -1,0 +1,380 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-action-cell.directive",
+        "js/aw-scrollpanel.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "panelBuilderReveal": {
+            "actionType": "dataProvider",
+            "method": "actionsDataProvider"
+        },
+        "commandBuilderReveal": {
+            "actionType": "dataProvider",
+            "method": "commandActionsDataProvider"
+        },
+        "retrieveActions": {
+            "actionType": "JSFunctionAsync",
+            "method": "retrieveActions",
+            "inputData": {
+                "viewModelId": "{{ctx.state.params.viewModelId}}",
+                "filter": "{{ctx.search.criteria.searchString}}"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "actions"
+            } ],
+            "outputData": {
+                "actionList": "actions",
+                "totalFound": "actions.length",
+                "ctx.search.totalFound": "actions.length"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "retrieveCommandActions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{ctx.search.criteria.searchString}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data._cursorObject.endIndex}}",
+                            "endReached": "{{data._cursorObject.endReached}}",
+                            "startIndex": "{{data._cursorObject.startIndex}}",
+                            "startReached": "{{data._cursorObject.startReached}}",
+                            "pagingType": "GetCurrentPage",
+                            "focusId": "{{ctx.state.params.s_uid}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.prevCursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.nextCursorObject": "data.actions.cursor",
+                "ctx.search.totalFound": "data.actions.totalFound"
+            }
+        },
+        "retrieveCommandActionsNext": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{ctx.search.criteria.searchString}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.commandActionsDataProvider.nextCursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.commandActionsDataProvider.nextCursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.commandActionsDataProvider.nextCursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.commandActionsDataProvider.nextCursorObject.startReached}}",
+                            "pagingType": "GetNextPage"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject.endReached": "data.actions.cursor.endReached",
+                "dataProviders.commandActionsDataProvider.nextCursorObject": "data.actions.cursor",
+                "ctx.search.totalFound": "data.actions.totalFound"
+            }
+        },
+        "retrieveCommandActionsPrevious": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{ctx.search.criteria.searchString}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": "{{data.dataProviders.commandActionsDataProvider.prevCursorObject.endIndex}}",
+                            "endReached": "{{data.dataProviders.commandActionsDataProvider.prevCursorObject.endReached}}",
+                            "startIndex": "{{data.dataProviders.commandActionsDataProvider.prevCursorObject.startIndex}}",
+                            "startReached": "{{data.dataProviders.commandActionsDataProvider.prevCursorObject.startReached}}",
+                            "pagingType": "GetPreviousPage"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject.startReached": "data.actions.cursor.startReached",
+                "dataProviders.commandActionsDataProvider.prevCursorObject": "data.actions.cursor",
+                "ctx.search.totalFound": "data.actions.totalFound"
+            }
+        },
+        "retrieveCommandActionsFocus": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String, $viewModelId:ID, $cursor:CursorInput){actions(filter:$filter, viewModelId:$viewModelId, cursor:$cursor){actions { id }, cursor { endIndex endReached startIndex startReached }, totalFound}}",
+                    "variables": {
+                        "filter": "{{ctx.search.criteria.searchString}}",
+                        "viewModelId": "{{ctx.state.params.viewModelId}}",
+                        "cursor": {
+                            "endIndex": 0,
+                            "endReached": false,
+                            "startIndex": 0,
+                            "startReached": true,
+                            "pagingType": "GetCurrentPage",
+                            "focusId": "{{ctx.state.params.s_uid}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "dataParsers": [ {
+                "id": "actions",
+                "responseObjs": "data.actions.actions"
+            } ],
+            "outputData": {
+                "actionList": "data.actions.actions",
+                "totalFound": "data.actions.totalFound",
+                "dataProviders.commandActionsDataProvider.cursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.prevCursorObject": "data.actions.cursor",
+                "dataProviders.commandActionsDataProvider.nextCursorObject": "data.actions.cursor",
+                "ctx.search.totalFound": "data.actions.totalFound"
+            }
+        },
+        "fireRefreshBreadCrumbEvent": {
+            "actionType": "JSFunction",
+            "method": "fireRefreshBreadCrumbEvent",
+            "inputData": {
+                "viewModelId": "{{ctx.state.params.viewModelId}}",
+                "selectedObjectId": "{{ctx.selected.uid}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "loadViewModel": {
+            "actionType": "JSFunction",
+            "method": "loadViewModel",
+            "inputData": {
+                "viewModelId": "{{ctx.state.params.viewModelId}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "discardChanges": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "actionBuilder.confirmUnsavedChanges",
+                    "eventData": {
+                        "action": "discard"
+                    }
+                } ]
+            }
+        },
+        "saveChanges": {
+            "actionType": "JSFunctionAsync",
+            "method": "saveActionFlow",
+            "inputData": {
+                "context": "{{ctx}}",
+                "persistentSave": true
+            },
+            "events": {
+                "success": [ {
+                        "name": "actionBuilder.confirmUnsavedChanges",
+                        "eventData": {
+                            "action": "save"
+                        }
+                    },
+                    {
+                        "name": "wysiwyg.updateConfigService"
+                    }
+                ],
+                "failure": [ {
+                    "name": "actionBuilder.confirmUnsavedChanges",
+                    "eventData": {
+                        "action": "cancel"
+                    }
+                } ]
+            },
+            "deps": "js/saveActionFlowService"
+        },
+        "confirmUnsavedChangesAction": {
+            "actionType": "JSFunction",
+            "method": "unsavedChangesAction",
+            "inputData": {
+                "data": "{{data.eventMap['actionBuilder.confirmUnsavedChanges']}}"
+            },
+            "deps": "js/saveActionFlowService"
+        },
+        "actionListMountAction": {
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "panelBuilderReveal",
+                    "condition": "conditions.shouldPanelBuilderReveal"
+                },
+                {
+                    "action": "commandBuilderReveal",
+                    "condition": "conditions.shouldCommandBuilderReveal"
+                },
+                {
+                    "action": "fireRefreshBreadCrumbEvent"
+                },
+                {
+                    "action": "loadViewModel",
+                    "condition": "conditions.shouldViewModelLoad"
+                }
+            ]
+        }
+    },
+
+    "data": {
+        "_cursorObject": {
+            "endIndex": 0,
+            "endReached": false,
+            "startIndex": 0,
+            "startReached": true,
+            "focusId": "{{ctx.state.params.s_uid}}"
+        }
+    },
+
+    "dataProviders": {
+        "actionsDataProvider": {
+            "action": "retrieveActions",
+            "response": "{{data.actionList}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            }
+        },
+        "commandActionsDataProvider": {
+            "action": "retrieveCommandActions",
+            "nextAction": "retrieveCommandActionsNext",
+            "previousAction": "retrieveCommandActionsPrevious",
+            "focusAction": "retrieveCommandActionsFocus",
+            "response": "{{data.actionList}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            }
+        }
+    },
+    "dataParseDefinitions": {
+        "actions": {
+            "cellHeader1": "{{response.id}}",
+            "uid": "{{response.id}}",
+            "cellHeader2": "{{response.cellHeader2}}",
+            "cellProperties": "{{response.cell_properties}}",
+            "thumbnailURL": "{{response.thumbnailURL}}",
+            "type": "{{response.type}}",
+            "typeHierarchy": "{{response.typeHierarchy}}",
+            "hasThumbnail": "{{response.hasThumbnail}}",
+            "identifier": "{{response.uid}}",
+            "indicators": "{{response.indicators}}",
+            "props": "{{response.props}}"
+        }
+    },
+
+    "conditions": {
+        "shouldPanelBuilderReveal": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions' && ctx.state.params.viewModelId"
+        },
+        "shouldCommandBuilderReveal": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0Actions'"
+        },
+        "shouldViewModelLoad": {
+            "expression": "ctx.sublocation.clientScopeURI === 'Awp0WysiwygActions' && ctx.state.params.viewModelId"
+        }
+    },
+
+    "messages": {
+        "confirmLeave": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.navigationConfirmationSingle}}",
+            "messageTextParams": [
+                "{{ctx.state.processed.s_uid}}"
+            ],
+
+            "navigationOptions": [
+                {
+                    "option": "Discard",
+                    "text": "{{i18n.discard}}",
+                    "action": "discardChanges"
+                },
+                {
+                    "option": "Save",
+                    "text": "{{i18n.save}}",
+                    "action": "saveChanges"
+                }
+            ]
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "fireRefreshBreadCrumbEvent"
+        },
+        {
+            "eventId": "actionsList.notifyConfigChange",
+            "condition": "ctx.sublocation.clientScopeURI === 'Awp0Actions'",
+            "action": "notifyConfigChange"
+        },
+        {
+            "eventId": "actionBuilder.confirmLeave",
+            "condition": "view === 'Graph'",
+            "message": "confirmLeave"
+        },
+        {
+            "eventId": "actionBuilder.confirmUnsavedChanges",
+            "cacheEventData": true,
+            "action": "confirmUnsavedChangesAction"
+        }
+    ],
+    "i18n": {
+        "navigationConfirmationSingle": [
+            "locationMessages"
+        ],
+        "discard": [
+            "XRTMessages"
+        ],
+        "save": [
+            "XRTMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onMount": "actionListMountAction"
+    }
+}

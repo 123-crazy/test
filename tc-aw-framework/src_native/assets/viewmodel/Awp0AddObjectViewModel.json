@@ -1,0 +1,190 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/enable-when.directive"
+    ],
+    "actions": {
+        "createObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateObject"
+                } ]
+            }
+        },
+        "updateCtxVariable": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "register",
+                "name": "addItemEventProgressing",
+                "value": true
+            }
+        },
+        "createRelationForPaletteOrSearch": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateRelation"
+                } ]
+            }
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+            "deps": "js/autoAssignService"
+        },
+        "clearAddContext": {
+            "actionType": "JSFunction",
+            "deps": "js/appCtxService",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "0": "addObject"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "condition": "!data.isDestroyed()",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "clearAddEventProgContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "0": "addItemEventProgressing"
+            },
+            "deps": "js/appCtxService"
+        },
+        "checkIfValidToClosePanel":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "updateAddContextClosePanel",
+                    "condition": "conditions.isValidToClose"
+                }
+            ]
+        },
+        "updateAddContextClosePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "!data.isDestroyed()",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "updateAddContextKeepPanelOpen": {
+            "actionType": "JSFunction",
+            "deps": "js/addObjectUtils",
+            "method": "updateAddObjectContext",
+            "inputData": {}
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        },
+        {
+            "eventId": "appCtx.register",
+            "condition": "name === 'mselected' || name === 'selected'",
+            "action": "checkIfValidToClosePanel"
+        },
+        {
+            "eventId": "Awp0ShowCreateObject.contentUnloaded",
+            "action": "clearAddContext"
+        },
+        {
+            "eventId": "addObject.startCreateObject",
+            "action": "updateCtxVariable"
+        },
+        {
+            "eventId": "Awp0AddObject.contentUnloaded",
+            "action": "clearAddEventProgContext",
+            "condition": "data.pinnedToForm.dbValue"
+        },
+        {
+            "eventId": "pasteItem.commitFailed",
+            "action": "clearAddEventProgContext"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddAndSubmitButtonVisible": {
+            "expression": "data.revision__awp0ProcessTemplates.dbValue && (data.selectedTab.panelId==='newTabPageSub' && ( ( data.creationType && data.objCreateInfo ) || data.isDatasetCreate)) && data.creationRelation.dbValue"
+        },
+        "isNewTabAddButtonVisible": {
+            "expression": "!data.revision__awp0ProcessTemplates.dbValue && (data.selectedTab.panelId==='newTabPageSub' && ( ( data.creationType && data.objCreateInfo ) || data.isDatasetCreate)) && data.creationRelation.dbValue"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        },
+        "isAddPanelXRTLoaded": {
+            "expression": "data.activeView==='addObjectPrimarySub'"
+        },
+        "isValidToClose": {
+            "expression": {
+                "$or": [
+                    {
+                        "$source": "data.pinnedToForm.dbValue",
+                        "$query": {
+                            "$eq": true
+                        }
+                    },
+                    {
+                        "$source": "ctx.mselected.length > 1 ",
+                        "$query": {
+                            "$eq": true
+                        }
+                    },
+                    {
+                        "$and": [
+                            {
+                                "$source": "data.unpinnedToForm.dbValue",
+                                "$query": {
+                                    "$eq": true
+                                }
+                            },
+                            {
+                                "$source": "ctx.addObject.targetObject.uid !== ctx.selected.uid",
+                                "$query": {
+                                    "$eq": true
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "i18n": {
+        "submitButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "ADD_BUTTON_TITLE": [
+            "BaseMessages"
+        ]
+    }
+}

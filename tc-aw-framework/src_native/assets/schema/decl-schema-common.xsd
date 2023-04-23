@@ -1,0 +1,99 @@
+<declUI:schema xmlns:declUI="http://www.w3.org/2001/XMLSchema"  xmlns:xsB="decl-schema-common"  targetNamespace="decl-schema-common">
+  <declUI:complexType name="propOnly" mixed="true">
+        <declUI:attribute name="prop" type="declUI:string" use="required"/>
+  </declUI:complexType>
+
+  <declUI:complexType mixed="true" name ="fullSchemaWithProp">
+    <declUI:complexContent>
+      <declUI:extension base="xsB:propOnly">
+        <declUI:sequence>
+          <declUI:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </declUI:sequence>
+      </declUI:extension>
+    </declUI:complexContent>
+  </declUI:complexType>
+
+  <declUI:complexType name="filterType" mixed="true">
+    <declUI:attribute name="filter-types" type="declUI:string" use="optional"/>
+  </declUI:complexType>
+  
+  <declUI:complexType mixed="true" name ="fullSchemaWithFilter">
+    <declUI:complexContent>
+      <declUI:extension base="xsB:filterType">
+        <declUI:sequence>
+          <declUI:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </declUI:sequence>
+      </declUI:extension>
+    </declUI:complexContent>
+  </declUI:complexType>
+
+  <declUI:group name="addElement">
+    <declUI:sequence>
+      <declUI:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </declUI:sequence>
+  </declUI:group>
+  <declUI:attributeGroup name="commandAttributes">
+    <declUI:attribute name="caption" type="declUI:string" use="required"/>
+    <declUI:attribute name="hideTitle" type="declUI:string" use="optional"/>
+    <declUI:attribute name="commands" type="declUI:string" use="optional"/>
+  </declUI:attributeGroup>
+  <declUI:attributeGroup name="sectionAttributes">
+    <declUI:attribute name="caption" type="declUI:string" use="required"/>
+    <declUI:attribute name="name" type="declUI:string" use="optional"/>
+    <declUI:attribute name="commands" type="declUI:string" use="required"/>
+  </declUI:attributeGroup>
+  <declUI:complexType name="add" >
+    <declUI:group ref="xsB:addElement"/>
+    <declUI:attributeGroup ref="xsB:sectionAttributes"/>
+  </declUI:complexType>
+
+  <declUI:complexType name="panelAdd" >
+    <declUI:group ref="xsB:addElement"/>
+    <declUI:attributeGroup ref="xsB:commandAttributes"/>
+  </declUI:complexType>
+  <declUI:attributeGroup name="propData">
+    <declUI:attribute name="prop" type="declUI:string" use="required"/>
+    <declUI:attribute name="dataprovider" type="declUI:string" use="required"/>
+  </declUI:attributeGroup>
+
+  <declUI:attribute name="ng-if" >
+    <declUI:simpleType>
+      <declUI:restriction base="declUI:string">
+      </declUI:restriction>
+    </declUI:simpleType>
+  </declUI:attribute>
+
+  <declUI:attribute name="visible-when" >
+    <declUI:simpleType>
+      <declUI:restriction base="declUI:string">
+      </declUI:restriction>
+    </declUI:simpleType>
+  </declUI:attribute>
+  
+  <declUI:attribute name="use-virtual" >
+    <declUI:simpleType>
+      <declUI:restriction base="declUI:string">
+        <declUI:pattern value="true |false"/>
+      </declUI:restriction>
+    </declUI:simpleType>
+  </declUI:attribute>
+  
+  <declUI:attribute name="fixed-cell-height" >
+    <declUI:simpleType>
+      <declUI:restriction base="declUI:string">
+      </declUI:restriction>
+    </declUI:simpleType>
+  </declUI:attribute>
+
+  <declUI:attribute name="visible" type="declUI:string" />
+  <declUI:attribute name="aw-enter-key" type="declUI:string" />
+  <declUI:attribute name="aw-form-validator"/>
+  <declUI:attribute name="aw-transclude"/>
+  <declUI:attribute name="aw-popup-draggable"/>
+  <declUI:attribute name="aw-init" type="declUI:string" />
+  <declUI:attribute name="aw-on-load" type="declUI:string" />
+  <declUI:attribute name="enable-when" type="declUI:string" />
+  <declUI:attribute name="aw-repeat" type="declUI:string" />
+  
+  
+</declUI:schema>

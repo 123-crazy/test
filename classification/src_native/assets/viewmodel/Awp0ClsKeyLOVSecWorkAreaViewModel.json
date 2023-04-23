@@ -1,0 +1,78 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-repeat.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/visible-when.directive",
+        "js/aw-splm-table.directive",
+        "js/exist-when.directive"
+    ],
+    "actions":{
+        "loadData": {
+            "actionType": "JSFunction",
+            "method": "loadDataForKeyLOV",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "data": "{{data}}"
+            },
+            "outputData":{
+                "treeLoadResult":"{{data.treeLoadResult1}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadColumnsForKeyLOV": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadColumnsForKeyLOV",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.entryDataProvider}}",
+                "type" : "{{ctx.clsAdmin.DataType}}",
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        }
+    },
+    "data":{ },
+    "dataProviders": {
+        "entryDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "treeLoadResult": "{{data.treeLoadResult1}}",
+            "inputData": {
+                "accessMode": "tree",
+                "topNodeUid": "top"
+            }
+        }
+    },
+    "columnProviders": {
+        "structureColumnProvider": {
+            "loadColumnAction": "loadColumnsForKeyLOV",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex" : -1,
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "entryGridForKeyLOV": {
+            "dataProvider": "entryDataProvider",
+            "columnProvider": "structureColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": false,
+                "enableSorting": false,
+                "useStaticFirstCol": true
+            }
+        }
+    },
+    "i18n": {
+        "dataType":  [ "ClassificationAdminMessages" ],
+        "metric":  [ "ClassificationAdminMessages" ],
+        "nonMetric":  [ "ClassificationAdminMessages" ],
+        "propertiesTitle":  [ "ClassificationAdminMessages" ],
+        "entries":  [ "ClassificationAdminMessages" ]
+    }
+
+}

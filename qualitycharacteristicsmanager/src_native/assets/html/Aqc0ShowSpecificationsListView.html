@@ -1,0 +1,41 @@
+<aw-panel-header>
+    <aw-back-button title="{{i18n.backButtontitle}}" action="navBackPanel"></aw-back-button>
+    <aw-break></aw-break>
+</aw-panel-header>
+<aw-panel-body>
+    <aw-row>
+        <aw-scrollpanel>
+            <aw-list exist-when="!ctx.isTC13_2OnwardsSupported" dataprovider="data.dataProviders.showSpecificationsListProvider">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list>
+            <aw-list-filter exist-when="ctx.isTC13_2OnwardsSupported && data.activeView === 'Aqc0ShowSpecificationsList'" dataprovider="data.dataProviders.showSpecificationsListProvider" prop="data.charSpecFilterBox">
+                <aw-default-cell vmo="item"></aw-default-cell>
+            </aw-list-filter>
+        </aw-scrollpanel>
+    </aw-row>
+    <aw-panel-section caption="{{i18n.propertiesPanelCaption}}" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects.length ===1 ">
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.object_desc"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0Context"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0Criticality"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0BasedOnId"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0limitation" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0VariableCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0UnitOfMeasure" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0VariableCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0NominalValue" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0VariableCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0ToleranceType" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0VariableCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0UpperTolerance" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0VariableCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0LowerTolerance" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0VariableCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0OkDescription" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0AttributiveCharSpec'"></aw-label>
+        <aw-label prop="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].props.qc0NokDescription" exist-when="data.dataProviders.showSpecificationsListProvider.selectedObjects[0].type === 'Qc0AttributiveCharSpec'"></aw-label>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button default="true" action="navBackMainPanelFomSpecification" visible-when="data.dataProviders.showSpecificationsListProvider.selectedObjects.length > 0 && data._internal.panelId === 'Aqc0AddCharRepresentation'">
+        {{(data.selectedSpecificationObject)?i18n.ReplaceButtonTitle:i18n.Aqc0Attach}}
+    </aw-button>
+    <aw-button default="true" action="deleteRelationOnReplace" visible-when="data.dataProviders.showSpecificationsListProvider.selectedObjects.length > 0 && data._internal.panelId === 'Aqc0ReplaceSpecificationFromRepresentation'">
+        <aw-i18n>i18n.ReplaceButtonTitle</aw-i18n>
+    </aw-button>
+    <aw-button default="true" action="attachCharSpecification" visible-when="data.dataProviders.showSpecificationsListProvider.selectedObjects.length > 0 && data._internal.panelId === 'Aqc0AddSpecificationsToCreatedRepresentation'">
+        <aw-i18n>i18n.Aqc0Attach</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

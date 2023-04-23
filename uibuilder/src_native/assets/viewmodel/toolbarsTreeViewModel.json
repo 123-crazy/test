@@ -1,0 +1,91 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "retrieveTreeNodes": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput"
+            },
+            "outputData": {},
+            "deps": "js/toolbarsSublocationService"
+        }
+    },
+    "data": {
+        "_cursorObject": {
+            "endIndex": 0,
+            "endReached": false,
+            "startIndex": 0,
+            "startReached": true
+        }
+    },
+    "dataProviders": {
+        "toolbarDataProvider": {
+            "initializeAction": "retrieveTreeNodes",
+            "nextAction": "retrieveTreeNodes",
+            "previousAction": "retrieveTreeNodes",
+            "response": "{{data.toolbarRows}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            }
+        }
+    },
+    "columnProviders": {
+        "toolbarColumnProvider": {
+            "columns": [
+                {
+                    "name": "displayName",
+                    "displayName": "{{i18n.datasetName}}",
+                    "minWidth": 24,
+                    "maxWidth": 600,
+                    "width": 450,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "isTreeNavigation": true
+                },
+                {
+                    "name": "nodeId",
+                    "displayName": "{{i18n.id}}",
+                    "minWidth": 24,
+                    "maxWidth": 500,
+                    "width": 250,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false
+                }
+            ]
+        }
+    },
+    "grids": {
+        "toolbarTree": {
+            "dataProvider": "toolbarDataProvider",
+            "columnProvider": "toolbarColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": true,
+                "enableSorting": false,
+                "maxRowsToShow": 75
+            }
+        }
+    },
+    "functions": {},
+    "conditions": {},
+    "onEvent": [],
+    "i18n": {
+        "id": [
+            "CommandBuilderMessages"
+        ],
+        "datasetName": [
+            "awAddDirectiveMessages"
+        ]
+    }
+}

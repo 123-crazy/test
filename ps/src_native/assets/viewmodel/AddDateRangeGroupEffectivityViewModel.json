@@ -1,0 +1,126 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":[
+                "js/aw-panel-body.directive",
+                "js/aw-panel-section.directive",
+                "js/aw-tab-set.directive",
+                "js/aw-panel-footer.directive",
+                "js/aw-button.directive",
+                "js/aw-i18n.directive"
+                ],
+    "i18n":
+    {
+        "searchEndItemPresenterBtn":[ "OccurrenceManagementConstants"],
+        "new":[ "OccurrenceManagementConstants"],
+        "endItemMessage":[ "OccurrenceManagementConstants"],
+        "configuredBy":["PSConstants"],
+        "editEffectivityTooltip":["OccurrenceManagementConstants"],
+        "apply":["OccurrenceManagementConstants"]
+    },
+    "functions": {
+        "appendAndGetSearchedAndExistingGroupEffectivities": {
+            "functionName": "applyDateEffectivityGroups",
+            "parameters": ["{{data}}", "{{data.dataProviders.performSearchForSharedEffectivities.selectedObjects}}"]
+        }
+    },
+    "data" :
+    {
+        "configuredBy":
+        {
+            "dbValue": "{{i18n.configuredBy}}",
+            "uiValue": "{{i18n.configuredBy}}"
+        },
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "panelId": "AuthorDateRangeGroupEffectivityInclude",
+                    "name": "{{i18n.new}}"
+                },
+                {
+                    "panelId": "SearchDateRangeGroupEffectivity",
+                    "name": "{{i18n.searchEndItemPresenterBtn}}",
+                    "selectedTab": true
+                 }
+            ]
+        }
+    },
+    "actions":
+    {
+        "initAddDateRangePanelAction": {
+            "actionType": "JSFunction",
+            "method": "initAddDateRangePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/dateEffectivityConfigurationService"
+        },
+        "applySearchedGroupEffectivityBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "applySearchedGroupEffectivity"
+                }
+            ]
+        },
+        "applySearchedGroupEffectivity":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path": "aceActiveContext.context.configContext",
+                "value":{
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "eg_uids": "{{function:appendAndGetSearchedAndExistingGroupEffectivities}}",
+                    "ue": "{{data.contextKeyObject.productContextInfo.props.awb0EffUnitNo.dbValues[0]}}",
+                    "ei_uid": "{{data.contextKeyObject.productContextInfo.props.awb0EffEndItem.dbValues[0]}}",                    
+                    "var_uids": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "startDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+            "events": {
+                "success": [{
+                    "name": "complete",
+                    "eventData":
+                    {
+                        "source": "aw_navigation"
+                    }
+                }
+               ]
+            },
+            "deps": "js/dateEffectivityConfigurationService"
+        },
+        "updateRequestPrefOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref",
+                "value": {
+                    "jitterFreePropLoad" : true,
+                    "userGesture": "EFFECTIVITY_CHANGE"
+                }
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "AddDateRangeGroupEffectivity"
+            },
+            "action": "initAddDateRangePanelAction"
+        },
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initAddDateRangePanelAction"
+        }
+    ]
+}

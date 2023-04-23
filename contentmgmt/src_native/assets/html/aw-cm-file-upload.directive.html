@@ -1,0 +1,14 @@
+<form id="fileUploadForm" name="fileUploadForm" target="{{formTarget}}" method="post" novalidate enctype="multipart/form-data">
+    <div class="aw-file-upload-container aw-widgets-droptable aw-widgets-chooseordropfile">
+        <div class="aw-file-upload-fileLabel">
+            {{fileUploadBtnLabel}}
+        </div>
+        <div exist-when="!data.fileName" class="aw-file-upload-fileName" readonly="true" disabled="true">
+            {{noFileChosenText}}
+        </div>
+        <div exist-when="data.fileName" class="aw-file-upload-fileName file-upload-selected-file">
+            {{data.fileName}}
+        </div>
+        <input multiple="multiple" type="file" ng-model="file.fmsFile" ng-required="isRequired &amp;&amp; !ctx.HostedFileNameContext.filename" accept="{{typeFilter === '.' ? '' : typeFilter}}" name="fmsFile" on-file-change="updateFile" class="aw-file-upload-fileInput ng-valid ng-valid-required ng-touched ng-not-empty ng-dirty ng-valid-parse">
+    </div>
+</form>

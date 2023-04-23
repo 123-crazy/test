@@ -1,0 +1,227 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-listbox.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "createRelations": {
+            "actionType": "JSFunctionAsync",
+            "method": "execute",
+            "inputData": {
+                "targetObject": "{{data.targetObject}}",
+                "sourceObjects": "{{data.objToRelateBasedOnConfiguredRevRule}}",
+                "relationName": "{{data.creationRelation.dbValue}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "gwt.CreateOrAddObjectCompleteEvent",
+                        "eventData": {
+                            "createdObjs": "{{data.sourceModelObjects}}"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": "{{conditions.isRefreshRequired}}",
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}",
+                            "relations": "{{data.creationRelation}}",
+                            "relatedModified": "{{data.targetModelObjects}}",
+                            "createdObjects": "{{data.sourceModelObjects}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": {
+                            "$source": "errorCodes",
+                            "$query": {
+                                "$all": {
+                                    "$source": "code",
+                                    "$query": {
+                                        "$eq": 6007
+                                    }
+                                }
+                            }
+                        },
+                        "eventData": {
+                            "refreshLocationFlag": "{{conditions.isRefreshRequired}}",
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}",
+                            "relations": "{{data.creationRelation}}",
+                            "relatedModified": "{{data.targetModelObjects}}",
+                            "createdObjects": "{{data.sourceModelObjects}}"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "data.sourceObjects.length == 1",
+                        "message": "paletteObjectSuccess"
+                    },
+                    {
+                        "condition": "data.sourceObjects.length > 1",
+                        "message": "paletteRelationSuccess"
+                    }
+                ]
+            },
+            "deps": "js/pasteService"
+        },
+        "setPin": {
+            "actionType": "JSFunction",
+            "method": "setPinnedToForm",
+            "inputData": {
+                "pinnedToForm": "{{data.pinnedToForm}}",
+                "unpinnedToForm": "{{data.unpinnedToForm}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "setUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPinnedToForm",
+            "inputData": {
+                "pinnedToForm": "{{data.pinnedToForm}}",
+                "unpinnedToForm": "{{data.unpinnedToForm}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "updateTargetObject": {
+            "actionType": "JSFunction",
+            "method": "updateTargetObject",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "evalObjBasedOnConfigRevRulePaletteSearch": {
+            "actionType": "JSFunction",
+            "method": "evaluateObjsBasedOnConfiguredRevRule",
+            "inputData": {
+                "objectToEvaluateForExactRelation": "{{data.sourceObjects}}"
+            },
+            "outputData": {
+                "objToRelateBasedOnConfiguredRevRule": ""
+            },
+            "deps": "js/awConfiguredRevService",
+            "events": {
+                "success": [
+                    {
+                        "name": "addObject.existingObjToRelateEvaluated"
+                    }
+                ]
+            }
+        }
+    },
+    "messages": {
+        "paletteObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pasteSuccessful}}",
+            "messageTextParams": [
+                "{{data.sourceObjects[0].props.object_string.dbValues[0]}}"
+            ]
+        },
+        "paletteRelationSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.mutiRelationObject}}",
+            "messageTextParams": [
+                "{{data.sourceObjects.length}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addObjectPanelCommand.addObjectPanelSetPin",
+            "action": "setPin"
+        },
+        {
+            "eventId": "addObjectPanelCommand.addObjectPanelSetUnPin",
+            "action": "setUnPin"
+        },
+        {
+            "eventId": "addObject.startCreateRelation",
+            "action": "evalObjBasedOnConfigRevRulePaletteSearch"
+        },
+        {
+            "eventId": "addObject.existingObjToRelateEvaluated",
+            "action": "createRelations"
+        },
+        {
+            "eventId": "breadcrumb.navigation",
+            "action": "updateTargetObject",
+            "cacheEventData": true
+        }
+    ],
+    "data": {
+        "addPanelTabModels": [
+            {
+                "tabKey": "new",
+                "panelId": "newTabPageSub",
+                "name": "{{i18n.newTabTitle}}",
+                "visibleWhen": "data.visibleAddPanelTabKeys.indexOf('new')>-1"
+            },
+            {
+                "tabKey": "palette",
+                "panelId": "paletteTabPageSub",
+                "name": "{{i18n.paletteTabTitle}}",
+                "visibleWhen": "data.visibleAddPanelTabKeys.indexOf('palette')>-1",
+                "recreatePanel": true
+            },
+            {
+                "tabKey": "search",
+                "panelId": "searchTabPageSub",
+                "name": "{{i18n.searchText}}",
+                "recreatePanel": true,
+                "visibleWhen": "data.visibleAddPanelTabKeys.indexOf('search')>-1"
+            }
+        ],
+        "addObjectPanelPinCommands": "addObjectPanel_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "creationRelation": {
+            "displayName": "{{i18n.relation}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "conditions": {
+        "showRelationsList": {
+            "expression": "(data.creationType || data.sourceObjects.length > 0) && data.relationList.length>1"
+        },
+        "isRefreshRequired": {
+            "expression": "ctx.addObject.refreshFlag && !data.unpinnedToForm.dbValue"
+        }
+    },
+    "i18n": {
+        "newTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "paletteTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "searchText": [
+            "UIMessages"
+        ],
+        "mutiRelationObject": [
+            "awAddDirectiveMessages"
+        ],
+        "pasteSuccessful": [
+            "awAddDirectiveMessages"
+        ],
+        "relation": [
+            "XRTMessages"
+        ]
+    }
+}

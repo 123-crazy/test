@@ -1,0 +1,27 @@
+<div class='aw-jswidgets-cellTop' ng-attr-tabindex='{{prop.isEditable&&!prop.isArray ? rowindex + 1 : -1 }}' ng-class="{'aw-jswidgets-editableGridCell': (prop.isEditable)&&(!prop.isArray)&&modifiable != 'false',
+  'aw-jswidgets-uiNonEditCell': !prop.isEditable||prop.isArray||modifiable == 'false',
+  'changed': prop.valueUpdated, 'aw-jswidgets-isEditing': prop.isEditing&&!prop.isArray}" ng-focus='startEdit($event)' ng-click='startEdit($event)' _colname='{{prop.propertyName}}'>
+
+    <div class='aw-jswidgets-tableNonEditContainer aw-layout-flexRowContainer' ng-if="(!prop.isEditing)||(prop.isArray)||modifiable == 'false'" title='{{ prop.uiValue }}'>
+        <div class='aw-jswidgets-dataGridCellText'>
+            <aw-clickable-title prop='prop' source='table' vmo='vmo'></aw-clickable-title>
+        </div>
+        <div class='aw-jswidgets-gridCellCommands aw-widgets-cellInteraction' ng-show='!prop.isEditable||prop.isArray'>
+            <div ng-show='dataProvider.selectionModel.multiSelectEnabled && vmo.selected'>
+                <a class='aw-commands-cellCommandCommon'>
+                    <div class='aw-commands-svg'>
+                        <aw-icon icon-id='cmdCheckmark'></aw-icon>
+                    </div>
+                </a>
+            </div>
+            <div ng-show='!dataProvider.selectionModel.multiSelectEnabled || !vmo.selected' class='aw-layout-flexColumn'>
+                <aw-list-command ng-if='!anchor' ng-repeat='command in commands' vmo='vmo' command='command'> </aw-list-command>
+                <aw-table-command-bar ng-if='anchor' anchor='{{anchor}}' context='commandContext' class='aw-layout-flexRow'></aw-table-command-bar>
+            </div>
+        </div>
+    </div>
+
+    <div class='aw-jswidgets-tableEditContainer' ng-if="prop.isEditing && !prop.isArray && modifiable != 'false'">
+        <aw-property-val prop='prop' hint='hint' in-table-cell='true'></aw-property-val>
+    </div>
+</div>

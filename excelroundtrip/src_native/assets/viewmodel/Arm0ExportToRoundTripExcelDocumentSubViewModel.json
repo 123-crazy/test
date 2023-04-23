@@ -1,0 +1,458 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-listbox.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-column.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/visible-when.directive",
+        "js/aw-list.directive",
+        "js/aw-command-panel-section.directive",
+        "js/enable-when.directive"
+    ],
+
+    "actions": {
+        "updateCtxAndExportExcel":
+        {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "isExcelRoundTripExportEventProgressing",
+                "value": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "exportExcel.eportDoc"
+                    }
+                ]
+            },
+            "deps": "js/appCtxService"
+        },
+        "unregisterExportCmdContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "isExcelRoundTripExportEventProgressing"
+            }
+        },
+        "prepareTemplateLists": {
+            "actionType": "JSFunction",
+            "method": "prepareTemplateLists",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "prepareColumnList": {
+            "actionType": "JSFunction",
+            "method": "prepareColumnList",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+
+        },
+        "exportDoc": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-RequirementsManagement",
+            "method": "exportToApplication3",
+            "inputData": {
+                "input": [ {
+                    "templateName": "{{function:getTemplateName}}",
+                    "applicationFormat": "RoundTripMSExcel",
+                    "objectsToExport": "{{function:getInputObjects}}",
+                    "targetObjectsToExport": "{{function:getTargetObjectsToExport}}",
+                    "exportOptions": "{{function:getExportOptionValueForExcel}}",
+                    "attributesToExport": "{{function:getSelectedProperties}}",
+                    "recipeSourceObjects": [],
+                    "recipeTargetObjects": [],
+                    "objectTemplateInputs": [],
+                    "includeAttachments": false
+                } ]
+            },
+
+            "outputData": {
+                "fileTicket": "transientFileReadTickets[0]"
+            },
+
+            "events": {
+                "success": [
+                    {
+                        "name":"exportExcel.unregisterExportCmdContext"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "exportToOfficeUtil.doExportDocumentEvent"
+                    }
+                ],
+
+                "failure": [
+                    {
+                        "name":"exportExcel.unregisterExportCmdContext"
+                    },
+                    {
+                        "condition": "errorCode.code==223201",
+                        "name": "layout.showToolInfo",
+                        "eventData": {
+                            "visible": false
+                        }
+                    },
+
+                    {
+                        "name": "exportToOfficeUtil.doExportDocumentEvent"
+                    }
+                ]
+            },
+            "actionMessages":
+            {
+                "failure":
+                [
+                    {
+                        "condition": "errorCode.code==223201",
+                        "message": "notificationForFlatListExportMsg"
+                    },
+                    {
+                        "message": "dispatcherNotInstalledExportFailure",
+                        "condition": "errorCode.code===3104"
+                    }
+                ],
+                 "success":
+                [
+                    {
+                        "condition": "data.runInBackgroundExcelExport.dbValue",
+                        "message": "notificationForExportRunInBackgroundMsg"
+                    }
+                ]
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "refreshProvider": {
+            "actionType": "dataProvider",
+            "method": "exportColumnList"
+        },
+        "removeColumn": {
+            "actionType": "JSFunction",
+            "method": "removeColumn",
+            "inputData": {
+                "data": "{{data}}",
+                "overrideType": "{{data.selectedCell}}"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "exportExcel.refreshColumnList"
+                } ]
+            },
+
+            "deps": "js/Arm0ExportToOfficeApp"
+
+        },
+        "updateColumnList": {
+            "actionType": "JSFunction",
+            "method": "updateColumnList",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "doExportDocument": {
+            "actionType": "JSFunction",
+            "method": "openFile",
+            "inputData": {
+                "data": "{{data.fileTicket}}"
+            },
+
+            "deps": "js/fmsUtils"
+        },
+        "moveUp": {
+            "actionType": "JSFunction",
+            "method": "moveUpDown",
+            "inputData": {
+                "data": "{{data.dataProviders}}",
+                "moveTo": "Up"
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "moveDown": {
+            "actionType": "JSFunction",
+            "method": "moveUpDown",
+            "inputData": {
+                "data": "{{data.dataProviders}}",
+                "moveTo": "Down"
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        },
+        "columnSelectionChanged": {
+            "actionType": "JSFunction",
+            "method": "columnSelectionChanged",
+            "inputData": {
+                "data": "{{data.dataProviders}}"
+            },
+            "deps": "js/Arm0ExportToOfficeApp"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "ExportToOffice.prepareTemplateLists",
+            "action": "prepareTemplateLists"
+        },
+        {
+            "eventId": "ExportObject.prepareColumnList",
+            "action": "prepareColumnList"
+
+        },
+        {
+            "eventId": "ExportToOffice.prepareTemplateLists",
+            "action": "prepareColumnList"
+        },
+        {
+            "eventId": "exportExcel.refreshColumnList",
+            "action": "refreshProvider"
+
+        },
+        {
+            "eventId": "exportExcel.updatedColumnList",
+            "action": "updateColumnList"
+
+        },
+        {
+            "eventId": "exportToOfficeUtil.doExportDocumentEvent",
+            "action": "doExportDocument"
+        },
+        {
+            "eventId": "Arm0MoveDown",
+            "action": "moveDown"
+        },
+        {
+            "eventId": "Arm0MoveUp",
+            "action": "moveUp"
+        },
+        {
+            "eventId": "exportColumnList.modelObjectsUpdated",
+            "action": "columnSelectionChanged"
+        },
+        {
+            "eventId": "exportColumnList.selectionChangeEvent",
+            "action": "columnSelectionChanged"
+        },
+        {
+            "eventId": "exportExcel.eportDoc",
+            "action": "exportDoc"
+        },
+        {
+            "eventId": "exportExcel.unregisterExportCmdContext",
+            "action": "unregisterExportCmdContext"
+        }
+    ],
+    "dataProviders": {
+        "exportColumnList": {
+            "commands": {
+                "delete": {
+                    "id": "cmdDelete",
+                    "title": "Delete",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+
+                    "priorities": [
+                        300
+                    ],
+
+                    "action": "removeColumn",
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            },
+            "response": "{{data.exportColumns.dbValue}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "data": {
+        "selectedcolmnsSubCommands": "arm0_selectedcolmnsSubCommands",
+        "exportColumns": {
+            "isArray": "true",
+            "dbValue": [
+
+            ]
+        },
+        "exportExcelOptions": {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.template}}",
+            "propertyRadioFalseText": "{{i18n.customizeExportProperties}}",
+            "dbValue": true,
+            "vertical": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "excelTemplates": {
+            "displayName": "{{i18n.template}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": true
+        },
+        "docStructure": {
+            "displayName": "{{i18n.docStructure}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": false
+        },
+        "idHyperlink": {
+            "displayName": "{{i18n.idHyperlink}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": false
+        },
+        "outlineNumbers": {
+            "displayName": "{{i18n.outlineNumbers}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": false
+        },
+        "isExportColumnEmpty": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "runInBackgroundExcelExport":
+        {
+            "displayName": "{{i18n.runinBG}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+
+    "functions": {
+        "getTemplateName": {
+            "functionName": "getTemplateNameForExport",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+
+        "getExportOptionValueForExcel": {
+            "functionName": "getExportOptionValueForExcel",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getSelectedProperties": {
+            "functionName": "getSelectedProperties",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getObjectsToExport": {
+            "functionName": "getObjectsToExportForExcel",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getTargetObjectsToExport": {
+            "functionName": "getTargetObjectsToExportForExcel",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+
+    "conditions": {
+        "showSettingsSection": {
+            "expression": "!ctx.excelTemplateForExport || ctx.excelTemplateForExport.showSettingsSection"
+        },
+        "showRadioButton": {
+            "expression": "!ctx.excelTemplateForExport || ctx.excelTemplateForExport.showRadioButton"
+        }
+    },
+    "messages": {
+        "notificationForExportRunInBackgroundMsg":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.notificationForExportRInB}}",
+            "messageTextParams":
+            [
+                "{{ctx.mselected[0]}}"
+            ]
+        },
+        "dispatcherNotInstalledExportFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+
+    "i18n": {
+        "exportPanelTitle": [
+            "ExcelRoundTripMessages"
+        ],
+
+        "advanceOpt": [
+            "ExcelRoundTripMessages"
+        ],
+
+        "template": [
+            "ExcelRoundTripMessages"
+        ],
+
+        "docStructure": [
+            "ExcelRoundTripMessages"
+        ],
+
+        "idHyperlink": [
+            "ExcelRoundTripMessages"
+        ],
+
+        "outlineNumbers": [
+            "ExcelRoundTripMessages"
+        ],
+
+        "export": [
+            "ExcelRoundTripMessages"
+        ],
+        "selectedcolmns": [
+            "ExcelRoundTripMessages"
+        ],
+        "customizeExportProperties": [
+            "ExcelRoundTripMessages"
+        ],
+        "selectExportProperties": [
+            "ExcelRoundTripMessages"
+        ],
+        "runinBG":[
+            "ExcelRoundTripMessages"
+        ],
+        "notificationForExportRInB":
+        [
+            "ExcelRoundTripMessages"
+        ],
+        "settingsLabel":
+        [
+            "ExcelRoundTripMessages"
+        ]
+    }
+}

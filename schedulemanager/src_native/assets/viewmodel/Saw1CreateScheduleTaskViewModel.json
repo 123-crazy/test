@@ -1,0 +1,551 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "data": {
+        "schStart": {
+            "type": "DATE"
+        },
+        "schFinish": {
+            "type": "DATE"
+        },
+        "saw1pincommands": "saw1_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "actions": {
+        "getScheduleTaskProperties": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects": "{{function:getScheduleTasks}}",
+                "attributes": [
+                    "schedule_tag",
+                    "fnd0ParentTask",
+                    "fnd0SummaryTask"
+                ]
+            },
+            "policy": {
+                "types": [ {
+                    "name": "ScheduleTask",
+                    "properties": [ {
+                            "name": "schedule_tag"
+                        },
+                        {
+                            "name": "fnd0ParentTask"
+                        },
+                        {
+                            "name": "fnd0SummaryTask"
+                        },
+                        {
+                            "name": "fnd0TaskTypeString"
+                        }
+                    ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "moveTasks.validateInput"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "soaErrorMessage"
+                } ]
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "validateInput": {
+            "actionType": "JSFunction",
+            "method": "validateInput",
+            "inputData": {
+                "targetTask": "{{ctx.selected}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "moveTasks"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode=='scheduleTaskMoveNoTargetTaskErrorMsg'",
+                        "message": "scheduleTaskMoveNoTargetTaskErrorMsg"
+                    },
+                    {
+                        "condition": "errorCode=='scheduleSummaryTaskMoveErrorMsg'",
+                        "message": "scheduleSummaryTaskMoveErrorMsg"
+                    }
+                ]
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "addObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2012-02-ScheduleManagement",
+            "method": "createTasks",
+            "inputData": {
+                "schedule": "{{function:getSchedule}}",
+                "createContainers": [ {
+                    "name": "{{data.object_name.dbValue}}",
+                    "desc": "{{data.object_desc.dbValue}}",
+                    "objectType": "{{data.selectedObject.props.type_name.dbValue}}",
+                    "start": "{{function:getDateString_startDate}}",
+                    "finish": "{{function:getDateString_finishDate}}",
+                    "workEstimate": "{{data.workEstimate}}",
+                    "parent": "{{function:getParentTask}}",
+                    "prevSibling": "{{function:getPreviousTask}}",
+                    "otherAttributes": [ {
+                        "attrName": "priority",
+                        "attrValue": "3",
+                        "attrType": 3
+                    } ],
+                    "typedOtherAttributes": [ {
+                        "objectType": "ScheduleTaskType",
+                        "updates": "{{function:getTypedAttributesContainer}}"
+                    } ]
+                } ]
+            },
+            "outputData": {
+                "createdMainObject": ""
+            },
+            "events": {
+                "success": [ {
+                        "name": "addObjectToRecentList"
+                    },
+                    {
+                        "name": "assignProjects"
+                    },
+                    {
+                        "condition": "ctx.state.params.pageId !== 'tc_xrt_Gantt'",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "isPinnedFlag": "{{conditions.ispinned}}",
+                            "relations": "",
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "createdObjects": "{{data.createdMainObject.createdObjects}}"
+                        }
+                    },
+                    {
+                        "condition": "!data.unpinnedToForm.dbValue",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "createSuccess"
+                } ],
+                "failure": [ {
+                    "message": "soaErrorMessage"
+                } ]
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "addObjectFromPalette": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2012-02-ScheduleManagement",
+            "method": "moveTasks",
+            "inputData": {
+                "schedule": "{{function:getSchedule}}",
+                "moveRequests": "{{function:getMoveTaskContainer}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "addObjectToRecentList"
+                    },
+                    {
+                        "condition": "ctx.state.params.pageId !== 'tc_xrt_Gantt'",
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.locationContext.modelObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "soaErrorMessage"
+                } ]
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "addSelection": {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.awTypeSelector.selectedObjects}}"
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "addRecentSelection": {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.getRecentTypesProvider.selectedObjects}}"
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "updateRecentUsedTypes": {
+            "actionType": "JSFunctionAsync",
+            "method": "updateRecentUsedTypes",
+            "inputData": {
+                "recentTypeName": "{{data.objCreateInfo.createType}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "getWorkEstimateValue": {
+            "actionType": "JSFunction",
+            "method": "getWorkEstimate",
+            "inputData": {
+                "data": "{{data}}",
+                "unitOfTimeMeasure": "{{ctx.xrtSummaryContextObject.props.saw1UnitOfTimeMeasure.dbValues[0]}}"
+            },
+            "outputData": {
+                "workEstimate": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "addScheduleTask.callSoa"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode=='workEstimateErrorMsg'",
+                    "message": "workEstimateErrorMsg"
+                } ]
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "createTaskDateValidation": {
+            "actionType": "JSFunction",
+            "method": "dateValidation",
+            "inputData": {
+                "data": "{{data}}",
+                "taskStartDate": "{{data.start_date.dateApi.dateObject}}",
+                "taskFinishDate": "{{data.finish_date.dateApi.dateObject}}",
+                "ctx": "{{ctx}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addScheduleTask.getWorkEstimateValue"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode=='scheduleTaskStartDateError'",
+                        "message": "scheduleTaskStartDateError"
+                    },
+                    {
+                        "condition": "errorCode=='scheduleTaskDateBoundaryError'",
+                        "message": "scheduleTaskDateBoundaryError"
+                    },
+                    {
+                        "condition": "errorCode=='invalidStartDateOrFinishDate'",
+                        "message": "invalidStartDateOrFinishDate"
+                    }
+                ]
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "assignProjectsToCreatedObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [ {
+                    "projects": "{{data.dataProviders.getUserProjectsProvider.selectedObjects}}",
+                    "objectToAssign": [
+                        "{{data.createdMainObject}}"
+                    ],
+                    "objectToRemove": []
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "soaErrorMessage"
+                } ]
+            }
+        },
+        "saw1SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "saw1SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "populateDefaultValuesForScheduleTask": {
+            "actionType": "JSFunction",
+            "method": "populateDefaultValuesForScheduleTask",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Saw1CreatePanelService"
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+            "deps": "js/autoAssignService"
+        }
+    },
+    "preferences": [
+        "AWC_Saw1DefaultTimeSpanUnit"
+    ],
+    "functions": {
+        "getDateString_startDate": {
+            "functionName": "getDateString",
+            "parameters": [
+                "{{data.start_date.dateApi.dateObject}}"
+            ]
+        },
+        "getDateString_finishDate": {
+            "functionName": "getDateString",
+            "parameters": [
+                "{{data.finish_date.dateApi.dateObject}}"
+            ]
+        },
+        "getSchedule": {
+            "functionName": "getSchedule",
+            "parameters": [
+                "{{ctx.selected}}"
+            ]
+        },
+        "getParentTask": {
+            "functionName": "getParentTask",
+            "parameters": [
+                "{{ctx.selected}}"
+            ]
+        },
+        "getNewParentTask": {
+            "functionName": "getParentTask",
+            "parameters": [
+                "{{ctx.selected}}"
+            ]
+        },
+        "getPreviousTask": {
+            "functionName": "getPreviousTask",
+            "parameters": [
+                "{{ctx.selected}}"
+            ]
+        },
+        "getTypedAttributesContainer": {
+            "functionName": "getTypedAttributesContainer",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.Object.DefaultAttributeMap}}"
+            ]
+        },
+        "getScheduleTasks": {
+            "functionName": "getScheduleTasks",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getMoveTaskContainer": {
+            "functionName": "getMoveTaskContainer",
+            "parameters": [
+                "{{data}}",
+                "{{ctx.selected}}"
+            ]
+        },
+        "dateValidation": {
+            "functionName": "dateValidation",
+            "parameters": [
+                "{{data}}",
+                "{{data.start_date.dateApi.dateObject}}",
+                "{{data.finish_date.dateApi.dateObject}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isValidToShowforOneType": {
+            "expression": "!data.selectedObject && data.totalFound === 1"
+        },
+        "isValidToShowForCustomType": {
+            "expression": "data.selectedObject && data.totalFound>1"
+        },
+        "isValidToShow": {
+            "expression": "data.selectedTab.panelId==='newTabPageSub' && (data.object_name.dbValue && data.object_name.dbValue!='') && ( data.start_date.dbValue!=null &&  data.start_date.dbValue!='') && ( data.finish_date.dbValue!=null &&  data.finish_date.dbValue!='') && ( data.fnd0WorkEffortString.dbValue!=null &&  data.fnd0WorkEffortString.dbValue!='')"
+        },
+        "isValidToShowInPalette": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "ispinned": {
+            "expression": "data.unpinnedToForm.dbValue"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "action": "addSelection"
+        },
+        {
+            "eventId": "getRecentTypesProvider.selectionChangeEvent",
+            "action": "addRecentSelection"
+        },
+        {
+            "eventId": "addObjectToRecentList",
+            "action": "updateRecentUsedTypes"
+        },
+        {
+            "eventId": "moveTasks",
+            "action": "addObjectFromPalette"
+        },
+        {
+            "eventId": "moveTasks.validateInput",
+            "action": "validateInput"
+        },
+        {
+            "eventId": "addScheduleTask.callSoa",
+            "action": "addObject"
+        },
+        {
+            "eventId": "assignProjects",
+            "action": "assignProjectsToCreatedObject"
+        },
+        {
+            "eventId": "addScheduleTask.getWorkEstimateValue",
+            "action": "getWorkEstimateValue"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetPin",
+            "cacheEventData": true,
+            "action": "saw1SetPin"
+        },
+        {
+            "eventId": "createScheduleTaskWorkSpace.saw1SetUnPin",
+            "cacheEventData": true,
+            "action": "saw1SetUnPin"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "populateDefaultValuesForScheduleTask"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        }
+    ],
+    "messages": {
+        "createSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.taskObjectAdded}}",
+            "messageTextParams": [
+                "{{data.object_name.dbValue}}"
+            ]
+        },
+        "scheduleTaskMoveNoTargetTaskErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.scheduleTaskMoveNoTargetTaskErrorMsg}}"
+        },
+        "scheduleSummaryTaskMoveErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.scheduleSummaryTaskMoveErrorMsg}}"
+        },
+        "workEstimateErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.workEstimateErrorMsg}}"
+        },
+        "scheduleTaskDateBoundaryError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.scheduleTaskDateBoundaryError}}"
+        },
+        "scheduleTaskStartDateError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.scheduleTaskStartDateError}}",
+            "messageTextParams": [
+                "{{data.finish_date.dateApi.dateObject}}",
+                "{{data.start_date.dateApi.dateObject}}"
+            ]
+        },
+        "invalidStartDateOrFinishDate": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.invalidStartDateOrFinishDate}}"
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "addTaskCommandTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "add": [
+            "ScheduleManagerMessages"
+        ],
+        "taskObjectAdded": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleSummaryTaskMoveErrorMsg": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleTaskMoveNoTargetTaskErrorMsg": [
+            "ScheduleManagerMessages"
+        ],
+        "workEstimateErrorMsg": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleTaskDateBoundaryError": [
+            "ScheduleManagerMessages"
+        ],
+        "scheduleTaskStartDateError": [
+            "ScheduleManagerMessages"
+        ],
+        "ganttTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "invalidStartDateOrFinishDate": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

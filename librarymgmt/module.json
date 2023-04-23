@@ -1,0 +1,223 @@
+{
+  "name": "librarymgmt",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "aliasRegistry": {
+    "typeLibrary48": [
+      "Lbr0Library"
+    ],
+    "typeLibraryElement48": [
+      "Lbr0LibraryElement"
+    ],
+    "typeLibraryNode48": [
+      "Lbr0HierarchyNode"
+    ]
+  },
+  "commandsViewModel": {
+    "commands": {},
+    "commandHandlers": {
+      "Lbr0ShowObjectCommandHandler": {
+        "id": "Awp0ShowObject",
+        "action": "Lbr0IsDirty",
+        "activeWhen": {
+          "condition": "conditions.Lbr0ShowObjectActiveCondition"
+        },
+        "visibleWhen": {
+          "condition": "conditions.Lbr0ShowObjectActiveCondition"
+        }
+      },
+      "LbrShowDelegateObjectCommandHandler": {
+        "id": "Awp0ShowObjectCell",
+        "action": "LbrShowObjectListAction",
+        "activeWhen": {
+          "condition": "conditions.lbrOpenObjectCondition"
+        },
+        "visibleWhen": {
+          "condition": "conditions.lbrOpenObjectCondition"
+        }
+      }
+    },
+    "commandPlacements": {},
+    "actions": {
+      "Lbr0ShowObjectAction": {
+        "actionType": "Navigate",
+        "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+        "navigationParams": {
+          "uid": "{{ctx.selected.uid}}"
+        }
+      },
+      "LbrShowObjectListAction": {
+        "actionType": "Navigate",
+        "navigateTo": "lbr1_LibraryResultsSubLocation",
+        "navigationParams": {
+          "uid": "{{commandContext.vmo.uid}}",
+          "searchCriteria": "*",
+          "filter": "Lbr0LibraryElement.lbr0Ancestors=0/{{commandContext.vmo.uid}}~",
+          "nameToken": "lbr1.LibraryResultsSubLocation"
+        }
+      },
+      "Lbr0IsDirty": {
+        "actionType": "JSFunctionAsync",
+        "method": "isDirty",
+        "outputData": {
+          "dirty": "isDirty"
+        },
+        "events": {
+          "success": [
+            {
+              "condition": "!data.dirty",
+              "name": "libMgmt.Lbr0CheckEditInProgress"
+            },
+            {
+              "condition": "data.dirty",
+              "name": "libMgmt.Lbr0LeaveConfirmationSuccess"
+            }
+          ]
+        },
+        "deps": "js/editHandlerService"
+      },
+      "Lbr0CheckEditInProgress": {
+        "actionType": "JSFunction",
+        "method": "editInProgress",
+        "outputData": {
+          "editInProgress": "editInProgress"
+        },
+        "events": {
+          "success": [
+            {
+              "condition": "!data.editInProgress",
+              "name": "libMgmt.Lbr0ShowObjectAction"
+            },
+            {
+              "condition": "data.editInProgress",
+              "name": "libMgmt.Lbr0CancelEdits"
+            }
+          ]
+        },
+        "deps": "js/editHandlerService"
+      },
+      "Lbr0LeaveConfirmation": {
+        "actionType": "JSFunctionAsync",
+        "method": "leaveConfirmation",
+        "events": {
+          "success": [
+            {
+              "name": "libMgmt.Lbr0ShowObjectAction"
+            }
+          ]
+        },
+        "deps": "js/editHandlerService"
+      },
+      "Lbr0CancelEdits": {
+        "actionType": "JSFunction",
+        "method": "cancelEdits",
+        "events": {
+          "success": [
+            {
+              "name": "libMgmt.Lbr0ShowObjectAction"
+            }
+          ]
+        },
+        "deps": "js/editHandlerService"
+      }
+    },
+    "onEvent": [
+      {
+        "eventId": "libMgmt.Lbr0CheckEditInProgress",
+        "action": "Lbr0CheckEditInProgress"
+      },
+      {
+        "eventId": "libMgmt.Lbr0LeaveConfirmationSuccess",
+        "action": "Lbr0LeaveConfirmation"
+      },
+      {
+        "eventId": "libMgmt.Lbr0CancelEdits",
+        "action": "Lbr0CancelEdits"
+      },
+      {
+        "eventId": "libMgmt.Lbr0ShowObjectAction",
+        "action": "Lbr0ShowObjectAction"
+      }
+    ],
+    "conditions": {
+      "Lbr0ShowObjectActiveCondition": {
+        "expression": {
+          "$and": [
+            {
+              "$source": "ctx.selected",
+              "$query": {
+                "$source": "modelType.typeHierarchyArray",
+                "$query": {
+                  "$in": [
+                    "Lbr0Library"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "lbrOpenObjectCondition": {
+        "expression": "commandContext.vmo.type === 'Lbr0Library'"
+      }
+    }
+  },
+  "states": {
+    "lbr1_LibraryLocation": {
+      "data": {},
+      "type": "location"
+    },
+    "lbr1_LibraryResultsSubLocation": {
+      "controller": "LibrarySubLocationCtrl",
+      "data": {
+        "priority": 0,
+        "label": {
+          "source": "/i18n/LibrarymgmtMessages",
+          "key": "libraryResultsTitle"
+        },
+        "clientScopeURI": "Awp0SearchResults",
+        "nameToken": "lbr1.LibraryResultsSubLocation",
+        "context": {
+          "search": {
+            "provider": "Awp0FullTextSearchProvider",
+            "sortType": "Priority",
+            "chartTitle": {
+              "source": "/i18n/SearchMessages",
+              "key": "SearchResultsChartTitle"
+            },
+            "maxToLoad": 50,
+            "maxToReturn": 50,
+            "tableViewProperties": [
+              "object_name",
+              "checked_out_user",
+              "object_desc",
+              "release_status_list",
+              "fnd0InProcess",
+              "ics_subclass_name"
+            ]
+          }
+        },
+        "viewBase": "base"
+      },
+      "dependencies": [
+        "js/aw.library.sublocation.controller"
+      ],
+      "params": {
+        "searchCriteria": null,
+        "filter": null
+      },
+      "templateUrl": "/html/aw.native.sublocation.html",
+      "parent": "lbr1_LibraryLocation",
+      "type": "subLocation",
+      "url": "/lbr1.LibraryResultsSubLocation"
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-cls-properties.directive",
+        "js/aw-cls-property-group-tree-section.directive",
+        "js/aw-column.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-search-box.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-widget.directive"
+    ],
+    "data":{
+        "panelMode": -1,
+        "showAllProp" : true,
+        "unitSystem": {
+            "displayName": "{{i18n.unitSystemLabel}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "propertyRadioTrueText": "{{i18n.unitSystemMetric}}",
+            "propertyRadioFalseText": "{{i18n.unitSystemNonMetric}}",
+            "dbValue": "true"
+        },
+        "caption":{
+            "displayName": "{{i18n.properties}}",
+            "type": "STRING",
+            "dbValue":"{{i18n.properties}}"
+        },
+        "propFilter" : {
+            "dbValue": "",
+            "type": "STRING"
+        },
+        "propFilterText": {
+            "dbValue": "{{i18n.searchPlaceholder}}"
+        },
+        "propGroupFilter" : {
+            "dbValue": "",
+            "type": "STRING"
+        },
+        "propgrouptype" : "PropGroup",
+        "propGroupFilterText": {
+            "dbValue": "{{i18n.searchPlaceholder}}"
+        }
+    },
+    "actions": {
+        "selectNode":{
+            "actionType": "JSFunction",
+            "method": "selectNodeForNode",
+            "inputData": {
+                "data": "{{data}}",
+                "selected":"{{ctx.clsAdmin.NodeIdClassId}}",
+                "type":"Attributes"
+            },
+            "events": {
+                "success": [ {
+                    "name": "reveal"
+                } ]
+            },
+            "deps":"js/classifyAdminService"
+        },
+        "changePreference": {
+            "actionType": "TcSoaService",
+            "serviceName": "Administration-2012-09-PreferenceManagement",
+            "method": "setPreferences2",
+            "inputData": {
+                "preferenceInput": [ {
+                    "preferenceName": "CLS_is_presentation_hierarchy_active",
+                    "values": [ "true" ]
+                } ]
+            },
+            "events": {
+                "success": [ {
+                    "name": "revealClassInfo"
+                } ]
+            }
+        },
+        "resetAttributeFilter": {
+            "actionType": "JSFunction",
+            "method": "resetAttributeFilter",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "drillToNextLevel": {
+            "actionType": "JSFunction",
+            "method": "detectNode",
+            "inputData": {
+                "selectedNode": "{{ctx.clsAdmin.nodeId}}",
+               "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "propertyFilter": {
+            "actionType": "JSFunction",
+            "method": "propertyFilter",
+            "inputData": {
+               "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "filterPropGroups": {
+            "actionType": "JSFunction",
+            "method": "filterPropGroups",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "filterProperties": {
+            "actionType": "JSFunction",
+            "method": "filterProperties",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        },
+        "getPropHeight": {
+            "actionType": "JSFunction",
+            "method": "getClsPropContainerHeight",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/classifyFullViewService"
+        }
+    },
+    "functions": {
+    },
+    "onEvent": [
+        {
+            "eventId":"refreshClassApp",
+            "action":"selectNode",
+            "condition": "ctx.clsAdmin.NodeIdClassId !== undefined"
+        },
+        {
+            "eventId":"revealClassInfo",
+            "action":"selectNode",
+            "condition": "ctx.clsAdmin.NodeIdClassId !== undefined"
+        },
+        {
+            "eventId":"reveal",
+            "action":"drillToNextLevel"
+        },
+        {
+             "eventId":"NodeSelectionEvent",
+            "action":"propertyFilter",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.valueChanged",
+            "criteria": {
+                "condition": "conditions.clsFS"
+            },
+            "action": "getPropHeight"
+        },
+        {
+            "eventId": "condition.valueChanged",
+            "criteria": {
+                "condition": "conditions.showAll"
+            },
+            "action": "getPropHeight"
+        }
+    ],
+    "i18n": {
+        "propertyGroups": [ "ClassificationAdminMessages" ],
+        "searchPlaceholder": [ "ClassificationAdminMessages" ],
+        "attrProp":["ClassificationAdminMessages"],
+        "propertiesTitle":["ClassificationAdminMessages"],
+        "classProperties":["ClassificationAdminMessages"],
+        "SMLRAC":["ClassificationAdminMessages"],
+        "GRPNODE":["ClassificationAdminMessages"]
+    },
+    "lifecycleHooks": {
+        "onInit": "changePreference"
+    }
+}

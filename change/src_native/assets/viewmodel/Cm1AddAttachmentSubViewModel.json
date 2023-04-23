@@ -1,0 +1,351 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-form.directive"
+    ],
+    "data": {
+        "reference": {
+            "displayName": "{{i18n.reference}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "datasetType": {
+            "displayName": "{{i18n.datasetType}}",
+            "type": "STRING",
+            "hasLov": true
+        }
+    },
+    "actions": {
+        "assignObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "changeReferences.assignobject",
+                        "eventData": {
+                            "selectedObjects": "{{data.sourceObjects}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "createObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addObjectCM.startCreateObject"
+                    }
+                ]
+            }
+        },
+        "navigateToCreateChangePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "Cm1CreateChangeSub",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "startCreateObjectCM": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "datasetCM.createObject",
+                        "condition": "data.isDatasetCreate && !data.isDSMUsable"
+                    },
+                    {
+                        "name": "genericCM.createObject",
+                        "condition": "!data.isDatasetCreate"
+                    }
+                ]
+            }
+        },
+        "genericAddObjectCM": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2016-09-DataManagement",
+            "method": "createAttachAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addObjectCM.assignProjects",
+                        "condition": "data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects.length>0"
+                    },
+                    {
+                        "name": "addObjectCM.objectcreated"
+                    },
+                    {
+                        "name": "complete.subPanel",
+                        "eventData": {
+                            "source": "Cm1AddAttachmentSub"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "assignProjectsToCreatedObjectCM": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-ProjectLevelSecurity",
+            "method": "assignOrRemoveObjects",
+            "inputData": {
+                "assignedOrRemovedobjects": [
+                    {
+                        "projects": "{{data.dataProviders.getAssignedProjectsProvider.viewModelCollection.loadedVMObjects}}",
+                        "objectToAssign": [
+                            "{{data.createdMainObject}}"
+                        ],
+                        "objectToRemove": []
+                    }
+                ]
+            }
+        },
+        "getDatasetTypesWithDefaultRelationCM": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2015-10-DataManagement",
+            "method": "getDatasetTypesWithDefaultRelation",
+            "inputData": {
+                "fileExtensions": [
+                    "{{data.fileExt}}"
+                ]
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "DatasetType",
+                        "properties": [
+                            {
+                                "name": "datasettype_name"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "datasetTypesWithDefaultRelInfo": "output[0].datasetTypesWithDefaultRelInfo",
+                "fileExtension": "output[0].fileExtension",
+                "fileFormat": "output[0].datasetTypesWithDefaultRelInfo[0].refInfos.fileFormat",
+                "datasetTypeList": "{{function:getDatasetTypesFromTypesWithRelInfo}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "getdatasettypesuccessCM"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "createDatasetCM": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-04-DataManagement",
+            "method": "createDatasets",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "{{data.datasetName.dbValue}}",
+                        "container": {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        },
+                        "datasetFileInfos": [
+                            {
+                                "fileName": "{{data.fileName}}",
+                                "namedReferenceName": "{{data.reference.dbValue.referenceName}}",
+                                "isText": "{{function:getFileFormat}}"
+                            }
+                        ],
+                        "relationType": "",
+                        "description": "{{data.datasetDesc.dbValue}}",
+                        "name": "{{data.datasetName.dbValue}}",
+                        "type": "{{data.datasetType.dbValue.props.object_string.dbValues[0]}}"
+                    }
+                ]
+            },
+            "outputData": {
+                "fmsTicket": "datasetOutput[0].commitInfo[0].datasetFileTicketInfos[0].ticket",
+                "commitInfos": "datasetOutput[0].commitInfo[0]",
+                "relatedModified": "datasetOutput[0].dataset",
+                "createdObject": "datasetOutput[0].dataset"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "fmsTicketCM.update"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "uploadFileCM": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData": {
+                "request": {
+                    "method": "POST",
+                    "url": "{{Constants.fmsUrl}}",
+                    "headers": {
+                        "Content-type": "undefined"
+                    },
+                    "data": "{{data.formData}}"
+                }
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "datasetCM.fileUploaded"
+                    }
+                ]
+            }
+        },
+        "commitDatasetFilesCM": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-FileManagement",
+            "method": "commitDatasetFiles",
+            "inputData": {
+                "commitInput": [
+                    {
+                        "dataset": "{{data.commitInfos.dataset}}",
+                        "createNewVersion": true,
+                        "datasetFileTicketInfos": [
+                            {
+                                "datasetFileInfo": {
+                                    "clientId": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.clientId}}",
+                                    "fileName": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.fileName}}",
+                                    "namedReferencedName": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.namedReferenceName}}",
+                                    "isText": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.isText}}",
+                                    "allowReplace": "{{data.commitInfos.datasetFileTicketInfos[0].datasetFileInfo.allowReplace}}"
+                                },
+                                "ticket": "{{data.fmsTicket}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addObjectCM.objectcreated"
+                    },
+                    {
+                        "name": "complete.subPanel",
+                        "eventData": {
+                            "source": "Cm1AddAttachmentSub"
+                        }
+                    }
+                ]
+            }
+        },
+        "updateFormDataCM": {
+            "actionType": "JSFunction",
+            "method": "updateFormData",
+            "inputData": {
+                "fileData": {
+                    "key": "fmsTicket",
+                    "value": "{{data.fmsTicket}}"
+                },
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "datasetCM.datasetCreated"
+                    }
+                ]
+            },
+            "deps": "js/declUtils"
+        },
+        "deleteDatasetCM": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteObjects",
+            "inputData": {
+                "objects": [
+                    "{{data.createdObject}}"
+                ]
+            }
+        }
+    },
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId==='newTabPageSub' && ( data.creationType || data.isDatasetCreate )"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub'"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "changeReferences.assignobject",
+            "action": "navigateToCreateChangePanel"
+        },
+        {
+            "eventId": "addObjectCM.objectcreated",
+            "action": "navigateToCreateChangePanel"
+        },
+        {
+            "eventId": "addObjectCM.startCreateObject",
+            "action": "startCreateObjectCM"
+        },
+        {
+            "eventId": "genericCM.createObject",
+            "action": "genericAddObjectCM"
+        },
+        {
+            "eventId": "addObjectCM.assignProjects",
+            "action": "assignProjectsToCreatedObjectCM"
+        },
+        {
+            "eventId": "datasetCM.createObject",
+            "action": "getDatasetTypesWithDefaultRelationCM"
+        },
+        {
+            "eventId": "datasetCM.datasetCreated",
+            "action": "uploadFileCM"
+        },
+        {
+            "eventId": "datasetCM.fileUploaded",
+            "action": "commitDatasetFilesCM"
+        },
+        {
+            "eventId": "datasetCM.commitFailed",
+            "action": "deleteDatasetCM"
+        },
+        {
+            "eventId": "getdatasettypesuccessCM",
+            "action": "createDatasetCM"
+        },
+        {
+            "eventId": "fmsTicketCM.update",
+            "action": "updateFormDataCM"
+        }
+    ],
+    "i18n": {
+        "ADD_BUTTON_TITLE": [
+            "BaseMessages"
+        ]
+    }
+}

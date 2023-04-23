@@ -1,0 +1,310 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-popup2.directive",
+        "js/enable-when.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-row.directive",
+        "js/aw-break.directive"
+    ],
+    "data": {
+        "revisions": {
+            "isArray": "true",
+            "dbValue": []
+        }
+    },
+    "dataProviders": {
+        "revisionData": {
+            "response": "{{data.revisions.dbValue}}",
+            "selectionModelMode": "single",
+            "totalFound": "{{data.revisions.dbValue.length}}"
+        },
+        "freezeRevisionsDataProvider":{
+            "response": "{{data.filterResults}}",
+            "selectionModelMode": "single",
+            "totalFound": "{{data.filterResults.length}}"
+        }
+    },
+    "actions": {
+        "setFullTextRevisions": {
+            "actionType": "JSFunction",
+            "method": "setFullTextRevisions",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "handleFullTextSelection":{
+            "actionType": "JSFunction",
+            "method": "handleFullTextSelection",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "selectFirstTableRow":{
+            "actionType": "JSFunction",
+            "method": "selectFirstTableRow",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "updateContentLocally":{
+            "actionType": "JSFunction",
+            "method": "updateContentLocally",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "hidePopupPanel":{
+            "actionType": "JSFunction",
+            "method": "hidePopupPanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "getFullTextVersionsInfo": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-RequirementsManagement",
+            "method": "getFullTextVersionInfo",
+            "inputData": {
+                "inputs": [ {
+                    "operationType": "DERIVED",
+                    "selectedObjects": "{{function:getSelected}}",
+                    "baseURL": "{{function:getFmsBaseURL}}"
+                } ]
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                        "name": "Arm0FreezeRevision.parseGetFullTextResponse"
+                    }
+                ]
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "refreshRevisionsList": {
+            "actionType": "dataProvider",
+            "method": "freezeRevisionsDataProvider"
+        },
+        "freezeObject":{
+            "actionType": "JSFunction",
+            "method": "freezeObject",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/reuseRequirementService"
+        },
+        "freezeAtRevision": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceReqMgmt-2019-06-SpecNavigation",
+            "method": "reuseSpecification",
+            "inputData": {
+                "inputs": [ {
+                    "operationType": "{{data.operationType}}",
+                    "selectedElements": "{{function:getSelected}}",
+                    "dataset": "{{function:getDatasetId}}",
+                    "inputCtxt": {},
+                    "isDeep": false,
+                    "isRunInBackground": false,
+                    "options": {},
+                    "datasetVersion": "{{function:getVersion}}"
+                } ]
+            },
+            "outputData": {
+                "response": "reuseStatusList"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "Arm0FreezeRevision.updateContentLocally"
+                    },
+                    {
+                        "name": "Arm0FreezeRevision.hidePopupPanel"
+                    }
+                ],
+
+                "failure": [ {
+                    "condition": "errorCode.code==223201",
+                    "name": "layout.showToolInfo",
+                    "eventData": {
+                        "visible": false
+                    }
+                } ]
+            },
+            "deps": "js/reuseRequirementService"
+        }
+    },
+    "functions": {
+        "getVersion": {
+            "functionName": "getVersion",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getFreezeOperationType": {
+            "functionName": "getFreezeOperationType",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getDatasetId":{
+            "functionName": "getDatasetId",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getFmsBaseURL": {
+            "functionName": "getFmsBaseURL",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getSelected":{
+            "functionName": "getSelected",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "columnProviders": {
+        "freezeRevisionsColumnProvider": {
+            "frozenColumnIndex":-1,
+            "columns": [
+                {
+                    "name": "name",
+                    "displayName": "{{i18n.revisionNameColumn}}",
+                    "minWidth": 60,
+                    "width": 180,
+                    "enableColumnMenu": false
+                },
+                {
+                    "name": "revision",
+                    "displayName": "{{i18n.revisionColumn}}",
+                    "maxWidth": 300,
+                    "width": 60,
+                    "enableColumnMenu": false
+                },
+                {
+                    "name": "version",
+                    "displayName": "{{i18n.versionColumn}}",
+                    "width": 55,
+                    "enableColumnMenu": false
+                },
+                {
+                    "name": "last_modified_user",
+                    "displayName": "{{i18n.lastModifiedUserColumn}}",
+                    "minWidth": 100,
+                    "width": 115,
+                    "enableColumnMenu": false
+                },
+                {
+                    "name": "date_modified",
+                    "displayName": "{{i18n.dateModifiedColumn}}",
+                    "minWidth": 100,
+                    "width": 115,
+                    "enableColumnMenu": false
+                }
+            ]
+        }
+    },
+    "grids": {
+        "freezeRevisionsTable": {
+            "dataProvider": "freezeRevisionsDataProvider",
+            "columnProvider": "freezeRevisionsColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enablePinning": true,
+                "enableSorting": false,
+                "enableGridMenu": true
+            }
+        }
+    },
+    "onEvent":
+    [
+
+        {
+            "eventId": "freezeRevisionsDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleFullTextSelection"
+        },
+        {
+            "eventId": "FullTextRequirement.refreshRevisionList",
+            "action": "refreshRevisionsList"
+        },
+        {
+            "eventId": "Arm0FreezeRevision.parseGetFullTextResponse",
+            "action": "setFullTextRevisions"
+        },
+        {
+            "eventId":"Arm0FreezeRevision.getFullTextVersionsInfo",
+            "action":"getFullTextVersionsInfo"
+        },
+        {
+            "eventId": "Arm0FreezeRevision.selectFirstTableRow",
+            "action": "selectFirstTableRow"
+        },
+        {
+            "eventId":"Arm0FreezeRevision.updateContentLocally",
+            "action": "updateContentLocally"
+        },
+        {
+            "eventId":"Arm0FreezeRevision.hidePopupPanel",
+            "action": "hidePopupPanel"
+        },
+        {
+            "eventId":"Arm0FreezeRevision.FreezeSingleSelected",
+            "action": "freezeAtRevision"
+        }
+    ],
+    "i18n": {
+        "freeze": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "preview" : [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "revision": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "unfreeze": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "revisionNameColumn":[
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "revisionColumn":[
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "versionColumn":[
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "lastModifiedUserColumn":[
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "dateModifiedColumn":[
+            "RichTextEditorCommandPanelsMessages"
+        ],
+        "freezeToLatest":[
+            "RichTextEditorCommandPanelsMessages"
+        ]
+    },
+    "conditions": {
+        "isRevisionsTableEnabled": {
+            "expression": "data.freezeRevision.dbValue===false"
+        }
+    }
+}

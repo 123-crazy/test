@@ -1,0 +1,86 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-command-bar.directive"
+    ],
+    "actions":
+    {
+        "updateSelection": {
+            "actionType": "JSFunction",
+            "method": "updateSelection",
+            "deps": "js/Awp0PerformTask",
+            "inputData":
+             {
+               "name": "{{ctx.selected}}",
+               "isPanelContext" : true
+             }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "complete",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "functions":
+    {
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "listDataProvider.selectionChangeEvent",
+            "action": "updateSelection"
+        },
+        {
+            "eventId": "gridDataProvider.selectionChangeEvent",
+            "action": "updateSelection"
+        },
+        {
+            "eventId": "imageDataProvider.selectionChangeEvent",
+            "action": "updateSelection"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "condition": "ctx.locationContext['ActiveWorkspace:Location'] !== 'com.siemens.splm.client.inbox.tasksLocation'",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "Workflow.closeOpenedPanel",
+            "action": "closePanel"
+        }
+
+    ],
+
+    "conditions":
+    {
+        "isGenericEPMTaskObject":
+        {
+            "expression": "( (ctx.task_to_perform.task[0].type != 'EPMConditionTask' && ctx.task_to_perform.task[0].type != 'EPMSelectSignoffTask' && ctx.task_to_perform.task[0].type != 'EPMRouteTask' && ctx.task_to_perform.task[0].type != 'EPMDoTask' && ctx.task_to_perform.task[0].type != 'Signoff' &&  ctx.task_to_perform.task[0].type != 'EPMPerformSignoffTask') && ctx.task_to_perform.task[0].modelType.typeHierarchyArray.indexOf('EPMTask') >= 0)"
+        }
+    },
+
+    "i18n":
+    {
+        "performTask":
+        [
+            "InboxMessages"
+        ]
+    }
+
+}

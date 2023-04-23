@@ -1,0 +1,24 @@
+<aw-command-panel caption="data.caption">
+    <aw-panel-body>
+        <aw-command-panel-section caption="i18n.includedLO">
+            <aw-widget prop="data.logicalObjectID"></aw-widget>
+            <aw-widget prop="data.displayName"></aw-widget>
+        </aw-command-panel-section>
+        <aw-command-panel-section caption="{{seg.caption}}"
+            anchor="(!$first&&$last)?data.removeSegmentCommands:''"
+            aw-repeat="seg:data.segments" context="data">
+            <aw-radiobutton prop="seg.props.fnd0Direction" action="clearSegment"></aw-radiobutton>
+            <aw-widget prop="seg.props.fnd0RelationOrReference" visible-when="seg.props.fnd0Direction.dbValue"></aw-widget>
+            <aw-widget prop="seg.props.fnd0DestinationType"></aw-widget>
+            <aw-widget prop="seg.props.fnd0RelationOrReference" visible-when="!seg.props.fnd0Direction.dbValue"></aw-widget>
+            <aw-widget prop="seg.props.fnd0DestinationCriteria"></aw-widget>
+        </aw-command-panel-section>
+        <aw-command-panel-section caption="{{data.addSegmentCaption}}"
+            visible-when="conditions.isValidToAddSegment"
+            anchor="data.addSegmentCommands" context="data">
+        </aw-command-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+        <aw-button action="specialCharacterCheckIncludedLogicalObject" visible-when="conditions.isValidToAddIncludedLogicalObject"><aw-i18n>i18n.add</aw-i18n></aw-button>
+    </aw-panel-footer>
+</aw-command-panel>

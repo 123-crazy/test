@@ -1,0 +1,287 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-enter-key.directive",
+        "js/aw-property-integer-val.directive",
+        "js/aw-list.directive"
+    ],
+
+    "actions": {
+
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "getPreferredUnitEffectivitiesAction"
+                },
+                {
+                    "action": "activateCurrentView",
+                    "condition": "conditions.isActiveViewDifferent"
+                }
+            ]
+        },
+
+        "activateCurrentView": {
+            "actionType": "JSFunction",
+            "method": "updateActiveContext",
+            "inputData": {
+                "data": "{{data.viewKey}}"
+            },
+            "deps": "js/contextStateMgmtService"
+        },
+
+        "updateUnitEffectivity": {
+            "actionType": "JSFunction",
+            "method": "updateUnitEffectivity",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+
+        "applyUnitEffectivity": {
+            "actionType": "JSFunction",
+            "method": "applyUnitEffectivity",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+        "selectUnitEffectivity": {
+            "actionType": "JSFunction",
+            "method": "selectUnitEffectivity",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+
+        "getPreferredUnitEffectivitiesAction": {
+            "actionType": "dataProvider",
+            "method": "getPreferredUnitEffectivities"
+        },
+
+        "getPreferredUnitEffectivities": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-ActiveWorkspaceBom-2019-12-OccurrenceConfiguration",
+            "method": "getConfigurationRules2",
+            "inputData": {
+                "input": {
+                    "maxToLoad": 20,
+                    "startIndex": 0,
+                    "searchCriteria": "",
+                    "productContext": {
+                        "type": "Awb0ProductContextInfo",
+                        "uid": "{{data.contextKeyObject.productContextInfo.uid}}"
+                    },
+
+                    "typeToFetch": "RevisionRule",
+                    "fetchOnlyPreferredConfiguration": true
+                }
+            },
+
+            "outputData": {
+                "unitEffectivities": "{{function:processUnitEffectivity}}"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "errorInGettingPreferredConfigInfo"
+                } ]
+            },
+
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+
+        "applyUnitEffectivityChangeBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateJitterFreePropLoadOnCurrentContext"
+                },{
+                    "action": "applyUnitEffectivityChange"
+                }
+            ]
+        },
+        "updateJitterFreePropLoadOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref.jitterFreePropLoad",
+                "value": true
+            },
+            "deps": "js/appCtxService"
+        },
+        "applyUnitEffectivityChange": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "{{data.contextKey + '.configContext'}}",
+                "value": {
+                    "r_uid": "{{data.contextKeyObject.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "var_uids": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "de": "{{data.contextKeyObject.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "ue": "{{data.eventData.effectiveUnit}}",
+                    "ei_uid": "{{data.eventData.endItem.uid}}",
+                    "eg_uids": "{{data.eventData.egos}}",
+                    "startFreshNavigation": true
+                }
+            },
+
+            "deps": "js/appCtxService"
+        },
+
+        "launchGroupEffectivityPanel": {
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData": {
+                "commandId": "Awb0GroupEffectivity",
+                "location": "aw_navigation"
+            }
+        },
+
+        "NavigateToGroupEffectivitiesPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "GroupEffectivities",
+                        "title": "{{data.i18n.groupEffectivities}}",
+                        "recreatePanel": true,
+                        "supportGoBack": true
+                    }
+                } ]
+            }
+        },
+
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        }
+    },
+
+    "dataProviders": {
+        "getPreferredUnitEffectivities": {
+            "action": "getPreferredUnitEffectivities",
+            "response": "{{data.unitEffectivities}}",
+            "selectionModelMode": "single"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "getPreferredUnitEffectivities.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updateUnitEffectivity"
+        },
+        {
+            "eventId": "getPreferredUnitEffectivities.modelObjectsUpdated",
+            "cacheEventData": true,
+            "action": "selectUnitEffectivity"
+        },
+        {
+            "eventId": "awConfigPanel.unitEffectivityChanged",
+            "cacheEventData": true,
+            "action": "applyUnitEffectivityChangeBatchJob"
+        },
+        {
+            "eventId": "awConfigPanel.groupEffectivityClicked",
+            "cacheEventData": true,
+            "action": "launchGroupEffectivityPanel",
+            "condition" : "data.subPanelContext === undefined || data.subPanelContext !== undefined && data.subPanelContext.activeView !== 'ConfigurationPanelFilters'"
+        },
+        {
+            "eventId": "awConfigPanel.groupEffectivityClicked",
+            "cacheEventData": true,
+            "action": "NavigateToGroupEffectivitiesPanel",
+            "condition" : "data.subPanelContext !== undefined"
+        }
+    ],
+
+    "functions": {
+        "processUnitEffectivity": {
+            "functionName": "processUnitEffectivity",
+            "parameters": [ "{{data}}" ]
+        }
+    },
+
+    "messages": {
+
+        "errorInGettingPreferredConfigInfo": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorInGettingPreferredConfigInfo}}"
+        }
+
+    },
+
+    "data": {
+
+        "newUnitEffectivity": {
+            "displayName": "",
+            "type": "INTEGER",
+            "requiredText": "n",
+            "propertyLabelDisplay": "NO_PROPERTY_LABEL",
+            "validationCriteria": [ {
+                "condition": "conditions.isPositiveNumber",
+                "value": "{{i18n.shouldBePositiveNumber}}"
+            } ]
+        },
+
+        "effectivityGroups": {
+            "uiValue": "{{i18n.effectivityGroups}}",
+            "type": "STRING"
+        },
+
+        "multipleGroups": {
+            "uiValue": "{{i18n.multipleGroups}}",
+            "type": "STRING"
+        },
+
+        "effectivityUnitSectionAllUnitsValue": {
+            "uiValue": "{{i18n.effectivityUnitSectionAllUnitsValue}}",
+            "displayName": "{{i18n.effectivityUnitSectionAllUnitsValue}}",
+            "type": "STRING"
+        }
+    },
+    "conditions": {
+        "isActiveViewDifferent": {
+            "expression": "data.viewKey !== ctx.aceActiveContext.key"
+        },
+        "isPositiveNumber": {
+            "expression": "data.newUnitEffectivity.dbValue < 0"
+        }
+    },
+
+    "i18n": {
+        "effectivityGroups": [
+            "OccurrenceManagementConstants"
+        ],
+        "multipleGroups": [
+            "OccurrenceManagementConstants"
+        ],
+        "errorInGettingPreferredConfigInfo": [
+            "OccurrenceManagementMessages"
+        ],
+        "shouldBePositiveNumber": [
+            "OccurrenceManagementMessages"
+        ],
+        "effectivityUnitSectionAllUnitsValue": [
+            "OccurrenceManagementConstants"
+        ],
+        "groupEffectivities": [
+            "OccurrenceManagementConstants"
+       ]
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    }
+}

@@ -1,0 +1,129 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-property-non-edit-val.directive",
+        "js/aw-link-with-popup.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions": {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "initializeUnitEffectivityInfo"
+                }
+            ]
+        },
+        "initializeUnitEffectivityInfo": {
+            "actionType": "JSFunction",
+            "method": "getInitialUnitEffectivityConfigurationData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+
+        "updateUnitEffectivityText": {
+            "actionType": "JSFunction",
+            "method": "updateUnitEffectivityText",
+            "inputData": {
+                "eventData": "{{data.eventData}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+        "getGroupEffectivityNames": {
+            "actionType": "JSFunction",
+            "method": "getInitialUnitEffectivityConfigurationData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.navigate",
+            "condition": "destPanelId === 'ConfigurationPanelFilters'",
+            "action": "getGroupEffectivityNames"
+        },
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeUnitEffectivityInfo",
+            "condition": "data.contextKey === 'aceActiveContext.context' || data.contextKey === ctx.aceActiveContext.key"
+        },
+        {
+            "eventId": "awConfigPanel.unitEffectivityChanged",
+            "cacheEventData": true,
+            "condition": "data.viewKey === ctx.aceActiveContext.key",
+            "action": "updateUnitEffectivityText"
+        }
+    ],
+
+    "data": {
+        "effectivityUnitSectionAllUnitsTitle": {
+            "uiValue": "{{i18n.effectivityUnitSectionAllUnitsTitle}}",
+            "type": "STRING"
+        },
+
+        "effectivityUnitSectionAllUnitsValue": {
+            "uiValue": "{{i18n.effectivityUnitSectionAllUnitsValue}}",
+            "displayName": "{{i18n.effectivityUnitSectionAllUnitsValue}}",
+            "type": "STRING"
+        },
+
+        "currentEffectiveUnit": {
+            "uiValue": "{{data.currentEffectiveUnit}}",
+            "type": "STRING"
+        },
+
+        "effectivityGroups": {
+            "uiValue": "{{i18n.effectivityGroups}}",
+            "type": "STRING"
+        },
+
+        "multipleGroups": {
+            "uiValue": "{{i18n.multipleGroups}}",
+            "type": "STRING"
+        }
+    },
+
+    "i18n": {
+
+        "effectivityUnitSectionAllUnitsValue": [
+            "OccurrenceManagementConstants"
+        ],
+
+        "effectivityUnitSectionAllUnitsTitle": [
+            "OccurrenceManagementConstants"
+        ],
+
+        "effectivityGroups": [
+            "OccurrenceManagementConstants"
+        ],
+
+        "multipleGroups": [
+            "OccurrenceManagementConstants"
+        ],
+
+        "errorInGettingPreferredConfigInfo": [
+            "OccurrenceManagementMessages"
+        ]
+    }
+}

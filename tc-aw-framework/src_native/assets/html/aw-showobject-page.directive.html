@@ -1,0 +1,21 @@
+<div class="aw-layout-flexRowContainer aw-layout-flexbox" ng-class="['aw-layout-locationPanel', locationPanelStyle, {'aw-layout-summaryOnly': layoutSummaryOnly, 'afx-layout-fullscreen': ctx.fullscreen}]">
+    <aw-row wrap-style="nowrap">
+        <aw-column width="fill" wrap-style="nowrap">
+            <aw-row height="7f" wrap-style="nowrap" class="afx-layout-header-container" ng-class="{'afx-layout-fullscreen-header-container': ctx.fullscreen}">
+                <aw-showobject-header headerVMO="headerViewModel" headerTitle="headerTitle" headerProperties="headerProperties" subLocationTabs="subLocationTabs" api="api" sub-panel-context="subPanelContext"></aw-showobject-header>
+            </aw-row>
+            <aw-row height="4f" wrap-style="nowrap" ng-show="subLocationTabs.length > 1 && !ctx.fullscreen">
+                <nav aria-label="i18n.secondaryNavigation" class="aw-layout-subLocationTitles afx-medium-background">
+                    <aw-tab-container tab-container-model="subLocationTabs" callback="api" tab-set-id="primary">
+                        <aw-tab tab-model="tab" ng-repeat="tab in subLocationTabs | filter:{displayTab:true}" ></aw-tab>
+                    </aw-tab-container>
+                </nav>
+            </aw-row>
+            <aw-row height="fill" wrap-style="nowrap" class="aw-layout-subLocation afx-content-background">
+                <aw-column wrap-style="nowrap" width="fill">
+                    <ng-transclude class="aw-layout-flexColumn"></ng-transclude>
+                </aw-column>
+            </aw-row>
+        </aw-column>
+    </aw-row>
+</div>

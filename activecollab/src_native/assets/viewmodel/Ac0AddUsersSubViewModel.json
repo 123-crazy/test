@@ -1,0 +1,201 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-include.directive",
+        "js/aw-property-label.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "revealParticipants":
+        {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "setData": {
+            "actionType": "JSFunction",
+            "method": "setParentData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Ac0ConversationService"
+        },
+        "search":
+        {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}",
+                "participantType":"{{ctx.workflow.participantType}}"
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "User",
+                        "properties":
+                        [
+                            {
+                                "name": "person",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            },
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "default_group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+
+            "deps": "js/Ac0UserPanelService"
+        },
+        "addUsers": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "createNewConv.addUsers",
+                        "eventData": {
+                            "selectedObjects": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "Ac0ConvCreateNewConvPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": {
+                            "destPanelId": "{{ctx.Ac0ConvCtx.invokingPanel}}",
+                            "data": "{{data}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "data":
+    {
+        "filterBox":
+        {
+            "displayName": "{{i18n.myFilter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "searchString":
+        {
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+
+    "dataProviders":
+    {
+        "userPerformSearch":
+        {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode":"multiple",
+            "commands": {
+               "Awp0ShowObjectCell":
+               {
+                   "id": "cmdOpen",
+                   "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                   "priorities": [ 300 ],
+                   "dependencies": [ "js/showObjectCommandHandler" ],
+                   "displayOption": "ON_HOVER_AND_SELECTION",
+                   "position": "TOP_RIGHT"
+               }
+           },
+           "noResultsFound" : "{{i18n.noResultsFound}}"
+        }
+    },
+
+    "conditions": {
+        "isSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        },
+        "isValidToAdd":
+        {
+            "expression": "data.dataProviders.userPerformSearch.selectedObjects != null && data.dataProviders.userPerformSearch.selectedObjects.length > 0"
+        },
+        "isShowNoResultMessage":
+        {
+           "expression": "data.dataProviders.userPerformSearch.noResults"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "createNewConv.addUsers",
+            "action": "Ac0ConvCreateNewConvPanel"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Ac0AddUsersSub"
+            },
+            "action": "revealParticipants"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Ac0AddUsersSub"
+            },
+
+            "action": "setData"
+        }
+    ],
+    "i18n": {
+        "addButtonTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "myFilter": [
+            "ActiveCollabDeclarativeMessages"
+        ]
+    }
+}

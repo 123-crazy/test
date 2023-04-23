@@ -1,0 +1,432 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-title-link.directive",
+        "js/aw-listbox.directive"
+    ],
+    "actions": {
+        "getNextId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "getNextIds",
+            "inputData": {
+                "vInfoForNextId": [ {
+                    "typeName": "CAW0Ishikawa",
+                    "propName": "caw0Id",
+                    "pattern": "nnnnnnnnn"
+                } ]
+            },
+            "outputData": {
+                "nextId": "nextIds[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.createIshikawaObject"
+                    }
+                ]
+            }
+        },
+        "createIshikawaObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateObjectInput}}"
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "addElementResponse": ""
+            },
+            "deps": "js/Caw0PropertyUpdateService",
+            "events": {
+                "success": [ {
+                    "name": "caw0.createRelation"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==26050",
+                    "message": "createRelFailureMsg"
+                } ]
+            }
+        },
+        "create5WhyObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": [
+                    {
+                        "clientId": "CreateObject",
+                        "createData": {
+                            "boName": "{{ctx.selectedObjectType}}",
+                            "propertyNameValues": {
+                                "caw0Id": [
+                                    "{{data.nextId}}"
+                                ],
+                                "object_desc": [
+                                    "{{data.object_desc.dbValue}}"
+                                ],
+                                "caw0ProbDefinition": [
+                                    "{{data.caw0ProbDefinition.dbValue}}"
+                                ],
+                                "caw0IshikawaCauseGroup": "{{data.caw0IshikawaCauseGroup.dbValue}}",
+                                "caw0ParentObject": [
+                                    "{{ctx.selected.uid}}"
+                                ]
+                            },
+                            "compoundCreateInput": {}
+                        },
+                        "workflowData": {}
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObject": "{{function:getCreatedObject}}",
+                "addElementResponse": ""
+            },
+            "deps": "js/addObjectUtils",
+            "events": {
+                "success": [ {
+                    "name": "caw0.createRelation"
+                } ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==26050",
+                    "message": "createRelFailureMsg"
+                } ]
+            }
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.selected}}",
+                    "secondaryObject": "{{data.createdObject}}",
+                    "relationType": "CAW0RelatedIshikawa",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "addElement.added",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "getCauses": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-Session",
+            "method": "getPreferences",
+            "inputData": {
+                "requestedPrefs": [ {
+                    "scope": "Site",
+                    "names": [
+                        "CAW0IshikawaCauseGroupVal"
+                    ]
+                } ]
+            },
+            "outputData": {
+                "preferences": "{{function:getICGValues}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "updateICGValues"
+                } ]
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "updateICGValues": {
+            "actionType": "JSFunction",
+            "method": "updateICGValues",
+            "deps": "js/Caw0PropertyUpdateService",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        },
+        "validateList": {
+            "actionType": "JSFunction",
+            "method": "rejectSuggestions",
+            "inputData": {
+                "selected": "request.selected",
+                "suggestion": "request.suggestion",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "valid": "valid",
+                "message": "message"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "updatePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "autoSelectType": {
+            "actionType": "JSFunction",
+            "method": "autoSelectType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "loadAnalysisDimension": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "caw0AnalysisDimension",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "CAW0Ishikawa"
+                    }
+                }
+            },
+            "outputData": {
+                "dimension": "{{function:getLOVListOfAnalysis}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "updatePanelData": {
+            "actionType": "JSFunction",
+            "method": "updatePanelData",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "deletePanelData": {
+            "actionType": "JSFunction",
+            "method": "deletePanelData",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "updatePanelData",
+        "onUnmount":"deletePanelData"
+    },
+    "onEvent": [ {
+            "eventId": "caw0.createIshikawaObject",
+            "action": "createIshikawaObject"
+        },
+        {
+            "eventId": "caw0.createRelation",
+            "action": "createRelation"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "getCauses"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "condition": "ctx.tcSessionData.tcMajorVersion >= 13",
+            "action": "loadAnalysisDimension"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "updateICGValues",
+            "action": "updateICGValues"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updatePanel"
+        },
+        {
+            "eventId": "awTypeSelector.modelObjectsUpdated",
+            "action": "autoSelectType"
+        }
+    ],
+    "dataProviders": {
+        "getCausesProvider": {
+            "initializeAction": "getCauses",
+            "validateAction": "validateList",
+            "response": "{{data.preferences}}",
+            "valid": "{{data.valid}}",
+            "message": "{{data.message}}",
+            "moreValuesExist": false
+        }
+    },
+    "data": {
+        "object_name": {
+            "displayName": "{{i18n.name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "Ishikawa",
+            "maxLength":128
+        },
+        "caw0ProbDefinition": {
+            "displayName": "{{i18n.probDefinition}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.selected.props.object_name.dbValues[0]}}",
+            "maxLength":256
+        },
+        "object_desc": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "dbValue": "",
+            "maxLength":240
+        },
+        "caw0IshikawaCauseGroup": {
+            "displayName": "{{i18n.causeGroup}}",
+            "type": "STRINGARRAY",
+            "isRequired": true,
+            "isArray": true,
+            "dataProvider": "getCausesProvider"
+        },
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "caw0AnalysisDimension": {
+            "displayName": "{{i18n.caw0AnalysisDimension}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true",
+            "hasLov": "true",
+            "hasInitialValue": "true",
+            "initialize": "true"
+        },
+        "caw0AnalysisDimensionStatic": {
+            "displayName": "{{i18n.caw0AnalysisDimension}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "{{ctx.selected.caw0AnalysisDimension}}",
+            "uiValue": "{{ctx.selected.caw0AnalysisDimension}}",
+            "isEditable": "false"
+        }
+    },
+    "conditions": {
+        "isNameDescCauseGroupEmpty": {
+            "expression": "data.caw0IshikawaCauseGroup.dbValue.length !== 0 && data.caw0ProbDefinition.dbValue !=='' && data.caw0ProbDefinition.dbValue !==null && data.caw0ProbDefinition.dbValue !== undefined"
+        }
+    },
+    "messages": {
+        "createRelFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "functions": {
+        "getCreateObjectInput": {
+            "functionName": "getCreateObjectInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}",
+                "addingIshikawa"
+            ]
+        }
+    },
+    "i18n": {
+        "probDefinition": [
+            "CAW0CapaMessages"
+        ],
+        "description": [
+            "CAW0CapaMessages"
+        ],
+        "whyType": [
+            "CAW0CapaMessages"
+        ],
+        "fiveWhy": [
+            "CAW0CapaMessages"
+        ],
+        "name": [
+            "CAW0CapaMessages"
+        ],
+        "causeGroup": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Ishikawa": [
+            "CAW0CapaMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ],
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "caw0AnalysisDimension": [
+            "CAW0CapaMessages"
+        ]
+    }
+}

@@ -1,0 +1,41 @@
+<aw-flex-row height="48f">
+    <aw-command-panel exist-when="ctx.searchFolder.isEditMode === true && ctx.searchFolder.awp0SearchType !== 'Unknown'" caption="" hide-title="true">
+        <aw-panel-body scrollable="true">
+            <aw-panel-section>
+                <div>
+                    <aw-label exist-when="ctx.searchFolder.useRule === 'savedSearch' && ctx.searchFolder.searchCriteria.searchString" prop="data.keyWordLabel"></aw-label>
+                </div>
+            </aw-panel-section>
+            <aw-panel-section>
+                <div class="aw-layout-flexColumn">
+                    <div class="aw-layout-panelSectionTitle aw-search-folderFilter">
+                        <label title="{{i18n.searchFiltersTitle}}">{{i18n.searchFiltersTitle}}</label>
+                    </div>
+                    <div>
+                        <aw-expandable-search-result-filter filters="ctx.searchResponseInfo"></aw-expandable-search-result-filter>
+                    </div>
+                    <div>&nbsp;</div>
+                </div>
+            </aw-panel-section>
+            <!-- Start of the 'navigation' section which contains the hierarchy filters. -->
+            <aw-panel-section visible-when="data.categories.navigateCategories && data.categories.navigateCategories.length > 0">
+                <aw-filter-category category-action="selectHierarchyCategory" search-action="selectHierarchyFilter" category="item" aw-repeat="item : data.categories.navigateCategories track by $index">
+                </aw-filter-category>
+
+                <!-- Separator between the Navigate and Refine filters. Only visible when there are navigation filters present.-->
+                <aw-filter-separator visibleWhen="data.categories.navigateCategories.length > 0">
+                    <aw-i18n>i18n.refine</aw-i18n>
+                </aw-filter-separator>
+            </aw-panel-section>
+            <!-- Start of the 'refine' section. -->
+            <aw-panel-section>
+                <aw-filter-in-filters-searchbox category="data.categories.refineCategories" index="-1" filterAction="filterAction" text="this" prop="data.searchBox1" exist-when="data.categories.refineCategories.length > 0">
+                </aw-filter-in-filters-searchbox>
+            </aw-panel-section>
+            <aw-panel-section>
+                <aw-filter-category expand-action="selectCategory2" category-action="selectCategory" search-action="selectFilter" category="item" disable-type-ahead-facet-search="{{ctx.preferences.AW_DisableTypeAheadFacetSearch[0]}}" aw-repeat="item : data.categories.refineCategories | filterInFiltersSearch :data.searchBox1.dbValue:this track by $index">
+                </aw-filter-category>
+            </aw-panel-section>
+        </aw-panel-body>
+    </aw-command-panel>
+</aw-flex-row>

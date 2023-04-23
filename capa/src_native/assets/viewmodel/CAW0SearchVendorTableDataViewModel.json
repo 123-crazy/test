@@ -1,0 +1,190 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-form.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "actions": {
+        "loadVendorDataAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "searchInput": {
+                    "maxToLoad": 25,
+                    "maxToReturn": 25,
+                    "providerName": "CAW0VendorTableDataProvider",
+                    "searchCriteria": {
+                        "parentUid": "{{ctx.xrtSummaryContextObject.uid}}",
+                        "searchString": "{{data.filterBox.dbValue}}",
+                        "isSearchPanel": "true",
+                        "objectSet": "{{ctx.selectedTableObjectSource[0]}}"
+                    },
+                    "startIndex": "{{data.dataProviders.loadVendorTableData.startIndex}}"
+                }
+            },
+            "outputData": {
+                "searchResults": "{{function:getLoadedVendorData}}",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "showVendorDataList": {
+            "actionType": "dataProvider",
+            "method": "loadVendorTableData"
+        },
+        "createCMReferencesRelationWithPSP": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.xrtSummaryContextObject}}",
+                    "secondaryObject": "{{ctx.selectedFailure}}",
+                    "relationType": "CMReferences",
+                    "clientId": "CreateObject",
+                    "userData": ""
+                } ]
+            },
+            "outputData": {
+                "partialErrors": "ServiceData.partialErrors"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData":
+                    {
+                        "source": "toolAndInfoPanel"
+                    }
+                },
+                {
+                    "name": "cdm.relatedModified",
+                    "eventData": {
+                        "relatedModified": [
+                            "{{ctx.xrtSummaryContextObject}}"
+                        ],
+                        "refreshLocationFlag": false
+                    }
+                } ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "successMessage"
+                } ],
+                "failure": [
+                    {
+                        "condition": "partialErrors[0].errorValues[0].code === 35010",
+                        "message": "caw0DeleteSingleFailureMessage"
+                    }
+                ]
+            }
+        },
+        "updateSelectedVendorDataObject": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedFailure",
+            "inputData": {
+                "data": "{{data.eventData}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "closePanelOnSelectionChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "dataProviders": {
+        "loadVendorTableData": {
+            "action": "loadVendorDataAction",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getLoadedVendorData": {
+            "functionName": "getLoadedVendorData",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "messages": {
+        "successMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addFailureToDefect}}",
+            "messageTextParams": [
+                "{{ctx.selectedFailure.props.object_name.dbValues[0]}}"
+            ]
+        },
+        "caw0DeleteSingleFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.caw0DeleteSingleFailureMessage}}",
+            "messageTextParams": [
+                "{{data.partialErrors[0].errorValues[0].message}}"
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "showVendorDataList"
+        },
+        {
+            "eventId": "loadVendorTableData.selectionChangeEvent",
+            "action": "updateSelectedVendorDataObject",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "objectSet.selectionChangeEvent",
+            "action": "closePanelOnSelectionChange"
+        }
+    ],
+    "i18n": {
+        "addFailureToDefect": ["CAW0CapaMessages"],
+        "addPanelTitle": [ "TCUICommandPanelsMessages" ],
+        "addButtonTitle": [ "TCUICommandPanelsMessages" ],
+        "caw0DeleteSingleFailureMessage": ["CAW0CapaMessages"]
+    }
+}

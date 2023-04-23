@@ -1,0 +1,106 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-sub-panel.directive",
+        "js/aw-init.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-body.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "Qam0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Qam0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "updatePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Qam0AddGenericQualityActionService"
+        },
+        "autoSelectType":{
+          "actionType":"JSFunction",
+          "method":"autoSelectType",
+          "inputData":{
+             "data":"{{data}}"
+          },
+          "deps":"js/Qam0AddGenericQualityActionService"
+        }
+    },
+    "data": {
+        "addObjectPanelPinCommands": "qam0_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "i18n": {
+        "qam0AddCaption":[
+            "QualityActionMgmtMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "Qam0AddGenericQualityAction.Qam0SetPin",
+            "cacheEventData": true,
+            "action": "Qam0SetPin"
+        },
+        {
+            "eventId": "Qam0AddGenericQualityAction.Qam0SetUnPin",
+            "cacheEventData": true,
+            "action": "Qam0SetUnPin"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updatePanel"
+        },
+        {
+          "eventId": "awTypeSelector.modelObjectsUpdated",
+          "action": "autoSelectType"
+        },
+        {
+            "eventId": "gwt.SubLocationContentSelectionChangeEvent",
+            "condition": "ctx.locationContext.modelObject.type !== 'Fnd0HomeFolder'",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "objectSet.selectionChangeEvent",
+            "condition": "ctx.selected.type !== 'Qam0QualityAction'",
+            "action": "closePanel"
+        }
+    ]
+}

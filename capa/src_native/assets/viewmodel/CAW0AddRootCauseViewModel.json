@@ -1,0 +1,76 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive"
+    ],
+    "actions": {
+        "caw0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "caw0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "updatePanelData": {
+            "actionType": "JSFunction",
+            "method": "updatePanelData",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "deletePanelData": {
+            "actionType": "JSFunction",
+            "method": "deletePanelData",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "updatePanelData",
+        "onUnmount":"deletePanelData"
+    },
+    "data": {
+        "caw0PinWhyCommands": "caw0_whyPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "i18n": {
+        "caw0add": [
+            "CAW0CapaMessages"
+        ]
+    },
+    "onEvent": [
+        {
+            "eventId": "addWhy.caw0SetPin",
+            "cacheEventData": true,
+            "action": "caw0SetPin"
+        },
+        {
+            "eventId": "addWhy.caw0SetUnPin",
+            "cacheEventData": true,
+            "action": "caw0SetUnPin"
+        }
+    ]
+}

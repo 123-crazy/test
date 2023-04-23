@@ -1,0 +1,18 @@
+<div class="aw-xrt-objectSetToolbar">
+    <aw-toolbar first-anchor="aw_objectSet" second-anchor="{{::objsetdata.id}},aw_objectSet_right"
+      reverse-second orientation="HORIZONTAL" context="commandContext"></aw-toolbar>
+</div>
+
+<div class="aw-xrt-objectSetContent aw-layout-flexColumn aw-base-scrollPanel" ng-style="{'max-height': ( activeDisplay !== 'compareDisplay' ) ? objectSetHeight : undefined, 'width': objectSetWidth}">
+    <aw-list dataprovider="dataProvider" ng-if="activeDisplay === 'listDisplay'" show-drop-area="{{::showDropArea}}" show-context-menu="true" show-check-box="showCheckBox">
+        <aw-default-cell vmo="item"></aw-default-cell>
+    </aw-list>
+
+    <aw-list dataprovider="dataProvider" ng-if="activeDisplay === 'thumbnailDisplay'" show-drop-area="{{::showDropArea}}" show-context-menu="true" show-check-box="showCheckBox">
+        <aw-image-cell vmo="item"></aw-image-cell>
+    </aw-list>
+
+    <aw-splm-table gridid="{{gridId}}" container-height="::objectSetHeight-1" content-filter="contentFilter" ng-if="activeDisplay === 'tableDisplay' && gridId" show-drop-area="{{::showDropArea}}" show-context-menu="true" show-check-box="showCheckBox"></aw-splm-table>
+
+    <aw-compare2 gridid="{{gridId}}" container-height="::objectSetHeight-1" ng-if="activeDisplay === 'compareDisplay'"></aw-compare2>
+</div>

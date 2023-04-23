@@ -1,0 +1,241 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-search-box.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-tab-set.directive",
+        "js/visible-when.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "data": {
+        "searchInContext": {
+            "displayName": "{{i18n.searchInContext}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "isEditable": "true",
+            "dbValue": ""
+        },
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "",
+            "autofocus": "true"
+        },
+        "searchFilterPanels": [
+            {
+                "tabKey": "results",
+                "panelId": "resultsTabPageSub",
+                "name": "{{i18n.results}}",
+                "visibleWhen": "true"
+            },
+            {
+                "tabKey": "filters",
+                "panelId": "filtersTabPageSub",
+                "name": "{{i18n.filterTabTitle}}",
+                "visibleWhen": "true"
+            }
+        ],
+        "keyWord": {
+            "displayName": "{{i18n.keywordsLabel}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP",
+            "dispValue": "{{ctx.KeyWordsString}}"
+        },
+        "showAddObjectTabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "panelId": "resultsTabPageSub",
+                    "name": "{{i18n.results}}",
+                    "recreatePanel": true,
+                    "selectedTab": true
+                },
+                {
+                    "panelId": "filtersTabPageSub",
+                    "name": "{{i18n.filterTabTitle}}",
+                    "recreatePanel": true
+                }
+            ]
+        }
+    },
+    "actions": {
+        "clearSearchResult": {
+            "actionType": "JSFunction",
+            "method": "clearSearchResult",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/Arm0CreateTraceLink"
+        },
+        "search": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "CreateTracelink.searchInContext",
+                        "condition": "data.searchInContext.dbValue && ctx.occmgmtContext"
+                    },
+                    {
+                        "name": "CreateTracelink.searchGloabal",
+                        "condition": "!data.searchInContext.dbValue"
+                    }
+                ]
+            }
+        },
+        "searchGloabal": {
+            "actionType": "JSFunction",
+            "method": "findSubBusinessObjectsAndInvokeSearch",
+            "inputData": {
+                "input": "{{data}}"
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "searchInContext": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-Finder",
+            "method": "performSearch",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "Awb0OccurrenceManagement",
+                    "columnsToExclude": [],
+                    "hostingClientName": "",
+                    "operationType": "intersection"
+                },
+                "saveColumnConfigData": {
+                    "columnConfigId": "",
+                    "clientScopeURI": "",
+                    "columns": [],
+                    "scope": "",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "attributesToInflate": [],
+                    "internalPropertyName": "",
+                    "maxToLoad": 50,
+                    "maxToReturn": 50,
+                    "providerName": "Awb0FullTextSearchProvider",
+                    "searchCriteria": {
+                        "includeConnections": "",
+                        "productContextUids": "{{ctx.occmgmtContext.productContextInfo.uid}}",
+                        "productContextsToBeExcludedFromSearch": "",
+                        "searchContext": "{{ctx.occmgmtContext.productContextInfo.uid}}",
+                        "searchScope": "{{ctx.occmgmtContext.topElement.uid}}",
+                        "searchString": "Name={{data.searchBox.dbValue}};"
+                    },
+                    "searchFilterFieldSortType": "Priority",
+                    "searchFilterMap": {},
+                    "searchSortCriteria": [],
+                    "startIndex": "{{data.dataProviders.performSearch.startIndex}}"
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults"
+            }
+        },
+        "callDataProvider": {
+            "actionType": "dataProvider",
+            "method": "performSearchInContext"
+        },
+        "handleSearchSelection": {
+            "actionType": "JSFunction",
+            "method": "handleSearchSelection",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjects": "{{data.eventData.selectedUids}}"
+            },
+            "deps": "js/Arm0CreateTraceLink"
+        }
+    },
+    "dataProviders": {
+        "performSearchInContext": {
+            "action": "searchInContext",
+            "commands": {
+                "Awp0NavigateObject": {
+                    "id": "cmdShowChildren",
+                    "title": "Navigate Object",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/navigateObjectCommandHandler"
+                    ],
+                    "displayOption": "ALWAYS",
+                    "position": "TOP_RIGHT"
+                }
+            },
+            "noResultsFound": "{{i18n.noResultsFound}}",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "performSearchInContext.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleSearchSelection"
+        },
+        {
+            "eventId": "performSearch.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "handleSearchSelection"
+        },
+        {
+            "eventId": "CreateTracelink.searchInContext",
+            "action": "callDataProvider"
+        },
+        {
+            "eventId": "CreateTracelink.searchGloabal",
+            "action": "searchGloabal"
+        }
+    ],
+    "functions": {
+        "findSubBusinessObjectsAndInvokeSearch": {
+            "functionName": "findSubBusinessObjectsAndInvokeSearch",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isInContextSearchEnabled": {
+            "expression": "ctx.occmgmtContext"
+        },
+        "isInContextSearchSelected": {
+            "expression": "conditions.isInContextSearchEnabled && data.searchInContext.dbValue == true"
+        },
+        "showSearchFilterPanel": {
+            "expression": "data.showSearchFilter != undefined && data.showSearchFilter == true && !conditions.isInContextSearchSelected"
+        }
+    },
+    "i18n": {
+        "results": [
+            "UIMessages"
+        ],
+        "filterTabTitle": [
+            "awAddDirectiveMessages"
+        ],
+        "keywordsLabel": [
+            "awAddDirectiveMessages"
+        ],
+        "searchInContext": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "noResultsFound":
+        [
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

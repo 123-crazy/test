@@ -1,0 +1,96 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-include.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-data-navigator.directive",
+        "js/exist-when.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-navigate-breadcrumb.directive"
+    ],
+    "actions": {
+        "initializeCbaBomPanel": {
+            "actionType": "JSFunction",
+            "method": "initializeCbaBomPanel",
+            "deps": "js/CbaBomPanelService",
+            "inputData": {
+                "subPanelContext": "{{subPanelContext}}",
+                "data": "{{data}}"
+            }
+        },
+        "cleanupCbaBomPanel": {
+            "actionType": "JSFunction",
+            "method": "cleanupCbaBomPanel",
+            "deps": "js/CbaBomPanelService"
+        },
+        "activateCurrentView": {
+            "actionType": "JSFunction",
+            "method": "updateActiveContext",
+            "inputData": {
+                "data": "{{data.viewKey}}"
+            },
+            "deps": "js/contextStateMgmtService"
+        },
+        "initializeCbaBomPanelView":{
+            "actionType": "batchJob",
+            "steps": [
+                {
+                    "action": "initializeCbaBomPanel"
+                },
+                {
+                    "action": "activateCurrentView",
+                    "condition": "conditions.isActiveViewDifferent"
+                }
+            ]
+        },
+        "executeCommandOpenPanel":{
+            "actionType": "JSFunction",
+            "method": "activateCommandPanel",
+            "deps": "js/commandPanel.service",
+            "inputData":
+            {
+                "commandId": "EntCBAOpenInViewPanel",
+                "location": "aw_toolsAndInfo",
+                "context": "{{data.eventData}}"
+            }
+        }
+    },
+
+    "dataProviders": {
+
+    },
+
+    "lifecycleHooks": {
+        "onInit": "initializeCbaBomPanel",
+        "onUnmount": "cleanupCbaBomPanel"
+    },
+
+    "onEvent": [
+        {
+            "eventId": "cba.executeCommandOpenPanel",
+            "action": "executeCommandOpenPanel",
+            "cacheEventData": true,
+            "condition": "ctx.cbaContext && !ctx.cbaContext.ImpactAnalysis"
+        }
+    ],
+
+    "messages": {},
+
+    "conditions": {
+        "isActiveViewDifferent": {
+            "expression": "data.viewKey !== ctx.aceActiveContext.key"
+        },
+        "isPartitionEnable": {
+            "expression": "ctx[data.provider.viewKey].supportedFeatures.Fgf0OrganizationSchemeFeature===true && ctx[data.provider.viewKey].supportedFeatures.Awb0EnableConfigurationPanelFeature===true"
+        }
+    },
+
+    "data": {
+        "contextInfo":{}
+    },
+
+    "i18n":
+    {
+
+    }
+}

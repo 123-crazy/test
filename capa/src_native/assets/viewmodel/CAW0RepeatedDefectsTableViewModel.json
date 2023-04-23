@@ -1,0 +1,177 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-compare2.directive",
+        "js/exist-when.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "actions": {
+        "doDataProvider": {
+            "actionType": "dataProvider",
+            "method": "RepeatedDefectsTableProvider"
+        },
+        "getRelatedAttachements": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "searchSortCriteria": "{{data.columnProviders.RepeatedDefectsTableColumnProvider.sortCriteria}}",
+                "columnFilters": "{{data.columnProviders.RepeatedDefectsTableColumnProvider.columnFilters}}"
+            },
+            "deps": "js/CAW0RepeatedDefectsTableService",
+            "outputData": {
+                "PSPObjects": "totalLoaded",
+                "ctx.search.totalFound": "totalLoaded.length",
+                "ctx.search.totalLoaded": "totalLoaded.length",
+                "commandContext.dataProvider.columnConfig": "columnConfig"
+
+            },
+            "events": {
+                "success": [ {
+                    "name": "caw0.RepeatedProbDefectLoaded"
+                } ]
+            }
+        },
+        "loadColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.RepeatedDefectsTableProvider}}"
+            },
+
+            "deps": "js/CAW0RepeatedDefectsTableService"
+        },
+        "updateExportToExcelContext": {
+            "actionType": "JSFunction",
+            "method": "updateExportToExcelContext",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.RepeatedDefectsTableProvider}}",
+                "columnProvider": "{{data.columnProviders.RepeatedDefectsTableColumnProvider}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/CAW0RepeatedDefectsTableService"
+        },
+        "setObjectSetView": {
+            "actionType": "JSFunction",
+            "method": "setObjectSetView",
+            "inputData": {
+                "value": "{{!ctx.showCompareView}}",
+                "1": "tableDisplay",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "setProbDefectSearchCriteria": {
+            "actionType": "JSFunction",
+            "method": "setCommandContextProbDefectSearchCriteria",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0RepeatedDefectsTableService"
+        }
+    },
+    "dataProviders": {
+        "RepeatedDefectsTableProvider": {
+            "action": "getRelatedAttachements",
+            "response": "{{data.PSPObjects}}",
+            "totalFound": "{{data.totalFound}}",
+            "cols": "{{data.columns}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands"
+        },
+        "RepeatedDefectsCompareProvider": {
+            "response": "{{data.PSPObjects}}",
+            "totalFound": "{{data.totalFound}}",
+            "cols": "{{data.columns}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "columnProviders": {
+        "RepeatedDefectsTableColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex": 1
+        }
+    },
+    "data": {
+        "commandContext": {
+            "tableDataProviderName": "CAW0RepeatedDefectsProvider",
+            "clientScopeURI": "CAW0RepeatedProbDefects"
+        }
+    },
+    "grids": {
+        "RepeatedDefectsTable": {
+            "dataProvider": "RepeatedDefectsTableProvider",
+            "columnProvider": "RepeatedDefectsTableColumnProvider",
+            "addIconColumn": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "maxRowsToShow": 5,
+                "isFilteringEnabled": true,
+                "enableSorting": true,
+                "enablePinning": true
+            }
+        },
+        "RepeatedDefectsCompare": {
+            "dataProvider": "RepeatedDefectsCompareProvider",
+            "columnProvider": "RepeatedDefectsTableColumnProvider",
+            "gridOptions": {}
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "setObjectSetView"
+    },
+    "onEvent": [ {
+            "eventId": "caw0.refreshRepeatedDefectsObjectSet",
+            "action": "doDataProvider"
+        },
+        {
+            "eventId": "caw0.updateExportToExcelContext",
+            "action": "updateExportToExcelContext"
+        },
+        {
+            "eventId": "caw0.RepeatedProbDefectLoaded",
+            "action": "setProbDefectSearchCriteria"
+        },
+        {
+            "eventId": "cdm.relatedModified",
+            "cacheEventData": true,
+            "action": "doDataProvider"
+        }
+    ],
+    "i18n": {
+        "name": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Id": [
+            "CAW0CapaMessages"
+        ],
+        "description": [
+            "CAW0CapaMessages"
+        ],
+        "caw0Category": [
+            "CAW0CapaMessages"
+        ],
+        "caw0maturity": [
+            "CAW0CapaMessages"
+        ],
+        "caw0disposition": [
+            "CAW0CapaMessages"
+        ],
+        "creationDate": [
+            "CAW0CapaMessages"
+        ],
+        "caw0dateModified": [
+            "CAW0CapaMessages"
+        ],
+        "caw0teamLeader": [
+            "CAW0CapaMessages"
+        ]
+    }
+}

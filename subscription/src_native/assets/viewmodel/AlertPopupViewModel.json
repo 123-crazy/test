@@ -1,0 +1,66 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+      "js/aw-i18n.directive",
+      "js/aw-link.directive",
+      "js/visible-when.directive",
+      "js/aw-repeat.directive",
+      "js/aw-visual-indicator.directive",
+      "js/aw-break.directive"
+    ],
+
+    "actions": {
+      "redirectToNewsFeed":
+      {
+          "actionType": "Navigate",
+          "navigateTo": "com_siemens_splm_client_subscription_follow_NewsFeedSubscriptions",
+          "navigationParams": {},
+          "events":
+          {
+              "success":
+              [
+                  {
+                      "name": "awPopupWidget.close"
+                  }
+              ]
+          }
+      },
+      "clearMessages":{
+          "actionType":"JSFunction",
+          "method":"markSubscriptionMessagesRead",
+          "inputData":{
+              "messageObjs":"{{context}}"
+            },
+          "deps":"js/aw.notification.service"
+      },
+      "markNotificationMessageRead":{
+          "actionType":"JSFunction",
+          "method":"markSubscriptionMessagesRead",
+          "inputData":{
+              "messageObjs":["{{commandContext.lineItem}}"]
+           },
+          "deps":"js/aw.notification.service"
+      }
+    },
+    "data": {
+      "clearLink": {
+          "displayName": "{{i18n.clear}}",
+          "type": "STRING",
+          "isRequired": "false",
+          "isEditable": "true",
+          "dbValue": "clear",
+          "dispValue": "{{i18n.clear}}"
+      }
+    },
+    "onEvent":
+      [
+          {
+              "eventId": "NotificationMessage.markRead",
+              "action": "markNotificationMessageRead"
+          }
+      ],
+    "i18n":{
+      "clear":["NotificationMessages"],
+      "noNotificationMsg":["NotificationMessages"]
+    }
+  }

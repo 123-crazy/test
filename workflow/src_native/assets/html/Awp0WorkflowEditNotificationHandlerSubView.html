@@ -1,0 +1,23 @@
+<aw-panel-body>
+    <aw-panel-section caption="i18n.emailNotifications">
+        <aw-listbox prop="data.reviewNotifyWhenList" list="data.reviewNotifyWhenValues" exist-when="conditions.isReviewAckRoutePSTaskTemplateSelected" action="notifyWhenReviewOptionChange"></aw-listbox>
+        <aw-listbox prop="data.taskNotifyWhenList" list="data.taskNotifyWhenValues" exist-when="!conditions.isReviewAckRoutePSTaskTemplateSelected" action="notifyTaskOptionChange"></aw-listbox>
+        <aw-widget prop="data.notifySubject" hint="textbox" enable-when="!conditions.isLateNotificationHandler"></aw-widget>
+        <aw-widget prop="data.notifyMessage" hint="textarea" enable-when="!conditions.isLateNotificationHandler"></aw-widget>
+        <aw-widget prop= "data.includeLabel"></aw-widget>
+        <aw-flex-row height="4f">
+            <aw-checkbox prop="data.processInfo" enable-when="data.isPanelEditable && !conditions.isLateNotificationHandler"></aw-checkbox>
+            <aw-checkbox prop="data.targetInfo" enable-when="data.isPanelEditable && !conditions.isLateNotificationHandler"></aw-checkbox>
+            <aw-checkbox prop="data.referenceInfo" enable-when="data.isPanelEditable && !conditions.isLateNotificationHandler"></aw-checkbox>
+        </aw-flex-row>
+        <aw-widget prop= "data.recipientsLabel" ></aw-widget>
+        <aw-list dataprovider="data.dataProviders.recipientsDataProvider" has-floating-cell-commands="false">
+            <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+        </aw-list>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-button action="saveHandler" visible-when="awPanelBody.$valid && awPanelBody.$dirty && data.dataProviders.recipientsDataProvider.viewModelCollection.loadedVMObjects.length > 1 || data.isValidToModify">
+        <aw-i18n>i18n.save</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

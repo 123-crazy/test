@@ -1,0 +1,132 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-link-with-popup-menu.directive",
+        "js/aw-context-separator.directive",
+        "js/aw-property-label.directive",
+        "js/aw-column.directive"
+    ],
+
+    "dataProviders":
+    {
+        "locationLink":
+        {
+            "dataProviderType": "Static",
+            "response":
+            [
+                "{{ctx.userSession.props.fnd0LocationCode.uiValue}}"
+            ],
+
+            "totalFound": 1
+        },
+
+        "locationLinkLOV":
+        {
+            "dataProviderType": "TcLOV",
+            "lovConfiguration":
+            {
+                "filterStr": "",
+                "maxResults": 0,
+                "viewModelObj": "{{ctx.userSession}}",
+                "viewProp": "{{ctx.userSession.props.fnd0LocationCode}}",
+                "operationName": "Edit",
+                "sortPropertyName": "object_name"
+            },
+
+            "totalFound": ""
+        }
+    },
+
+    "actions":
+    {
+        "getGlobalConstant":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "BusinessModeler-2011-06-Constants",
+            "method": "getGlobalConstantValues2",
+            "inputData":
+            {
+                "keys":
+                [
+                    "Fnd0DisplayLocationCodeLOV"
+                ]
+            },
+
+            "outputData":
+            {
+                "ctx.isCodeLovSet": "constantValues[0].value[0]"
+            }
+        },
+
+        "locationCodeChange":
+        {
+            "actionType": "JSFunction",
+            "method": "setUserSessionState",
+            "inputData":
+            {
+                "pairs":
+                [
+                    {
+                        "name": "fnd0LocationCode",
+                        "value": "{{data.eventData.property.dbValue.propDisplayValue}}"
+                    }
+                ]
+            },
+
+            "deps": "soa/sessionService"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "awlinkPopup.selected",
+            "condition": "conditions.isLocationCodeSel",
+            "cacheEventData": true,
+            "action": "locationCodeChange"
+        },
+
+        {
+            "eventId": "locationContext.contentLoaded",
+            "condition": "conditions.hasLocationCodes",
+            "action": "getGlobalConstant"
+        }
+    ],
+
+    "conditions":
+    {
+        "showLocationCode":
+        {
+            "expression": "ctx.userSession.props.fnd0LocationCode && ctx.isCodeLovSet=='false' && ctx.userSession.props.fnd0LocationCode.uiValue!=''"
+        },
+
+        "showLocationCodeLOV":
+        {
+            "expression": "ctx.userSession.props.fnd0LocationCode && ctx.isCodeLovSet=='true' && ctx.userSession.props.fnd0LocationCode.uiValue!=''"
+        },
+
+        "hasLocationCodes":
+        {
+            "expression": "ctx.userSession.props.fnd0LocationCode && ctx.userSession.props.fnd0LocationCode.uiValue!=='' "
+        },
+
+        "isLocationCodeSel":
+        {
+            "expression": "property.dbValue && property.dbValue.lovValueProp === 'fnd0LocationCode'"
+        }
+    },
+    "data":
+    {
+        "location":
+        {
+            "isNull": false,
+            "propertyDisplayName": "{{i18n.location}}",
+            "uiValue": "{{i18n.location}}"
+        }
+    },
+    "i18n":
+    {
+        "location": [ "ProjmgmtConstants" ]
+    }
+}

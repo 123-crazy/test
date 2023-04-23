@@ -1,0 +1,68 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-label.directive",
+        "js/aw-button.directive",
+        "js/aw-numeric.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "goToPage": {
+            "actionType": "JSFunction",
+            "method": "goToPage",
+            "inputData": {
+                "page": "{{data.box.dbValue}}"
+            },
+            "deps": "js/utils2dViewer"
+        }
+    },
+    "data": {
+        "pages": {
+            "displayName": "{{i18n.numPages}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.awTwoDViewer.numPages}}",
+            "dispValue": "{{ctx.awTwoDViewer.numPages}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "box": {
+            "displayName": "{{i18n.page}}",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.awTwoDViewer.currentPage}}",
+            "dispValue": "{{ctx.awTwoDViewer.currentPage}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "messages": {
+
+    },
+    "conditions": {
+        "currentIsNotEmpty": {
+            "expression": "data.box.dbValue && data.box.dbValue!=''"
+        },
+        "currentIsNotSame": {
+            "expression": "data.box.dbValue && data.box.dbValue!=ctx.awTwoDViewer.currentPage"
+        },
+        "isValidToShowChangeButton": {
+            "expression": "conditions.currentIsNotEmpty && conditions.currentIsNotSame"
+        }
+    },
+    "i18n": {
+        "page": [
+            "Viewer2DMessages"
+        ],
+        "numPages": [
+            "Viewer2DMessages"
+        ],
+        "goToPage": [
+            "Viewer2DMessages"
+        ]
+    }
+}

@@ -1,0 +1,101 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": 
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-history.directive",
+        "js/aw-clipboard.directive",
+        "js/aw-favorite.directive"
+    ],
+
+    "actions":
+    {
+        "handlePaletteSelection": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "configPanel.updateConfigItems",
+                        "condition": "ctx.getRecentObjsProvider.selectedObjects.length > 0",
+                        "eventData": 
+                        {
+                            "selectedObject": "{{ctx.getRecentObjsProvider.selectedObjects[0]}}"
+                        }
+                    },
+                    {
+                        "name": "configPanel.updateConfigItems",
+                        "condition": "ctx.getClipboardProvider.selectedObjects.length > 0",
+                        "eventData": 
+                        {
+                            "selectedObject": "{{ctx.getClipboardProvider.selectedObjects[0]}}"
+                        }
+                    },
+                    {
+                        "name": "configPanel.updateConfigItems",
+                        "condition": "ctx.getFavoriteProvider.selectedObjects.length > 0",
+                        "eventData": 
+                        {
+                            "selectedObject": "{{ctx.getFavoriteProvider.selectedObjects[0]}}"
+                        }
+                    },
+                    {
+                        "name": "configPanel.svrOwningItemChanged"
+                    },
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData": 
+                        {
+                            "destPanelId": "ConfigurationPanelFilters"
+                        }                        
+                    }
+                ]
+            }
+        },
+        "updateConfigItems":
+        {
+            "actionType": "JSFunction",
+            "method": "updateConfigItems",
+            "inputData":
+            {
+                "newItemSelected": "{{data.eventData.selectedObject}}"
+            },
+        "deps": "js/variantInfoConfigurationService"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "getRecentObjsProvider.selectionChangeEvent",
+            "criteria":
+            {
+                "$parent.data.selectedTab.panelId": "SVROwningElementPaletteTab"
+            },
+            "action": "handlePaletteSelection"
+        },
+        {
+            "eventId": "getClipboardProvider.selectionChangeEvent",
+            "criteria":
+            {
+                "$parent.data.selectedTab.panelId": "SVROwningElementPaletteTab"
+            },
+            "action": "handlePaletteSelection"
+        },
+        {
+            "eventId": "getFavoriteProvider.selectionChangeEvent",
+            "criteria":
+            {
+                "$parent.data.selectedTab.panelId": "SVROwningElementPaletteTab"
+            },
+            "action": "handlePaletteSelection"
+        },
+        {
+            "eventId": "configPanel.updateConfigItems",
+            "cacheEventData": true,
+            "action": "updateConfigItems"
+        }
+    ]
+}

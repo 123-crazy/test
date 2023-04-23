@@ -1,0 +1,75 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive"
+    ],
+    "data": {
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "Aqc0pinCommands": "aqc0_oneStepPinCommands"
+    },
+    "actions": {
+        "updateCtxForAceAddSiblingPanelAction": {
+            "actionType": "JSFunction",
+            "method": "updateCtxForFailureAddSiblingPanel",
+            "inputData": {
+                "parent": "{{ctx.selected}}"
+            },
+            "outputData": {},
+            "deps": "js/Aqc0FailureManagerUtils"
+        },
+        "aqc0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "aqc0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "updateCtxForAceAddSiblingPanelAction",
+            "criteria": {
+                "panelId": "Aqc0AddFailureSpec"
+            }
+        },
+        {
+            "eventId": "addCharSpecPanel.Aqc0SetPin",
+            "cacheEventData": true,
+            "action": "aqc0SetPin"
+        },
+        {
+            "eventId": "addCharSpecPanel.Aqc0SetUnPin",
+            "cacheEventData": true,
+            "action": "aqc0SetUnPin"
+        },
+        {
+            "eventId" :"awPanel.loadParentElement",
+            "action":"updateCtxForAceAddSiblingPanelAction"
+        }
+    ],
+    "i18n": {
+        "Aqc0Add": [
+            "qualityfailuremanagerMessages"
+        ]
+    }
+}

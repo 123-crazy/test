@@ -1,0 +1,35 @@
+<aw-panel-body>
+    <aw-radiobutton prop="data.teamAssignmentOptionValue" exist-when="conditions.isTeamAssignmentOptionPresent"></aw-radiobutton>
+    <aw-checkbox prop="data.reassignOutsideGroupRoleOptionValue" exist-when="conditions.isReassignOptionPresent"></aw-checkbox>
+    <aw-panel-section caption="i18n.assignments">
+        <aw-panel-section id="assigner" caption="i18n.Assigner" exist-when="conditions.isAssignerPresent" context="data.dataProviders.assignerDataProvider">
+            <aw-list dataprovider="data.dataProviders.assignerDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="assignee" caption="i18n.assignee" exist-when="conditions.isAssigneePresent" context="data.dataProviders.assignerDataProvider">
+            <aw-list dataprovider="data.dataProviders.assignerDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="reviewers" exist-when="conditions.isReviewersPresent" caption="i18n.addReviewerLabelText" context="data.dataProviders.reviewersDataProvider">
+            <aw-list dataprovider="data.dataProviders.reviewersDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="acknowledgers" exist-when="conditions.isAcknowledgersPresent" caption="i18n.Acknowledgers" context="data.dataProviders.acknowledgersDataProvider">
+            <aw-list dataprovider="data.dataProviders.acknowledgersDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+        <aw-panel-section id="notifyees" exist-when="conditions.isNotifyeesPresent" caption="i18n.Notifyees" context="data.dataProviders.notifyeesDataProvider">
+            <aw-list dataprovider="data.dataProviders.notifyeesDataProvider">
+                <aw-include name="Awp0UserPanelCell" sub-panel-context="item"></aw-include>
+            </aw-list>
+        </aw-panel-section>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-footer>
+    <aw-checkbox prop="data.reviewersSignoffMust" visible-when="conditions.isReviewersSignoffMustDisplayable" enable-when="conditions.isTemplateInEditMode"></aw-checkbox>
+    <aw-button action="saveHandler" visible-when="conditions.isValidToUpdate"><aw-i18n>i18n.save</aw-i18n></aw-button>
+</aw-panel-footer>

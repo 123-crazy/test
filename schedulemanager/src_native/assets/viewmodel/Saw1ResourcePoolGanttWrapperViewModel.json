@@ -1,0 +1,60 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-tab-set.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "assignUser":
+        {
+                  "actionType": "JSFunction",
+                  "method": "IsPrivilegedOrWorkflowOwner",
+                  "inputData":
+                  {
+                       "ctx": "{{ctx}}",
+                       "data": "{{data}}"
+                  },
+                   "deps": "js/Saw1WorkflowTasks"
+        }
+    },
+    "data": {
+        "tabsModel": {
+            "isArray": "true",
+            "dbValue": [
+                {
+                    "panelId": "WorkflowOwner",
+                    "name": "{{i18n.users}}",
+                    "recreatePanel": true,
+                    "visibleWhen": " ctx.panelContext.title === data.i18n.PrivilegedUser"
+                },
+                {
+                    "panelId": "WorkflowOwner",
+                    "name": "{{ctx.panelContext.title}}",
+                    "recreatePanel": true,
+                    "visibleWhen": " ctx.panelContext.title !== data.i18n.PrivilegedUser"
+                },
+                {
+                    "panelId": "Saw1ResourcePoolGantt",
+                    "name": "{{i18n.resourcePool}}",
+                    "recreatePanel": true,
+                    "visibleWhen": " ctx.panelContext.title === data.i18n.PrivilegedUser"
+                }
+            ]
+        }
+    },
+    "i18n": {
+        "resourcePool": [
+            "ScheduleManagerMessages"
+        ],
+        "assignButtonText": [
+            "ScheduleManagerMessages"
+        ],
+        "users": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

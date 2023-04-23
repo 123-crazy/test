@@ -1,0 +1,27 @@
+<aw-flex-row height="48f">
+    <aw-command-panel caption="" hide-title="true">
+        <aw-panel-body scrollable="true">
+            <aw-panel-section>
+                <div exist-when="ctx.searchFolder.isEditMode === true && ctx.searchFolder.useRule === 'newRule'">
+                    <aw-advsearch-lov-val prop="data.awp0AdvancedQueryName"></aw-advsearch-lov-val>
+                </div>
+                <div>&nbsp;</div>
+            </aw-panel-section>
+            <aw-panel-section exist-when="ctx.searchFolder.isEditMode === true && conditions.showAdvancedSavedSearchAttributes">
+                <aw-widget exist-when="(ctx.searchFolder.useRule === 'savedSearch' || ctx.searchFolder.useRule === 'currentRule')" prop="data.referencingSavedQuery"></aw-widget>
+                <span class="aw-search-advancedSearchClearAll">
+                    <aw-link  prop="data.advancedSearchClearAll" exist-when="conditions.showClearAll" action="clearAllAction"></aw-link>
+                </span>
+                <div aw-repeat="prop : data.awp0AdvancedQueryAttributes">
+                    <aw-widget prop="prop" exist-when="prop.hint !=='checkboxoptionlov'"></aw-widget>
+                    <aw-checkbox-multiselect prop="prop" exist-when="prop.hint ==='checkboxoptionlov'"></aw-checkbox-multiselect>
+                </div>
+            </aw-panel-section>
+        </aw-panel-body>
+        <aw-panel-footer>
+            <aw-button exist-when="conditions.showExecuteAdvancedSavedSearchButton" action="reviewAndExecuteAdvancedSavedSearch">
+                <aw-i18n>i18n.searchBtn</aw-i18n>
+            </aw-button>
+        </aw-panel-footer>
+    </aw-command-panel>
+</aw-flex-row>

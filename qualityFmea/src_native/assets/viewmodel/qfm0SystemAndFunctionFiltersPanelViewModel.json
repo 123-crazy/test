@@ -1,0 +1,103 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-checkbox.directive"
+    ],
+    "actions": {
+        "toggleShowInactive": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "condition" : "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'FunctionSpecificationSubLocation' || ctx.locationContext['ActiveWorkspace:SubLocation'] === 'qualityfunctionspecificationmanager'" ,
+                        "name": "awConfigPanel.applyShowInactiveToggledForFunctionSpec",
+                        "eventData": {
+                            "toggleValue": "{{data.showInactive.dbValue}}"
+                        }
+                    },
+                    {
+                        "condition" : "ctx.locationContext['ActiveWorkspace:SubLocation'] === 'SystemEleSpecificationSubLocation'" ,
+                        "name": "awConfigPanel.applyShowInactiveToggledForSystemEleSpec",
+                        "eventData": {
+                            "toggleValue": "{{data.showInactive.dbValue}}"
+                        }
+                    }
+                ]
+            }
+        },
+        "performToggleShowInactiveForFunctionSpec": {
+            "actionType": "JSFunction",
+            "method": "setToggleInputToFunctionSpecCtx",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/qfm0FunctionManagerUtils",
+            "events": {
+                "success": [
+                    {
+                        "name": "primaryWorkarea.reset"
+                    }
+                ]
+            }
+        },
+        "performToggleShowInactiveForSystemEleSpec": {
+            "actionType": "JSFunction",
+            "method": "setToggleInputToSystemEleSpecCtx",
+            "inputData": {
+                "data":"{{data}}"
+            },
+            "deps": "js/qfm0SystemEleSpecManagerUtils",
+            "events": {
+                "success": [
+                    {
+                        "name": "primaryWorkarea.reset"
+                    }
+                ]
+            }
+        }
+    },
+    "dataProviders": {},
+    "messages": {},
+    "data": {
+        "showInactiveFunctionSpec": {
+            "displayName": "{{i18n.ShowInactive}}",
+            "dbValue": "{{ctx.functionSpecManagerContext.showInactive}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "showInactiveSystemEleSpec": {
+            "displayName": "{{i18n.ShowInactive}}",
+            "dbValue": "{{ctx.systemEleSpecManagerContext.showInactive}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    "onEvent": [
+
+        {
+            "eventId": "awConfigPanel.applyShowInactiveToggledForFunctionSpec",
+            "action": "performToggleShowInactiveForFunctionSpec"
+        },
+        {
+            "eventId" :"awConfigPanel.applyShowInactiveToggledForSystemEleSpec",
+            "action": "performToggleShowInactiveForSystemEleSpec"
+        }
+
+    ],
+    "conditions": {},
+    "i18n": {
+        "ShowInactive": [
+            "qualityFmeaMessages"
+        ],
+        "Status":[
+            "qualityFmeaMessages"
+        ]
+    }
+}

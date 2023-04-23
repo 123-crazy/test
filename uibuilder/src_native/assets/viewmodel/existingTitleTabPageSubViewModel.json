@@ -1,0 +1,181 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-widget.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "reveal":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "existingTitle.loadLocalizationInfoOnReveal",
+                        "condition": "ctx.panelContext.titleKey && ctx.panelContext.titleSource"
+                    }
+                ]
+            }
+        },
+        "loadLocalizationInfo": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "query($input: I18NRef!){i18n(input:$input){en cs_CZ de es fr it ja_JP ko_KR pl_PL pt_BR ru_RU zh_CN zh_TW}}",
+                    "variables": {
+                        "input": {
+                            "key": "{{ctx.panelContext.titleKey}}",
+                            "source": "{{ctx.panelContext.titleSource}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData":
+            {
+                "titlesData": "{{function:convertLocaleStringToVMProps}}"
+            },
+            "deps": "js/localizationPanelService"
+        },
+        "updateSelectedObject": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedObjectProps",
+            "inputData":
+            {
+                "propName": "{{data.eventData.propName}}",
+                "propValue": "{{data.eventData.propValue}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "getDefinitionCommandTitleI18Ns": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String!){i18ns(filter:$filter){key source value}}",
+                    "variables":{
+                        "filter": "{{data.existingI18nTitle.uiValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "titleI18NsArray": "{{function:convertTitleI18NsToLovEntries}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "existingTitleSelected":{
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "query($input: I18NRef!){i18n(input:$input){en cs_CZ de es fr it ja_JP ko_KR pl_PL pt_BR ru_RU zh_CN zh_TW}}",
+                    "variables": {
+                        "input": {
+                            "key": "{{data.eventData.lovValue.i18nKey}}",
+                            "source": "{{data.eventData.lovValue.i18nSource}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData":
+            {
+                "titlesData": "{{function:convertLocaleStringToVMPropsAfterTitleSelection}}"
+            },
+            "deps": "js/localizationPanelService"
+        },
+        "validateSelectedLocale": {
+            "actionType": "JSFunction",
+            "method": "validateSelectedLocale",
+            "inputData":
+            {
+                "propName": "{{data.existingI18nTitle.selectedLovEntries[0].suggested}}"
+            },
+            "outputData":
+            {
+                "validTitle": "valid",
+                "titleError": "error"
+            },
+            "deps": "js/localizationPanelService"
+        }
+    },
+    "data":
+    {
+        "titlesData": [],
+        "existingI18nTitle": {
+            "displayName": "{{i18n.commandTitle}}",
+            "type": "STRING",
+            "isEditable": true,
+            "hasLov": true,
+            "dispValue": "",
+            "dbValue": "",
+            "dataProvider": "getCommandTitleI18NDP"
+        }
+    },
+    "dataProviders":
+    {
+        "getCommandTitleI18NDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getDefinitionCommandTitleI18Ns",
+            "validateAction": "validateSelectedLocale",
+            "valid": "{{data.validTitle}}",
+            "error": "{{data.titleError}}",
+            "response": "{{data.titleI18NsArray}}",
+            "totalFound": "{{data.titleI18NsArray.length}}"
+        }
+    },
+    "functions": {
+        "convertLocaleStringToVMProps": {
+            "functionName": "convertLocaleStringToVMProps",
+            "parameters": [
+                "{{ctx.panelContext.titleKey}}",
+                "{{ctx.panelContext.titleSource}}",
+                "{{ctx.panelContext.dbValue}}",
+                "{{ctx.selected.uid}}"
+            ]
+        },
+        "convertLocaleStringToVMPropsAfterTitleSelection": {
+            "functionName": "convertLocaleStringToVMProps",
+            "parameters": [
+                "{{data.eventData.lovValue.i18nKey}}",
+                "{{data.eventData.lovValue.i18nSource}}",
+                "{{ctx.panelContext.dbValue}}",
+                "{{ctx.selected.uid}}",
+                "false"
+            ]
+        },
+        "convertTitleI18NsToLovEntries": {
+            "functionName": "convertTitleI18NsToLovEntries"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "existingI18nTitle.lovValueChanged",
+            "cacheEventData": true,
+            "action": "existingTitleSelected"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "existingTitleTabPageSub"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "existingTitle.loadLocalizationInfoOnReveal",
+            "action": "loadLocalizationInfo"
+        }
+    ],
+    "i18n": {
+        "commandTitle": [ "CommandBuilderMessages" ]
+    }
+}

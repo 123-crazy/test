@@ -1,0 +1,136 @@
+{
+    "schemaVersion" : "1.0.0",
+"imports": 
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",      
+        "js/visible-when.directive",
+        "js/aw-init.directive"  
+    ],
+    "actions": 
+    {
+        "pgp0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "setHasActivePin"
+                }]
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "pgp0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "unRegisterActivePin"
+                }]
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "setHasActivePin": { 
+            "actionType": "modifyCtx", 
+            "inputData": { 
+                "methodType": "register", 
+                "name": "hasActivePinnedPanel", 
+                "value": true 
+            }
+        },
+        "unRegisterActivePin": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "inputData": {
+                "name": "hasActivePinnedPanel"
+            },
+            "deps": "js/appCtxService"
+        },
+        "updateAddContextClosePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "!data.isDestroyed()",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }  
+    }, 
+    "data": 
+    { "showpanel": 
+        {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "dbValue": "{{ctx.programPlanningContext.showTypes}}"
+        },
+        "pgp0pincommands":"pgp0_oneStepPinCommands",
+         "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }             
+    },
+    "conditions": {
+        "showtypes": {
+            "expression": "data.showpanel.dbValue"
+        }
+    },
+    "lifecycleHooks": {
+        "onUnmount": "unRegisterActivePin"
+    },
+    "onEvent": [
+        {
+            "eventId": "addCriteria.pgp0SetPin",
+            "cacheEventData": true,
+            "action": "pgp0SetPin"
+          },
+          {
+            "eventId": "addCriteria.pgp0SetUnPin",
+            "cacheEventData": true,
+            "action": "pgp0SetUnPin"
+          },
+          {
+              "eventId": "unRegisterActivePin",
+              "action": "unRegisterActivePin",
+              "cacheEventData": true
+          },
+          {
+              "eventId": "setHasActivePin",
+              "action": "setHasActivePin",
+              "cacheEventData": true
+          },
+          {
+            "eventId": "appCtx.register",
+            "condition": "name === 'mselected'",
+            "action": "updateAddContextClosePanel"
+          }
+    ],
+    "i18n": 
+    {   
+        "addEventCommandTitle": ["ProgramPlanningCommandPanelsMessages"],
+        "Pgp0PinButtonToolTip": ["ProgramPlanningCommandPanelsMessages"],
+        "Pgp0UnpinButtonToolTip": ["ProgramPlanningCommandPanelsMessages"]
+    }
+}

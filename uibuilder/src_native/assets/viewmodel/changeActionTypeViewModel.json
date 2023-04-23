@@ -1,0 +1,199 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-bpmn-cell.directive",
+        "js/aw-button.directive",
+        "js/exist-when.directive"
+    ],
+    "data": {
+        "actionType": {
+            "displayName": "{{i18n.actionType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEnabled": "false",
+            "maxLength": 128,
+            "renderingHint": "label",
+            "dbValue": "{{ctx.graph.selected.model.modelObject.actionDef.actionType}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.actionDef.actionType}}"
+        },
+        "actionName": {
+            "displayName": "{{i18n.actionName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEnabled": "false",
+            "maxLength": 128,
+            "renderingHint": "label",
+            "dbValue": "{{ctx.graph.selected.model.modelObject.name}}",
+            "dispValue": "{{ctx.graph.selected.model.modelObject.name}}"
+        }
+    },
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getObjectActivitiesProvider"
+            ]
+        },
+        "getObjectActivities": {
+            "actionType": "JSFunctionAsync",
+            "method": "getActionTypes",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "dataParsers": [ {
+                "id": "vmoActionTypes",
+                "responseObjs": "objectActivitiesArray"
+            } ],
+            "outputData": {
+                "objectActivities": "objectActivitiesArray"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "updateActivityType": {
+            "actionType": "JSFunction",
+            "method": "updateActivityType",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/actionBuilderService"
+        },
+        "changeNodeCategoryMessage": {
+            "actionType": "JSFunction",
+            "method": "changeNodeCategoryMessage",
+            "inputData": {},
+            "deps": "js/actionBuilderService"
+        },
+        "toggleChangeActivityOff": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "toggleChangeActivityType"
+            }
+        },
+        "changeTypeClosePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "dataProviders": {
+        "getObjectActivitiesProvider": {
+            "action": "getObjectActivities",
+            "response": "{{data.objectActivities}}",
+            "totalFound": "{{data.objectActivities.length}}",
+            "selectionModelMode": "single"
+        }
+    },
+    "dataParseDefinitions": {
+        "vmoActionTypes": {
+            "identifier": "{{response.id}}",
+            "props": {
+                "title": {
+                    "name": "title",
+                    "displayName": "Title",
+                    "value": "{{response.id}}",
+                    "displayValue": "{{response.title}}",
+                    "type": "STRING"
+                },
+                "icon": {
+                    "name": "icon",
+                    "displayName": "iconName",
+                    "value": "{{response.icon}}",
+                    "displayValue": "{{response.icon}}",
+                    "type": "STRING"
+                },
+                "propsView": {
+                    "name": "view",
+                    "displayName": "viewName",
+                    "value": "{{response.propsView}}",
+                    "displayValue": "{{response.propsView}}",
+                    "type": "STRING"
+                }
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "changeActionType.confirmChangeType",
+            "message": "confirmChangeType"
+        },
+        {
+            "eventId": "changeActionType.closeChangeTypePanel",
+            "action": "changeTypeClosePanel"
+        }
+    ],
+    "conditions": {
+        "isValidToSave": {
+            "expression": "data.dataProviders.getObjectActivitiesProvider.selectedObjects.length === 1"
+        }
+    },
+    "messages": {
+        "confirmChangeType": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.changeNodeActivityType}}",
+            "messageTextParams": [],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": ""
+                },
+                {
+                    "option": "Change",
+                    "text": "{{i18n.change}}",
+                    "action": "updateActivityType"
+                }
+            ]
+        }
+    },
+    "i18n": {
+        "actionType": [
+            "ActionBuilderMessages"
+        ],
+        "actionName": [
+            "ActionBuilderMessages"
+        ],
+        "actionObjectActivities": [
+            "ActionBuilderMessages"
+        ],
+        "actionToolbox": [
+            "ActionBuilderMessages"
+        ],
+        "loading": [
+            "ActionBuilderMessages"
+        ],
+        "changeActivityType": [
+            "ActionBuilderMessages"
+        ],
+        "updateParams": [
+            "ActionBuilderMessages"
+        ],
+        "change": [
+            "ActionBuilderMessages"
+        ],
+        "cancel": [
+            "ActionBuilderMessages"
+        ],
+        "changeNodeActivityType": [
+            "ActionBuilderMessages"
+        ]
+    },
+    "lifecycleHooks": {
+        "onUnmount": "toggleChangeActivityOff"
+    }
+}

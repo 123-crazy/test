@@ -1,0 +1,246 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-toolbar.directive"
+    ],
+    "data": {
+        "commandContext": {
+            "tableDataProviderName": "CAW0CorrActionProvider",
+            "clientScopeURI": "CAW0CorrectiveQAColumns",
+            "objectSetSource":"CPA0CorrectiveAction.Qam0QualityAction",
+            "searchCriteria": {
+                "parentUid": "{{ctx.xrtSummaryContextObject.uid}}",
+                "relationName": "CPA0CorrectiveAction",
+                "rootCauseUid": "{{ctx.SelectedRootCauseDefect.uid}}"
+            },
+            "modelTypeRelationListMap": {
+                "Qam0QualityAction" : ["CPA0CorrectiveAction"]
+            }
+        }
+    },
+    "actions": {
+        "doDataProvider": {
+            "actionType": "dataProvider",
+            "method": "CorrectiveQADataProvider"
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "CAW0CorrectiveQAColumns"
+                },
+                "saveColumnConfigData": {
+                    "clientScopeURI": "CAW0CorrectiveQAColumns",
+                    "columnConfigId": "{{data.dataProviders.CorrectiveQADataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.CorrectiveQADataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                },
+                "searchInput": {
+                    "attributesToInflate": "{{ctx.search.tableViewProperties}}",
+                    "maxToLoad": 100,
+                    "maxToReturn": 100,
+                    "providerName": "CAW0CorrActionProvider",
+                    "searchCriteria": {
+                        "parentUid": "{{ctx.xrtSummaryContextObject.uid}}",
+                        "relationName": "CPA0CorrectiveAction"
+                    },
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.correctiveQAColoumnsProvider.sortCriteria}}",
+                    "columnFilters": "{{data.columnProviders.correctiveQAColoumnsProvider.columnFilters}}",
+                    "startIndex": 0
+                },
+                "inflateProperties": true,
+                "noServiceData": false
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "correctiveActions": "{{json:searchResultsJSON}}",
+                "dataProviders.CorrectiveQADataProvider.columnConfig": "columnConfig",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "commandContext.dataProvider.columnConfig": "columnConfig"
+            }
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "CAW0CorrectiveQAColumns",
+                        "operationType": "configured",
+                        "typeNames": [ "WorkspaceObject" ],
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [ {} ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.CorrectiveQADataProvider.resetColumnConfigs": "columnConfigurations"
+            }
+        },
+        "loadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "CAW0CorrectiveQAColumns"
+                },
+                "searchInput": {
+                    "maxToLoad": 100,
+                    "maxToReturn": 100,
+                    "providerName": "CAW0CorrActionProvider",
+                    "searchCriteria": {
+                        "parentUid": "{{ctx.xrtSummaryContextObject.uid}}",
+                        "relationName": "CPA0CorrectiveAction",
+                        "rootCauseUid": "{{ctx.SelectedRootCauseDefect.uid}}"
+                    },
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{data.columnProviders.correctiveQAColoumnsProvider.sortCriteria}}",
+                    "startIndex": 0,
+                    "columnFilters": "{{data.columnProviders.correctiveQAColoumnsProvider.columnFilters}}"
+                },
+                "inflateProperties": true,
+                "noServiceData": false
+            },
+            "outputData": {
+                "totalFound": "totalFound",
+                "correctiveActions": "{{json:searchResultsJSON}}",
+                "dataProviders.CorrectiveQADataProvider.columnConfig": "columnConfig",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "commandContext.dataProvider.columnConfig": "columnConfig"
+            },
+            "events": {
+                "success": [ {
+                    "name": "caw0.CorrectiveQADataProvider.modelObjectsUpdated"
+                } ]
+            }
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "updateRootCauseContext": {
+            "actionType": "JSFunction",
+            "method": "updateRootCauseContext",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}",
+                "actionType": "CPA0CorrectiveAction"
+            },
+            "deps": "js/CAW0AddQualityActionsService"
+        },
+        "SetSelectionOfCorrectiveAction": {
+            "actionType": "JSFunction",
+            "method": "SetSelectionOfCorrectiveAction",
+            "inputData": {
+                "ctx":"{{ctx}}",
+                "data": "{{data.eventData}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        },
+        "setProviderForEdit": {
+            "actionType": "JSFunction",
+            "method": "setProviderForEdit",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/CAW0capaUtilsService"
+        }
+    },
+    "functions": {
+        "getProgramViewsSearchCriteria": {
+            "functionName": "getProgramViewsSearchCriteria",
+            "parameters": [
+                "{{ctx.state.params}}",
+                "{{ctx.search.criteria}}"
+            ]
+        }
+    },
+    "dataProviders": {
+        "CorrectiveQADataProvider": {
+            "action": "loadData",
+            "editContext": "TABLE_CONTEXT",
+            "response": "{{data.correctiveActions}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+    "columnProviders": {
+        "correctiveQAColoumnsProvider": {
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "CorrectiveActionsTable": {
+            "dataProvider": "CorrectiveQADataProvider",
+            "columnProvider": "correctiveQAColoumnsProvider",
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "isFilteringEnabled": true,
+                "enableSorting": true,
+                "enablePinning": true,
+                "maxRowsToShow": 10
+            }
+        }
+    },
+    "onEvent": [ {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+
+            "eventId": "qam0QARelationCreated",
+            "cacheEventData": true,
+            "action": "updateRootCauseContext"
+        },
+        {
+            "eventId": "CorrectiveQADataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "SetSelectionOfCorrectiveAction"
+        },
+        {
+            "eventId": "caw0.CorrectiveQADataProvider.modelObjectsUpdated",
+            "cacheEventData": true,
+            "action": "setProviderForEdit"
+        }
+    ]
+}

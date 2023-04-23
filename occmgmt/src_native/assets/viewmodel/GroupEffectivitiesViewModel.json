@@ -1,0 +1,126 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-panel-body.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-command-panel-section.directive",
+        "js/exist-when.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-panel-section.directive"
+    ],
+    "i18n": {
+        "groupEffectivityTitle": [ "OccurrenceManagementConstants" ],
+        "groupEffectivities": [ "OccurrenceManagementConstants" ],
+        "edit": [ "OccurrenceManagementConstants" ],
+        "editGroupEffTitle": [ "OccurrenceManagementConstants" ]
+    },
+    "data": {
+        "commandGroupEffectivities": "awb0_commandGroupEffectivities"
+
+    },
+    "functions": {
+        "removeEffectivityGroups": {
+            "functionName": "removeEffectivityGroups",
+            "parameters": [ "{{data}}", "{{data.dataProviders.getAppliedGroupEffectivities.selectedObjects}}", "{{data.eventData}}" ]
+        }
+    },
+    "dataProviders": {
+        "getAppliedGroupEffectivities": {
+            "action": "getAllAppliedGroupEffectivities",
+            "response": "{{data.groupEffectivitiesApplied}}",
+            "totalFound": "{{data.groupEffectivitiesLength}}",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "edit_effectivity_group_cell_commands"
+        }
+    },
+    "actions": {
+        "getAllAppliedGroupEffectivities": {
+            "actionType": "JSFunction",
+            "method": "getAllAppliedGroupEffectivities",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "groupEffectivitiesLength": "groupEffectivitiesLength",
+                "groupEffectivitiesApplied": "groupEffectivitiesApplied"
+            },
+
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        },
+
+        "getAllAppliedGroupEffectivitiesAction": {
+            "actionType": "dataProvider",
+            "method": "getAppliedGroupEffectivities"
+        },
+        "removeAppliedGroupEffectivitiesBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "removeAppliedGroupEffectivities"
+                }
+            ]
+        },
+        "updateRequestPrefOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref",
+                "value": {
+                    "jitterFreePropLoad" : true,
+                    "userGesture": "EFFECTIVITY_CHANGE"
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "removeAppliedGroupEffectivities": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.configContext",
+                "value": {
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "eg_uids": "{{function:removeEffectivityGroups}}",
+                    "de": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "var_uids": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRules.dbValues}}",
+                    "iro_uid": "{{data.contextKeyObject.productContextInfo.props.awb0VariantRuleOwningRev.dbValues[0]}}",
+                    "startDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+            "events": {
+                "success": [ {
+                    "name": "groupEffectivitiesView.groupEffectivitiesRemoved"
+                } ]
+            },
+            "deps": "js/endItemUnitEffectivityConfigurationService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "GroupEffectivities"
+            },
+            "action": "getAllAppliedGroupEffectivitiesAction"
+        },
+        {
+            "eventId": "removeGroupEffectivities",
+            "cacheEventData": true,
+            "action": "removeAppliedGroupEffectivitiesBatchJob"
+        },
+        {
+            "eventId": "awPanel.navigate",
+            "condition": "destPanelId === 'GroupEffectivities'",
+            "action": "getAllAppliedGroupEffectivitiesAction"
+        },
+        {
+            "eventId": "groupEffectivitiesView.groupEffectivitiesRemoved",
+            "action": "getAllAppliedGroupEffectivitiesAction"
+        },
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "getAllAppliedGroupEffectivitiesAction"
+        }
+    ]
+}

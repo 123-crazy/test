@@ -1,0 +1,63 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-section.directive",
+        "js/aw-checkbox.directive",        
+        "js/visible-when.directive"
+    ],
+    
+    "actions":
+    {
+        "keepShareAttrsInSync": {
+            "actionType": "JSFunction",
+            "method": "keepShareAttrsInSync",
+            "inputData": {
+                "data": "{{data}}",
+                "parent": "{{$parent}}"
+            },
+            "deps": "js/saveWorkingContextService"        
+        }
+    },
+    
+    "data": 
+    {
+        "awb0AllowReadShare":
+        {
+            "type": "BOOLEAN",
+            "isEditable": "true",
+            "dbValue": "{{conditions.readShareAllowed}}",
+            "displayName": "{{i18n.allowReadShare}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },        
+        "awb0AllowWriteShare":
+        {
+            "type": "BOOLEAN",
+            "isEditable": "true",
+            "dbValue": "{{conditions.writeShareAllowed}}",
+            "displayName": "{{i18n.allowWriteShare}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        }
+    },
+    
+    "conditions": {
+        "canShowReadCheckBox": {
+            "expression": "(ctx.aceActiveContext.context.workingCtxOpType === 'UPDATE' && ctx.user.uid == ctx.aceActiveContext.context.workingContextObj.props.owning_user.dbValues[0]) || (ctx.aceActiveContext.context.workingCtxOpType !== 'UPDATE')"
+        },
+        "canShowWriteCheckBox": {
+            "expression": "(ctx.aceActiveContext.context.workingCtxOpType === 'UPDATE' && ctx.user.uid == ctx.aceActiveContext.context.workingContextObj.props.owning_user.dbValues[0] && data.awb0AllowReadShare.dbValue) || (ctx.aceActiveContext.context.workingCtxOpType !== 'UPDATE' && data.awb0AllowReadShare.dbValue)"
+        },
+        "readShareAllowed": {
+            "expression": "ctx.aceActiveContext.context.workingContextObj.props.awb0AllowReadShare.dbValues[0] === '1'"
+        },
+        "writeShareAllowed": {
+            "expression": "ctx.aceActiveContext.context.workingContextObj.props.awb0AllowWriteShare.dbValues[0] === '1'"
+        }        
+    },
+    
+    "i18n":
+    {
+        "allowReadShare": [ "OccurrenceManagementConstants" ],
+        "allowWriteShare": [ "OccurrenceManagementConstants" ]
+    }
+}

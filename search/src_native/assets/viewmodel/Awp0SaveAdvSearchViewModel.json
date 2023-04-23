@@ -1,0 +1,215 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [ "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-widget.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ],
+    "actions": {
+        "save": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-AdvancedSavedSearch",
+            "method": "createAdvancedSavedSearch",
+            "inputData": {
+                "inputs": "{{function:getSavedAdvSearchInputs}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "search.createOrModifySavedSearch"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==141152",
+                    "message": "confirmOverwrite"
+                } ],
+
+                "success": [ {
+                    "condition": "data.pinToHome.dbValue === true || data.pinToHome.dbValue === 'true'",
+                    "message": "pinToHome"
+                } ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        },
+
+        "overwrite": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-AdvancedSavedSearch",
+            "method": "createAdvancedSavedSearch",
+            "inputData": {
+                "inputs": [ {
+                    "stringValueInputKeyValuePairs": {
+                        "savedSearchName": "{{data.searchName.dbValue}}",
+                        "referencingSavedQuery": "{{data.referencingSavedQuery.dbValue}}"
+                    },
+                    "boolValueInputKeyValuePairs": {
+                        "pinToHome": "{{function:isPinToHome}}",
+                        "override": true,
+                        "shareSavedSearch": "{{function:isShareSavedSearch}}",
+                        "favorite": "{{function:isFavorite}}"
+                    },
+                    "savedSearchCriteria": "{{function:getSavedSearchCriteriaFromAdvancedSearch}}"
+                } ]
+            },
+            "events": {
+                "success": [ {
+                        "name": "search.createOrModifySavedSearch"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Awp0SaveSearchUtils"
+        }
+    },
+
+    "data": {
+        "searchName": {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "maxLength": 128
+        },
+
+        "referencingSavedQuery": {
+            "displayName": "{{i18n.referencingSavedQuery}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.advancedSearch.criteria.queryUID}}",
+            "dispValue": "{{ctx.advancedSearch.referencingSavedQuery}}"
+        },
+
+        "savedSearchCriteria": {
+            "displayName": "{{i18n.savedSearchCriteria}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.advancedSearch.searchFilters}}",
+            "dispValue": "{{ctx.advancedSearch.searchFilters}}"
+        },
+
+        "pinToHome": {
+            "displayName": "{{i18n.pinSearch}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "false"
+        },
+
+        "shareSavedSearch": {
+            "displayName": "{{i18n.shareSavedSearch}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "false"
+        },
+
+        "favorite": {
+            "displayName": "{{i18n.favorite}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": "{{ctx.advancedSearch.favorite}}"
+        }
+    },
+
+    "functions": {
+        "getSavedAdvSearchInputs": {
+            "functionName": "getSavedAdvSearchInputs",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getSavedSearchCriteriaFromAdvancedSearch": {
+            "functionName": "getSavedSearchCriteriaFromAdvancedSearch",
+            "parameters": [
+                "{{ctx.advancedSearch.searchFilters}}"
+            ]
+        },
+        "isPinToHome": {
+            "functionName": "isPinToHome",
+            "parameters": [
+                "{{data.pinToHome.dbValue}}"
+            ]
+        },
+        "isShareSavedSearch": {
+            "functionName": "isShareSavedSearch",
+            "parameters": [
+                "{{data.shareSavedSearch.dbValue}}"
+            ]
+        },
+        "isFavorite": {
+            "functionName": "isFavorite",
+            "parameters": [
+                "{{data.favorite.dbValue}}"
+            ]
+        }
+    },
+
+    "messages": {
+        "confirmOverwrite": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.nameInUse}}",
+            "messageTextParams": [
+                "{{data.searchName.dbValue}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.CancelText}}",
+                    "action": ""
+                },
+
+                {
+                    "option": "Overwrite",
+                    "text": "{{i18n.OverwriteText}}",
+                    "action": "overwrite"
+                }
+            ]
+        },
+
+        "pinToHome": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.pinToHome}}",
+            "messageTextParams": [
+                "{{data.searchName.dbValue}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isValidToSave": {
+            "expression": "data.searchName.dbValue && data.searchName.dbValue!=''"
+        }
+    },
+
+    "i18n": {
+        "Name": [ "SearchMessages" ],
+        "SaveSearch": [ "SearchMessages" ],
+        "Criteria": [ "SearchMessages" ],
+        "Save": [ "SearchMessages" ],
+        "nameInUse": [ "SearchMessages" ],
+        "CancelText": [ "SearchMessages" ],
+        "OverwriteText": [ "SearchMessages" ],
+        "pinToHome": [ "SearchMessages" ],
+        "referencingSavedQuery": [ "SearchMessages" ],
+        "savedSearchCriteria": [ "SearchMessages" ],
+        "pinSearch": [ "SearchMessages" ],
+        "shareSavedSearch": [ "SearchMessages" ],
+        "favorite": [ "SearchMessages" ]
+    }
+
+}

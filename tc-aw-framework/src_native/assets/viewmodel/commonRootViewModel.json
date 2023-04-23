@@ -1,0 +1,102 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-progress-indicator.directive",
+        "js/visible-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-click.directive",
+        "js/aw-layout-slot.directive"
+    ],
+    "data": {
+        "narrowModeStyle": "",
+        "skipToMainClickEvent" : null
+    },
+    "actions": {
+        "checkNarrowMode": {
+            "actionType": "JSFunction",
+            "method": "checkNarrowMode",
+            "deps": "js/aw.narrowMode.service",
+            "outputData": {
+                "narrowModeStyle": ""
+            }
+        },
+        "checkShowUserSettingsBarValue": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "checkNarrowMode"
+                },
+                {
+                    "action": "getShowUserSettingsBarValueInLocalStorage"
+                },
+                {
+                    "action": "setShowUserSettingsBarValueInCtx"
+                },
+                {
+                    "action": "initializeSkipToMainListener"
+                }
+            ]
+        },
+        "getShowUserSettingsBarValueInLocalStorage": {
+            "actionType": "JSFunction",
+            "method": "get",
+            "deps": "js/localStorage",
+            "inputData": {
+                "topic": "showUserSettingsBar"
+            },
+            "outputData": {
+                "showUserSettingsBar": ""
+            }
+        },
+        "setShowUserSettingsBarValueInCtx": {
+            "actionType": "modifyCtx",
+            "inputData": {
+                "methodType": "update",
+                "name": "showUserSettingsBar",
+                "value": "{{data.showUserSettingsBar}}"
+            }
+        },
+        "toggleShowUserSettingsBarValueInLocalStorage": {
+            "actionType": "JSFunction",
+            "method": "publish",
+            "deps": "js/localStorage",
+            "inputData": {
+                "topic": "showUserSettingsBar",
+                "data": "{{ctx.showUserSettingsBar}}"
+            }
+        },
+        "initializeSkipToMainListener": {
+            "actionType": "JSFunction",
+            "method": "initializeSkipToMain",
+            "deps": "js/wcagService",
+            "inputData": {
+                "data": "{{data}}"
+            }
+        }
+    },
+    "dataProviders": {},
+    "functions": {},
+    "onEvent": [ {
+            "eventId": "aw.windowResize",
+            "action": "checkNarrowMode"
+        },
+        {
+            "eventId": "appCtx.update",
+            "condition": "name === 'showUserSettingsBar'",
+            "action": "toggleShowUserSettingsBarValueInLocalStorage"
+        }
+    ],
+    "i18n": {
+        "skipToMainLabel": ["UIElementsMessages"]
+    },
+    "messages": {},
+    "conditions": {
+        "isTaskbarFullScreen": {
+            "expression": "ctx.taskbarfullscreen && ctx.taskbarfullscreen === 'true'"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "checkShowUserSettingsBarValue"
+    }
+}

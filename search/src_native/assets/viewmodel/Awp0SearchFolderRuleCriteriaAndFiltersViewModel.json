@@ -1,0 +1,50 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-widget.directive"
+    ],
+    "data": {
+        "searchFolderCriteria": {
+            "displayName": "{{i18n.searchCriteria}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false"
+        },
+        "searchFolderFilters": {
+            "displayName": "{{i18n.filterString}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "false",
+            "isArray": "true"
+        }
+    },
+    "actions":
+    {
+        "updateCriteriaAndFilters":
+        {
+            "actionType": "JSFunction",
+            "method": "updateCriteriaAndFilters",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "searchFolder": "{{ctx.mselected[0].uid}}"
+            },
+            "deps": "js/searchFolderService"
+        }
+    },
+    "functions": {
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Awp0SearchFolderRuleCriteriaAndFilters.contentLoaded",
+            "action": "updateCriteriaAndFilters"
+        }
+    ],
+    "i18n":
+    {
+        "searchCriteria": [ "SearchMessages" ],
+        "filterString": [ "SearchMessages" ]
+    }
+}
+

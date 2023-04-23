@@ -1,0 +1,32 @@
+{
+    "schemaVersion": "1.0.0",
+
+    "data": {
+        "fnd0Parent": {
+            "type": "STRING",
+            "isEditable": true,
+            "dbValue": "{{ctx.aceActiveContext.context.revOccParentItem}}"
+        },
+        "fnd0Child": {
+            "type": "STRING",
+            "isEditable": true,
+            "dbValue": "{{ctx.aceActiveContext.context.revOccChildItem}}"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "populateParentRevision",
+        "onUnmount": "clearParentContext"
+    },
+    "actions": {
+        "populateParentRevision": {
+            "actionType": "JSFunction",
+            "method": "populateParentRevision",
+            "deps": "js/addRevOccService"
+        },
+        "clearParentContext": {
+            "actionType": "JSFunction",
+            "method": "clearParentContext",
+            "deps": "js/addRevOccService"
+        }
+    }
+}

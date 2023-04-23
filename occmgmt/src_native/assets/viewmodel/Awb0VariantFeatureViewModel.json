@@ -1,0 +1,221 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-property-non-edit-val.directive"
+    ],
+
+    "actions": {
+        "initSVROwningItems": {
+            "actionType": "JSFunction",
+            "method": "initSVROwningItems",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+
+        "revealSVROwningItems": {
+            "actionType": "dataProvider",
+            "method": "getConfiguredSVROwningItems"
+        },
+
+        "fetchSVROwningItems": {
+            "actionType": "JSFunction",
+            "method": "getSVROwningItems",
+            "inputData": {},
+            "outputData": {
+                "svrOwningItems": ""
+            },
+            "deps": "js/variantInfoConfigurationService"
+        },
+
+        "svrOwningItemSelected": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "SVROwningElementPanel",
+                        "title": "{{data.i18n.configPanelEffectiveVariantForTitle}}",
+                        "recreatePanel": "true",
+                        "supportGoBack": true
+                    }
+                } ]
+            }
+        },
+        "applyCustomVariantInfoChangeBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "applyCustomVariantInfoChange"
+                }
+            ]
+        },
+        "updateRequestPrefOnCurrentContext": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.transientRequestPref",
+                "value": {
+                    "jitterFreePropLoad" : true,
+                    "userGesture": "VARIANT_RULE_CHANGE"
+                }
+            },
+            "deps": "js/appCtxService"
+        },
+        "applyCustomVariantInfoChange":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData":
+            {
+                "path": "aceActiveContext.context.configContext",
+                "value":{
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "var_uids": "{{function:getVariantRulesToApply}}",
+                    "de": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "ue": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffUnitNo.dbValues[0]}}",
+                    "ei_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffEndItem.dbValues[0]}}",
+                    "startDate" :"{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate" :"{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "fromUnit" :"{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffUnits.dbValues[0]}}",
+                    "toUnit" :"{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffUnits.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+        "deps": "js/variantInfoConfigurationService"
+        },
+
+        "updateRequestPrefForCustomVariantInfoChange":
+        {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "deps": "js/appCtxService",
+            "inputData":
+            {
+                "path":"aceActiveContext.context.requestPref",
+                "value":{
+                    "customVariantRule":"true"
+                }
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                       "name": "awConfigPanel.handleCustomVariantInfoChange"
+                    }
+                ]
+            }
+        },
+        "applyEndItemChangedBatchJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateRequestPrefOnCurrentContext"
+                },{
+                    "action": "applyEndItemChanged"
+                }
+            ]
+        },
+        "applyEndItemChanged": {
+            "actionType": "JSFunction",
+            "method": "updatePartialCtx",
+            "inputData": {
+                "path": "aceActiveContext.context.configContext",
+                "value": {
+                    "r_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0CurrentRevRule.dbValues[0]}}",
+                    "var_uids": "{{data.eventData.variantRules}}",
+                    "iro_uid": "{{data.eventData.svrOwningItem.uid}}",
+                    "de": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffDate.dbValues[0]}}",
+                    "ue": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffUnitNo.dbValues[0]}}",
+                    "ei_uid": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EffEndItem.dbValues[0]}}",
+                    "startDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffDates.dbValues[0]}}",
+                    "endDate": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffDates.dbValues[0]}}",
+                    "fromUnit": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0StartEffUnits.dbValues[0]}}",
+                    "toUnit": "{{ctx.aceActiveContext.context.productContextInfo.props.awb0EndEffUnits.dbValues[0]}}",
+                    "startFreshNavigation": true
+                }
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+
+    "dataProviders": {
+        "getConfiguredSVROwningItems": {
+            "action": "fetchSVROwningItems",
+            "response": "{{data.svrOwningItems}}",
+            "uidInResponse": "dbValues[0]",
+            "selectionModelMode": "single"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initSVROwningItems"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initSVROwningItems"
+        },
+        {
+            "eventId": "configPanel.svrOwningItemChanged",
+            "action": "initSVROwningItems"
+        },
+        {
+            "eventId": "configPanel.revealSVROwningItems",
+            "action": "revealSVROwningItems"
+        },
+        {
+            "eventId": "getConfiguredSVROwningItems.selectionChangeEvent",
+            "action": "svrOwningItemSelected"
+        },
+        {
+            "eventId": "awConfigPanel.handleCustomVariantInfoChange",
+            "action": "applyCustomVariantInfoChangeBatchJob"
+        },
+        {
+            "eventId": "variantConfiguratorPanel.configureWithCustomVariantRule",
+            "action": "updateRequestPrefForCustomVariantInfoChange"
+        },
+        {
+            "eventId": "awConfigPanel.variantInfoChanged",
+            "cacheEventData": true,
+            "condition": "svrOwningItem && !variantRules",
+            "action": "applyEndItemChangedBatchJob"
+        }
+    ],
+
+    "messages": {
+
+    },
+
+    "data": {
+        "variantCommands": "awb0_variantCommands",
+
+        "savedVariant": {
+            "uiValue": "{{i18n.savedVariant}}",
+            "type": "STRING"
+        }
+    },
+
+    "functions": {
+        "getVariantRulesToApply": {
+            "functionName": "getVariantRulesToApply",
+            "parameters": []
+        }
+    },
+
+    "i18n": {
+        "variant": [ "OccurrenceManagementConstants" ],
+        "configPanelEffectiveVariantForTitle": [ "OccurrenceManagementConstants" ],
+        "variantSectionTitle": [ "OccurrenceManagementConstants" ],
+        "savedVariant": [ "OccurrenceManagementConstants" ]
+    }
+}

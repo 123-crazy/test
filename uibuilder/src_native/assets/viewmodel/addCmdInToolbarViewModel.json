@@ -1,0 +1,105 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-widget.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "availableCommands": {
+            "displayName": "{{i18n.selectChildLabel}}",
+            "type": "STRING",
+            "isEditable": true,
+            "hasLov": true,
+            "dispValue": "{{ctx.selected.props.availableCommands.displayValues[0]}}",
+            "dbValue": "{{ctx.selected.props.availableCommands.dbValue}}",
+            "dataProvider": "availableCommandsDataProvider"
+        }
+    },
+    "dataProviders": {
+        "availableCommandsDataProvider": {
+            "action": "getAvailableCommands",
+            "response": "{{data.availableCommandsInfo}}",
+            "totalFound": "{{data.availableCommandsInfo.length}}"
+        }
+    },
+    "actions": {
+        "updateCommandsTable": {
+            "actionType": "JSFunction",
+            "method": "publish",
+            "inputData": {
+                "topic": "toolbarSummary.updateCommandsTable"
+            },
+            "deps": "js/eventBus"
+        },
+        "getAvailableCommands": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($criteria:String){commands(commandInput:{criteria:$criteria}){commands{id title{value}}}}",
+                    "variables": {
+                        "criteria": "{{prop.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "availableCommandsInfo": "{{function:convertCommandsToLovEntries}}"
+            },
+            "deps": "js/placementsService"
+        },
+        "add": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($command:ID!, $anchor: String){addPlacement(input:{command:$command anchor:$anchor priority: -1}){id}}",
+                    "variables": {
+                        "command": "{{data.availableCommands.dbValue}}",
+                        "anchor": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addCmd.updateCmdsInToolbar"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addCmd.updateCmdsInToolbar",
+            "action": "updateCommandsTable"
+        }
+    ],
+    "conditions": {
+        "isValidToAdd": {
+            "expression": "data.availableCommands.dbValue && data.availableCommands.dbValue !=''"
+        }
+    },
+    "i18n": {
+        "addCommandTitle": [
+            "CommandBuilderMessages"
+        ],
+        "selectChildLabel": [
+            "CommandBuilderMessages"
+        ],
+        "ADD_BUTTON_TITLE": [
+            "BaseMessages"
+        ]
+    }
+}

@@ -1,0 +1,203 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-xrt.directive"
+    ],
+    "data": {
+        "createFollowUpQualityAudit": {
+            "displayName": "{{i18n.qa0CreateFollowUpQualityAudit}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT",
+            "dbValue": 0,
+            "type": "BOOLEAN"
+        },
+        "objName" : {
+            "displayName": "{{i18n.qualityAudittitle}}"
+        }
+    },
+    "actions": {
+        "actionCreateRelationSuccessorAudit":{
+            "actionType": "JSFunction",
+            "method": "updateAuditSWA",
+            "inputData": {
+            },
+            "deps": "js/qa0AuditSaveAsService"
+        },
+        "getSuccessorRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2019-06-Finder",
+            "method": "performSearchViewModel4",
+            "inputData": {
+                "columnConfigInput": {
+                    "clientName": "AWClient",
+                    "clientScopeURI": ""
+                },
+                "searchInput": {
+                    "searchCriteria": {
+                        "parentUid": "{{ctx.selected.uid}}"
+                    }
+                }
+            },
+            "outputData": {
+                "totalFound": "totalFound"
+            }
+        },
+        "getDeepCopyData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "getDeepCopyData",
+            "inputData": {
+                "deepCopyDataInput": {
+                    "operation": "SaveAs",
+                    "targetObject": "{{ctx.selected}}",
+                    "deepCopyDatas": [],
+                    "selectedBO": "{{ctx.selected}}"
+                }
+            },
+            "outputData": {
+                "deepCopyDatas": "deepCopyDatas"
+            },
+            "events": {
+                "success": [ {
+                    "name": "auditSaveAs"
+                } ]
+            },
+            "deps": "js/qa0AuditSaveAsService"
+        },
+        "createNewObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2012-09-DataManagement",
+            "method": "saveAsObjectAndRelate",
+            "inputData":
+            {
+                "saveAsInput": "{{function:prepareSaveAsInput}}",
+                "relateInfo": [ {
+                    "relate": true
+                } ]
+            },
+            "outputData": {
+                "createdAudit": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createRelationEvent",
+                        "condition": "data.createFollowUpQualityAudit.dbValue"
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!data.createFollowUpQualityAudit.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "SaveAsObjectSuccess"
+                } ]
+            },
+            "deps": "js/qa0AuditSaveAsService"
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{ctx.selected}}",
+                    "secondaryObject": "{{data.createdAudit}}",
+                    "relationType": "Qa0QualityAuditSuccessorRel",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "createRelationSuccessorAudit"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ],
+                "failure": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "createRelationEvent",
+            "action" : "createRelation"
+        },
+        {
+            "eventId": "auditSaveAs",
+            "action" : "createNewObject"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "getSuccessorRelation"
+        },
+        {
+            "eventId": "createRelationSuccessorAudit",
+            "action": "actionCreateRelationSuccessorAudit"
+        }
+    ],
+    "functions": {
+        "prepareSaveAsInput":{
+            "functionName":"prepareSaveAsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "messages": {
+        "SaveAsObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.qa0SaveAsObjectSuccess}}",
+            "messageTextParams": [
+                "{{data.createdAudit.props.object_name.dbValues[0]}"
+            ]
+        }
+    },
+    "conditions": {
+
+    },
+    "i18n": {
+        "qa0SaveAs": [
+            "qualityauditMessages"
+        ],
+        "qa0CreateFollowUpQualityAudit": [
+            "qualityauditMessages"
+        ],
+        "qa0SaveAsObjectSuccess" : [
+            "qualityauditMessages"
+        ]
+    }
+}

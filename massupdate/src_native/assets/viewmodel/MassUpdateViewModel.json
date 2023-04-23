@@ -1,0 +1,202 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/aw-panel-header.directive"
+
+    ],
+
+    "actions": {
+        "validateProblemItemAlreadyExistsInECN": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForSecondary",
+            "inputData":{
+                "secondaryObjects": ["{{function:getClipboardFavouriteRecentSelectedItem}}"],
+                "pref": {
+                   "expItemRev":false,
+                   "returnRelations":true,
+                   "info":[
+                      {
+                          "relationTypeName":"CMHasProblemItem",
+                          "otherSideObjectTypes":
+                          [
+                              "ChangeNoticeRevision"
+                          ]
+                      }
+                   ]
+                }
+             },
+
+            "outputData":
+            {
+                "changeNoticeList": "{{function:processSecondaryObject}}",
+                "isProblemItemReusable":"{{function:isProblemItemReusable}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name" : "MassUpdateViewModel.validationSuccess",
+                        "condition": "data.changeNoticeList.length === 0 || data.isProblemItemReusable === true"
+                    }
+                ]
+            },
+            "actionMessages": 
+            {
+                "success": 
+                [
+                    {
+                        "message" : "probItemAlreadyExistsUnderSomeECN",
+                        "condition": "data.changeNoticeList.length === 1 && data.isProblemItemReusable === false"
+                    },
+                    {
+                        "message" : "probItemAlreadyExistsUnderMultipleECNs",
+                        "condition": "data.changeNoticeList.length > 1 && data.isProblemItemReusable === false"
+                    }
+
+                ]
+            },
+            "deps": "js/massUpdateService"
+        },
+        "closePanel": 
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": 
+            {
+                "events": 
+                [
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "addProblemObjectToECR": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createOrUpdateRelations",
+            "inputData": {
+                "infos": [ {
+                    "clientId": "addProblemObjectToECR",
+                    "relationType": "CMHasProblemItem",
+                    "primaryObject": {
+                        "uid": "{{ctx.xrtSummaryContextObject.uid}}",
+                        "type": "{{ctx.xrtSummaryContextObject.type}}"
+                    },
+                    "secondaryData": [ {
+                        "clientId": "SecondaryData",
+                        "secondary": "{{function:getClipboardFavouriteRecentSelectedItem}}"
+                    } ]
+                } ]
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                        "name": "MassUpdateViewModel.AddActionComplete"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Massupdate' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Massupdate'",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "relations": "",
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "MassUpdateViewModel.setSelectedProblem"
+                    }
+                ]
+            },
+            "deps": "js/massUpdateService"
+        },
+
+        "setProblemItem": {
+            "actionType": "JSFunction",
+            "method": "setProblemItem",
+            "inputData": {
+                "problemItem": "{{data.selectedProblemItem}}"
+            },
+            "deps": "js/massUpdateService"
+        }
+    },
+
+    "conditions": {
+        "showCommand": {
+            "expression": "ctx.getRecentObjsProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length || ctx.getClipboardProvider.selectedObjects.length > 0 || data.dataProviders.performSearch.selectedObjects.length > 0"
+        }
+    },
+
+    "functions": {
+        "getClipboardFavouriteRecentSelectedItem": {
+            "functionName": "getClipboardFavouriteRecentSelectedItem",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+
+    "onEvent": [ 
+        {
+            "eventId": "MassUpdateViewModel.setSelectedProblem",
+            "action": "setProblemItem"
+        },
+        {
+            "eventId": "MassUpdateViewModel.validationSuccess",
+            "action": "addProblemObjectToECR"
+        },
+        { 
+            "eventId": "primaryWorkArea.selectionChangeEvent", 
+            "action": "closePanel" 
+        },
+        { 
+            "eventId": "MassUpdateViewModel.AddActionComplete", 
+            "action": "closePanel" 
+        },
+        {
+            "eventId": "ImpactedAssembliesPanel.contentUnloaded",
+            "action": "closePanel"    
+        }
+        
+    ],
+
+    "i18n": {
+        "Select": [ "MassUpdateConstants" ],
+        "set": [ "MassUpdateConstants" ],
+        "probItemAlreadyExistsUnderSomeECN": [ "MassUpdateMessages" ],
+        "probItemAlreadyExistsUnderMultipleECNs": [ "MassUpdateMessages" ]
+    },
+    "messages": {
+        "probItemAlreadyExistsUnderSomeECN": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.probItemAlreadyExistsUnderSomeECN}}",
+            "messageTextParams": [
+                "{{data.selectedProblemItem}}",
+                "{{data.changeNoticeList}}"
+            ]
+        },
+        "probItemAlreadyExistsUnderMultipleECNs": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.probItemAlreadyExistsUnderMultipleECNs}}",
+            "messageTextParams": [
+                "{{data.selectedProblemItem}}"
+            ]
+        }
+    }
+}

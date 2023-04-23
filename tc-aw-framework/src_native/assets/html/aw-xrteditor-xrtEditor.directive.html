@@ -1,0 +1,87 @@
+<!-- Begin subLocation  -->
+<div class="aw-layout-sublocationTabPanel fiddle">
+    <div class="aw-layout-defaultSublocation fiddle">
+        <div class="aw-layout-sublocationContainer">
+            <div class="aw-layout-panel aw-layout-navigationArea afx-content-background" ng-show="isShowNavPanel()">
+                <!-- Begin searchFiltersNav panel  -->
+                <div class="aw-layout-panelTitle">
+                    <div class="gwt-Label" title="Filters"><aw-i18n>{{i18n.filters}}</aw-i18n></div>
+                </div>
+                <div class="aw-layout-panelMain">
+                    <div class="aw-search-searchFilter aw-layout-panelContent">
+                        <div class="aw-layout-panelBody"></div>
+                        <div class="aw-layout-panelFooter hidden"></div>
+                    </div>
+                </div>
+                <!-- End searchFiltersNav panel  -->
+            </div>
+            <div class="aw-layout-workarea">
+                <!-- Begin workAreaCommandBar panel  -->
+                <div ng-include="baseUrlPath + '/html/aw-xrteditor-workAreaCommandBar.directive.html'"></div>
+                <!-- End workAreaCommandBar panel  -->
+                <div class="aw-layout-xrtBreadCrumb">
+                    <xrt-ctx-breadcrumb ></xrt-ctx-breadcrumb>
+                </div>
+                <div class="aw-layout-workareaMain aw-layout-flexRow">
+
+                    <div class="aw-layout-aceEditorPanel">
+                        <div class="aw-layout-panelTitle">
+                            <div class="gwt-Label" title="Edit" ng-hide="editing">{{stylesheetContext.datasetName}}
+                                (Read only)</div>
+                            <div class="gwt-Label" title="Edit" ng-show="editing"><aw-i18n>{{i18n.edit}}</aw-i18n>:</div>
+                            <input class="ds-edit" type="text" ng-model="stylesheetContext.datasetName" ng-show="editing"></input>
+                        </div>
+                        <div class="aw-layout-ace" ui-ace="{ onLoad : aceLoaded }" ng-model="$parent.aceModel" exist-when="uiAceLoaded" ></div>
+                    </div>
+
+                    <div class="aw-layout-aceNavigationPanel aw-layout-flexColumn">
+                        <div class="aw-layout-treePanel">
+                            <div class="aw-layout-panelTitle">
+                                <div class="gwt-Label" title="Outline"><aw-i18n>{{i18n.outline}}</aw-i18n></div>
+                            </div>
+                            <div class="aw-layout-outline">
+                                <aw-tree tree="dataForTheTree">
+                                    {{node.type}}: {{node.attributes[0].value}}
+                                </aw-tree>
+                            </div>
+
+                        </div>
+
+                        <div class="aw-layout-detailsPanel">
+                            <div class="aw-layout-panelTitle">
+                                <div class="gwt-Label" title="Details"><aw-i18n>{{i18n.details}}</aw-i18n></div>
+                            </div>
+                            <div class="aw-jswidgets-grid aw-jswidgets-tablePropGrid">
+                                <aw-splm-table gridid="details" exist-when="tableViewModelLoaded"></aw-splm-table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="aw-layout-panel aw-layout-infoPanel" ng-show="isShowToolInfo()">
+                <!-- Begin searchFiltersNav panel  -->
+                <div class="aw-layout-panelTitle">
+                    <div class="gwt-Label" title="Clone"><aw-i18n>{{i18n.clone}}</aw-i18n></div>
+                </div>
+                <div class="aw-layout-panelMain">
+                    <div class="aw-layout-panelContent" style="height: 780px;">
+                        <div class="aw-layout-panelBody"></div>
+                        <div class="aw-layout-panelFooter hidden"></div>
+                    </div>
+                </div>
+                <!-- End searchFiltersNav panel  -->
+            </div>
+            <!-- Begin infoCommandBar panel  -->
+            <div class="aw-layout-infoCommandbar">
+                <div class="aw-commands-commandBar aw-commands-commandBarVertical">
+
+                </div>
+            </div>
+            <!-- End infoCommandBar panel  -->
+            <!-- Begin footer panel  -->
+            <div ng-include="baseUrlPath + '/html/aw-xrteditor-footer.directive.html'"></div>
+            <!-- End footer panel  -->
+        </div>
+    </div>
+    <!-- End subLocation  -->
+</div>

@@ -1,0 +1,207 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-panel-footer.directive"
+    ],
+     "data": {
+        "NoPropertiesMessage":{
+            "displayName": "",
+            "type": "STRING",
+            "dispValue": "{{i18n.NoPropertiesMessage}}"
+        },
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING"
+        },
+        "unitSystem": {
+            "displayName": "{{i18n.unitSystemLabel}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.unitSystemMetric}}",
+            "propertyRadioFalseText": "{{i18n.unitSystemNonMetric}}",
+            "dbValue": "{{data.unitSystem.dbValue}}"
+        },
+        "panelMode": 1,
+        "activeView": 1,
+        "searchStringMinLength": 3,
+        "delayTimeTree": {
+            "displayName": "{{i18n.delayTimeTree}}",
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "1000",
+            "dispValue": "{{i18n.Delayms}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "classificationSearchCommands": "classify_searchCommand",
+        "aw_ZeroCompileCommandAnchor": "aw_ZeroCompileCommandAnchor",
+        "searchBox1": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": ""
+        },
+        "autoUpdateEnabled": {
+            "displayName": "{{i18n.AutoUpdate}}",
+            "type": "BOOLEAN",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "isRequired": "true",
+            "isEditable": "true"
+        },
+        "bulkFiltersMap": {},
+        "applyAllButton": {
+            "displayName": "{{i18n.ApplyAll}}",
+            "type": "STRING",
+            "isRequired": "false"
+        },
+        "clearAllButton": {
+            "displayName": "{{i18n.ClearAll}}",
+            "type": "STRING",
+            "isRequired": "false"
+        }
+    },
+    "i18n": {
+        "delayTimeTree": [ "ClassificationPanelMessages" ],
+        "Delayms": [ "ClassificationPanelMessages" ],
+        "NoPropertiesMessage":[ "ClassificationPanelMessages"],
+        "Classes": [ "ClassificationPanelMessages" ],
+        "Filters": [ "ClassificationPanelMessages" ],
+        "Navigate": [ "ClassificationPanelMessages" ],
+        "NotAllowedSearch": [ "ClassificationPanelMessages" ],
+        "AutoUpdate": [ "ClassificationPanelMessages" ],
+        "ApplyAll": [ "ClassificationPanelMessages" ],
+        "ClearAll": [ "ClassificationPanelMessages" ],
+        "search": [
+            "ClassificationPanelMessages"
+        ],
+        "filterString": [
+            "SearchMessages"
+        ],
+        "refine": [
+            "SearchMessages"
+        ],
+        "loadingFilterCategoriesFailed": [
+            "SearchMessages"
+        ],
+        "rangeOrCheckboxFilter": [
+            "ClassificationPanelMessages"
+        ],
+        "InvalidSearchStringLength": [ "ClassificationPanelMessages" ]
+    },
+    "actions": {
+        "applyAllOnButton": {
+            "actionType": "JSFunction",
+            "method":"copyBulkFiltersToCtx",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "primaryWorkarea.reset"
+                } ]
+            },
+            "deps": "js/classifySearchService"
+        },
+
+        "resetScope":{
+        "actionType": "JSFunction",
+        "method": "resetScope",
+        "inputData": {
+            "data": "{{data}}",
+            "ctx":"{{ctx}}"
+        },
+        "deps": "js/classifySearchService"
+       },
+        "setPanelIsClosedOnCtx": {
+            "actionType": "JSFunction",
+            "method": "setPanelIsClosedOnCtx",
+            "inputData": {
+            },
+            "deps": "js/classifySearchService"
+        },
+
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "updateCategories",
+            "inputData": {
+                "categories": "{{ctx.searchResponseInfo.searchFilterCategories}}",
+                "categoryValues": "{{ctx.searchResponseInfo.searchFilterMap}}",
+                "groupProperty": "{{ctx.searchResponseInfo.objectsGroupedByProperty.internalPropertyName}}",
+                "colorToggle": "false",
+                "currentCategories": "{{ctx.searchResponseInfo.searchCurrentFilterCategories}}",
+                "showRange": true
+            },
+            "outputData": {
+                "categories": "",
+                "ctx.clsLocation.mruActive": false
+            },
+            "events": {
+                "success": [ {
+                    "name": "navigatePanel.loadingFailed",
+                    "condition": "ctx.searchResponseInfo.searchFilterCategories.length == 0 && ctx.searchResponseInfo.totalFound > 0"
+                }
+            ]
+            },
+            "deps": "js/filterPanelService"
+        }
+    },
+    "dataProviders": {
+
+    },
+    "columnProviders": {
+
+    },
+    "grids": {
+
+    },
+    "conditions": {
+        "showFilters": {
+            "expression": " ctx.clsLocation.isVncVisible !== true "
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "appCtx.register",
+            "condition":"name === 'activeNavigationCommand'",
+            "action": "setPanelIsClosedOnCtx",
+            "cacheEventData": true
+        }
+    ],
+    "messages":{
+
+    },
+    "functions": {
+        "getBulkFilterMap": {
+            "functionName": "getBulkFilterMap",
+            "parameters": [
+                "{{data.bulkFiltersMap}}"
+            ]
+        },
+        "getFilterMap": {
+            "functionName": "getFilterMap",
+            "parameters": [
+                "{{ctx.search.activeFilterMap}}",
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "getStartIndexForFilterValueSearch": {
+            "functionName": "getStartIndexForFilterValueSearch",
+            "parameters": [
+                "{{ctx.search.valueCategory}}"
+            ]
+        },
+        "getClsSearchCriteria": {
+            "functionName": "getClsSearchCriteria",
+            "parameters": []
+        }
+    }
+}
+
+

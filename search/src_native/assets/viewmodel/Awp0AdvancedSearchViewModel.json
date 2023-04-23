@@ -1,0 +1,167 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-property-lov-val.directive",
+        "js/aw-advsearch-lov-val.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-checkbox-multiselect.directive",
+        "js/aw-repeat.directive",
+        "js/aw-link.directive"],
+    "data": {
+        "searchCriteria": {
+            "type": "STRING"
+        },
+        "isAdvancedSearchSupported": {
+            "displayName": "",
+            "type": "STRING",
+            "dispValue":""
+        },
+        "advancedSearchClearAll": {
+            "displayName": "{{i18n.advancedSearchClearAll}}",
+            "type": "STRING"
+        },
+        "tabModels":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "name": "{{i18n.quickText}}"
+                },
+                {
+                    "name": "{{i18n.advancedText}}"
+                }
+            ]
+        },
+
+        "awp0QuickSearchName": {},
+        "awp0AdvancedQueryName": {},
+        "awp0QuickQueryAttributes": {},
+        "awp0AdvancedQueryAttributes": {}
+    },
+    "actions":
+    {
+        "doQuickSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "doQuickSearch",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                       "name": "checkAdvancedPanelClose"
+                    }
+                ]
+            },
+            "deps": "js/advancedSearchService"
+        },
+        "doAdvancedSearch":
+        {
+            "actionType": "JSFunction",
+            "method": "doAdvancedSearch",
+            "inputData":
+            {
+                "data":"{{data}}"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                       "name": "checkAdvancedPanelClose"
+                    }
+                ]
+            },
+            "deps": "js/advancedSearchService"
+        },
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "getAdvancedSearchViewModel",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/advancedSearchService"
+        },
+        "closeAdvancedPanelNarrow":
+        {
+            "actionType": "JSFunction",
+            "method": "closeAdvancedPanelNarrow",
+            "deps": "js/advancedSearchUtils",
+            "inputData":
+            {
+                "source": "navigationPanel"
+            }
+        },
+        "clearAllAction":
+        {
+            "actionType": "JSFunction",
+            "method": "clearAllAction",
+            "inputData":
+            {
+                "data" : "{{data}}"
+            },
+            "deps": "js/advancedSearchService"
+        }
+     },
+
+    "onEvent":
+    [
+        {
+            "eventId": "checkAdvancedPanelClose",
+            "action": "closeAdvancedPanelNarrow"
+        }
+    ],
+
+    "preferences":
+    [
+        "Quick_Access_Queries_Attribute",
+        "QRYColumnsShownPref",
+        "Quick_Access_Queries"
+    ],
+
+     "conditions":
+    {
+        "showAdvancedSearchButton":{
+            "expression": "data.selectedTab.pageId==1 && data.awp0AdvancedQueryName && data.awp0AdvancedQueryName.dbValue"
+        },
+        "showAdvancedSearchSection":{
+            "expression": "data.isAdvancedSearchSupported.dbValue=='ADVANCED_SEARCH_SUPPORTED'"
+        },
+        "showAdvancedSearchAttributes":{
+            "expression": "data.awp0AdvancedQueryName && data.awp0AdvancedQueryName.dbValue"
+        },
+        "showClearAll":{
+            "expression": "data.awp0AdvancedQueryAttributes"
+        },
+        "showPreferredSearchSettings": {
+            "expression": "ctx.advancedSearch.showPreferredSearchSettings"
+        }
+    },
+
+    "i18n":
+    {
+        "advancedSearch": ["SearchMessages"],
+        "quickText": ["SearchMessages"],
+        "advancedText": ["SearchMessages"],
+        "searchBtn": ["SearchMessages"],
+        "searchString": ["SearchMessages"],
+        "advancedSearchClearAll": ["SearchMessages"]
+    }
+
+}

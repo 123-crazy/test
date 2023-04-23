@@ -1,0 +1,54 @@
+<aw-scrollpanel exist-when="!ctx.clsLocation.isFiltersVisible && ctx.ViewModeContext.ViewModeContext==='TableView'">
+    <div class="aw-clsLocation-fullViewVncFlexBox aw-xrt-columnContentPanel">
+        <div class="aw-classificationpanelsjs-searchVisualNavigationContent aw-base-scrollPanel">
+            <div class="aw-layout-panelBody">
+
+                <div class="aw-widgets-cellListWidgetContainer">
+                    <ul class="aw-widgets-cellListWidget aw-layout-flexRowContainer">
+                        <li class="aw-widgets-cellListItem aw-widgets-cellTop aw-cls-widgets-cellListItemSelected" aw-repeat="item : ctx.clsLocation.currentLevel.children" aw-click="ctx.parentClick( ctx.clsLocation , item, $last, $index)" tabindex="0">
+                            <div class="aw-vnc-classname-header">
+                                <div class="aw-widgets-cellListCellContent">
+                                    <div class="aw-widgets-cellListCellTitleBlock">
+                                        <span title="{{item.className}}" class="aw-widgets-cellListCellTitle" cell-title-id="CellTitle">{{item.className}}</span>
+                                        <label class="aw-widgets-cellListCellItemType aw-base-small" title="{{item.className}}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="aw-class-info" aw-class="item.children.length ? 'aw-vnc-child-exists' : 'aw-vnc-no-child-exists'">
+                                <div visible-when="(item.iconAvailable || item.classDescription === '')">
+                                    <div class="aw-widgets-cellListCellImage" aw-class="item.iconAvailable ? 'aw-vnc-custom-icon' : 'aw-vnc-default-icon'">
+                                        <div cls-vnc-id="CellThumbnail" class="aw-base-large-thumbnail">
+                                            <div class="aw-widgets-modelObjectThumbnailContainer">
+                                                <div class="aw-widgets-modelObjectThumbnail">
+                                                    <aw-image class="aw-base-icon" source="imageURL" aw-repeat="imageURL : item.typeIconFileUrl" visible-when="imageURL" title="{{item.classDescription}}"></aw-image>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div visible-when= "!item.iconAvailable && item.classDescription !== ''">
+                                    <div class="aw-widgets-classDescription">
+                                        {{ item.classDescription }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="aw-clspanel-nextLvlChildren">
+                              <aw-link class ="aw-clspanel-nextLvlChildren" prop="secondLevelChildren" aw-repeat="secondLevelChildren : item.children | limitTo: 4" aw-click="ctx.childClick(ctx.clsLocation, secondLevelChildren, item, $last, $index)"></aw-link>
+                            </div>
+                            <div class="aw-clspanel-label" exist-when="item.children.length > 4">
+                                <label>
+                                    <aw-i18n>i18n.more</aw-i18n>
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</aw-scrollpanel>
+<aw-splm-table gridid="gridView" show-decorators="true" show-context-menu="true"
+    exist-when="ctx.clsLocation.isFiltersVisible && ctx.search.totalFound!==0" show-check-box="subPanelContext.showCheckBox"></aw-splm-table>
+<div class="aw-clspanel-noSearchResultsFound">
+    <aw-property-non-edit-val prop="ctx.clsLocation.noSearchResultsFound" visible-when="(ctx.clsLocation.mruActive === false && ctx.search.totalFound===0) || (ctx.clsLocation.mruActive === true && ctx.clsLocation.mruObjects.length === 0)"></aw-property-non-edit-val>
+</div>

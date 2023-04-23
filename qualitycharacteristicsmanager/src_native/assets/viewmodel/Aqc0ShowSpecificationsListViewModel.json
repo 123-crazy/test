@@ -1,0 +1,245 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-footer.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-back-button.directive",
+        "js/exist-when.directive",
+        "js/aw-label.directive",
+        "js/aw-row.directive",
+        "js/visible-when.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-break.directive"
+    ],
+    "data": {
+        "properties": {
+            "displayName": "{{i18n.propertiesPanelCaption}}",
+            "type": "STRING",
+            "dbValue": "Properties"
+        },
+        "charSpecFilterBox": {
+           "displayName": "{{i18n.Filter}}",
+           "type": "STRING",
+           "dbValue": ""
+        },
+        "activeView": "Aqc0ShowSpecificationsList"
+    },
+    "actions": {
+        "showSpecificationsList": {
+            "actionType": "dataProvider",
+            "method": "showSpecificationsListProvider"
+        },
+        "getSpecifications": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadObjects",
+            "deps": "js/Aqc0CipUtilService",
+            "inputData": {
+                "data": "{{data}}",
+                "charSpecFilterBox": "{{data.charSpecFilterBox}}"
+            },
+            "outputData": {
+                "specificationsList": "specificationsList",
+                "totalFoundSpecifications": "totalLoaded.length",
+                "ctx.search.totalFound": "totalLoaded.length",
+                "ctx.search.totalLoaded": "totalLoaded.length"
+            }
+        },
+        "showSpecificationsDetails": {
+            "actionType": "JSFunction",
+            "method": "getSpecificationsDetails",
+            "deps": "js/Aqc0CipUtilService",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {}
+        },
+        "deleteRelationOnReplace": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "deleteRelations",
+            "inputData": {
+                "input": [ {
+                    "clientId": "",
+                    "relationType": "Aqc0LinkToSpec",
+                    "primaryObject": {
+                        "type": "{{ctx.pselected.type}}",
+                        "uid": "{{ctx.pselected.type === 'Aqc0QcElement' ? ctx.pselected.props.awb0UnderlyingObject.dbValues[0] : ctx.pselected.uid}}"
+                    },
+                    "secondaryObject": {
+                        "type": "{{ctx.selected.type}}",
+                        "uid": "{{ctx.selected.uid}}"
+                    }
+                } ]
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "deleteSuccess"
+                } ]
+            }
+        },
+        "attachCharSpecification": {
+            "actionType": "JSFunction",
+            "method": "createRelations",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "serviceData": "ServiceData"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        },
+                        "condition": "ctx.selected.type === 'Aqc0QcElement' || ctx.selected.type === 'Aqc0CharElementRevision'"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ],
+                            "refreshLocationFlag": true
+                        },
+                        "condition": "ctx.pselected.type === 'Aqc0QcElement' || ctx.pselected.type === 'Aqc0CharElementRevision'"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "successMessage",
+                    "condition": "data.serviceData.updated.length > 0 && data._internal.panelId !== 'Aqc0ReplaceSpecificationFromRepresentation'"
+                },{
+                    "message": "deleteSuccessMessage",
+                    "condition": "data.serviceData.updated.length > 0 && data._internal.panelId === 'Aqc0ReplaceSpecificationFromRepresentation'"
+                } ],
+                "failure": [
+                    {
+                        "condition": "data.serviceData.partialErrors.length > 0",
+                        "message": "AttachObjectFailureMessage"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CipUtilService"
+        },
+        "navBackPanel":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                 "events":
+                     [
+                         {
+                            "name": "complete.subPanel",
+                            "eventData":
+                            {
+                                "source": "Aqc0ShowSpecificationsList"
+                               }
+                        }
+                     ]
+            }
+
+        },
+        "navBackMainPanelFomSpecification":{
+            "actionType": "JSFunction",
+            "method": "selectSpecificationAndNavigateToMainPanel",
+            "deps": "js/Aqc0openCharGroupCommandHandler",
+            "inputData": {
+                "data": "{{data}}"
+        }
+    }
+
+    },
+    "dataProviders": {
+        "showSpecificationsListProvider": {
+            "action": "getSpecifications",
+            "response": "{{data.specificationsList}}",
+            "totalFound": "{{data.totalFoundSpecifications}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "dependencies": [ "js/showObjectCommandHandler" ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "getSelectedSpecification": {
+            "functionName": "getSelectedSpecification",
+            "parameters": [
+                "{{data.dataProviders.showSpecificationsListProvider}}"
+            ]
+        },
+        "getUnderlyingObject": {
+            "functionName": "getUnderlyingObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "showSpecificationsList"
+        },
+        {
+            "eventId": "showSpecificationsListProvider.selectionChangeEvent",
+            "action": "showSpecificationsDetails"
+        },
+        {
+            "eventId":"deleteSuccess",
+            "action": "attachCharSpecification"
+        }
+    ],
+    "messages": {
+        "successMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.attachCharSpecification}}"
+        },
+        "AttachObjectFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.PartialError}}",
+            "messageTextParams": [
+                "{{data.serviceData.partialErrors[0].errorValues[0].message}}"
+            ]
+        },
+        "deleteSuccessMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.deleteSuccessMessage}}"
+        }
+    },
+    "i18n": {
+        "attachCharSpecification": [ "qualitycharacteristicsmanagerMessages" ],
+        "Aqc0Attach": [ "qualitycharacteristicsmanagerMessages" ],
+        "backButtontitle": [ "qualitycharacteristicsmanagerMessages" ],
+        "deleteSuccessMessage": [ "qualitycharacteristicsmanagerMessages" ],
+        "Filter": [ "qualitycharacteristicsmanagerMessages" ],
+        "PartialError": [ "qualitycharacteristicsmanagerMessages" ],
+        "propertiesPanelCaption": [ "qualitycharacteristicsmanagerMessages" ],
+        "ReplaceButtonTitle": [ "qualitycharacteristicsmanagerMessages" ]
+    }
+}

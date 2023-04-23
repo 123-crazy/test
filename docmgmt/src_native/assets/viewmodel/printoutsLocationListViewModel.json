@@ -1,0 +1,82 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+
+        "loadData":
+        {
+            "actionType": "JSFunctionAsync",
+            "method": "loadData",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": "{{ctx.search.maxToLoad}}",
+                    "maxToReturn": "{{ctx.search.maxToReturn}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{ctx.search.criteria}}",
+                    "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                    "startIndex": "{{data.dataProviders.imageDataProvider.startIndex}}",
+                    "searchFilterMap6": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{ctx.search.sortCriteria}}"
+                },
+
+                "columnConfigInput":
+                {
+                    "clientName": "AWClient",
+                    "clientScopeURI": "{{ctx.sublocation.clientScopeURI}}"
+                }
+            },
+
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "{{json:searchResultsJSON}}",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap6",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap6",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty"
+            },
+
+            "deps": "js/printoutsLocationService"
+        }
+    },
+
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "reports_cell_commands"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "printoutsLocationList.contentLoaded",
+            "action": "reveal"
+        }
+    ]
+}

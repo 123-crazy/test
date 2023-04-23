@@ -1,0 +1,46 @@
+<aw-popup-panel2>
+    <div class="aw-jswidgets-checkboxDrop aw-jswidgets-drop aw-base-scrollPanel aw-jswidgets-page" ng-style="{'width': lovDDWidth}" aw-when-scrolled="requestNextLovEntries()">
+        <div class="aw-jswidgets-cbaSearch aw-widget-iconParent" ng-class="filterClass()">
+            <input type="text" autocomplete="off" autocorrect="off" autocapitilize="off" aw-autofocus auto-focus="true" spellcheck="false" ng-model="listFilterText" ng-change="changeFunction(listFilterText)"/>
+            <aw-property-image name="cmdSearch" class="aw-widget-icon"></aw-property-image>
+        </div>
+        <ul class="aw-widgets-cellListWidget">
+            <div class="afx-selected-vals">
+                <li class="aw-jswidgets-nestingListItem" ng-repeat="lovEntry in filtered = ( selectedPHolders | filter: {propDisplayValue: listFilterText})" ng-class="{'aw-search-settingsDisabled' : lovEntry.disabled === true}" ng-disabled="lovEntry.disabled === true">
+                    <div class="aw-jswidgets-nestingListItemDisplay">
+                        <span>
+                            <div class="afx-checkbox afx-checkbox-label-right">
+                                <label class="aw-jswidgets-checkboxWrapper">
+                                    <input aria-label="{{lovEntry.propDisplayValue}}" type="checkbox" id="{{lovEntry.propInternalValue + $id}}" class="aw-jswidgets-checkboxButton" ng-disabled="lovEntry.disabled === true" ng-model="lovEntry.sel" ng-change="updateArray(lovEntry)" />
+                                    <span class="afx-checkbox-md-style">
+                                        <span class="check"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <label class="aw-jswidgets-checkboxLabel" for="{{lovEntry.propInternalValue + $id}}" title="{{lovEntry.propDisplayValue}}">{{lovEntry.propDisplayValue}}</label>
+                        </span>
+                        <div ng-if="lovEntry.propDisplayDescription" class="aw-widgets-cellListCellItemType aw-base-small" title="{{lovEntry.propDisplayDescription}}">{{lovEntry.propDisplayDescription}}</div>
+                    </div>
+                </li>
+            </div>
+
+            <li class="aw-jswidgets-nestingListItem" ng-repeat="lovEntry in filtered = ( lovEntries | filter: {propDisplayValue: listFilterText})">
+                <div class="aw-jswidgets-nestingListItemDisplay">
+                    <span>
+                        <div class="afx-checkbox afx-checkbox-label-right">
+                            <label class="aw-jswidgets-checkboxWrapper">
+                                <input aria-label="{{lovEntry.propDisplayValue}}" type="checkbox" id="{{lovEntry.propInternalValue + $id}}" class="aw-jswidgets-checkboxButton" ng-model="lovEntry.sel" ng-change="updateArray(lovEntry)" />
+                                <span class="afx-checkbox-md-style">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <label class="aw-jswidgets-checkboxLabel" for="{{lovEntry.propInternalValue + $id}}" title="{{lovEntry.propDisplayValue}}">{{lovEntry.propDisplayValue}}</label>
+                    </span>
+                    <div ng-if="lovEntry.propDisplayDescription" class="aw-widgets-cellListCellItemType aw-base-small" title="{{lovEntry.propDisplayDescription}}">{{lovEntry.propDisplayDescription}}</div>
+                </div>
+            </li>
+            <li class="aw-jswidgets-loading" ng-class="loadingClass()">&nbsp;</li>
+        </ul>
+    </div>
+</aw-popup-panel2>

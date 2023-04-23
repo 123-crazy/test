@@ -1,0 +1,140 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "loadData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "maxTreeLevel": "{{data.maxTreeLevel}}",
+                "delayTimeTree": "{{data.delayTimeTree}}",
+                "dataProvider": "{{data.dataProviders.fmeaCompareDataProvider}}",
+                "sortCriteria": "{{data.columnProviders.fmeaCompareColumnProvider.sortCriteria}}",
+                "differenceType":"{{data.i18n.qfm0DifferenceType}}",
+                "remarks":"{{data.i18n.qfm0Remarks}}",
+                "name":"{{data.i18n.qfm0Name}}",
+                "context":"{{data.i18n.qfm0Context}}",
+                "description":"{{data.i18n.qfm0Description}}",
+                "id":"{{data.i18n.qfm0Id}}"
+            },
+            "outputData": {
+                "ctx.search.totalFound": "result.treeLoadResult.totalChildCount",
+                "ctx.search.totalLoaded": "result.treeLoadResult.childNodes.length",
+                "totalFound": "result.treeLoadResult.totalChildCount",
+                "totalLoaded": "result.treeLoadResult.childNodes.length",
+                "searchResults": "result.treeLoadResult.childNodes",
+                "dataProviders.fmeaCompareDataProvider.columnConfig": "result.colDefs"
+            },
+            "deps": "js/Qfm0FmeaCompareTreeService"
+        },
+        "loadProperties": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableProperties",
+            "inputData": {
+                "propertyLoadInput": "request.propertyLoadInput",
+                "delayTimeProperty": "{{data.delayTimeProperty}}"
+            },
+            "deps": "js/Qfm0FmeaCompareTreeService"
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        }
+    },
+    "data": {
+        "delayTimeTree": {
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "20",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        },
+        "maxTreeLevel": {
+            "type": "INTEGER",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "100",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+    "dataProviders": {
+        "fmeaCompareDataProvider": {
+            "action": "loadData",
+            "initializeAction": "loadData",
+            "nextAction": "loadData",
+            "previousAction": "loadData",
+            "focusAction": "loadData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "multiple",
+            "treePageSize": 100,
+            "inputData": {
+                "accessMode": "tree",
+                "selectionModel": "{{subPanelContext.selectionModel}}",
+                "topNodeUid": "{{ctx.state.params.uid}}"
+            },
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectObjectNavigationCellListActionCommands"
+        },
+        "fmeaComparePropertyProvider": {
+            "action": "loadProperties",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "fmeaCompareColumnProvider": {
+            "soaEnabled": false,
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "fmeaCompareTree": {
+            "dataProvider": "fmeaCompareDataProvider",
+            "propertyProvider": "fmeaComparePropertyProvider",
+            "columnProvider": "fmeaCompareColumnProvider",
+            "addIconColumn": false,
+            "enableArrangeMenu": true,
+            "gridOptions": {
+                "enableGridMenu": true,
+                "enablePinning": true,
+                "useStaticFirstCol": true
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        }
+    ],
+    "i18n": {
+        "qfm0DifferenceType": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Remarks": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Name": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Context": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Description": [
+            "qualityFmeaMessages"
+        ],
+        "qfm0Id": [
+            "qualityFmeaMessages"
+        ]
+    }
+}

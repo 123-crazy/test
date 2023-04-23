@@ -1,0 +1,94 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/wys-preview.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "openToolsPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awsidenav.openClose",
+                    "eventData": {
+                        "id": "aw_navigation"
+                    }
+                } ]
+            }
+        },
+        "loadWysiwygJson": {
+            "actionType": "JSFunction",
+            "method": "processWysiwygJson",
+            "outputData": {
+                "wysiwygJson": "wysiwygJson"
+            },
+            "events": {
+                "success": [ {
+                    "name": "wysiwygJsonLoaded"
+                } ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "displayFilteredNodesAction": {
+            "actionType": "JSFunction",
+            "method": "displayFilteredNodes",
+            "inputData": {
+                "data": "{{data}}",
+                "inputNode": "{{data.eventData}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "wysiwygJsonLoaded"
+                } ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "wysiwygPreviewMountAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "wysiwygPreviewMountActionEvent"
+                } ]
+            }
+        }
+    },
+
+    "data": {
+        "toolsPanelData": {
+            "slide": "PUSH",
+            "direction": "LEFT_TO_RIGHT",
+            "animation": true,
+            "width": "STANDARD",
+            "height": "FULL"
+        }
+    },
+    "conditions": {},
+    "onEvent": [
+        {
+            "eventId": "wysiwygPreviewMountActionEvent",
+            "action": "openToolsPanel"
+        },
+        {
+            "eventId": "wysiwygTree.refresh",
+            "action": "loadWysiwygJson"
+        },
+        {
+            "eventId": "wysiwygPreviewMountActionEvent",
+            "action": "loadWysiwygJson"
+        },
+        {
+            "eventId": "wysiwygTree.filteredNodes",
+            "cacheEventData": true,
+            "action": "displayFilteredNodesAction"
+        }
+    ],
+    "i18n": {},
+    "lifecycleHooks": {
+        "onMount": "wysiwygPreviewMountAction"
+    }
+}

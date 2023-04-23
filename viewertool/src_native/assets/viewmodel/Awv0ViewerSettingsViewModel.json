@@ -1,0 +1,1293 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-slider.directive",
+        "js/aw-label.directive",
+        "js/exist-when.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-link-with-popup-menu.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-image.directive",
+        "js/aw-click.directive",
+        "js/aw-break.directive"
+    ],
+
+    "actions": {
+        "reveal": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "viewerSettingsPanelRevealed"
+                },
+                {
+                    "action": "revealDataProvider"
+                }
+            ]
+        },
+        "viewerSettingsPanelRevealed": {
+            "actionType": "JSFunction",
+            "method": "viewerSettingsPanelRevealed",
+            "inputData": {
+                "shadedCheckboxProp": "{{data.shadedCheckboxProp}}",
+                "walkCheckboxProp": "{{data.walkCheckboxProp}}",
+                "useIndexedCheckboxProp": "{{data.useIndexedCheckboxProp}}",
+                "modelTitleProp": "{{data.modelTitleProp}}",
+                "unitTextProp": "{{data.unitTextProp}}",
+                "localeTextBundle": "{{data.i18n}}",
+                "renderSourceServerCheckboxProp": "{{data.renderSourceServerCheckboxProp}}",
+                "renderSourceClientCheckboxProp": "{{data.renderSourceClientCheckboxProp}}",
+                "modelName": "{{data.modelName}}",
+                "materialProp": "{{data.materialProp}}"
+            },
+
+
+            "outputData": {
+                "shadedCheckboxProp": "shadedCheckboxProp",
+                "walkCheckboxProp": "walkCheckboxProp",
+                "useIndexedCheckboxProp": "useIndexedCheckboxProp",
+                "modelTitleProp": "modelTitleProp",
+                "unitTextProp": "unitTextProp",
+                "renderSourceServerCheckboxProp": "renderSourceServerCheckboxProp",
+                "renderSourceClientCheckboxProp": "renderSourceClientCheckboxProp",
+                "modelName": "modelName",
+                "materialProp": "materialProp",
+                "materialCommandProp.iconName": "materialProp.dbValue[0].iconUrl",
+                "materialCommandProp.tooltip": "materialProp.dbValue[0].tooltip",
+                "handleMaterialIconClick": "handleMaterialIconClick"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "revealBackgroundThemeProp": {
+            "actionType": "JSFunctionAsync",
+            "method": "viewerSettingsPanelRevealThemeProp",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "themeProp": "themeProp",
+                "colorThemeList": "colorThemeList"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "revealDataProvider": {
+            "actionType": "dataProvider",
+            "method": "themeDataProvider"
+        },
+
+        "launchPopup": {
+            "actionType": "JSFunction",
+            "method": "show",
+            "inputData": {
+                "data": {
+                    "declView": "Awv0MaterialGridPopup",
+                    "options": {
+                        "reference": "materialRefId",
+                        "forceCloseOthers": false,
+                        "width": 160,
+                        "height": 192,
+                        "placement": "bottom-start"
+                    },
+                    "locals": {
+                        "hasCloseButton": true
+                    }
+                }
+            },
+            "deps": "js/popupService"
+        },
+        "showMaterialPopupEvent": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "materialWidget.showMaterialPopup",
+                    "condition": "ctx.viewer && ctx.viewer.licLevel && ctx.viewer.licLevel>=1"
+                } ]
+            }
+        },
+        "updateMaterialWidget": {
+            "actionType": "JSFunction",
+            "method": "updateMaterialWidget",
+            "inputData": {
+                "eventData": "{{data.eventMap['MaterialWidget.selectionChanged']}}",
+                "materialProp": "{{data.materialProp}}"
+            },
+            "outputData": {
+                "materialProp": "materialProp",
+                "materialCommandProp.iconName": "materialProp.dbValue[0].iconUrl",
+                "materialCommandProp.tooltip": "materialProp.dbValue[0].tooltip"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "shadedWithEdgesSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "shadedWithEdgesSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.shadedCheckboxProp.dbValue}}"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "materialSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "materialSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.materialCheckboxProp.dbValue}}"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "trihedronSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "trihedronSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.trihedronCheckboxProp.dbValue}}"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "renderSourceChangedServer": {
+            "actionType": "JSFunction",
+            "method": "renderSourceChangedServer",
+            "inputData": {
+                "renderSourceServerCheckboxProp": "{{data.renderSourceServerCheckboxProp}}",
+                "isUserRenderOptionSettingInProgress": "{{data.isUserRenderOptionSettingInProgress}}"
+            },
+            "outputData": {
+                "isUserRenderOptionSettingInProgress": "isUserRenderOptionSettingInProgress",
+                "modifiedRenderOption": "modifiedRenderOption",
+                "renderOptionEvent": "renderOptionEvent"
+            },
+            "events": {
+                "success": [ {
+                        "name": "viewerSettings.renderSourceChangedToSSR",
+                        "condition": "data.renderOptionEvent === 'Server'"
+                    },
+                    {
+                        "name": "viewerSettings.renderSourceChangedToCSR",
+                        "condition": "data.renderOptionEvent === 'Client'"
+                    },
+                    {
+                        "name": "viewerSettings.revertSettingToSSR",
+                        "condition": "data.renderOptionEvent === 'RevertToSSR'"
+                    },
+                    {
+                        "name": "viewerSettings.revertSettingToCSR",
+                        "condition": "data.renderOptionEvent === 'RevertToCSR'"
+                    }
+                ]
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "renderSourceChangedClient": {
+            "actionType": "JSFunction",
+            "method": "renderSourceChangedClient",
+            "inputData": {
+                "renderSourceClientCheckboxProp": "{{data.renderSourceClientCheckboxProp}}",
+                "isUserRenderOptionSettingInProgress": "{{data.isUserRenderOptionSettingInProgress}}"
+            },
+            "outputData": {
+                "isUserRenderOptionSettingInProgress": "isUserRenderOptionSettingInProgress",
+                "modifiedRenderOption": "modifiedRenderOption",
+                "renderOptionEvent": "renderOptionEvent"
+            },
+            "events": {
+                "success": [ {
+                        "name": "viewerSettings.renderSourceChangedToSSR",
+                        "condition": "data.renderOptionEvent === 'Server'"
+                    },
+                    {
+                        "name": "viewerSettings.renderSourceChangedToCSR",
+                        "condition": "data.renderOptionEvent === 'Client'"
+                    },
+                    {
+                        "name": "viewerSettings.revertSettingToSSR",
+                        "condition": "data.renderOptionEvent === 'RevertToSSR'"
+                    },
+                    {
+                        "name": "viewerSettings.revertSettingToCSR",
+                        "condition": "data.renderOptionEvent === 'RevertToCSR'"
+                    }
+                ]
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "renderSourceChangeCancelled": {
+            "actionType": "JSFunction",
+            "method": "renderSourceChangeCancelled",
+            "inputData": {
+                "renderSourceServerCheckboxProp": "{{data.renderSourceServerCheckboxProp}}",
+                "renderSourceClientCheckboxProp": "{{data.renderSourceClientCheckboxProp}}",
+                "modifiedRenderOption": "{{data.modifiedRenderOption}}"
+            },
+            "outputData": {
+                "renderSourceServerCheckboxProp": "renderSourceServerCheckboxProp",
+                "renderSourceClientCheckboxProp": "renderSourceClientCheckboxProp"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "renderSourceChangeSuccess": {
+            "actionType": "JSFunction",
+            "method": "renderSourceChangeSuccess",
+            "inputData": {
+                "renderSourceServerCheckboxProp": "{{data.renderSourceServerCheckboxProp}}",
+                "renderSourceClientCheckboxProp": "{{data.renderSourceClientCheckboxProp}}",
+                "modifiedRenderOption": "{{data.modifiedRenderOption}}"
+            },
+            "outputData": {
+                "renderSourceServerCheckboxProp": "renderSourceServerCheckboxProp",
+                "renderSourceClientCheckboxProp": "renderSourceClientCheckboxProp"
+            },
+
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "revertRenderSettingToSSR": {
+            "actionType": "JSFunction",
+            "method": "revertRenderSettingToSSR",
+            "inputData": {
+                "renderSourceServerCheckboxProp": "{{data.renderSourceServerCheckboxProp}}",
+                "renderSourceClientCheckboxProp": "{{data.renderSourceClientCheckboxProp}}"
+            },
+            "outputData": {
+                "renderSourceServerCheckboxProp": "renderSourceServerCheckboxProp",
+                "renderSourceClientCheckboxProp": "renderSourceClientCheckboxProp"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "revertRenderSettingToCSR": {
+            "actionType": "JSFunction",
+            "method": "revertRenderSettingToCSR",
+            "inputData": {
+                "renderSourceServerCheckboxProp": "{{data.renderSourceServerCheckboxProp}}",
+                "renderSourceClientCheckboxProp": "{{data.renderSourceClientCheckboxProp}}"
+            },
+            "outputData": {
+                "renderSourceServerCheckboxProp": "renderSourceServerCheckboxProp",
+                "renderSourceClientCheckboxProp": "renderSourceClientCheckboxProp"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "showFloorSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "showFloorSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.showFloorCheckboxProp.dbValue}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "gridSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "gridSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.gridCheckboxProp.dbValue}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "shadowSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "shadowSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.shadowCheckboxProp.dbValue}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "reflectionSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "reflectionSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.reflectionCheckboxProp.dbValue}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "examineSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "examineSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.examineCheckboxProp.dbValue}}",
+                "walkCheckboxProp": "{{data.walkCheckboxProp}}"
+            },
+            "outputData": {
+                "walkCheckboxProp": "walkCheckboxProp"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "walkSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "walkSettingChanged",
+            "inputData": {
+                "isChecked": "{{data.walkCheckboxProp.dbValue}}",
+                "examineCheckboxProp": "{{data.examineCheckboxProp}}"
+            },
+            "outputData": {
+                "examineCheckboxProp": "examineCheckboxProp"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "pmiSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "setPMIFaltToScreen",
+            "inputData": {
+                "setFlatToScreen": "{{data.pmiCheckboxProp.dbValue}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "useTransparencySettingChanged": {
+            "actionType": "JSFunction",
+            "method": "useTransparencySettingChanged",
+            "inputData": {
+                "viewerSettingValue": "{{data.useTransparencyCheckboxProp.dbValue}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "useIndexedSettingChanged": {
+            "actionType": "JSFunction",
+            "method": "useIndexedSettingChanged",
+            "inputData": {
+                "viewerSettingValue": "{{data.useIndexedCheckboxProp}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "handleSliderChangeEvent": {
+            "actionType": "JSFunction",
+            "method": "handleSliderChangeEvent",
+            "inputData": {
+                "sliderValue": "{{prop.dbValue[0].sliderOption.value}}",
+                "floorSliderProp": "{{data.floorSliderProp}}"
+            },
+            "outputData": {
+                "floorSliderProp": ""
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "updateShowPMIFlatToScreenTrue": {
+            "actionType": "JSFunction",
+            "method": "updateShowPMIFlatToScreenTrue",
+            "inputData": {
+                "pmiCheckboxProp": "{{data.pmiCheckboxProp}}"
+            },
+            "outputData": {
+                "pmiCheckboxProp": ""
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "updateShowPMIFlatToScreenFalse": {
+            "actionType": "JSFunction",
+            "method": "updateShowPMIFlatToScreenFalse",
+            "inputData": {
+                "pmiCheckboxProp": "{{data.pmiCheckboxProp}}"
+            },
+            "outputData": {
+                "pmiCheckboxProp": ""
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "updateSelectionDisplayHighlight": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionDisplayHighlight",
+            "inputData": {
+                "useTransparencyCheckboxProp": "{{data.useTransparencyCheckboxProp}}"
+            },
+            "outputData": {
+                "useTransparencyCheckboxProp": ""
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "updateSelectionDisplayTransparent": {
+            "actionType": "JSFunction",
+            "method": "updateSelectionDisplayTransparent",
+            "inputData": {
+                "useTransparencyCheckboxProp": "{{data.useTransparencyCheckboxProp}}"
+            },
+            "outputData": {
+                "useTransparencyCheckboxProp": ""
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "setDisplayUnit": {
+            "actionType": "JSFunction",
+            "method": "setDisplayUnit",
+            "inputData": {
+                "SelectedItem": "{{data.unitTextProp.propertyDisplayName}}",
+                "localeTextBundle": "{{data.i18n}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        },
+
+        "themeSelectionChange": {
+            "actionType": "JSFunction",
+            "method": "setColorTheme",
+            "inputData": {
+                "currentValue": "{{data.themeProp}}",
+                "data":"{{data.colorThemeList}}"
+            },
+            "deps": "js/Awv0ViewerSettingsService"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "viewerSettings.viewerSelectionDisplayHighlight",
+            "action": "updateSelectionDisplayHighlight"
+        },
+        {
+            "eventId": "MaterialWidget.selectionChanged",
+            "action": "updateMaterialWidget",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "viewerSettings.viewerSelectionDisplayTransparent",
+            "action": "updateSelectionDisplayTransparent"
+        },
+
+        {
+            "eventId": "viewerSettings.showPMIFlatToScreenTrue",
+            "action": "updateShowPMIFlatToScreenTrue"
+        },
+
+        {
+            "eventId": "viewerSettings.showPMIFlatToScreenFalse",
+            "action": "updateShowPMIFlatToScreenFalse"
+        },
+
+        {
+            "eventId": "awlinkPopup.selected",
+            "action": "themeSelectionChange",
+            "condition": "property.propertyName === 'themeProp'",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "awlinkPopup.selected",
+            "action": "setDisplayUnit",
+            "condition": "property.propertyName === 'unitTextProp'",
+            "cacheEventData": true
+        },
+
+        {
+            "eventId": "materialWidget.showMaterialPopup",
+            "action": "launchPopup"
+        },
+        {
+            "eventId": "viewerSettings.renderSourceChangedToCSR",
+            "message": "confirmRenderSourceChangeClient"
+        },
+        {
+            "eventId": "viewerSettings.renderSourceChangedToSSR",
+            "message": "confirmRenderSourceChangeServer"
+        },
+        {
+            "eventId": "viewerSettings.revertSettingToSSR",
+            "action": "revertRenderSettingToSSR"
+        },
+        {
+            "eventId": "viewerSettings.revertSettingToCSR",
+            "action": "revertRenderSettingToCSR"
+        }
+    ],
+
+    "dataProviders": {
+        "themeDataProvider":{
+            "dataProviderType": "TcLOV",
+            "action": "revealBackgroundThemeProp",
+            "response": "{{data.colorThemeList}}",
+            "totalFound": "{{data.colorThemeList.length}}",
+            "selectionModelMode": "single"
+        },
+        "unitDataProvider": {
+            "dataProviderType": "Static",
+            "response": [ {
+                    "staticDisplayValue": "{{i18n.millimeters}}",
+                    "staticElementObject": "cmdListView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.centimeters}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.meters}}",
+                    "staticElementObject": "cmdCompareView",
+                    "selected": true
+                },
+                {
+                    "staticDisplayValue": "{{i18n.inches}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.feet}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.yards}}",
+                    "staticElementObject": "cmdCompareView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.micrometers}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.decimeters}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.kilometers}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                },
+                {
+                    "staticDisplayValue": "{{i18n.mils}}",
+                    "staticElementObject": "cmdTableView",
+                    "selected": false
+                }
+            ],
+            "totalFound": 10
+        }
+    },
+
+    "data": {
+        "shadedCheckboxProp": {
+            "displayName": "{{i18n.shadedFeatureLine}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isVisible": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visShading}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "materialCheckboxProp": {
+            "displayName": "",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_applyTrueShadingMaterial}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "materialCommandProp": {
+            "action": "showMaterialPopupEvent",
+            "iconName": "",
+            "tooltip": ""
+        },
+
+        "materialProp": {
+            "displayName": "",
+            "isArray": "true",
+            "dbValue": [ {
+                "iconName": "",
+                "tooltip": "",
+                "checkAction": "materialSettingChanged",
+                "buttonAction": "showMaterialPopupEvent",
+                "isChecked": "{{ctx.viewer.preference.AWC_applyTrueShadingMaterial}}",
+                "materialIndex": "{{ctx.viewer.preference.AWC_visMaterial}}"
+            } ]
+        },
+
+        "trihedronCheckboxProp": {
+            "displayName": "{{i18n.trihedronCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visTrihedronOn}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "renderSourceServerCheckboxProp": {
+            "displayName": "{{i18n.renderServer}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": null,
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "renderSourceClientCheckboxProp": {
+            "displayName": "{{i18n.renderClient}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": null,
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "themeProp": {
+            "displayName": "{{i18n.theme}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+
+        "themeTitleProp": {
+            "displayName": "{{i18n.theme}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+
+        "colorThemeList": {
+            "type": "STRING",
+            "dbValue": [
+            ]
+        },
+        "offsetLabelProp": {
+            "displayName": "{{i18n.offsetLabelName}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+
+        "modelTitleProp": {
+            "displayName": "{{i18n.modelTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true",
+            "dispValue": "{{i18n.meters}}"
+        },
+
+        "displayedTitleProp": {
+            "displayName": "{{i18n.displayedTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+
+        "unitTextProp": {
+            "displayName": "{{i18n.meters}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true"
+        },
+
+        "renderSource": {
+            "displayName": "{{i18n.renderSourceTitle}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": ""
+        },
+
+        "modelName": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": "",
+            "isEditable": "true"
+        },
+
+        "showFloorCheckboxProp": {
+            "displayName": "{{i18n.floorCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visFloorOn}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "gridCheckboxProp": {
+            "displayName": "{{i18n.gridCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visGridOn}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "shadowCheckboxProp": {
+            "displayName": "{{i18n.shadowCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visShadowOn}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "reflectionCheckboxProp": {
+            "displayName": "{{i18n.reflectionCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visReflectionOn}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "examineCheckboxProp": {
+            "displayName": "{{i18n.examineCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.isExamineNavigationMode}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "walkCheckboxProp": {
+            "displayName": "{{i18n.walkCheckboxName}}",
+            "type": "BOOLEAN",
+            "isVisible": "true",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.isWalkNavigationMode}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "pmiCheckboxProp": {
+            "displayName": "{{i18n.pmiCheckboxLabel}}",
+            "type": "BOOLEAN",
+            "isVisible": "false",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.pmiChecked}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "useIndexedCheckboxProp": {
+            "displayName": "{{i18n.useIndexedCheckboxName}}",
+            "type": "BOOLEAN",
+            "isVisible": "false",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "useTransparencyCheckboxProp": {
+            "displayName": "{{i18n.useTransparencyCheckboxName}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "{{ctx.viewer.preference.AWC_visSelectionDisplay}}",
+            "dispValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+
+        "floorSliderProp": {
+            "isArray": "true",
+            "dbValue": [ {
+                "sliderOption": {
+                    "disabled": false,
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "value": 50,
+                    "orientation": "horizontal",
+                    "range": false
+                },
+
+                "showIncrementButtons": true,
+                "sliderChangeEventAction": "handleSliderChangeEvent"
+            } ]
+        }
+    },
+
+    "messages": {
+        "confirmRenderSourceChangeServer": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.renderSourceWarningServerText}}",
+            "messageTextParams": [
+                "{{data.modelName.propertyDisplayName}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": "renderSourceChangeCancelled"
+                },
+                {
+                    "option": "Reload",
+                    "text": "{{i18n.reload}}",
+                    "action": "renderSourceChangeSuccess"
+                }
+            ]
+        },
+        "confirmRenderSourceChangeClient": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.renderSourceWarningClientText}}",
+            "messageTextParams": [
+                "{{data.modelName.propertyDisplayName}}"
+            ],
+            "navigationOptions": [ {
+                    "option": "Cancel",
+                    "text": "{{i18n.cancel}}",
+                    "action": "renderSourceChangeCancelled"
+                },
+                {
+                    "option": "Reload",
+                    "text": "{{i18n.reload}}",
+                    "action": "renderSourceChangeSuccess"
+                }
+            ]
+        }
+    },
+
+    "conditions": {
+        "showFloorOptions": {
+            "expression": "data.showFloorCheckboxProp.dbValue == true"
+        },
+
+        "showShadedWithEdges": {
+            "expression": "data.shadedCheckboxProp.isVisible == true"
+        },
+
+        "showPMI": {
+            "expression": "data.pmiCheckboxProp.isVisible == true"
+        },
+
+        "walkModeAvailability": {
+            "expression": "data.isWalkModeAvailability"
+        },
+
+        "viewerLicenceOnOrAboveStandard": {
+            "expression": "ctx.viewer && ctx.viewer.licLevel && ctx.viewer.licLevel>=1"
+        },
+
+        "viewerLicenceOnOrAboveProfessional": {
+            "expression": "ctx.viewer && ctx.viewer.licLevel && ctx.viewer.licLevel>=2"
+        },
+
+        "isNonPVWCSRViewer":{
+            "expression":"ctx.viewer && ctx.viewer.preference && (ctx.viewer.preference.AWV0ViewerRenderOption[0] === 'SSR' || ctx.viewer.preference.AWV0ViewerRenderOption[0] === 'CSR' && ctx.viewer.preference.AWV0ViewerCSROption !== 'PVW')"
+        },
+
+        "showIndexedOption": {
+            "expression": "data.useIndexedCheckboxProp.isVisible == true"
+        },
+
+        "showRenderOptions": {
+            "expression": "data.renderSourceServerCheckboxProp.dbValue !== null"
+        }
+
+    },
+
+    "i18n": {
+        "toolPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "unitPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "modelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "millimeters": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "centimeters": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "meters": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "inches": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "feet": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "yards": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "micrometers": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "decimeters": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "kilometers": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "mils": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "displayedTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "renderPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "renderSourceTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "renderClient": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "renderServer": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "reload": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "cancel": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "renderSourceWarningServerText": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "renderSourceWarningClientText": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "planeLabelName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "offsetLabelName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "pmiPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "navigationPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "IndexedModePanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "selectionDisplayPanelTitle": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "pmiCheckboxLabel": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "trihedronCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "gridCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shadowCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "reflectionCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "examineCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "walkCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "useTransparencyCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "useIndexedCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "multiSelectionCheckboxName": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shaded": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shadedFeatureLine": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip1": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip2": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip3": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip4": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip5": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip6": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip7": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip8": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip9": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip10": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip11": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip12": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip13": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip14": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip15": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip16": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip17": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip18": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip19": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip20": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip21": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip22": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip23": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip24": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip25": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip26": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip27": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip28": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip29": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialTooltip30": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorVisibilityPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorVisibilityPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorOffsetPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorOffsetPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorOrientationPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "floorOrientationPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "gridPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "gridPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "materialPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "reflectionPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "reflectionPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shadowPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shadowPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shadingPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "shadingPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "fromSession": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "theme": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "trihedronPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "trihedronPropertySetSuccess": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "applyTrueShadingMaterialsPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "selectionDisplayPropertySetFailure": [
+            "ViewerSettingsToolMessages"
+        ],
+
+        "colorThemeTitle": [
+            "ViewerSettingsToolMessages"
+        ]
+    }
+}

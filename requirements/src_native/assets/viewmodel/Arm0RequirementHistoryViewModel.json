@@ -1,0 +1,337 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-list.directive",
+        "js/aw-break.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-column.directive",
+        "js/exist-when.directive",
+        "js/visible-when.directive",
+        "js/aw-advanced-bar.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-include.directive",
+        "js/aw-i18n.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "progress.start"
+                },
+                {
+                    "name": "Arm0RequirementHistory.callCompareHistoryService"
+                } ]
+            }
+        },
+        "openObjectInNewTab":{
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "locale": "{{ctx.userSession.props.fnd0locale.dbValues[0]}}",
+                "uid": "{{data.selectedCell.props[7].propValues[0]}}"
+            },
+            "navigateIn": "newTab"
+        },
+        "callCompareHistoryService": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData":
+            {
+                "request":
+                {
+                    "method": "POST",
+                    "withCredentials": false,
+                    "url": "{{function:getCompareHistoryServiceURL}}",
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "data": {
+                        "baseURL": "{{function:getFmsBaseURL}}",
+                        "selectedObjects": [{
+                            "uid": "{{ctx.selected.uid}}",
+                            "type": "{{ctx.selected.type}}"
+                        }]
+                    }
+                }
+            },
+            "outputData": {
+                "compareData": "data"
+            },
+            "events": {
+                "success": [ {
+                        "name": "Arm0RequirementHistory.refreshFullTextCompareDataList"
+                    },
+                    {
+                        "name": "progress.end"
+                    }
+                ],
+                "failure":
+                [
+                    {
+                        "name": "progress.end"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "MicroserviceInstallationErrorCompare"
+                } ]
+            },
+            "deps": "js/Arm0CompareHistoryService"
+        },
+        "compareHtmlVersion": {
+            "actionType": "RESTService",
+            "serviceName": "",
+            "method": "POST",
+            "inputData":
+            {
+                "request":
+                {
+                    "method": "POST",
+                    "withCredentials": false,
+                    "url": "{{function:getCompareHtmlServiceURL}}",
+                    "headers": {
+                        "Content-Type": "application/json"
+                    },
+                    "data": "{{function:getSelectedObjectsHtml}}"
+                }
+            },
+            "outputData": {
+                "compareHtmlData": "data.output"
+            },
+            "events": {
+                "success": [ {
+                        "name": "Arm0RequirementHistory.showHtmlCompareReport"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "message": "MicroserviceInstallationErrorCompare"
+                } ]
+            },
+            "deps": "js/Arm0CompareHistoryService"
+
+        },
+        "showHtmlCompareReport": {
+            "actionType": "JSFunction",
+            "method": "showHtmlCompareReport",
+            "inputData": {
+                "htmlData": "{{data.compareHtmlData}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0CompareHistoryService"
+
+        },
+        "showCompareVersionHistory": {
+            "actionType": "JSFunction",
+            "method": "showCompareVersionHistory",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Arm0CompareHistoryService"
+
+        },
+        "refreshFullTextCompareDataList":
+        {
+            "actionType": "dataProvider",
+            "method": "fullTextCompareDataList"
+        },
+        "subscribeEvents": {
+            "actionType": "JSFunction",
+            "method": "subscribeEvents",
+            "inputData": {
+            },
+            "deps": "js/Arm0CompareHistoryService"
+
+        },
+        "unsubscribeEvents": {
+            "actionType": "JSFunction",
+            "method": "unsubscribeEvents",
+            "inputData": {
+            },
+            "deps": "js/Arm0CompareHistoryService"
+
+        },
+        "registerContext": {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "Arm0RequirementHistoryContext",
+                "value": "{{data.dataProviders}}"
+            },
+            "deps": "js/appCtxService"
+
+        },
+        "unregisterContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "Arm0RequirementHistoryContext"
+            }
+        },
+        "setPrimaryObjectInMSelected": {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "mselected",
+                "value": ["{{ctx.pselected}}"]
+            },
+            "deps": "js/appCtxService"
+        },
+        "setPrimaryObjectAsSelected": {
+            "actionType": "JSFunction",
+            "method": "registerCtx",
+            "inputData": {
+                "name": "selected",
+                "value": "{{ctx.pselected}}"
+            },
+            "deps": "js/appCtxService"
+        }
+    },
+    "functions": {
+        "getCompareHistoryServiceURL": {
+            "functionName": "getCompareHistoryServiceURL",
+            "parameters": [
+            ]
+        },
+        "getCompareHtmlServiceURL": {
+            "functionName": "getCompareHtmlServiceURL",
+            "parameters": [
+            ]
+        },
+        "getSelectedObjectsHtml": {
+            "functionName": "getSelectedObjectsHtml",
+            "parameters": [
+                "{{data.dataProviders.fullTextCompareDataList}}",
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        },
+        "getFmsBaseURL": {
+            "functionName": "getFmsBaseURL",
+            "parameters": [
+            ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Arm0RequirementHistory.refreshFullTextCompareDataList",
+            "action": "refreshFullTextCompareDataList"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.compareHtmlVersion",
+            "action": "compareHtmlVersion"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.showHtmlCompareReport",
+            "action": "showHtmlCompareReport"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.showCompareVersionHistory",
+            "action": "showCompareVersionHistory"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.contentLoaded",
+            "action": "registerContext"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.contentUnloaded",
+            "action": "unregisterContext"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.contentLoaded",
+            "action": "subscribeEvents"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.contentUnloaded",
+            "action": "unsubscribeEvents"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.callCompareHistoryService",
+            "action": "callCompareHistoryService"
+        },
+        {
+            "eventId": "Awp0ShowSaveAs.saveAsComplete",
+            "action": "reveal"
+        },
+        {
+            "eventId": "fullTextCompareDataList.selectionChangeEvent",
+            "action": "setPrimaryObjectInMSelected",
+            "condition": "data.dataProviders.fullTextCompareDataList.selectedObjects.length > 0"
+        },
+        {
+            "eventId": "fullTextCompareDataList.selectionChangeEvent",
+            "action": "setPrimaryObjectAsSelected",
+            "condition": "data.dataProviders.fullTextCompareDataList.selectedObjects.length > 0"
+        },
+        {
+            "eventId": "Arm0RequirementHistory.openObjectInNewTab",
+            "cacheEventData":true,
+            "action": "openObjectInNewTab"
+        }
+
+    ],
+    "data": {},
+    "dataProviders":
+    {
+      "fullTextCompareDataList":
+        {
+            "commands":
+            {
+                "open":
+                {
+                    "id": "cmdOpen",
+                    "title": "{{i18n.openRequirementsTitle}}",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "action":"openObjectInNewTab",
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "BOTTOM_RIGHT"
+                }
+
+
+            },
+            "response":"{{data.compareData}}",
+            "selectionModelMode": "multiple"
+         }
+    },
+    "i18n":
+    {
+        "added": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "removed": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "modified": [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "MicroserviceInstallationError":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "compare":[
+            "RequirementsCommandPanelsMessages"
+        ],
+        "openRequirementsTitle": [
+            "RequirementsCommandPanelsMessages"
+        ]
+
+    },
+    "messages": {
+        "MicroserviceInstallationErrorCompare": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.MicroserviceInstallationError}}",
+            "messageTextParams": [
+                "{{data.i18n.compare}}"
+            ]
+        }
+    }
+}

@@ -1,0 +1,396 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-column.directive",
+        "js/aw-break.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "reloadDataProvider": {
+            "actionType": "dataProvider",
+            "method": "treeTasksTemplateDataProvider"
+        },
+
+        "loadTreeColumns": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableColumns",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.treeTasksTemplateDataProvider}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0TemplateAssignment"
+        },
+
+        "loadTreeData": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "data": "{{data}}",
+                "treeLoadInput": "request.treeLoadInput",
+                "selected": "{{ctx.xrtSummaryContextObject}}"
+            },
+            "deps": "js/Awp0TemplateAssignment"
+        },
+        "registerPropPolicy": {
+            "actionType": "JSFunction",
+            "method": "registerPropPolicy",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.treeTasksTemplateDataProvider}}"
+            },
+            "deps": "js/Awp0TemplateAssignment"
+        },
+        "unRegisterPropPolicy": {
+            "actionType": "JSFunction",
+            "method": "unRegisterPropPolicy",
+            "inputData": {},
+
+            "deps": "js/Awp0TemplateAssignment"
+        },
+        "templateRowSelectionAction": {
+            "actionType": "JSFunction",
+            "method": "templateRowChangeSelection",
+            "inputData": {
+                "selectedTreeNode": "{{data.dataProviders.treeTasksTemplateDataProvider.selectedObjects}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Awp0TemplateAssignment"
+        },
+        "unregisterContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "workflowPalData"
+            }
+        },
+        "updateTemplateAssignmentNode": {
+            "actionType": "JSFunction",
+            "method": "updateTemplateAssignmentNode",
+            "inputData": {
+                "selectedTreeNode": "{{data.dataProviders.treeTasksTemplateDataProvider.selectedObjects}}",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0TemplateAssignment"
+        },
+        "updateTemplateAssignmentNodeInternal": {
+            "actionType": "JSFunction",
+            "method": "updateTemplateAssignmentNode",
+            "inputData": {
+                "selectedTreeNode": "{{data.eventData.selTemplate}}",
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0TemplateAssignment"
+        }
+    },
+    "dataProviders": {
+        "treeTasksTemplateDataProvider": {
+            "initializeAction": "loadTreeData",
+            "nextAction": "loadTreeData",
+            "previousAction": "loadTreeData",
+            "editContext": "PAL_TABLE_CONTEXT",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "selectionModelMode": "single",
+            "contextMenuCommandsAnchor": "aw_palTaskAssignmentTreeTableContextMenu",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "policy": {
+
+                "types": [ {
+                        "name": "EPMAssignmentList",
+                        "properties": [ {
+                                "name": "resources",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "task_templates",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "list_name"
+                            },
+                            {
+                                "name": "list_desc"
+                            },
+                            {
+                                "name": "owning_group"
+                            },
+                            {
+                                "name": "owning_user"
+                            },
+                            {
+                                "name": "shared"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMResourceList",
+                        "properties": [ {
+                                "name": "profiles",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "resources",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "actions"
+                            },
+                            {
+                                "name": "rev_quorum"
+                            },
+                            {
+                                "name": "ack_quorum"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMTaskTemplate",
+                        "properties": [ {
+                                "name": "process_template",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "fnd0Assignee",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "user",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "userName"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Group",
+                        "properties": [ {
+                            "name": "object_full_name"
+                        } ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [ {
+                            "name": "object_string"
+                        } ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [ {
+                            "name": "role_name"
+                        } ]
+                    },
+                    {
+                        "name": "ResourcePool",
+                        "properties": [
+                            {
+                                "name": "group"
+                            },
+                            {
+                                "name": "role"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMSignoffProfile",
+                        "properties": [
+                            {
+                                "name": "number_of_signoffs"
+                            },
+                            {
+                                "name": "allow_subgroups"
+                            },
+                            {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "columnProviders": {
+        "treeTemplatesColumnProvider": {
+            "loadColumnAction": "loadTreeColumns",
+            "columns": "{{data.columns}}",
+            "sortCriteria": [],
+            "frozenColumnIndex": -1
+        }
+    },
+    "grids": {
+        "taskTemplateTreeTable": {
+
+            "dataProvider": "treeTasksTemplateDataProvider",
+            "columnProvider": "treeTemplatesColumnProvider",
+            "enableArrangeMenu": false,
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableGridMenu": false,
+                "enablePinning": true,
+                "enableSorting": false,
+                "textBundle": {
+                    "TwistieTooltipCollapsed": "{{i18n.expand}}",
+                    "TwistieTooltipExpanded": "{{i18n.collapse}}"
+                },
+                "useStaticFirstCol": true,
+                "maxRowsToShow": 15
+            }
+        }
+    },
+    "data": {
+        "isSharedOption": {
+            "displayName": "{{i18n.isShared}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "false",
+            "dbValue": "{{ctx.workflowPalData.selPalVMO.props.shared.dbValue}}",
+            "uiValue":"{{ctx.workflowPalData.selPalVMO.props.shared.uiValue}}",
+            "dispValue": "{{ctx.workflowPalData.selPalVMO.props.shared.uiValue}}"
+        },
+        "palName":
+        {
+            "displayName": "{{i18n.Workflow_Name}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "dbValue": "{{ctx.workflowPalData.selPalVMO.props.list_name.dbValue}}",
+            "uiValue": "{{ctx.workflowPalData.selPalVMO.props.list_name.uiValue}}"
+        },
+        "palDesc":
+        {
+            "displayName": "{{i18n.Description}}",
+            "type": "STRING",
+            "isEditable": "false",
+            "dbValue": "{{ctx.workflowPalData.selPalVMO.props.list_desc.dbValue}}",
+            "uiValue": "{{ctx.workflowPalData.selPalVMO.props.list_desc.uiValue}}"
+        },
+        "processTemplate":
+        {
+            "displayName": "{{i18n.Workflow_Template}}",
+            "type": "OBJECT",
+            "isEditable": "false",
+            "dbValue": "{{ctx.workflowPalData.processTemplateObject.uid}}",
+            "uiValue": "{{ctx.workflowPalData.processTemplateObject.props.object_string.uiValues[0]}}"
+        }
+    },
+
+    "conditions": {
+        "isPriviledgeToModify": {
+            "expression": "ctx.workflowPalData.isPriviledgeToModify && conditions.isPalMgmtTCServerVersion122OrLater"
+        },
+        "isPalMgmtTCServerVersion122OrLater": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 12 || (ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion >= 2 ) )"
+        },
+        "hasPriviledgeToShare": {
+            "expression": "ctx.workflowPalData.isGroupAdminOrSysAdmin && conditions.isPalMgmtTCServerVersion122OrLater"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "Awp0TemplateAssignment.contentLoaded",
+            "action": "registerPropPolicy"
+        },
+        {
+            "eventId": "Awp0TemplateAssignment.contentUnloaded",
+            "action": "unRegisterPropPolicy"
+        },
+        {
+            "eventId": "Awp0TemplateAssignment.contentUnloaded",
+            "action": "unregisterContext"
+        },
+        {
+            "eventId": "treeTasksTemplateDataProvider.selectionChangeEvent",
+            "action": "templateRowSelectionAction"
+        },
+        {
+            "eventId": "Awp0TemplateAssignment.updateTreeData",
+            "action": "updateTemplateAssignmentNode"
+        },
+        {
+            "eventId": "Awp0TemplateAssignment.updatePreviousTreeDataRow",
+            "cacheEventData": true,
+            "action": "updateTemplateAssignmentNodeInternal"
+        },
+        {
+            "eventId": "Awp0TemplateAssignment.reset",
+            "action": "reloadDataProvider"
+        },
+        {
+            "eventId": "workflow.openTaskAssignmentPanel",
+            "action": "templateRowSelectionAction"
+        }
+    ],
+    "i18n": {
+        "taskName": [ "WorkflowCommandPanelsMessages" ],
+        "assignee": [ "WorkflowCommandPanelsMessages" ],
+        "Assigner": [ "WorkflowCommandPanelsMessages" ],
+        "Notifyees": [ "WorkflowCommandPanelsMessages" ],
+        "reviewers": [ "InboxMessages" ],
+        "save": [ "InboxMessages" ],
+        "discard": [ "InboxMessages" ],
+        "navigationConfirmation": [ "InboxMessages" ],
+        "Acknowledgers": [ "WorkflowCommandPanelsMessages" ],
+        "required": [ "WorkflowCommandPanelsMessages" ],
+        "isShared": [ "WorkflowPalMgmtMessages" ],
+        "Workflow_Name": [ "WorkflowCommandPanelsMessages" ],
+        "Workflow_Template": [ "WorkflowCommandPanelsMessages" ],
+        "Description":  [ "WorkflowCommandPanelsMessages" ],
+        "Properties": [ "NameValuePanelsMessages" ]
+    }
+}

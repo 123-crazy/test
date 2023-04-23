@@ -1,0 +1,140 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-listbox.directive"
+    ],
+    "data":{
+        "option":
+        {
+            "type": "STRING",
+            "hasLov": true,
+            "dbValue": ""
+        }
+    },
+    "actions":
+    {
+        "setSelectedProgramViewsOption":
+        {
+            "actionType": "JSFunction",
+            "method": "setSelectedProgramViewsOption",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1ProgramViewsService"
+        },
+        "getProgramViewsOptions":
+        {
+            "actionType": "JSFunction",
+            "method": "getProgramViewsOptions",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1ProgramViewsService"
+        },
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "listDataProvider"
+        },
+        "loadData":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Query-2014-11-Finder",
+            "method": "performSearch",
+            "inputData":
+            {
+                "searchInput":
+                {
+                    "maxToLoad": "{{ctx.search.maxToLoad}}",
+                    "maxToReturn": "{{ctx.search.maxToReturn}}",
+                    "providerName": "{{ctx.search.provider}}",
+                    "searchCriteria": "{{function:getProgramViewsSearchCriteria}}",
+                    "searchFilterFieldSortType" : "{{ctx.search.sortType}}",
+                    "startIndex": "{{data.dataProviders.listDataProvider.startIndex}}",
+                    "searchFilterMap": "{{ctx.search.activeFilterMap}}",
+                    "searchSortCriteria": "{{ctx.search.sortCriteria}}"
+                }
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "BusinessObject",
+                        "properties":
+                        [
+                            {
+                                "name": "awp0CellProperties"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData":
+            {
+                "totalFound": "totalFound",
+                "searchResults": "searchResults",
+                "ctx.search.totalFound": "totalFound",
+                "ctx.search.totalLoaded": "totalLoaded",
+                "ctx.search.filterMap": "searchFilterMap",
+                "ctx.search.filterCategories": "searchFilterCategories",
+                "ctx.search.objectsGroupedByProperty": "objectsGroupedByProperty",
+                "ctx.searchResponseInfo.searchFilterCategories": "searchFilterCategories",
+                "ctx.searchResponseInfo.searchFilterMap": "searchFilterMap",
+                "ctx.searchResponseInfo.objectsGroupedByProperty": "objectsGroupedByProperty"
+            },
+            "deps": "js/Saw1ProgramViewsService"
+        }
+    },
+    "functions":
+    {
+        "getProgramViewsSearchCriteria":
+        {
+            "functionName": "getProgramViewsSearchCriteria",
+            "parameters":
+            [
+                "{{ctx.state.params}}",
+                "{{ctx.search.criteria}}"
+            ]
+        }
+    },
+    "dataProviders":
+    {
+        "listDataProvider":
+        {
+            "action": "loadData",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "inputData": {
+                "selectionModel": "{{subPanelContext.selectionModel}}"
+            },
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+        
+
+    },
+    "onEvent": [
+        {
+            "eventId": "programViewsList.contentLoaded",
+            "action": "reveal"
+        },
+        {
+            "eventId": "programViewsList.contentLoaded",
+            "action": "getProgramViewsOptions"
+        }
+    ],
+    "i18n": {
+        "myProgramViews": [
+            "ScheduleManagerMessages"
+        ],
+        "allProgramViews": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}

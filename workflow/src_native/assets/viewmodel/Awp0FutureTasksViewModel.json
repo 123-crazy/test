@@ -1,0 +1,159 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-command-panel-section.directive"
+    ],
+    "actions":
+    {
+        "populateRequiredProperties":
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData":
+            {
+                "objects":
+                [
+                    "{{ctx.xrtSummaryContextObject}}"
+                ],
+                "attributes": [
+                    "fnd0AllWorkflows",
+                    "fnd0MyWorkflowTasks",
+                    "object_string",
+                    "object_desc"
+                ]
+            },
+            "policy":
+            {
+
+                "types": [
+
+                    {
+                        "name": "WorkspaceObject",
+                        "properties": [
+                            {
+                                "name": "object_string"
+                            },
+                            {
+                                "name": "fnd0AllWorkflows",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "fnd0MyWorkflowTasks",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "EPMTask",
+                        "properties": [
+                            {
+                                "name": "parent_process",
+                                "modifiers":
+                                [
+                                    {
+                                        "Value":"true",
+                                        "name":"withProperties"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "object_name"
+                            }
+                        ]
+                    }
+                ]
+
+            }
+        },
+        "populateOrHideFutureTaskTable": {
+            "actionType": "JSFunction",
+            "method": "populateOrHideFutureTaskTable",
+            "inputData": {
+                "data": "{{data}}",
+                "viewName": "{{data.eventMap['awCommandPanelSection.collapse'].name}}",
+                "isCollapsed": "{{data.eventMap['awCommandPanelSection.collapse'].isCollapsed}}"
+            },
+            "deps": "js/Awp0TasksUtils"
+        },
+        "collapseUpcomingTaskTable": {
+            "actionType": "JSFunction",
+            "method": "collapseGivenSection",
+            "inputData": {
+                "data": "{{data}}",
+                "sectionName": "Awp0FutureTasksPanelSection"
+            },
+            "deps": "js/Awp0TasksUtils"
+        }
+    },
+    "functions":
+    {
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Awp0FutureTasks.contentLoaded",
+            "condition": "conditions.isFutureTaskViewForNonTaskObject",
+            "action": "populateRequiredProperties"
+        },
+        {
+            "eventId": "awCommandPanelSection.collapse",
+            "action": "populateOrHideFutureTaskTable",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "workflowNativeBreadCrumb.update",
+            "condition": "conditions.isFutureTaskTableVisible",
+            "action": "collapseUpcomingTaskTable"
+        },
+        {
+            "eventId": "workflowViewer.openProcessInViewer",
+            "condition": "conditions.isFutureTaskTableVisible",
+            "action": "collapseUpcomingTaskTable"
+        },
+        {
+            "eventId": "workflow.collapseFutureTaskTable",
+            "condition": "conditions.isFutureTaskTableVisible",
+            "action": "collapseUpcomingTaskTable"
+        }
+
+    ],
+
+    "data":
+    {
+        "sectionCommands": "Awp0EditCommands_Right"
+    },
+
+    "conditions":
+    {
+        "isFutureTaskViewForNonTaskObject":
+        {
+            "expression": "( ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('EPMTask') <= -1 || ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('Signoff') <= -1)"
+        },
+        "isTCVersion122OrLater": {
+            "expression": "(ctx.tcSessionData.tcMajorVersion > 12 || (ctx.tcSessionData.tcMajorVersion === 12 && ctx.tcSessionData.tcMinorVersion >= 2 ) )"
+        },
+        "isFutureTaskTableVisible": {
+            "expression": "data.isFutureTaskTableVisible && ( ctx.xrtPageContext.secondaryXrtPageID === 'tc_xrt_Workflow' || ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Workflow')"
+        }
+    },
+    "i18n":
+    {
+        "upcomingTasks": ["InboxMessages"]
+    }
+
+}

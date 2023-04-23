@@ -1,0 +1,143 @@
+@use 'sass:math';
+
+@mixin gradient_bg() {
+    background-image: -ms-radial-gradient(75% top, ellipse farthest-side, $background_1 -100%, $background_2 40%, $background_3 75%, $background_4 100%);
+    background-image: -moz-radial-gradient(75% top, ellipse farthest-side, $background_1 -100%, $background_2 40%, $background_3 75%, $background_4 100%);
+    background-image: -o-radial-gradient(75% top, ellipse farthest-side, $background_1 -100%, $background_2 40%, $background_3 75%, $background_4 100%);
+    background-image: -webkit-gradient(radial, 75% top, 0, center top, 258, color-stop(-100, $background_1), color-stop(40, $background_2), color-stop(75, $background_3), color-stop(100, $background_4));
+    background-image: -webkit-radial-gradient(75% top, ellipse farthest-side, $background_1 -100%, $background_2 40%, $background_3 75%, $background_4 100%);
+    background-image: radial-gradient(ellipse farthest-side at 75% top, $background_1 -100%, $background_2 40%, $background_3 75%, $background_4 100%);
+}
+
+@mixin transition($property, $timeInMilliseconds, $easeInOrOut) {
+    -webkit-transition: $property $timeInMilliseconds $easeInOrOut;
+    -moz-transition: $property $timeInMilliseconds $easeInOrOut;
+    -o-transition: $property $timeInMilliseconds $easeInOrOut;
+    transition: $property $timeInMilliseconds $easeInOrOut;
+}
+
+@mixin transform_rotate($degree) {
+    -ms-transform: rotate($degree);
+    -webkit-transform: rotate($degree);
+    -o-transition: rotate($degree);
+    transform: rotate($degree);
+}
+
+@mixin calc($property, $expression) {
+    #{$property}: -moz-calc(#{$expression});
+    #{$property}: -webkit-calc(#{$expression});
+    #{$property}: calc(#{$expression});
+}
+
+@mixin flex($flex) {
+    -webkit-flex: $flex;
+    -ms-flex: $flex;
+    flex: $flex;
+}
+
+@mixin box_pack_justify() {
+    -webkit-box-pack: justify;
+    -moz-box-pack: justify;
+    -ms-flex-pack: justify;
+}
+
+@mixin linear_gradient($direction, $colorStop1, $colorStop2) {
+    background-image: -webkit-linear-gradient($direction, $colorStop1, $colorStop2);
+    background-image: -moz-linear-gradient($direction, $colorStop1, $colorStop2);
+    background-image: -ms-linear-gradient($direction, $colorStop1, $colorStop2);
+    background-image: linear-gradient($direction, $colorStop1, $colorStop2);
+}
+
+@mixin display_flex {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+}
+
+@mixin flex_justify_content {
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    justify-content: space-between;
+}
+
+//New Grid Layout mixins
+@mixin generate-grid-width() {
+    @for $index from 1 through 12 {
+        &.width-#{$index} {
+            width:  math.div($index, 12)*100%;
+        }
+    }
+}
+
+@mixin generate-grid-height() {
+    @for $index from 1 through 12 {
+        &.height-#{$index} {
+            height: math.div($index, 12)*100%;
+        }
+    }
+}
+
+$grid-columns: 12;
+@mixin make-col-offset($columns: $grid-columns) {
+    @for $index from 1 through 12 {
+        &.offset-#{$index} {
+            $num: math.div($index, $columns);
+            margin-left: if($num==0, 0, percentage($num));
+        }
+
+        &.offsetRight-#{$index} {
+            $num: math.div($index, $columns);
+            margin-right: if($num==0, 0, percentage($num));
+        }
+
+        &.offsetFixed-#{$index} {
+            margin-left: $index + rem;
+        }
+
+        &.offsetRightFixed-#{$index} {
+            margin-right: $index + rem;
+        }
+    }
+}
+
+@mixin make-row-offset($columns: $grid-columns) {
+    @for $index from 1 through 12 {
+        &.offset-#{$index} {
+            $num:  math.div($index, $columns);
+            margin-top: if($num==0, 0, percentage($num));
+        }
+
+        &.offsetBottom-#{$index} {
+            $num: math.div($index, $columns);
+            margin-bottom: if($num==0, 0, percentage($num));
+        }
+
+        &.offsetFixed-#{$index} {
+            margin-top: $index + rem;
+        }
+
+        &.offsetBottomFixed-#{$index} {
+            margin-bottom: $index + rem;
+        }
+    }
+}
+
+$justify-options: flex-start flex-end center space-between space-around space-evenly;
+@mixin layout-justify() {
+    @each $justify in $justify-options {
+        .justify-#{$justify} {
+            justify-content: $justify;
+        }
+    }
+}
+
+$align-options: flex-start center flex-end stretch;
+@mixin layout-align-content() {
+    @each $align in $align-options {
+        .align-#{$align} {
+            align-items: $align;
+        }
+    }
+}

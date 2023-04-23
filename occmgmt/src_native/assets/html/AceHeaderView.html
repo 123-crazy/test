@@ -1,0 +1,41 @@
+<aw-header-contribution exist-when="(ctx.aceActiveContext.context.currentState.incontext_uid != undefined) && (ctx.aceActiveContext.context.currentState.incontext_uid != null)">
+    <aw-include name="Awb0OverrideContext"></aw-include>
+</aw-header-contribution>
+
+<aw-header-contribution>
+    <aw-property-label prop="data.revisionRule"></aw-property-label>
+    <aw-include name="Awb0RevisionRule"></aw-include>
+</aw-header-contribution>
+
+<aw-header-contribution exist-when="ctx.aceActiveContext.context.supportedFeatures.Awb0DateEffectivityConfigFeature">
+    <aw-property-label prop="data.effectiveDate"></aw-property-label>
+    <aw-include name="Awb0DateEffectivity"></aw-include>
+</aw-header-contribution>
+
+<aw-header-contribution exist-when="ctx.aceActiveContext.context.supportedFeatures.Awb0UnitEffectivityConfigFeature">
+    <aw-include name="Awb0UnitEffectivity"></aw-include>
+    <div>&nbsp;&nbsp;</div>
+    <aw-property-non-edit-val prop="data.effectivityEndItem" exist-when="data.effectivityEndItem.dbValue"></aw-property-non-edit-val>
+</aw-header-contribution>
+
+<aw-header-contribution exist-when="ctx.aceActiveContext.context.supportedFeatures.Awb0VariantFeature">
+    <aw-property-label prop="data.svrLabel"></aw-property-label>
+    <aw-include name="Awb0VariantRule"></aw-include>
+    <div>&nbsp;&nbsp;</div>
+    <aw-property-non-edit-val prop="data.SVROwningItemRev" exist-when="!ctx.aceActiveContext.context.supportedFeatures.Awb0HideSVROwningItem && data.SVROwningItemRev.dbValue"></aw-property-non-edit-val>
+</aw-header-contribution>
+
+<aw-header-contribution exist-when="ctx.aceActiveContext.context.productContextInfo.props.awb0AppliedArrangement.dbValues[0] != null && ctx.aceActiveContext.context.productContextInfo.props.awb0AppliedArrangement.dbValues[0] != ''">
+    <aw-property-label prop="data.arrangementLabel"></aw-property-label>
+    <aw-include name="Awb0Arrangements"></aw-include>
+</aw-header-contribution>
+
+<aw-header-contribution exist-when="(!ctx.aceActiveContext.context.supportedFeatures.Awb0FullTextSearchFeature || ctx.aceActiveContext.context.productContextInfo.props.awb0IndexUpdateDate == '') && ctx.aceActiveContext.context.supportedFeatures.Awb0ClosureRuleFeature">
+    <aw-property-label prop="data.closureRuleLabel"></aw-property-label>
+    <aw-include name="Awb0ClosureRule"></aw-include>
+</aw-header-contribution>
+
+<aw-header-contribution exist-when="ctx.aceActiveContext.context.productContextInfo.props.awb0ViewType.dbValues[0]!=null && (!ctx.aceActiveContext.context.supportedFeatures.Awb0FullTextSearchFeature || ctx.aceActiveContext.context.productContextInfo.props.awb0IndexUpdateDate == '')" >
+    <aw-property-label prop="data.viewTypeLabel"></aw-property-label>
+    <aw-include name="Awb0ViewType"></aw-include>
+</aw-header-contribution>

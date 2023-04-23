@@ -1,0 +1,334 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-body.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-widget.directive",
+        "js/aw-radiobutton.directive"
+
+    ],
+
+    "actions":
+    {
+
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "resourcePoolPerformSearch"
+        },
+
+        "search":
+        {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.resourcePoolPerformSearch}}",
+                "participantType":"{{ctx.workflow.participantType}}"
+            },
+
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "Group",
+                        "properties":
+                        [
+                            {
+                                "name": "object_full_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Role",
+                        "properties":
+                        [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "POM_member",
+                        "properties":
+                        [
+                            {
+                                "name": "user",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "GroupMember",
+                        "properties":
+                        [
+                            {
+                                "name": "group",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+
+                            {
+                                "name": "role",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "userName"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ResourcePool",
+                        "properties": [ {
+                                "name": "group",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [ {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                } ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties":
+                        [
+                            {
+                                "name": "person",
+                                "modifiers":
+                                [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+
+                    {
+                        "name": "Person",
+                        "properties":
+                        [
+                            {
+                                "name": "user_name"
+                            },
+
+                            {
+                                "name": "PA9"
+                            },
+
+                            {
+                                "name": "PA10"
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "workflowTemplate.updateStyle"
+                    }
+                ]
+            },
+            "deps": "js/userPanelService"
+        },
+
+        "addSelection":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectedObject",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled":"{{function:getMultiSelectMode}}",
+                "selection": "{{data.dataProviders.resourcePoolPerformSearch.selectedObjects}}"
+            },
+
+            "deps": "js/userPanelService"
+        },
+        "addUsers":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectionToMainPanel",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "multiSelectEnabled":"{{function:getMultiSelectMode}}",
+                "selection": "{{data.selectedObjects}}"
+            },
+
+            "deps": "js/userPanelService"
+        }
+    },
+
+    "data":
+    {
+
+        "resourceFilterBox":
+        {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue":""
+
+        },
+
+        "projectObject":
+        {
+            "displayName": "{{i18n.project}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "teamAssignmentOption": {
+            "displayName": "{{i18n.teamAssignmentOption}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "vertical": true,
+            "dbValue": true,
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "propertyRadioTrueText": "{{i18n.assignerSelectionFromTeam}}",
+            "propertyRadioFalseText": "{{i18n.assignmentClaimedByAssignee}}"
+        },
+        "reassignOutsideGroupRoleOption": {
+            "displayName": "{{i18n.reassignOutsideGroupRoleQuestion}}",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": true,
+            "vertical": true,
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "numberOfReviewers":
+        {
+            "displayName": "{{i18n.number_of_signoffs}}",
+            "type": "INTEGER",
+            "dbValue": 1,
+            "isEditable": "true",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE"
+        }
+
+    },
+    "dataProviders":
+    {
+        "resourcePoolPerformSearch":
+        {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "{{ctx.workflow.selectionModelMode}}",
+            "commands": {
+               "Awp0ShowObjectCell":
+               {
+                   "id": "cmdOpen",
+                   "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                   "priorities": [ 300 ],
+                   "dependencies": [ "js/showObjectCommandHandler" ],
+                   "displayOption": "ON_HOVER_AND_SELECTION",
+                   "position": "TOP_RIGHT"
+               }
+           },
+           "noResultsFound" : "{{i18n.noResultsFound}}"
+        }
+    },
+
+    "conditions":
+    {
+        "isShowNoResultMessage":
+        {
+           "expression": "data.dataProviders.resourcePoolPerformSearch.noResults"
+        },
+        "numberOfReviewersOnlyPositiveInteger": {
+            "expression": "(data.numberOfReviewers.dbValue!='' && data.numberOfReviewers.dbValue<=0)"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "resourcePoolPerformSearch.selectionChangeEvent",
+            "action": "addSelection"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Awp0WorkflowResourcePoolTab"
+            },
+
+            "action": "reveal"
+        }
+    ],
+
+    "functions":
+    {
+        "getMultiSelectMode":
+        {
+            "functionName": "getMultiSelectMode",
+            "parameters":
+            [
+                "{{ctx.workflow.selectionModelMode}}"
+            ]
+        }
+    },
+
+    "i18n":
+    {
+        "Add_Title": [ "WorkflowCommandPanelsMessages"],
+        "noResultsFound": [ "InboxMessages"],
+        "reassignOutsideGroupRoleQuestion": [ "WorkflowDesignerMessages" ],
+        "teamAssignmentOption": [ "WorkflowDesignerMessages" ],
+        "assignerSelectionFromTeam": [ "WorkflowDesignerMessages" ],
+        "assignmentClaimedByAssignee": [ "WorkflowDesignerMessages" ],
+        "number_of_signoffs": [ "WorkflowDesignerMessages" ]
+    }
+}

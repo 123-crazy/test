@@ -1,0 +1,593 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-widget.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-row.directive",
+        "js/aw-column.directive",
+        "js/aw-icon.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-command-bar.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "loadDefinition": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($id:ID!){command(id:$id){title{value titleKey:key titleSource:source} description{value titleKey:key titleSource:source} icon{id url}type selectedTitle{value selectedTKey:key selectedTSource:source} selectedDescription{value selectedTKey:key selectedTSource:source} selectedIcon{id}extendedTooltip selectedExtendedTooltip}}",
+                    "variables": {
+                        "id": "{{ctx.selected.props.cmdId.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "rawCommandInfo": "data.command",
+                "commandDefs": "{{function:convertCommandDefinitionData}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "loadIcons": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){icons(filter:$filter){id content}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "rawIconInfo": "data.icons",
+                "iconsInfo": "{{function:convertIconsToLovEntries}}"
+            },
+            "deps": "js/commandIconService"
+        },
+        "getDefinitionCommandTitleI18Ns": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String!){i18ns(filter:$filter){key source value}}",
+                    "variables":{
+                        "filter":"{{ctx.selected.props.title.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "titleI18NsArray": "{{function:convertTitleI18NsToLovEntries}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "getCommandTypes": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "{commandTypes}"
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "commandTypes": "{{function:convertCommandTypesToLovEntries}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "updateCommandTitle": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$title:I18NRef){updateCommandTitle(input:{id:$commandID title:$title}){id title{value titleKey:key titleSource:source}}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "title":{
+                            "key": "{{data.eventData.key}}",
+                            "source": "{{data.eventData.source}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandTitle": "data.updateCommandTitle"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "title",
+                            "propValue": "{{data.updatedCommandTitle.title}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "updateCommandType": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$type:CommandType!){updateCommandType(input:{id:$commandID type:$type}){id type}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "type": "{{ctx.selected.props.type.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updateCommandType": "data.updateCommandType"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "type",
+                            "propValue": "{{data.updateCommandType.type}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "showIconData": {
+            "actionType": "dataProvider",
+            "method": "iconsDataProvider"
+        },
+        "updateIcon": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!, $iconID:ID!){updateCommandIcon(input:{id:$commandID,iconId:$iconID}){id icon{id url} }}",
+                    "variables":{
+                        "commandID": "{{ctx.selected.props.cmdId.dbValue}}",
+                        "iconID":"{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandIcon": "data.updateCommandIcon"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commandSummary.commandIconUpdated",
+                        "eventData": {
+                            "updatedCommandIcon": "{{data.updatedCommandIcon.icon}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "updateCommandIcon": {
+            "actionType": "JSFunction",
+            "method": "updateCommandIcon",
+            "inputData": {
+                "icon": "{{data.eventData.updatedCommandIcon}}"
+            },
+            "deps": "js/commandIconService"
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "updateCommandSelectedTitle": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$title:I18NRef){updateCommandSelectedTitle(input:{id:$commandID title:$title}){id selectedTitle{value selectedTKey:key selectedTSource:source}}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "title":{
+                            "key": "{{data.eventData.key}}",
+                            "source": "{{data.eventData.source}}"
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandSelectedTitle": "data.updateCommandSelectedTitle"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "selectedTitle",
+                            "propValue": "{{data.updatedCommandSelectedTitle.selectedTitle}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "getDefCmdSelectedTitleI18Ns": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String!){i18ns(filter:$filter){key source value}}",
+                    "variables":{
+                        "filter":"{{ctx.selected.props.selectedTitle.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "stitleI18NsArray": "{{function:convertTitleI18NsToLovEntries}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "updateCommandExtendedTooltip": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!, $viewName:String!){updateCommandExtendedTooltip(input:{id:$commandID,viewName:$viewName}){id extendedTooltip}}",
+                    "variables":{
+                        "commandID": "{{ctx.selected.uid}}",
+                        "viewName": "{{ctx.selected.props.extendedTooltip.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "updateSelectedCommandExtendedTooltip": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!, $viewName:String!){updateSelectedCommandExtendedTooltip(input:{id:$commandID,viewName:$viewName}){id selectedExtendedTooltip}}",
+                    "variables":{
+                        "commandID": "{{ctx.selected.uid}}",
+                        "viewName": "{{ctx.selected.props.selectedExtendedTooltip.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "updateSelectedCommandIcon": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData":
+            {
+                "request": {
+                    "query": "mutation($commandID:ID!, $iconID:ID!){updateSelectedCommandIcon(input:{id:$commandID,iconId:$iconID}){id selectedIcon{id url} }}",
+                    "variables":{
+                        "commandID": "{{ctx.selected.uid}}",
+                        "iconID": "{{ctx.selected.props.selectedIcon.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updateSelectedCommandIcon": "data.updateSelectedCommandIcon"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "selectedIcon",
+                            "propValue": "{{data.updateSelectedCommandIcon.selectedIcon.id}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "updateSelectedObject": {
+            "actionType": "JSFunction",
+            "method": "updateSelectedObjectProps",
+            "inputData":
+            {
+                "propName": "{{data.eventData.propName}}",
+                "propValue": "{{data.eventData.propValue}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "commandTitleChanged":{
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$text:String){updateCommandTitle(input:{id:$commandID text:$text}){id title{value}}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "text": "{{ctx.selected.props.title.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandTitle": "data.updateCommandTitle"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "title",
+                            "propValue": "{{data.updatedCommandTitle.title}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "commandDescriptionChanged":{
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$text:String){updateCommandDescription(input:{id:$commandID text:$text}){id description{value}}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "text": "{{ctx.selected.props.description.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandDescription": "data.updateCommandDescription"
+            },
+            "events": {
+                "success":
+                [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "Description",
+                            "propValue": "{{data.updatedCommandDescription.description}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "commandSelectedTitleChanged":{
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$text:String){updateCommandSelectedTitle(input:{id:$commandID text:$text}){id selectedTitle{value}}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "text": "{{ctx.selected.props.selectedTitle.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandSelectedTitle": "data.updateCommandSelectedTitle"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "selectedTitle",
+                            "propValue": "{{data.updatedCommandSelectedTitle.selectedTitle}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "commandSelectedDescriptionChanged":{
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandID:ID!,$text:String){updateCommandSelectedDescription(input:{id:$commandID text:$text}){id selectedDescription{value}}}",
+                    "variables": {
+                        "commandID": "{{ctx.selected.uid}}",
+                        "text": "{{ctx.selected.props.selectedDescription.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "updatedCommandSelectedDescription": "data.updateCommandSelectedDescription"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "commandSummary.updateSelectedObject",
+                        "eventData":
+                        {
+                            "propName": "selectedDescription",
+                            "propValue": "{{data.updatedCommandSelectedDescription.selectedDescription}}"
+                        }
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        }
+    },
+    "data": {
+        "commandID": {
+            "displayName": "{{i18n.commandId}}",
+            "type": "STRING",
+            "isEditable": false,
+            "dispValue": "{{ctx.selected.uid}}",
+            "dbValue": "{{ctx.selected.uid}}"
+        }
+    },
+    "dataProviders": {
+        "getCommandTitleI18NDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getDefinitionCommandTitleI18Ns",
+            "response": "{{data.titleI18NsArray}}",
+            "totalFound": "{{data.titleI18NsArray.length}}"
+        },
+        "getCommandTypeDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getCommandTypes",
+            "response": "{{data.commandTypes}}",
+            "totalFound": "{{data.commandTypes.length}}"
+        },
+        "iconsDataProvider": {
+            "dataProviderType": "TcLOV",
+            "action": "loadIcons",
+            "response": "{{data.iconsInfo}}",
+            "totalFound": "{{data.iconsInfo.length}}"
+        },
+        "getCmdSelectedTitleI18NDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getDefCmdSelectedTitleI18Ns",
+            "response": "{{data.stitleI18NsArray}}",
+            "totalFound": "{{data.stitleI18NsArray.length}}"
+        }
+    },
+    "functions": {
+        "convertCommandDefinitionData": {
+            "functionName": "convertCommandDefinitionData",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "convertTitleI18NsToLovEntries": {
+            "functionName": "convertTitleI18NsToLovEntries"
+        },
+        "convertCommandTypesToLovEntries": {
+            "functionName": "convertCommandTypesToLovEntries"
+        },
+        "convertIconsToLovEntries": {
+            "functionName": "convertIconsToLovEntries"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "commandDefSummary.contentLoaded",
+            "action": "loadDefinition",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "icon.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateIcon"
+        },
+        {
+            "eventId": "commandSummary.commandIconUpdated",
+            "cacheEventData": true,
+            "action": "updateCommandIcon"
+        },
+        {
+            "eventId": "commandSummary.notifyConfigChange",
+            "action": "notifyConfigChange"
+        },
+        {
+            "eventId": "title.blured",
+            "action": "commandTitleChanged"
+        },
+        {
+            "eventId": "description.blured",
+            "action": "commandDescriptionChanged"
+        },
+        {
+            "eventId": "type.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateCommandType"
+        },
+        {
+            "eventId": "commandSummary.updateSelectedObject",
+            "cacheEventData": true,
+            "action": "updateSelectedObject"
+        },
+        {
+            "eventId": "selectedTitle.blured",
+            "action": "commandSelectedTitleChanged"
+        },
+        {
+            "eventId": "selectedDescription.blured",
+            "action": "commandSelectedDescriptionChanged"
+        },
+        {
+            "eventId": "extendedTooltip.blured",
+            "action": "updateCommandExtendedTooltip"
+        },
+        {
+            "eventId": "selectedExtendedTooltip.blured",
+            "action": "updateSelectedCommandExtendedTooltip"
+        },
+        {
+            "eventId": "selectedIcon.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateSelectedCommandIcon"
+        },
+        {
+            "eventId": "commandSummary.updateCommandTitle",
+            "cacheEventData": true,
+            "action": "updateCommandTitle"
+        },
+        {
+            "eventId": "commandSummary.updateCommandSelectedTitle",
+            "cacheEventData": true,
+            "action": "updateCommandSelectedTitle"
+        }
+
+    ],
+    "i18n": {
+        "commandId": [ "CommandBuilderMessages" ]
+    }
+}

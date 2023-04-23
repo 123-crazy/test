@@ -1,0 +1,211 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports": [
+      "js/aw-panel-body.directive",
+      "js/aw-list-filter.directive",
+      "js/aw-default-cell.directive"
+   ],
+   "actions":
+   {
+       "reveal":
+          {
+                    "actionType": "dataProvider",
+                    "method": "userPerformSearch"
+          },
+      "search":
+          {
+                     "actionType": "JSFunction",
+                     "method": "performSearch",
+                     "inputData": {
+                        "data": "{{data}}",
+                        "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+                     },
+                     "policy": {
+                        "types": [
+                           {
+                              "name": "Group",
+                              "properties": [
+                                 {
+                                    "name": "object_full_name"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "Role",
+                              "properties": [
+                                 {
+                                    "name": "role_name"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "POM_member",
+                              "properties": [
+                                 {
+                                    "name": "user",
+                                    "modifiers": [
+                                       {
+                                          "name": "withProperties",
+                                          "Value": "true"
+                                       }
+                                    ]
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "GroupMember",
+                              "properties": [
+                                 {
+                                    "name": "group",
+                                    "modifiers": [
+                                       {
+                                          "name": "withProperties",
+                                          "Value": "true"
+                                       }
+                                    ]
+                                 },
+                                 {
+                                    "name": "role",
+                                    "modifiers": [
+                                       {
+                                          "name": "withProperties",
+                                          "Value": "true"
+                                       }
+                                    ]
+                                 },
+                                 {
+                                    "name": "userName"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "User",
+                              "properties": [
+                                 {
+                                    "name": "person",
+                                    "modifiers": [
+                                       {
+                                          "name": "withProperties",
+                                          "Value": "true"
+                                       }
+                                    ]
+                                 },
+                                 {
+                                    "name": "user_name"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "Person",
+                              "properties": [
+                                 {
+                                    "name": "user_name"
+                                 },
+                                 {
+                                    "name": "PA9"
+                                 },
+                                 {
+                                    "name": "PA10"
+                                 }
+                              ]
+                           }
+                        ]
+                     },
+                     "outputData": {
+                        "searchResults": "searchResults",
+                        "totalFound": "totalFound",
+                        "totalLoaded": "totalLoaded"
+                     },
+                     "deps": "js/userListService"
+          },
+      "addSelection":
+          {
+             "actionType": "JSFunction",
+             "method": "addSelectedObject",
+             "inputData": {
+                "data": "{{data}}",
+                "selection": "{{data.dataProviders.userPerformSearch.selectedObjects}}"
+             },
+             "deps": "js/userListService"
+          }
+   },
+   "data": {
+      "filterBox": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      },
+      "userProjectObject": {
+         "displayName": "{{i18n.project}}",
+         "type": "STRING",
+         "isRequired": "true",
+         "hasLov": true
+      }
+   },
+   "dataProviders": {
+      "userPerformSearch": {
+         "action": "search",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "single",
+           "commands": {
+            "Awp0ShowObjectCell": {
+               "id": "cmdAdd",
+               "areas": [
+                  "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+               ],
+               "priorities": [
+                  300
+               ],
+               "dependencies": [
+                  "js/showObjectCommandHandler"
+               ],
+               "displayOption": "ON_HOVER_AND_SELECTION",
+               "position": "TOP_RIGHT"
+            }
+         }
+      }
+   },
+
+    "functions": {
+
+
+    },
+   "conditions": {
+
+   },
+   "preferences": [
+      "WRKFLW_allow_resourcepool_assignments",
+      "WRKFLW_show_user_assignment_options"
+   ],
+   "i18n": {
+      "project": [
+         "ScheduleManagerMessages"
+      ],
+      "none": [
+         "ScheduleManagerMessages"
+      ],
+      "users": [
+         "ScheduleManagerMessages"
+      ],
+      "assignButtonText":[
+          "ScheduleManagerMessages"
+      ]
+   },
+   "onEvent": [
+      {
+         "eventId": "userPerformSearch.selectionChangeEvent",
+         "action": "addSelection"
+      },
+      {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "WorkflowOwner"
+            },
+
+            "action": "reveal"
+        }
+   ]
+}

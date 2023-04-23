@@ -1,0 +1,171 @@
+{
+  "name": "pmitool",
+  "description": "",
+  "type": [
+    "native"
+  ],
+  "srcDir": "src_native",
+  "pathOffset": ".",
+  "skipAudit": true,
+  "skipTest": true,
+  "version": "6.1.6",
+  "author": "Siemens Product Lifecycle Management Software Inc.",
+  "commandsViewModel": {
+    "commands": {
+      "Awv0PmiTool": {
+        "iconId": "cmdPMI",
+        "isGroup": false,
+        "title": "{{i18n.Awv0PmiCommandTitle}}",
+        "description": "{{i18n.Awv0PmiToolDesc}}"
+      },
+      "Awv0PmiTool_scv": {
+        "iconId": "cmdPMI",
+        "isGroup": false,
+        "title": "{{i18n.Awv0PmiCommandTitle}}",
+        "description": "{{i18n.Awv0PmiToolDesc}}"
+      },
+      "PmiStepThroughPrevCommand": {
+        "iconId": "cmdUp",
+        "isGroup": false,
+        "title": "{{i18n.stepThroughPrev}}",
+        "description": "{{i18n.PmiStepThroughPrevCommandDesc}}"
+      },
+      "PmiStepThroughNextCommand": {
+        "iconId": "cmdDown",
+        "isGroup": false,
+        "title": "{{i18n.stepThroughNext}}",
+        "description": "{{i18n.PmiStepThroughNextCommandDesc}}"
+      }
+    },
+    "commandHandlers": {
+      "Awv0PmiToolHandler": {
+        "id": "Awv0PmiTool",
+        "action": "showToolPanel",
+        "activeWhen": true,
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.isViewerRevealedAndIn3DModeWithPMI"
+        }
+      },
+      "Awv0PmiToolHandler_scv": {
+        "id": "Awv0PmiTool_scv",
+        "action": "showToolPanel_scv",
+        "activeWhen": true,
+        "visibleWhen": true,
+        "enableWhen": {
+          "condition": "conditions.isViewerRevealedAndIn3DModeWithPMI_scv"
+        }
+      },
+      "PmiStepThroughPrevCommandHandler": {
+        "id": "PmiStepThroughPrevCommand",
+        "activeWhen": {
+          "condition": "conditions.isPMIDataAvailable"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isPMIDataAvailable"
+        },
+        "action": "stepThroughPrevInListAction"
+      },
+      "PmiStepThroughNextCommandHandler": {
+        "id": "PmiStepThroughNextCommand",
+        "activeWhen": {
+          "condition": "conditions.isPMIDataAvailable"
+        },
+        "visibleWhen": {
+          "condition": "conditions.isPMIDataAvailable"
+        },
+        "action": "stepThroughNextInListAction"
+      }
+    },
+    "commandPlacements": {
+      "Awv0PmiToolCommandPlacement": {
+        "id": "Awv0PmiTool",
+        "uiAnchor": "aw_3dViewer",
+        "priority": 80
+      },
+      "Awv0PmiToolCommandPlacement_scv": {
+        "id": "Awv0PmiTool_scv",
+        "uiAnchor": "aw_3dViewerRight",
+        "priority": 80
+      },
+      "PmiStepThroughNextCommandPlacement": {
+        "id": "PmiStepThroughNextCommand",
+        "uiAnchor": "pmiStepCmdsAnchor",
+        "priority": 1
+      },
+      "PmiStepThroughPrevCommandPlacement": {
+        "id": "PmiStepThroughPrevCommand",
+        "uiAnchor": "pmiStepCmdsAnchor",
+        "priority": 2
+      }
+    },
+    "actions": {
+      "showToolPanel": {
+        "actionType": "JSFunction",
+        "method": "activateViewerCommandPanel",
+        "deps": "js/viewerContext.service",
+        "inputData": {
+          "commandId": "Awv0PmiTool",
+          "location": "aw_toolsAndInfo",
+          "viewerCtxNamespace": "awDefaultViewer"
+        }
+      },
+      "showToolPanel_scv": {
+        "actionType": "JSFunction",
+        "method": "activateViewerCommandPanel",
+        "deps": "js/viewerContext.service",
+        "inputData": {
+          "commandId": "Awv0PmiTool",
+          "location": "aw_toolsAndInfo",
+          "viewerCtxNamespace": "awStructureCompareViewer",
+          "closeWhenCommandHidden": false
+        }
+      },
+      "stepThroughPrevInListAction": {
+        "actionType": "JSFunction",
+        "method": "stepThroughPrevCommand",
+        "deps": "js/pmiToolUtil"
+      },
+      "stepThroughNextInListAction": {
+        "actionType": "JSFunction",
+        "method": "stepThroughNextCommand",
+        "deps": "js/pmiToolUtil"
+      }
+    },
+    "conditions": {
+      "isViewerRevealedAndIn3DModeWithPMI": {
+        "expression": "ctx.awDefaultViewer.isViewerRevealed && ctx.awDefaultViewer.viewerViewMode === 'VIEWER3D' && ctx.awDefaultViewer.hasPMIData && ctx.awDefaultViewer.disablePMI !== true"
+      },
+      "isViewerRevealedAndIn3DModeWithPMI_scv": {
+        "expression": "ctx.awStructureCompareViewer.isViewerRevealed && ctx.awStructureCompareViewer.viewerViewMode === 'VIEWER3D' && ctx.awStructureCompareViewer.hasPMIData && ctx.awStructureCompareViewer.disablePMI !== true"
+      },
+      "isPMIDataAvailable": {
+        "expression": "ctx.awDefaultViewer.hasPMIData"
+      }
+    },
+    "messages": {},
+    "i18n": {
+      "Awv0PmiCommandTitle": [
+        "PmiToolMessages"
+      ],
+      "stepThroughPrev": [
+        "PmiToolMessages"
+      ],
+      "stepThroughNext": [
+        "PmiToolMessages"
+      ],
+      "pmiStepCmdsAnchor": [
+        "PmiToolMessages"
+      ],
+      "Awv0PmiToolDesc": [
+        "PmiToolMessages"
+      ],
+      "PmiStepThroughPrevCommandDesc": [
+        "PmiToolMessages"
+      ],
+      "PmiStepThroughNextCommandDesc": [
+        "PmiToolMessages"
+      ]
+    }
+  }
+}

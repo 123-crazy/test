@@ -1,0 +1,38 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports":
+    [
+        "js/aw-panel-section.directive",
+        "js/aw-include.directive"
+    ],
+    "actions":{
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "getObject",
+            "inputData": {
+                "data": "{{ctx.userSession.props.group.dbValues[0]}}"
+            },
+            "outputData": {
+                "ctx.isPrivilege": "props.privilege"
+            },
+
+            "deps": "soa/kernel/clientDataModel"
+        }
+    },
+    "conditions": {
+        "isPrivilegedUser": {
+            "expression": "ctx.isPrivilege.dbValues[0] === '1'|| ctx.user.uid===ctx.xrtSummaryContextObject.uid"
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Aut0UserMemberships.contentLoaded",
+            "action": "reveal"
+        }
+    ],
+    "i18n" :
+    {
+        "userMembershipTitle":["UsermanagementMessages"]
+    }
+}

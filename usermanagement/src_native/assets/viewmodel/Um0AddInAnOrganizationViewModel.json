@@ -1,0 +1,110 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-tab-set.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive"
+    ], 
+   
+    "actions":
+    {
+        "getObjectFromBreadCrumb":
+        {
+            "actionType": "JSFunction",
+            "method": "getObjectFromBreadCrumb",
+            "inputData": 
+            {
+            
+            },
+            "deps": "js/um0AddInAnOrganizationService"
+        },
+        
+        "add":
+        {
+            "actionType": "JSFunction",
+            "method": "addAdminObjects",
+            "inputData": 
+            {
+                "selectedPanelId": "{{data.selectedTab.panelId}}",
+                "isGroupRadioButtonSelected":  true,
+                "searchResults":  "{{data.dataProviders.doSearchForGroupsTab.selectedObjects}}"
+            },
+            "deps": "js/um0AddInAnOrganizationService"
+        },
+        
+        "closePanel":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [               
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    
+    "conditions":
+    {
+        "isValidToAddAdminObjects": 
+        {
+            "expression": "((data.name.uiValue.length>0) || (data.selectedTab.panelId==='OrganizationSearchTab' && data.dataProviders.doSearchForGroupsTab.selectedObjects.length>0))" 
+        }
+    },
+
+    "onEvent": 
+    [
+        {  
+           "eventId": "awPanel.reveal",
+           "action": "getObjectFromBreadCrumb"
+        },
+        {
+            "eventId": "awPanel.selectionChange",
+            "action": "closePanel"
+        } 
+    ], 
+    
+    "data": 
+    {
+        "tabsModel":
+        {
+            "isArray": "true",
+            "dbValue":
+            [
+                {
+                    "tabKey": "new",
+                    "panelId": "OrganizationNewTab",
+                    "name": "{{i18n.NewTab}}",
+                    "selectedTab": true
+                },
+                {
+                    "tabKey": "search",
+                    "panelId": "OrganizationSearchTab",
+                    "name": "{{i18n.SearchTab}}",
+                    "recreatePanel": false
+                }
+            ]
+        }
+    },
+    
+    "i18n":
+    {
+        "AddTitle": [ "UsermanagementCommandPanelMessages" ],
+        "NewTab": [ "UsermanagementCommandPanelMessages" ],
+        "SearchTab": [ "UsermanagementCommandPanelMessages" ],
+        "AddButton": [ "UsermanagementCommandPanelMessages" ]
+    }
+}

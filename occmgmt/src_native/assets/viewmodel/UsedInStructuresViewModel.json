@@ -1,0 +1,200 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/exist-when.directive",
+        "js/visible-when.directive"
+    ],
+    "lifecycleHooks": {
+        "onMount": "initializeUsedInStructuresView"
+     },
+     "conditions":   {
+        "isTableEmpty": {
+            "expression": "data.isDataLoadDone && data.dataProviders.usedInStructuresDataProvider.viewModelCollection.loadedVMObjects.length === 0"
+        }
+     },
+    "actions": {
+        "initializeUsedInStructuresView": {
+            "actionType": "JSFunction",
+            "method": "initializeUsedInStructuresView",
+            "inputData": {
+                "data": "{{data}}",
+                "subPanelContext": "{{subPanelContext}}"
+            },
+            "outputData": {},
+            "deps": "js/usedInStructuresService"
+        },
+        "loadWhereUsed": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadWhereUsedTree",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "dataProvider": "{{data.dataProviders.usedInStructuresDataProvider}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "response": "tableSummaries",
+                "isDataLoadDone": true
+            },
+            "deps": "js/usedInStructuresService"
+        },
+        "resetTreeData": {
+            "actionType": "JSFunction",
+            "method": "resetTreeData",
+            "inputData": {
+                "treeLoadInput": "{{data.treeLoadInput}}"
+            },
+            "deps": "js/usedInStructuresService"
+        },
+        "saveColumnConfigLoadData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2016-03-UiConfig",
+            "method": "saveUIColumnConfigs",
+            "inputData": {
+                "columnConfigurations": [ {
+                    "clientScopeURI": "{{data.clientScopeURI}}",
+                    "columnConfigId": "{{data.dataProviders.usedInStructuresDataProvider.columnConfig.columnConfigId}}",
+                    "columns": "{{data.dataProviders.usedInStructuresDataProvider.newColumns}}",
+                    "scope": "LoginUser",
+                    "scopeName": ""
+                } ]
+            },
+            "outputData": {}
+        },
+        "resetColumnConfig": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2017-06-UiConfig",
+            "method": "getOrResetUIColumnConfigs2",
+            "inputData": {
+                "getOrResetUiConfigsIn": [ {
+                    "scope": "LoginUser",
+                    "scopeName": "",
+                    "clientName": "AWClient",
+                    "resetColumnConfig": true,
+                    "columnConfigQueryInfos": [ {
+                        "clientScopeURI": "{{data.clientScopeURI}}",
+                        "operationType": "configured",
+                        "columnsToExclude": []
+                    } ],
+                    "businessObjects": [ {} ]
+                } ]
+            },
+            "outputData": {
+                "dataProviders.usedInStructuresDataProvider.resetColumnConfigs": "columnConfigurations"
+            }
+        },
+        "doArrangeEvent": {
+            "actionType": "JSFunctionAsync",
+            "method": "arrangeColumns",
+            "inputData": {
+                "declViewModel": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/columnArrangeService"
+        },
+        "resetUsedInStructuresData": {
+            "actionType": "JSFunction",
+            "method": "resetUsedInStructuresData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/usedInStructuresService"
+        }
+    },
+
+    "onEvent": [ {
+            "eventId": "columnArrange",
+            "cacheEventData": true,
+            "action": "doArrangeEvent"
+        },
+        {
+            "eventId": "usedInStructuresGrid.plTable.toggleTreeNode",
+            "cacheEventData": true,
+            "action": "resetTreeData"
+        },
+        {
+            "eventId": "usedInStructuresGrid2.plTable.toggleTreeNode",
+            "cacheEventData": true,
+            "action": "resetTreeData"
+        },
+        {
+            "eventId": "aw.revisionRuleChangeEvent",
+            "action": "resetUsedInStructuresData"
+        }
+    ],
+
+    "columnProviders": {
+        "usedInStructuresColumnProvider": {
+            "columns": [ {} ],
+            "saveColumnAndLoadAction": "saveColumnConfigLoadData",
+            "resetColumnAction": "resetColumnConfig",
+            "sortCriteria": []
+        }
+    },
+
+    "dataProviders": {
+        "usedInStructuresDataProvider": {
+            "initializeAction": "loadWhereUsed",
+            "nextAction": "loadWhereUsed",
+            "previousAction": "loadWhereUsed",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "editContext": "TABLE_CONTEXT",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "response": "data.response",
+            "selectionModelMode": "multiple",
+            "commandsAnchor": "com.siemens.splm.clientfx.tcui.commands.modelObjectCellListActionCommands"
+        }
+    },
+
+    "grids": {
+        "usedInStructuresGrid": {
+            "dataProvider": "usedInStructuresDataProvider",
+            "columnProvider": "usedInStructuresColumnProvider",
+            "enableArrangeMenu": true,
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableSorting": false,
+                "useStaticFirstCol": false,
+                "enableExpansionStateCaching": false,
+                "enableExpandAndPaginationInEdit": true,
+                "textBundle": {
+                    "TwistieTooltipCollapsed": "{{i18n.TwistieTooltipCollapsed}}",
+                    "TwistieTooltipExpanded": "{{i18n.TwistieTooltipExpanded}}"
+                },
+                "maxRowsToShow": 10
+            },
+
+            "deps": "js/usedInStructuresService"
+        },
+        "usedInStructuresGrid2": {
+            "dataProvider": "usedInStructuresDataProvider",
+            "columnProvider": "usedInStructuresColumnProvider",
+            "enableArrangeMenu": true,
+            "addIconColumn": false,
+            "gridOptions": {
+                "enableSorting": false,
+                "useStaticFirstCol": false,
+                "enableExpansionStateCaching": false,
+                "enableExpandAndPaginationInEdit": true,
+                "textBundle": {
+                    "TwistieTooltipCollapsed": "{{i18n.TwistieTooltipCollapsed}}",
+                    "TwistieTooltipExpanded": "{{i18n.TwistieTooltipExpanded}}"
+                },
+                "maxRowsToShow": 10
+            },
+
+            "deps": "js/usedInStructuresService"
+        }
+    },
+
+    "i18n": {
+        "revisionRuleLabel": [
+            "OccurrenceManagementConstants"
+        ],
+        "selectionNotUsedInAnyStructure": [
+            "OccurrenceManagementConstants"
+        ]
+    }
+}

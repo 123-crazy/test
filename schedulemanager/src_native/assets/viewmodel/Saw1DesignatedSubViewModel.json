@@ -1,0 +1,138 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports": [
+      "js/aw-panel-body.directive",
+      "js/aw-radiobutton.directive",
+      "js/aw-list-filter.directive",
+      "js/aw-default-cell.directive",
+      "js/aw-break.directive"
+   ],
+   "actions": {
+        "getPanel":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "condition": "conditions.isSelected",
+                        "eventData":
+                        {
+                            "destPanelId": "Saw1DesignatedUsers",
+                            "title": "{{i18n.discipline}}",
+                            "supportGoBack": "true"
+                        }
+                    }
+                ]
+            }
+       },
+       "getDisciplineSubReveal":{
+             "actionType":"dataProvider",
+             "method":"disciplineList"
+       },
+       "getDesignteDiscEvent": {
+            "actionType":"JSFunction",
+            "method":"getDesignteDiscEvent",
+            "inputData":{
+                "data":"{{data}}"
+             },
+            "events":{
+                "success":[
+                   {
+                       "name": "AllDiscipline",
+                       "condition": "data.disciplineData.dbValue === true"
+                    },
+                    {
+                       "name": "CommonDiscipline",
+                       "condition": "data.disciplineData.dbValue === false"
+                    }
+              ]
+         },
+         "deps":"js/ResourcesService"
+       },
+       "getDesignteDisciplines":{
+          "actionType": "JSFunction",
+          "method": "getDesigntedDisciplines",
+          "inputData":
+          {
+              "data": "{{data}}",
+              "dataProvider": "{{data.dataProviders.disciplineList}}"
+          },
+         "outputData": {
+            "searchResults": "searchResults",
+            "totalFound": "totalFound",
+            "totalLoaded": "totalLoaded"
+         },
+         "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            },
+          "deps": "js/ResourcesService"
+        }
+   },
+   "data": {
+      "filterBoxDiscipline": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      },
+      "disciplineData": {
+         "type": "BOOLEAN",
+         "isRequired": "true",
+         "propertyRadioTrueText": "{{i18n.common}}",
+         "propertyRadioFalseText": "{{i18n.all}}",
+         "dbValue": true,
+         "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+      }
+    },
+   "dataProviders": {
+      "disciplineList": {
+         "action": "getDesignteDisciplines",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "single"
+      }
+   },
+   "conditions": {
+      "isSelected": {
+         "expression": "data.dataProviders.disciplineList.selectedObjects.length > 0"
+      }
+   },
+   "onEvent": [
+      {
+         "eventId":"AllDiscipline",
+          "action":"getDisciplineSubReveal"
+      },
+      {
+         "eventId":"CommonDiscipline",
+         "action":"getDisciplineSubReveal"
+      },
+      {
+         "eventId": "disciplineList.selectionChangeEvent",
+         "action": "getPanel"
+      }
+   ],
+   "messages": {
+    "displayError": {
+        "messageType": "ERROR",
+        "messageText": "{{errorCode}}"
+     }
+    },
+   "i18n": {
+      "all": [
+         "ScheduleManagerMessages"
+      ],
+      "common": [
+         "ScheduleManagerMessages"
+      ],
+      "discipline": [
+         "ScheduleManagerMessages"
+      ]
+   }
+}

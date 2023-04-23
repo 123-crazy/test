@@ -1,0 +1,125 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-widget.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "baseCommands": {
+            "displayName": "{{i18n.selectChildLabel}}",
+            "type": "STRING",
+            "isEditable": true,
+            "hasLov": true,
+            "dispValue": "",
+            "dbValue": "",
+            "dataProvider": "baseCommandsDataProvider"
+        }
+    },
+    "dataProviders": {
+        "baseCommandsDataProvider": {
+            "action": "getBaseCommands",
+            "response": "{{data.baseCommandsInfo}}",
+            "totalFound": "{{data.baseCommandsInfo.length}}"
+        }
+    },
+    "actions": {
+        "updateChildren": {
+            "actionType": "JSFunction",
+            "method": "publish",
+            "inputData": {
+                "topic": "commandSummary.updateChildren"
+            },
+            "deps": "js/eventBus"
+        },
+        "getBaseCommands": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($criteria:String, $filter:CommandFilter){commands(commandInput:{criteria:$criteria filter:$filter}){commands{id title{value}}}}",
+                    "variables": {
+                        "criteria": "{{data.baseCommands.dbValue}}",
+                        "filter": {
+                            "commandTypes": [
+                                "BASE"
+                            ]
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "baseCommandsInfo": "{{function:convertCommandsToLovEntries}}"
+            },
+            "deps": "js/placementsService"
+        },
+        "add": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($command:ID!, $parentGroupId: String){addPlacement(input:{command:$command parentGroupId:$parentGroupId priority: -1}){id}}",
+                    "variables": {
+                        "command": "{{data.baseCommands.dbValue}}",
+                        "parentGroupId": "{{ctx.selected.uid}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addChild.updateChildren"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "addChild.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addChild.updateChildren",
+            "action": "updateChildren"
+        },
+        {
+            "eventId": "addChild.notifyConfigChange",
+            "action": "notifyConfigChange"
+        }
+    ],
+    "conditions": {
+        "isValidToAdd": {
+            "expression": "data.baseCommands.dbValue && data.baseCommands.dbValue !=''"
+        }
+    },
+    "i18n": {
+        "addChildTitle": [
+            "CommandBuilderMessages"
+        ],
+        "selectChildLabel": [
+            "CommandBuilderMessages"
+        ],
+        "ADD_BUTTON_TITLE": [
+            "BaseMessages"
+        ]
+    }
+}

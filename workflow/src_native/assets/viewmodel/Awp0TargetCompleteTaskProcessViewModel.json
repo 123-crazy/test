@@ -1,0 +1,106 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+         "js/aw-label.directive",
+        "js/aw-include.directive",
+        "js/exist-when.directive",
+        "js/aw-panel.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-listbox.directive"
+    ],
+    "actions":
+    {
+
+        "populateSecondaryPanel": {
+            "actionType": "JSFunction",
+            "method": "populateTargetPanelData",
+            "deps": "js/Awp0TargetCompleteTask",
+            "inputData":
+             {
+                "data": "{{data}}",
+               "name": "{{ctx.selected}}",
+               "ctx":"{{ctx}}"
+             }
+        },
+        "updateTaskPanel": {
+            "actionType": "JSFunction",
+            "method": "updateTaskPanel",
+            "deps": "js/Awp0TargetCompleteTask",
+            "inputData":
+             {
+               "selectedJob": "{{ctx.ActiveWorkspace:xrtContext.selectedProcess}}",
+               "ctx":"{{ctx}}",
+               "data":"{{data}}"
+             }
+        },
+        "updateTaskPanelWhenTaskOpenInViewer": {
+            "actionType": "JSFunction",
+            "method": "updateTaskPanel",
+            "deps": "js/Awp0TargetCompleteTask",
+            "inputData":
+             {
+               "selectedJob": "{{data.eventData.props.parent_process.dbValues[0]}}",
+               "ctx":"{{ctx}}",
+               "data":"{{data}}"
+             }
+        },
+        "updateActionSelection": {
+            "actionType": "JSFunction",
+            "method": "updateActionSelection",
+            "deps": "js/Awp0TargetCompleteTask",
+            "inputData":
+             {
+                "selectedJob": "{{data.workflowTemplates.dbValue}}",
+                "ctx":"{{ctx}}",
+                "data":"{{data}}"
+             }
+        }
+    },
+    "data": {
+        "workflowTemplates":
+        {
+            "displayName": "{{i18n.Workflow}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+         "workflowTemplateLabel": {
+            "displayName": "{{i18n.Workflow}}",
+            "type": "STRING",
+            "dispValue": "{{data.workflowProcessList[0].propDisplayValue}}"
+        }
+
+    },
+    "functions":
+    {
+
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Awp0TargetCompleteTaskProcess.contentLoaded",
+            "action": "populateSecondaryPanel"
+        },
+        {
+            "eventId": "workflowTaskPanel.update",
+            "action": "updateTaskPanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "workflowTaskPanel.updateWhenTaskOpenInViewer",
+            "action": "updateTaskPanelWhenTaskOpenInViewer",
+            "cacheEventData": true
+        }
+    ],
+
+    "conditions":
+    {
+        "isSelectedEPMTaskOrSignOffTask":
+        {
+          "expression":"ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('Signoff') >= 0 || ctx.xrtSummaryContextObject.modelType.typeHierarchyArray.indexOf('EPMTask') >= 0"
+        }
+    },
+    "i18n":
+    {
+        "Workflow": [ "WorkflowCommandPanelsMessages" ]
+    }
+}

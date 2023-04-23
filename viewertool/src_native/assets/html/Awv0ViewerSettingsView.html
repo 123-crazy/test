@@ -1,0 +1,89 @@
+<aw-command-panel caption="i18n.toolPanelTitle">
+    <aw-panel-body>
+        <aw-panel-section caption="i18n.unitPanelTitle">
+            <aw-panel-body>
+                <aw-label prop="data.modelTitleProp"></aw-label>
+            </aw-panel-body>
+            <aw-panel-body>
+                <aw-row height="1.5f">
+                    <aw-column width="4">
+                        <aw-label prop="data.displayedTitleProp"></aw-label>
+                    </aw-column>
+                    <aw-column width="6.2">
+                        <aw-link-with-popup-menu prop="data.unitTextProp" dataprovider="data.dataProviders.unitDataProvider"></aw-link-with-popup-menu>
+                    </aw-column>
+                </aw-row>
+            </aw-panel-body>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.renderPanelTitle">
+            <aw-checkbox prop="data.shadedCheckboxProp" exist-when="conditions.showShadedWithEdges" action="shadedWithEdgesSettingChanged"></aw-checkbox>
+            <aw-flex-row height="2.5f" justify="center" align-content="center" exist-when="conditions.viewerLicenceOnOrAboveStandard && conditions.isNonPVWCSRViewer">
+                <aw-flex-column class="aw-viewertool-selectedMaterialCheckbox" justify="bottom" align-content="center" width="2.5f">
+                    <aw-checkbox prop="data.materialCheckboxProp" action="materialSettingChanged"></aw-checkbox>
+                </aw-flex-column>
+                <aw-flex-column class="aw-viewertool-selectedMaterialIcon" justify="top" align-content="center" width="2.5f">
+                    <aw-image aw-click="data.handleMaterialIconClick()" id="materialRefId" source="data.materialCommandProp.iconName" is-icon="true"></aw-image>
+                </aw-flex-column>
+                <aw-flex-column class="aw-viewertool-selectedMaterialText" justify="top" align-content="start">
+                    {{data.materialProp.dbValue[0].tooltip}}
+                </aw-flex-column>
+            </aw-flex-row>
+            <aw-checkbox prop="data.trihedronCheckboxProp" action="trihedronSettingChanged"></aw-checkbox>
+            <aw-row height="2f">
+                <aw-column>
+                    <aw-label prop="data.renderSource"></aw-label>
+                </aw-column>
+            </aw-row>
+            <aw-checkbox prop="data.renderSourceServerCheckboxProp" action="renderSourceChangedServer" exist-when="conditions.showRenderOptions"></aw-checkbox>
+            <aw-checkbox prop="data.renderSourceClientCheckboxProp" action="renderSourceChangedClient" exist-when="conditions.showRenderOptions"></aw-checkbox>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.colorThemeTitle">
+            <aw-row height="2.5f">
+                <aw-column width="4">
+                    <aw-label prop="data.themeTitleProp"></aw-label>
+                </aw-column>
+                <aw-column width="6">
+                    <aw-link-with-popup-menu prop="data.themeProp" dataprovider="data.dataProviders.themeDataProvider"></aw-link-with-popup-menu>
+                </aw-column>
+            </aw-row>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.floorPanelTitle" exist-when="conditions.viewerLicenceOnOrAboveProfessional && conditions.isNonPVWCSRViewer">
+            <aw-checkbox prop="data.showFloorCheckboxProp" action="showFloorSettingChanged"></aw-checkbox>
+            <aw-row>
+                <aw-column justify="left" offset="0.050">
+                    <aw-command-bar anchor="aw_FloorPlane" alignment="HORIZONTAL" show-command-labels="true" exist-when="conditions.showFloorOptions"></aw-command-bar>
+                </aw-column>
+            </aw-row>
+            <aw-row>
+                <aw-column justify="left" offset="0.075">
+                    <aw-label prop="data.offsetLabelProp" exist-when="conditions.showFloorOptions"></aw-label>
+                </aw-column>
+            </aw-row>
+            <aw-row>
+                <aw-column justify="left" offset="0.075">
+                    <aw-slider prop="data.floorSliderProp" exist-when="conditions.showFloorOptions"></aw-slider>
+                </aw-column>
+            </aw-row>
+            <aw-break></aw-break>
+            <aw-checkbox prop="data.gridCheckboxProp" action="gridSettingChanged" exist-when="conditions.showFloorOptions"></aw-checkbox>
+            <aw-checkbox prop="data.shadowCheckboxProp" action="shadowSettingChanged" exist-when="conditions.showFloorOptions"></aw-checkbox>
+            <aw-checkbox prop="data.reflectionCheckboxProp" action="reflectionSettingChanged" exist-when="conditions.showFloorOptions"></aw-checkbox>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.pmiPanelTitle" exist-when="conditions.showPMI">
+            <aw-checkbox prop="data.pmiCheckboxProp" action="pmiSettingChanged"></aw-checkbox>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.navigationPanelTitle" exist-when="conditions.viewerLicenceOnOrAboveStandard && conditions.isNonPVWCSRViewer">
+            <aw-checkbox prop="data.examineCheckboxProp" action="examineSettingChanged"></aw-checkbox>
+            <aw-checkbox prop="data.walkCheckboxProp" action="walkSettingChanged"></aw-checkbox>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.selectionDisplayPanelTitle">
+            <aw-checkbox prop="data.useTransparencyCheckboxProp" action="useTransparencySettingChanged"></aw-checkbox>
+        </aw-panel-section>
+        <aw-panel-section caption="i18n.IndexedModePanelTitle" exist-when="conditions.showIndexedOption">
+            <aw-checkbox prop="data.useIndexedCheckboxProp" action="useIndexedSettingChanged"></aw-checkbox>
+        </aw-panel-section>
+    </aw-panel-body>
+    <aw-panel-footer>
+    </aw-panel-footer>
+</aw-command-panel>
+

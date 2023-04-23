@@ -1,0 +1,298 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-widget.directive",
+        "js/aw-list.directive",
+        "js/aw-include.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/visible-when.directive",
+        "js/aw-command-panel-section.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "populatePanelData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Awp0OutOfOffice"
+        },
+        "initDataProvider": {
+            "actionType": "dataProvider",
+            "method": "getUsers"
+        },
+        "validateAndSetOutOfOffice": {
+            "actionType": "JSFunction",
+            "method": "validateAndSetOutOfOffice",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "i18n.invalidUser"
+                    }
+                ]
+            },
+            "deps": "js/Awp0OutOfOffice"
+        },
+        "setOutOfOffice": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2014-06-Workflow",
+            "method": "setOutOfOffice",
+            "inputData": {
+                "fromResource": "{{function:getExistingResourceInput}}",
+                "toResource": "{{function:getNewResourceInput}}",
+                "startDate": "{{function:getDateString_startDate}}",
+                "endDate": "{{function:getDateString_endDate}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "refresh"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Awp0OutOfOffice",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "serverError"
+                    }
+                ]
+            }
+        },
+        "clearOutOfOffice": {
+            "actionType": "TcSoaService",
+            "serviceName": "Workflow-2014-06-Workflow",
+            "method": "setOutOfOffice",
+            "inputData": {
+                "fromResource": "{{function:getExistingResourceInput}}",
+                "toResource": "{{function:getNullResourceInput}}",
+                "startDate": "0001-01-01T00:00:00",
+                "endDate": "0001-01-01T00:00:00"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "outOfOffice.clear",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Awp0OutOfOffice",
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "serverError"
+                    }
+                ]
+            }
+        },
+
+        "clearOutOfOfficePanel":
+        {
+           "actionType": "JSFunction",
+           "method": "clearOutOfOfficePanel",
+           "inputData":
+           {
+                "data": "{{data}}"
+           },
+           "deps": "js/Awp0OutOfOffice"
+        },
+        "addSelectedUsers":
+        {
+            "actionType": "JSFunction",
+            "method": "addSelectedUsers",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0OutOfOffice"
+        },
+        "navigateToMainPage":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData":
+            {
+                "events":
+                [
+                    {
+                        "name": "awPanel.navigate",
+                        "eventData":
+                        {
+                            "destPanelId": "Awp0OutOfOfficeSub",
+                            "eventData": "{{data.eventData}}"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "functions": {
+        "getDateString_startDate": {
+            "functionName": "getDateString",
+            "parameters": [
+                "{{data.startDate.dateApi.dateObject}}"
+            ]
+        },
+        "getDateString_endDate": {
+            "functionName": "getDateString",
+            "parameters": [
+                "{{data.endDate.dateApi.dateObject}}"
+            ]
+        },
+        "getNewResourceInput": {
+            "functionName": "getNewResourceInput",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getExistingResourceInput": {
+            "functionName": "getExistingResourceInput",
+            "parameters": [
+            ]
+        },
+        "getNullResourceInput": {
+            "functionName": "getNullResourceInput",
+            "parameters": [
+            ]
+        },
+        "clearOutOfOfficePanel":
+        {
+            "functionName": "clearOutOfOfficePanel",
+            "parameters": [
+            ]
+        }
+    },
+    "conditions": {
+        "isSetOutOfOfficeVisible": {
+            "expression": "data.userUids && data.userUids[0] !== '' && data.userUids[0] != ctx.selected.props.inbox_delegate.dbValues[0]"
+        },
+        "isClearOutOfOfficeVisible": {
+            "expression": "data.inboxDelegateUID && data.inboxDelegateUID !== ''"
+        },
+        "updateExistingUser": {
+            "expression": "data.inboxDelegateUID && data.inboxDelegateUID === ctx.selected.props.inbox_delegate.dbValues[0]"
+        }
+    },
+    "data": {
+        "startDate": {
+            "dbValue": "{{ctx.selected.props.fnd0OutOfOfficeStartDate.dbValues[0]}}",
+            "type": "DATETIME",
+            "displayName": "{{i18n.startDate}}",
+            "uiValue": ""
+        },
+        "endDate": {
+            "dbValue": "{{ctx.selected.props.fnd0OutOfOfficeEndDate.dbValues[0]}}",
+            "type": "DATETIME",
+            "displayName": "{{i18n.endDate}}",
+            "uiValue": ""
+        },
+        "sectionCommands":"awp0_sectionCommands"
+    },
+    "dataProviders": {
+        "getUsers": {
+            "response": "{{data.users}}",
+            "totalFound": "{{data.users.length}}",
+            "selectionModelMode": "single",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "title": "Open",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "i18n": {
+        "outOfOfficeCommandTitle": [
+            "InboxMessages"
+        ],
+        "startDate": [
+            "InboxMessages"
+        ],
+        "endDate": [
+            "InboxMessages"
+        ],
+        "recipient": [
+            "InboxMessages"
+        ],
+
+        "outOfOfficeSet": [
+            "InboxMessages"
+        ],
+        "outOfOfficeClear": [
+            "InboxMessages"
+        ],
+        "users": [
+            "InboxMessages"
+        ],
+        "invalidUser": [
+            "InboxMessages"
+        ],
+        "endDateBeforeStartDateMessage": [
+            "InboxMessages"
+        ]
+    },
+    "messages": {
+        "invalidUser": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.invalidUser}}"
+        },
+        "endDateBeforeStartDateMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.endDateBeforeStartDateMessage}}"
+        },
+        "serverError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "initDataProvider"
+        },
+        {
+            "eventId": "outOfOffice.set",
+            "action": "setOutOfOffice"
+        },
+        {
+            "eventId":"outOfOffice.clear",
+            "action": "clearOutOfOfficePanel"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "navigateToMainPage"
+        },
+        {
+            "eventId": "addSelectionToMainPanel",
+            "action": "addSelectedUsers"
+        }
+    ]
+}

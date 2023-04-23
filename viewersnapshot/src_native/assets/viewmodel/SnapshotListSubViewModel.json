@@ -1,0 +1,210 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-pic.directive",
+        "js/aw-command-bar.directive",
+        "js/aw-click.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-separator.directive"
+    ],
+    "actions": {
+
+        "revealSessionSnapshot": {
+            "actionType": "JSFunction",
+            "method": "snapshotPanelRevealed",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "viewerCtxNamespace": "viewerCtxNamespace",
+                "handleCommandBarClick" : "handleCommandBarClick",
+                "vmoForSnapshotGallery": "vmoForSnapshotGallery"
+            },
+            "deps": "js/viewerSnapshotService"
+        },
+        "viewerSnapshotListDataUpdatedAction": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "callSnapshotListDataProvider",
+                    "condition": "conditions.snapshotsViewList"
+                },
+                {
+                    "action": "callSnapshotCardDataProvider",
+                    "condition": "conditions.snapshotsViewImage"
+                }
+            ]
+        },
+        "callSnapshotListDataProvider": {
+            "actionType": "dataProvider",
+            "method": "snapshotDataProvider"
+        },
+        "callSnapshotCardDataProvider": {
+            "actionType": "dataProvider",
+            "method": "snapshotCardViewDataProvider"
+        },
+        "getAllSnapshots": {
+            "actionType": "JSFunction",
+            "method": "getAllSnapshotData",
+            "inputData": {
+                "searchCriteria": {
+                    "searchString": "{{data.filterBox.dbValue}}"
+                }
+            },
+            "outputData": {
+                "allSnapshots": "allSnapshots",
+                "totalFound": "totalFound"
+            },
+            "deps": "js/viewerSnapshotService"
+        },
+        "showEditSnapshotAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awPanel.navigate",
+                    "eventData": {
+                        "destPanelId": "SnapshotEditSub",
+                        "title": "{{data.i18n.editSnapshot}}",
+                        "supportGoBack": true,
+                        "recreatePanel": true
+                    }
+                } ]
+            }
+        },
+        "applySnapshot": {
+            "actionType": "JSFunction",
+            "method": "applySnapshot",
+            "inputData": {
+                "snapshot":"{{data.eventData.snapshot}}",
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.snapshotCardViewDataProvider}}",
+                "otherDataProvider": "{{data.dataProviders.snapshotDataProvider}}"
+            },
+            "deps": "js/viewerSnapshotService"
+        },
+        "clearPreviousSnapshotSelection":{
+            "actionType": "JSFunction",
+            "inputData": {
+                "dataProvider": "{{data.dataProviders.snapshotDataProvider}}"
+            },
+            "method": "clearPreviousSnapshotSelection",
+            "deps": "js/viewerSnapshotService"
+        },
+        "setSnapshotView": {
+            "actionType": "JSFunction",
+            "method": "setSnapshotView",
+            "inputData": {
+                "viewerCtxNamespace": "{{data.viewerCtxNamespace}}",
+                "snapshotView": "{{data.eventMap['viewersnapshot.setview'].snapshotView}}"
+            },
+            "deps": "js/viewerSnapshotService"
+        },
+        "isInputSnapshotSelected":{
+            "actionType": "JSFunction",
+            "method": "isInputSnapshotSelectedView",
+            "inputData": {
+                "eventData": "{{parameters.eventData}}"
+            },
+            "deps": "js/viewerSnapshotService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "viewerSnapshotListDataUpdated",
+            "action": "viewerSnapshotListDataUpdatedAction"
+        },
+        {
+            "eventId":"snapshot.snapshotRenameSuccessful",
+            "action":"viewerSnapshotListDataUpdatedAction"
+        },
+        {
+            "eventId": "showEditSnapshot",
+            "action": "showEditSnapshotAction"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "SnapshotListSub"
+            },
+            "action": "revealSessionSnapshot"
+        },
+        {
+            "eventId":"awTab.selected",
+            "inputArgs": {
+                "eventData": "{{eventData}}"
+            },
+            "action":"isInputSnapshotSelected"
+        },
+        {
+            "eventId": "viewersnapshot.setview",
+            "action": "setSnapshotView",
+            "condition": "viewerCtxNamespace === data.viewerCtxNamespace",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "viewersnapshot.applySnapshot",
+            "action": "applySnapshot",
+            "cacheEventData": true
+        }
+    ],
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "requiredText": "{{i18n.filter}}",
+            "dbValue": ""
+        },
+        "vmoForSnapshotGallery": ""
+    },
+
+    "dataProviders": {
+        "snapshotDataProvider": {
+            "action": "getAllSnapshots",
+            "response": "{{data.allSnapshots}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "snapshot_list_cell_commands"
+        },
+        "snapshotCardViewDataProvider": {
+            "action": "getAllSnapshots",
+            "response": "{{data.allSnapshots}}",
+            "totalFound": "{{data.totalFound}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+    "conditions": {
+        "dataFetchComplete": {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].pmiToolCtx.dataFetchComplete"
+        },
+        "snapshotFilterValueChanged": {
+            "expression": "data.filterBox.dbValue",
+            "trackValues": true
+        },
+        "snapshotsViewImage": {
+            "expression": "ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView === 'Image'"
+        },
+        "snapshotsViewList": {
+            "expression": "!ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView || ctx[ctx.viewer.activeViewerCommandCtx].snapshotCtx.snapshotView === 'List'"
+        }
+    },
+    "lifecycleHooks": {
+        "onInit": "revealSessionSnapshot"
+    },
+    "i18n": {
+        "snapshotPanelTitle": [ "ViewerSnapshotMessages" ],
+        "createSnapshotTitle": [ "ViewerSnapshotMessages" ],
+        "editSnapshot": [ "ViewerSnapshotMessages" ],
+        "filter": [ "ViewerSnapshotMessages" ],
+        "snapshotApplyFailed": [ "ViewerSnapshotMessages" ],
+        "currentCaptureLabel": [ "ViewerSnapshotMessages" ],
+        "showingSnapshotCapturesFor": [ "ViewerSnapshotMessages" ]
+    }
+
+}

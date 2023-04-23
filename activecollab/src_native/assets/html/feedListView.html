@@ -1,0 +1,109 @@
+<aw-panel-body class="aw-activecollab-flexColumnContainer">
+    <aw-list dataprovider="data.dataProviders.conversationDataProvider" class="aw-activecollab-shadow">
+        <aw-flex-column class="aw-layout-flexRow" aw-class="[{'aw-activecollab-openStatus aw-widgets-showCellDecorator': item.props.convStatus.dbValue==='Open' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'},{'aw-activecollab-closedStatus aw-widgets-showCellDecorator': item.props.convStatus.dbValue==='Closed' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'},{'aw-activecollab-inProgressStatus aw-widgets-showCellDecorator': item.props.convStatus.dbValue==='In Progress' && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'}]">
+            <aw-flex-column justify="top" visible-when="item.isParticipantObjVisible">
+                <aw-flex-row justify="left" align-content="center">
+                    <aw-flex-column width="9">
+                        <aw-flex-row align-conten="center">
+                            <aw-flex-column justify="center" width="2f" visible-when="item.props.isConvPrivate.dbValue">
+                                    <aw-icon class="aw-commands-svg" icon-id="indicatorPrivate"></aw-icon>
+                            </aw-flex-column>
+                            <aw-flex-column width="3f" aw-repeat=" userObj : item.props.inflatedParticipantObjList">
+                                <aw-avatar size="xsmall" source="userObj.props.thumbnailUrl" extended-tooltip="{{userObj.props.participantNameTooltip}}"></aw-avatar>
+                            </aw-flex-column>
+                            <aw-flex-column justify="center" width="5f">
+                                <div>
+                                    {{item.moreParticipantPopupLink.propertyDisplayName}}
+                                </div>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <aw-flex-row justify="left" align-content="center">
+                <aw-flex-column width="9">
+                    <aw-flex-row class="aw-activecollab-srcObjChip" justify="left" align-content="center">
+                        <aw-chip chip="item.chipData" button-type="base" extended-tooltip="{{item.chipData.extendedTooltip}}"></aw-chip>
+                        <div>
+                            {{item.moreSourceObjPopupLink.propertyDisplayName}}
+                        </div>
+                    </aw-flex-row>
+                </aw-flex-column>
+            </aw-flex-row>
+            <div visible-when="item.isSourceObjVisible || item.isParticipantObjVisible" class="aw-activecollab-convSeparator aw-theme-separator"></div>
+            <aw-flex-column justify="center" visible-when="item.isConvActionable && ctx.preferences.Ac0EnableTrackedDiscussions[0]==='true'">
+                <aw-flex-row justify="left" align-content="start" class="aw-activecollab-userBold">
+                    <aw-flex-column width="10f">
+                        <div class="aw-activecollab-statusLabel">{{item.props.convStatus.uiValue}}</div>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <aw-flex-column justify="center">
+                <aw-flex-row justify="left" align-content="start">
+                    <aw-flex-column width="5f">
+                        <aw-avatar size="small" source="item.thumbnailUrl" exist-when="item.hasThumbnail"></aw-avatar>
+                        <aw-avatar size="small" source="item.typeIconURL" exist-when="!item.hasThumbnail"></aw-avatar>
+                    </aw-flex-column>
+                    <aw-flex-column>
+                        <aw-flex-row class="aw-widgets-propertyNonEditValue" justify="space-between" height="1.5f" class="aw-activecollab-convCreds">
+                            <aw-flex-column width="6" class="aw-activecollab-userBold">
+                                {{item.props.userName.displayValues[0]}}
+                            </aw-flex-column>
+                            <aw-flex-column width="4" align-content="end">
+                                {{item.props.modifiedDateTime.displayValues[0]}}
+                            </aw-flex-column>
+                        </aw-flex-row>
+                        <aw-flex-row>
+                            <div aw-parse-html="" display-val="item.props.richTextObject.curtailRichText" is-rich-text="true" visible-when="item.props.richTextObject && item.props.richTextObject.curtailRichText.length > 0 && item.showMore"></div>
+                            <div aw-parse-html="" display-val="item.props.richText.displayValues[0]" is-rich-text="true" visible-when="item.props.richText.displayValues[0] && item.props.richText.displayValues[0].length > 0 && !item.showMore"></div>
+                            <div visible-when="!item.props.richText.displayValues[0] && item.showMore">
+                                {{item.props.plainTextObject.curtailPlainText}}
+                            </div>
+                            <div visible-when="!item.props.richText.displayValues[0] && !item.showMore">
+                                {{item.props.plainText.displayValues[0]}}
+                            </div>
+                        </aw-flex-row>
+                        <aw-flex-row>
+                            <aw-flex-column align-content="center" justify="center" width="100%" aw-repeat=" relatedObj : item.props.inflatedRelatedObjList">
+                                <aw-include name="Ac0SnapshotCard" sub-panel-context="{snapshot:relatedObj, showCMDBar:false}"></aw-include>
+                            </aw-flex-column>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+            <div class="aw-activecollab-convSeparator aw-theme-separator"></div>
+            <aw-flex-column justify="center" visible-when="item.hasReplies">
+                <aw-flex-row justify="left" align-content="start">
+                    <aw-flex-column width="5f" visible-when="!item.props.latestCommentautoMsgType.displayValues[0]">
+                        <aw-avatar size="small" source="item.latestCommentthumbnailUrl" exist-when="item.haslatestCommentThumbnail"></aw-avatar>
+                        <aw-avatar size="small" source="item.typeIconURL" exist-when="!item.haslatestCommentThumbnail"></aw-avatar>
+                    </aw-flex-column>
+                    <aw-flex-column>
+                        <aw-flex-row class="aw-widgets-propertyNonEditValue" justify="space-between" class="aw-activecollab-convCreds">
+                            <aw-flex-column class="aw-activecollab-autoMsg" visible-when="item.props.latestCommentautoMsgType.displayValues[0]">
+                                <div aw-parse-html="" display-val="item.props.latestCommentrichTextObject.curtailRichText" is-rich-text="true" visible-when="item.props.latestCommentrichTextObject && item.props.latestCommentrichTextObject.curtailRichText.length > 0 && item.showMoreLC"></div>
+                                <div aw-parse-html="" display-val="item.props.latestCommentrichText.displayValues[0]" is-rich-text="true" visible-when="item.props.latestCommentrichText.displayValues[0] && item.props.latestCommentrichText.displayValues[0].length > 0 && !item.showMoreLC"></div>
+                            </aw-flex-column>
+                            <aw-flex-column width="6" class="aw-activecollab-userBold" visible-when="!item.props.latestCommentautoMsgType.displayValues[0]">
+                                {{item.props.latestCommentuserName.displayValues[0].split( '(' )[0].trim()}}
+                            </aw-flex-column>
+                            <aw-flex-column width="4" align-content="end">
+                                {{item.props.latestCommentmodifiedDateTime.displayValues[0]}}
+                            </aw-flex-column>
+                        </aw-flex-row>
+                        <aw-flex-row visible-when="!item.props.latestCommentautoMsgType.displayValues[0]">
+                            <div aw-parse-html="" display-val="item.props.latestCommentrichTextObject.curtailRichText" is-rich-text="true" visible-when="item.props.latestCommentrichTextObject && item.props.latestCommentrichTextObject.curtailRichText.length > 0 && item.showMoreLC"></div>
+                            <div aw-parse-html="" display-val="item.props.latestCommentrichText.displayValues[0]" is-rich-text="true" visible-when="item.props.latestCommentrichText.displayValues[0] && item.props.latestCommentrichText.displayValues[0].length > 0 && !item.showMoreLC"></div>
+                            <div visible-when="!item.props.latestCommentrichText.displayValues[0] && item.showMoreLC">
+                                {{item.props.latestCommentplainTextObject.curtailPlainText}}
+                            </div>
+                            <div visible-when="!item.props.latestCommentrichText.displayValues[0] && !item.showMoreLC">
+                                {{item.props.latestCommentplainText.displayValues[0]}}
+                            </div>
+                        </aw-flex-row>
+                    </aw-flex-column>
+                </aw-flex-row>
+            </aw-flex-column>
+        </aw-flex-column>
+    </aw-list>
+</aw-panel-body>

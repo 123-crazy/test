@@ -1,0 +1,67 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+        "js/aw-link-with-popup.directive",
+        "js/aw-include.directive",
+        "js/aw-property-non-edit-val.directive"
+    ],
+
+    "actions":
+    {
+        "initializeClosureRuleConfigurationInfo":
+        {
+            "actionType": "JSFunction",
+            "method": "getInitialClosureRuleConfigurationData",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+        "deps": "js/closureRuleConfigurationService"
+        },
+        "updateCurrentClosureRules": {
+            "actionType": "JSFunction",
+            "method": "updateCurrentClosureRules",
+            "inputData": {
+                "data":"{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps":"js/closureRuleConfigurationService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeClosureRuleConfigurationInfo"
+    },
+    "onEvent": [
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeClosureRuleConfigurationInfo"
+        },
+        {
+            "eventId": "awClosureRule.ValueChanged",
+            "cacheEventData": true,
+            "action": "updateCurrentClosureRules"
+        }
+    ],
+
+    "messages": {},
+
+    "data": {
+        "defaultClosureRule":
+        {
+            "displayName": "{{i18n.defaultClosureRuleValue}}",
+            "uiValue": "{{i18n.defaultClosureRuleValue}}",
+            "type": "STRING"
+        },
+        "currentClosureRule":
+        {
+            "uiValue": "{{data.currentClosureRule}}",
+            "type": "STRING"
+        }
+    },
+
+    "i18n":
+    {
+        "expansion": ["OccurrenceManagementConstants"],
+        "defaultClosureRuleValue": ["OccurrenceManagementConstants"]
+    }
+}

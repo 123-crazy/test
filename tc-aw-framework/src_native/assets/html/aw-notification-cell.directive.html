@@ -1,0 +1,29 @@
+<div id='notificationCell{{::vmo.notificationId}}' class="aw-notification-cell" aw-class="{'aw-notification-cell-importance-high' : isHighNotificationlevel,
+'aw-notification-cell-importance-medium' : isMediumNotificationlevel,
+'aw-notification-cell-importance-low' : isLowNotificationlevel,
+'aw-notification-cell-read' : vmo.notificationRead }" aw-click="onNotificationClickAction(vmo)">
+    <div class="aw-sub-notification-cell">
+        <div class="aw-notification-cellListCellImage"  ng-if="vmo.typeIconURL">
+            <aw-icon icon-id="{{vmo.typeIconURL}}"></aw-icon>
+        </div>
+        <div class="aw-notification-cellListCellContent">
+            <aw-cell-command-bar class="aw-notification-cell-command" aw-class="[{'aw-notification-cell-command-no-custom-include' : !isCustomViewIncluded}]"
+            anchor="aw_notification_cellCommandsExt" context="{vmo}"></aw-cell-command-bar>
+            <div class="aw-notification-cell-title" aw-class="{'aw-notification-cell-title-high' : isHighNotificationlevel ,
+            'aw-notification-cell-title-medium' : isMediumNotificationlevel,
+            'aw-notification-cell-title-low' : isLowNotificationlevel,
+            'aw-notification-cell-title-no-custom-include' : !isCustomViewIncluded}">
+                    <aw-clickable-title title="{{vmo.cellHeader1}}" source="list" vmo="vmo"></aw-clickable-title>
+            </div>
+            <div id="cellProperties" aw-repeat="cellProp:vmo.cellProperties" >
+                <div class="aw-widgets-cellListCellProperties">
+                    <label class="aw-notification-cell-prop">{{cellProp.key}}:</label>
+                    <label class="aw-notification-cell-prop" title="{{cellProp.value}}">{{cellProp.value}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <aw-row class="aw-notification-cell-customInclude" ng-if="vmo.viewName">
+        <aw-include name="{{vmo.viewName}}"></aw-include>
+    </aw-row>
+</div>

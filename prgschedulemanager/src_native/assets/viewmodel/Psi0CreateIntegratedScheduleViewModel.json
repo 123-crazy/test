@@ -1,0 +1,119 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports": [
+      "js/aw-i18n.directive",
+      "js/aw-command-panel.directive",
+      "js/aw-panel-body.directive",
+      "js/aw-panel-section.directive",
+      "js/aw-widget.directive",
+      "js/aw-textbox.directive",
+
+      "js/aw-datetime.directive",
+      "js/visible-when.directive",
+      "js/aw-button.directive",
+      "js/aw-panel-footer.directive"
+   ],
+   "data": {
+      "name": {
+         "displayName": "{{i18n.name}}",
+         "type": "STRING",
+         "isRequired": "true"
+      },
+      "description": {
+         "displayName": "{{i18n.description}}",
+         "type": "STRING",
+         "maxLength": 90,
+         "isRequired": "false",
+         "isEditable": "true"
+      },
+      "plannedStartDate": {
+         "displayName": "{{i18n.plannedStartDate}}",
+         "type": "DATETIME",
+         "dbValue": "{{ctx.plannedStartDate.plannedStartDate}}",
+         "uiValue": "{{ctx.plannedStartDate.plannedStartDate}}"
+      },
+      "plannedFinishDate": {
+         "displayName": "{{i18n.plannedFinishDate}}",
+         "type": "DATETIME",
+         "dbValue": "",
+         "uiValue": ""
+      }
+   },
+   "actions":
+   {
+      "create":{
+         "actionType": "TcSoaService",
+         "serviceName": "PPSMInterfaceAw-2017-06-PPSMInterface",
+         "method": "createIntegratedSchedule",
+         "inputData": {
+            "eventObject": "{{ctx.eventObj.eventObj}}",
+            "name": "{{data.name.dbValue}}",
+            "description": "{{data.description.dbValue}}",
+            "plannedStartDate": "{{function:getDateString_plannedStartDate}}", 
+            "plannedFinishDate": "{{function:getDateString_plannedFinishDate}}",
+            "scheduleOptions":
+            {
+                "":""
+            },
+            "runInBackground": true
+         },
+         "events": {
+            "success": [              
+               {
+                  "name": "complete",
+                  "eventData": {
+                     "source": "toolAndInfoPanel"
+                  }
+               }             
+            ]
+         },  
+         "deps": "js/Saw1ShiftScheduleService"
+      }
+   },
+   "functions": 
+    { 
+      "getDateString_plannedStartDate":{
+         "functionName": "getDateString_startDate",
+         "parameters": [
+            "{{data.plannedStartDate.dateApi.dateObject}}"
+         ]
+      },
+      "getDateString_plannedFinishDate":{
+         "functionName": "getDateString_startDate",
+         "parameters": [
+            "{{data.plannedFinishDate.dateApi.dateObject}}"
+         ]
+      }
+    },
+   "conditions": {
+      "isValidToSave": {
+         "expression": "data.name.dbValue && data.name.dbValue!=''"
+      }
+   },
+   "i18n": {
+      "createIntegratedSchedule": [
+         "ProgramdiagrammingMessages"
+      ],
+      "integratedSchedule": [
+         "ProgramdiagrammingMessages"
+      ],
+      "properties": [
+         "ProgramdiagrammingMessages"
+      ],
+      "name": [
+         "ProgramdiagrammingMessages"
+      ],
+      "description": [
+         "ProgramdiagrammingMessages"
+      ],
+      "create": [
+         "ProgramdiagrammingMessages"
+      ],
+      "plannedStartDate": [
+         "ProgramdiagrammingMessages"
+      ],
+      "plannedFinishDate": [
+         "ProgramdiagrammingMessages"
+      ]
+   }
+}

@@ -1,0 +1,17 @@
+<div id="aw-tcoo-viewer" exist-when="!hostedInOC" ng-style="{'height': viewerHeight}">
+      <div ng-if="viewerHeaderProperties" class="aw-viewerjs-header">
+        <aw-viewer-header data="viewerHeaderProperties"></aw-viewer-header>
+    </div>
+    <div ng-if="loading" class="aw-jswidgets-text">{{$parent.loadingMsg}}</div>
+    <div ng-if="!loading && hasError" class="aw-jswidgets-text">{{errorMsg}}</div>
+    <div ng-if="!loading && !hasError" id="tcooFrameParent" style="height: calc( 100% - 75px );">
+        <input name="access_token" value='{{tcooParams.accessToken}}' type="hidden"/>
+        <input name="access_token_ttl" value="{{tcooParams.accessTokenTtl}}" type="hidden"/>
+        <span id="frameholder">
+            <div class="aw-viewerjs-progressContainer" exist-when="showProgress">
+                <div class="aw-viewerjs-progress"></div>
+            </div>
+            <iframe name="officeFrame" class="aw-viewerjs-officeFrame" title="Office Online Frame" exist-when="!showProgress"></iframe>
+        </span>
+    </div>
+</div>

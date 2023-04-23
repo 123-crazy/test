@@ -1,0 +1,283 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-list-filter.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-default-cell.directive"
+    ],
+    "actions": {
+        "executeSearch": {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "search": {
+            "actionType": "JSFunction",
+            "method": "performSearch",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.userPerformSearch}}"
+            },
+            "outputData":
+            {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "policy": {
+                "types": [
+                    {
+                        "name": "POM_member",
+                        "properties": [
+                            {
+                                "name": "user",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "GroupMember",
+                        "properties": [
+                            {
+                                "name": "group",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "role",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Role",
+                        "properties": [
+                            {
+                                "name": "role_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Group",
+                        "properties": [
+                            {
+                                "name": "name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "POM_user",
+                        "properties": [
+                            {
+                                "name": "user_id"
+                            },
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "User",
+                        "properties": [
+                            {
+                                "name": "person",
+                                "modifiers": [
+                                    {
+                                        "name": "withProperties",
+                                        "Value": "true"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Person",
+                        "properties": [
+                            {
+                                "name": "user_name"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "deps": "js/qa0AuditTeamService"
+        },
+        "addTeamMember": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": "{{function:createAuditTeamMemberRelations}}"
+            },
+            "outputData": {
+                "serviceData": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "refreshLocationFlag": false
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ],
+                            "refreshLocationFlag": true
+                        }
+                    }
+                ]
+            },
+            "deps": "js/qa0AuditTeamService"
+        },
+        "initializeVieModelData": {
+            "actionType": "JSFunction",
+            "method": "initializeVieModelData",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/qa0AuditTeamService"
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "{{i18n.qa0Filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "allGroups": {
+            "displayName": "{{i18n.qa0Group}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allRoles": {
+            "displayName": "{{i18n.qa0Role}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "displayGroupDropDown": {
+            "dbValue": true
+        },
+        "additionalSearchCriteria": {
+            "group": ""
+        },
+        "parentAudit" : {
+            "value": "{{ctx.xrtSummaryContextObject}}"
+        }
+    },
+    "dataProviders": {
+        "userPerformSearch": {
+            "action": "search",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "multiple",
+            "commands": {
+                "Awp0ShowObjectCell": {
+                    "id": "cmdOpen",
+                    "areas": [
+                        "com.siemens.splm.clientfx.ui.modelObjectListActionCommands"
+                    ],
+                    "priorities": [
+                        300
+                    ],
+                    "dependencies": [
+                        "js/showObjectCommandHandler"
+                    ],
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+            }
+        }
+    },
+    "functions": {
+        "createAuditTeamMemberRelations": {
+            "functionName": "createAuditTeamMemberRelations",
+            "parameters": [
+                "Qa0AuditTeam",
+                "{{data.dataProviders.userPerformSearch.selectedObjects}}",
+                "{{ctx.xrtSummaryContextObject}}"
+            ]
+        }
+    },
+    "conditions": {
+        "displayGroupDropDown":
+        {
+            "expression": "data.displayGroupDropDown.dbValue"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "action": "executeSearch"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "initializeVieModelData"
+        },
+        {
+            "eventId": "awPopupWidget.close",
+            "action": "userPerformSearch"
+        }
+    ],
+    "i18n": {
+        "qa0Add": [
+            "qualityauditMessages"
+        ],
+        "qa0AllGroups": [
+            "qualityauditMessages"
+        ],
+        "qa0Filter":[
+            "qualityauditMessages"
+        ],
+        "qa0AllRoles": [
+            "qualityauditMessages"
+        ],
+        "qa0Group": [
+            "qualityauditMessages"
+        ],
+        "qa0Role": [
+            "qualityauditMessages"
+        ]
+    }
+}

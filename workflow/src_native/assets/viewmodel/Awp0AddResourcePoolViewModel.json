@@ -1,0 +1,198 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-radiobutton.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-include.directive",
+        "js/aw-break.directive",
+        "js/aw-panel-section.directive"
+
+    ],
+
+    "actions":
+    {
+        "loadAccessibleResourcePool":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "AccessibleResourcePool",
+                        "condition": "!conditions.resourcePoolRestictionCheck"
+                    }
+                ]
+            }
+        },
+        "subscribe":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{function:subscribeResourcePool}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified":
+                            [
+                                "{{ctx.locationContext.modelObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Awp0AddResourcePool"
+
+        },
+
+
+
+        "loadSubscribeResourcePoolPanel": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getResourcePool"
+            ]
+        },
+
+
+        "getResourcePoolEvent": {
+            "actionType":"JSFunction",
+            "method":"getResourcePoolEvent",
+            "inputData":{
+                "data":"{{data}}"
+             },
+            "events":{
+                "success":[
+                   {
+                       "name": "AccessibleResourcePool",
+                       "condition": "data.resourcePoolRadioButton.dbValue === true"
+                    },
+                    {
+                       "name": "AllResourcePool",
+                       "condition": "data.resourcePoolRadioButton.dbValue === false"
+                    }
+              ]
+         },
+         "deps":"js/Awp0AddResourcePool"
+       },
+
+       "getResourcePools":{
+        "actionType": "TcSoaService",
+        "serviceName": "Query-2014-11-Finder",
+        "method": "performSearch",
+        "inputData":
+         {
+            "searchInput":
+            {
+                "maxToLoad": 50,
+                "maxToReturn": 50,
+                "providerName": "Awp0ResourceProvider",
+                "searchCriteria": {
+                    "responseType": "",
+                    "searchString": "{{data.filterBox.dbValue}}",
+                    "resourceProviderContentType": "{{function:getRadioButtonString}}"
+                },
+                "searchFilterFieldSortType": "Alphabetical",
+                "searchFilterMap": {},
+
+                "searchSortCriteria": [],
+                "startIndex": "{{dataProvider.startIndex}}"
+            }
+         },
+         "outputData": {
+          "searchResults": "searchResults",
+          "totalFound": "totalFound",
+          "totalLoaded": "totalLoaded"
+       },
+        "deps": "js/Awp0AddResourcePool"
+      }
+
+    },
+    "functions":
+    {
+        "subscribeResourcePool": {
+            "functionName": "prepareSubscribeResourcePoolInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+               ]
+        },
+        "getRadioButtonString": {
+            "functionName": "getRadioButtonString",
+            "parameters": [
+                "{{data}}"
+               ]
+        }
+    },
+    "onEvent": [
+        {
+            "eventId":"AccessibleResourcePool",
+             "action":"loadSubscribeResourcePoolPanel"
+         },
+         {
+            "eventId":"AllResourcePool",
+            "action":"loadSubscribeResourcePoolPanel"
+         }
+    ],
+
+    "conditions": {
+        "isValidToAdd": {
+           "expression": "data.dataProviders.getResourcePool.selectedObjects.length > 0"
+        },
+        "resourcePoolRestictionCheck":{
+            "expression":"data.preferences.EPM_resource_pool_restrict_subscription[0]!=='On' && data.preferences.EPM_resource_pool_restrict_subscription[0]!=='oN' && data.preferences.EPM_resource_pool_restrict_subscription[0]!=='ON'"
+        }
+     },
+
+    "data":
+    {
+        "resourcePoolRadioButton": {
+            "type": "BOOLEAN",
+            "isRequired": "true",
+            "propertyRadioTrueText": "{{i18n.accessible}}",
+            "propertyRadioFalseText": "{{i18n.allResource}}",
+            "dbValue": true,
+            "labelPosition" : "PROPERTY_LABEL_AT_RIGHT"
+         },
+         "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "dataProviders": {
+        "getResourcePool": {
+            "action": "getResourcePools",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "multiple"
+        }
+    },
+
+    "i18n":
+    {
+        "accessible": [ "InboxMessages"],
+        "allResource": [ "InboxMessages"],
+        "resourcePoolTitle": [ "InboxMessages" ],
+        "surrogateAdd": [ "InboxMessages" ]
+    },
+    "preferences":
+    [
+        "EPM_resource_pool_restrict_subscription"
+    ],
+    "lifecycleHooks": {
+        "onMount": "loadAccessibleResourcePool"
+    }
+}

@@ -1,0 +1,211 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": 
+    [
+        "js/aw-command-panel.directive",
+        "js/aw-command-sub-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-init.directive"
+    ],
+
+    "data": 
+    {
+        
+    },
+
+    "actions": 
+    {
+        "addObject": 
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": 
+            {
+                "inputs": "{{function:getCreateInput}}"
+            },
+
+            "outputData": 
+            {
+                "createdMainObject": "output[0].objects[2]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "workElementCreateRelationEvent",
+                        "eventData": 
+                        {
+                            "createdMainObject": "{{data.createdMainObject}}",
+                            "selectedObject": "{{ctx.Object.selectedObject}}",
+                            "relationType": "{{ctx.Object.relationType}}"
+                        }
+                    }
+                ]
+            },
+
+            "deps": "js/addObjectUtils"
+        },
+
+        "populatePropsForCreate": 
+        {
+            "actionType": "JSFunction",
+            "method": "populatePropsForCreate",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "addObject.add"
+                    }
+                ]
+            },
+
+            "deps": "js/Psi0ProgramDiagramming"
+        },
+
+        "workElementCreateRelation": 
+        {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": 
+            {
+                "input": 
+                [
+                    {
+                        "primaryObject": "{{ctx.Object.selectedObject}}",
+                        "secondaryObject": "{{data.createdMainObject}}",
+                        "relationType": "{{ctx.Object.relationType}}",
+                        "clientId": "",
+                        "userData": 
+                        {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        }
+                    }
+                ]
+            },
+
+            "outputData": 
+            {
+                "newRelationCreated": "output"
+            },
+
+            "events": 
+            {
+                "success": 
+                [
+                    {
+                        "name": "networkGrpahUpdateEvent",
+                        "eventData": 
+                        {
+                            "workElementCreate": "outputData"
+                        }
+                        
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": 
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "networkGrpahUpdateAction": 
+        {
+            "actionType": "JSFunction",
+            "method": "networkGrpahUpdateMethod",
+            "inputData": 
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/NetworkGraphService"
+        }
+        
+    },
+
+    "onEvent": 
+    [
+        {
+            "eventId": "addObject.add",
+            "action": "addObject"
+        },
+        {
+            "eventId": "workElementCreateRelationEvent",
+            "action": "workElementCreateRelation",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "networkGrpahUpdateEvent",
+            "action": "networkGrpahUpdateAction",
+            "cacheEventData": true
+        }
+    ],
+
+    "functions": 
+    {
+        "getCreateInput": 
+        {
+            "functionName": "getCreateInput",
+            "parameters": 
+            [
+                "{{data}}"
+            ]
+        },
+
+        "getCreatedObject": 
+        {
+            "functionName": "getCreatedObject",
+            "parameters": 
+            [
+                
+            ]
+        }
+    },
+
+    "conditions": 
+    {
+        "isValidToShowforOneType": 
+        {
+            "expression": "!data.selectedObject && data.totalFound === 1"
+        },
+
+        "isValidToShowForCustomType": 
+        {
+            "expression": "data.selectedObject && data.totalFound > 1"
+        },
+
+        "isValidToShow": 
+        {
+            "expression": "conditions.isValidToShowforOneType || conditions.isValidToShowForCustomType"
+        }
+    },
+
+    "i18n": 
+    {
+        "AddWorkElementTitle": 
+        [
+            "ProgramDiagrammingConstants"
+        ],
+
+        "add": 
+        [
+            "ProgramDiagrammingConstants"
+        ]
+    }
+}

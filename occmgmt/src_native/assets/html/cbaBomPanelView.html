@@ -1,0 +1,30 @@
+<div class="aw-layout-panelBody aw-layout-flexColumnContainer">
+    <aw-flex-row exist-when="ctx[data.provider.contextKey].modelObject" height="5f">
+        <aw-flex-column width="fill">
+            <aw-flex-row height="3f" class="aw-layout-breadCrumbContainer">
+                <div class="aw-cba-displayLabelContainer">
+                    <aw-flex-row width="fill">
+                        <label class="aw-cba-displayLabel"> {{data.provider.displayLabel.text}} </label>
+                        <span class="aw-cba-displayLabel"> {{data.provider.displayLabel.separator}} </span>
+                    </aw-flex-row>
+                </div>
+                <aw-flex-row width="fill">
+                    <aw-navigate-breadcrumb provider="" compact="true" breadcrumb-config="data.provider.breadcrumbConfig">
+                    </aw-navigate-breadcrumb>
+                </aw-flex-row>
+            </aw-flex-row>
+            <aw-flex-row exist-when="ctx[data.provider.contextKey].modelObject" height="2f">
+                <div class="aw-layout-flexRowContainer aw-layout-headerContribution aw-cba-headerConfig">
+                    <aw-include exist-when="!conditions.isPartitionEnable" name="AceSplitHeader" sub-panel-context="data.contextInfo"></aw-include>
+                    <aw-include exist-when="conditions.isPartitionEnable" name="FgfAceSplitHeader" sub-panel-context="data.contextInfo"></aw-include>
+                </div>
+            </aw-flex-row>
+        </aw-flex-column>
+    </aw-flex-row>
+    <aw-data-navigator exist-when="ctx[data.provider.contextKey].modelObject" context-key="data.provider.contextKey"
+        provider="data.provider" base-selection="ctx[data.provider.contextKey].modelObject" layout="{{data.provider.splitterLayout}}">
+    </aw-data-navigator>
+    <aw-flex-row exist-when="!ctx[data.provider.contextKey].modelObject && ctx.cbaContext.ImpactAnalysis" >
+            <aw-include name="Pma1AlignedStructureAbsent"></aw-include>
+    </aw-flex-row>
+</div>

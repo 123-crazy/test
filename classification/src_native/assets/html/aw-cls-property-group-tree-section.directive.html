@@ -1,0 +1,23 @@
+<ul class="aw-ui-tree aw-clspanel-propertyGroupTreeSection">
+    <li class="aw-ui-treeNode" aw-repeat="node : nodes  track by $index" exist-when="node.type==='Block' && node.visible">
+        <div class="aw-clspanel-treeValueSection" title="{{node.name}}">
+            <div class="aw-clspanel-propertyGroupTreeExpansionSection" exist-when="ctx.locationContext['ActiveWorkspace:SubLocation'] !== 'clsNodes' && node.hasBlockChildren &&( node.children.length > 0 || node.instances.length > 0 )">
+                <aw-property-image class="aw-clspanel-headerImage" name="miscDownArrow_uxRefresh" ng-click="collapse(node)" ng-show="node.expanded"></aw-property-image>
+                <aw-property-image class="aw-clspanel-headerImage" ng-class="{ 'aw-clspanel-imageChevron': !node.expanded }" name="miscDownArrow_uxRefresh" ng-click="expand(node)"  ng-show="!node.expanded"></aw-property-image>
+            </div>
+            
+            <div class="aw-cls-propertyGroupTreeExpansionSection" exist-when="ctx.locationContext['ActiveWorkspace:SubLocation'] === 'clsNodes' 
+            && ( ( node.children.length > 0 && node.cardinalController && node.polymorphicTypeProperty ) || ( node.hasBlockChildren && node.children.length > 0 && !node.cardinalController && !node.polymorphicTypeProperty ) || ( node.hasBlockChildren && node.children.length > 0 && !node.cardinalController && node.polymorphicTypeProperty ))">
+                <aw-property-image class="aw-cls-headerImage" name="miscDownArrow_uxRefresh" ng-click="collapse(node)" ng-show="node.expanded"></aw-property-image>
+                <aw-property-image class="aw-cls-headerImage" ng-class="{ 'aw-cls-image-chevron': !node.expanded }" name="miscDownArrow_uxRefresh" ng-click="expand(node)"  ng-show="!node.expanded"></aw-property-image>
+            </div>
+            <aw-property-image class="aw-clspanel-headerImage aw-clspanel-typeIcon aw-clspanel-propertyImage" name="indicatorCardinalProperty" ng-show="node.cardinalController" title="{{data.i18n.cardinalBlock}}"></aw-property-image>
+            <aw-property-image class="aw-clspanel-headerImage aw-clspanel-typeIcon aw-clspanel-propertyImage" name="indicatorPolymorphicProperty" ng-show="node.polymorphicTypeProperty && !node.cardinalController" title="{{data.i18n.polymorphicBlock}}"></aw-property-image>
+            <div class="aw-ui-treeNodeValue aw-clspanel-blockHeader" ng-class="{'aw-state-selected': node.selected, 'aw-clspanel-propertyGroupLastChild': !node.hasBlockChildren}" ng-click="toggleSelection(node)" aw-transclude>
+                {{node.name}}{{node.suffix}}
+            </div>
+        </div>
+        <aw-cls-property-group-tree-section nodes="node.instances" ng-show="node.expanded" exist-when="node.instances.length !== 0"></aw-cls-property-group-tree-section>
+        <aw-cls-property-group-tree-section nodes="node.children" ng-show="node.expanded" exist-when="node.hasBlockChildren && node.instances.length === 0"></aw-cls-property-group-tree-section>
+    </li>
+</ul>

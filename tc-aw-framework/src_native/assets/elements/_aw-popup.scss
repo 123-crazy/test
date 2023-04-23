@@ -1,0 +1,358 @@
+// Copyright (c) 2020 Siemens
+
+// aw-popup
+aw-popup {
+    .aw-popup-contentContainer {
+        border-radius: $popup_container_border_radius;
+
+        .aw-layout-panelTitle {
+            padding: $popup_title_padding;
+            border-radius: $popup_title_border_radius;
+
+            .aw-base-iconButton {
+                margin: $popup_title_icon_button_margin;
+                height: $popup_title_icon_button_height;
+                width: $popup_title_icon_button_width;
+            }
+        }
+
+        .aw-layout-popup {
+            border: $popup_child_border;
+            border-radius: $popup_child_border_radius;
+            @include flexbox();
+            @include flex-direction(column);
+        }
+    }
+
+    // panel layout css
+    .aw-layout-popup {
+        border: $popup_border;
+        border-radius: $popup_border_radius;
+    }
+
+    .aw-popup-centerAligned {
+        -webkit-box-pack: justify;
+        -webkit-justify-content: center;
+        -ms-flex-pack: justify;
+        -moz-box-pack: justify;
+        justify-content: center;
+        align-items: center;
+        -webkit-align-items: center;
+        -ms-flex-align: center
+    }
+
+    .aw-popup-topAligned {
+        z-index: $popup_position_top_aligned_z-index;
+        position: absolute;
+        left: $popup_position_top_aligned_left;
+        top: $popup_position_top_aligned_top;
+    }
+
+    .aw-popup-noModal {
+        position: inherit;
+        transform: translate(-50%);
+    }
+
+    .aw-popup-contentContainer {
+        z-index: $popup_content_container_z-index;
+        opacity: $popup_content_container_opacity;
+    }
+
+    @extend %mask;
+    @extend %share;
+
+}
+
+//aw-link-with-popup-menu icon css
+.aw-layout-headerSubTitle {
+    .aw-base-icon {
+        height: $popup_menu_icon_height;
+        width: $popup_menu_icon_width;
+    }
+}
+
+
+// aw-popup is replaceable,
+// the enhanced aw-popup-panel2 also have the mask feature, and will completely replace all popups.
+aw-popup-panel2 {
+    @extend %mask;
+    @extend %share;
+
+    .aw-layout-popup {
+        transition: opacity $popup_transition_duration;
+    }
+
+    .aw-popup-panelContainer {
+        border-radius: $popup_container_border_radius;
+    }
+
+    .aw-popup-contentContainer {
+
+        .aw-layout-panelTitle {
+            border-radius: $popup_title_border_radius;
+
+            .aw-base-iconButton {
+                margin: $popup_title_icon_button_margin;
+                height: $popup_title_icon_button_height;
+                width: $popup_title_icon_button_width;
+            }
+        }
+    }
+
+    .aw-widgets-cellListItemCell {
+        .aw-widgets-cellTop {
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+
+    .aw-popup-enableResize{
+        resize:both;
+        max-width: unset;
+        max-height: unset;
+        min-width: unset;
+        min-height: unset;
+        // specific selector - to avoid being override
+        &.aw-popup-container{
+            max-height: unset;
+        }
+    }
+}
+
+
+
+%mask {
+    .aw-popup-screenMask {
+        opacity: $popup_screen_mask_opacity;
+    }
+
+    .aw-popup-fullPage {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+%share {
+    z-index: 999999;
+    position: absolute;
+
+    .aw-popup-container {
+        max-width: $popup_container_max_width;
+        max-height: $popup_container_max_height;
+        min-width: $popup_container_min_width;
+        min-height: $popup_container_min_height;
+    }
+
+    //used by aw-popup only, kept for backward compatibility
+    .aw-popup-animate {
+        opacity: 1;
+        transition: opacity 1s;
+    }
+
+    .aw-popup-scrollable {
+        overflow: auto;
+    }
+
+    .aw-popup-commands {
+        justify-content: flex-end;
+    }
+
+    .aw-layout-panelFooter {
+        @include flexbox();
+        @include flex-direction(row);
+        @include justify-content(flex-end);
+        @include align-items(center);
+    }
+
+    button {
+        &.aw-base-size-auto:not(:last-child) {
+            margin: $popup_button_not_last_child_margin;
+        }
+
+        &.aw-base-size-auto:last-child {
+            margin: $popup_button_last_child_margin;
+        }
+
+        &.disabled {
+            cursor: default;
+            box-sizing: border-box;
+        }
+    }
+}
+
+@mixin arrow-placement($dir1, $dir2, $arrow_size, $arrow_fill_size) {
+    margin-#{$dir1}: $arrow_size;
+
+    .popupArrow {
+        #{$dir1}: calc(#{$arrow_size} * -1);
+        #{$dir2}: calc(50% - #{$arrow_size});
+
+        .arrow_bg {
+            border-#{$dir1}-width: 0;
+
+            .arrow_fg {
+                border-#{$dir1}-width: 0;
+                #{$dir2}: $arrow_fill_size * -1;
+                #{$dir1}: 1px;
+            }
+        }
+    }
+}
+
+// popup arrow related styles
+.aw-layout-popup {
+    .popupInner {
+        position: relative;
+    }
+
+    .popupArrow {
+        position: absolute;
+        z-index: 10000; //larger than popup
+
+        .arrow_bg {
+            position: relative;
+            border-style: solid;
+
+            .arrow_fg {
+                position: absolute;
+                border-style: solid;
+            }
+        }
+    }
+
+    &[x-placement] {
+        .popupArrow {
+            .arrow_bg {
+                border-width: $popup_arrow_size;
+
+                .arrow_fg {
+                    border-width: $popup_arrow_fill_size;
+                }
+            }
+        }
+    }
+
+    &[x-placement^="bottom"] {
+        @include arrow-placement(top, left, $popup_arrow_size, $popup_arrow_fill_size);
+    }
+
+    &[x-placement^="top"] {
+        @include arrow-placement(bottom, left, $popup_arrow_size, $popup_arrow_fill_size);
+    }
+
+    &[x-placement^="right"] {
+        @include arrow-placement(left, top, $popup_arrow_size, $popup_arrow_fill_size);
+    }
+
+    &[x-placement^="left"] {
+        @include arrow-placement(right, top, $popup_arrow_size, $popup_arrow_fill_size);
+    }
+}
+
+// balloon specific styles
+.aw-popup-balloon {
+    @extend %common;
+
+    .aw-jswidgets-loading-container,
+    .aw-layout-flexColumnContainer {
+        padding: 1rem;
+    }
+
+    .aw-popup-close+.aw-layout-flexColumnContainer {
+        padding-right: 1.5rem;
+    }
+
+    .aw-popup-close {
+        position: absolute;
+        font-size: $balloon_popup_close_font_size;
+        top: 0.5rem;
+        right: 0.5rem;
+        margin: 0 0 0 0;
+        height: $balloon_popup_close_height;
+        width: $balloon_popup_close_width;
+    }
+
+    .aw-popup-close:hover,
+    .aw-popup-close:focus {
+        text-decoration: none;
+        cursor: pointer;
+    }
+}
+
+
+// extended-tooltip specific styles
+.aw-popup-tooltip {
+    @extend %common;
+
+    // legacy
+    max-width: 360px;
+    max-height: 360px;
+    min-width: 48px;
+    min-height: 32px;
+
+    .aw-jswidgets-loading-container,
+    .aw-layout-flexColumnContainer {
+        padding: 0.5rem 1rem;
+    }
+
+    // use to prevent pointer-events when tooltip is in showing stage
+    &.aw-popup-tooltip-showing {
+        pointer-events: none;
+    }
+
+    // prevent content go out of container
+    .aw-popup-tooltipContainer{
+        max-height: calc(360px - 1rem);
+        max-width: calc(360px - 2rem);
+        overflow: auto;
+    }
+}
+
+%common {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+
+    .aw-jswidgets-loading {
+        width: 20px;
+        height: 20px;
+        margin: 0 0 0 0;
+    }
+
+    .aw-layout-panelBody {
+        padding: 0
+    }
+}
+
+
+// resize detector used in popup
+.aw-popup-resize-detector {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+@keyframes popupAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.aw_popup_easein{
+    animation: popupAnimation 600ms;
+    animation-timing-function: cubic-bezier(1,-0.78, 0.59, 0.77);
+}

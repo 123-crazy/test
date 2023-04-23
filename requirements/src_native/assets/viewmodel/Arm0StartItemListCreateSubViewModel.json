@@ -1,0 +1,104 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-list.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":
+    {
+        "removeFromStartItems": {
+            "actionType": "JSFunction",
+            "method": "removeFromStartItems",
+            "inputData":
+            {
+                "data": "{{subPanelContext}}",
+                "obj": "{{data.selectedCell}}"
+            },
+            "deps": "js/Arm0CreateTraceLink"
+        },
+        "refreshStartItemList":
+        {
+            "actionType": "dataProvider",
+            "method": "startItemList"
+        },
+        "attachVMO":
+        {
+            "actionType": "JSFunction",
+            "method": "attachVMOToItemLists",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "isStartItemList": true
+            },
+            "deps": "js/Arm0CreateTraceLink"
+        }
+    },
+
+    "onEvent": [
+        {
+            "eventId": "CreateTracelink.refreshStartItemList",
+            "action": "refreshStartItemList"
+        }
+    ],
+    "dataParseDefinitions": {
+        
+    },
+     "messages":
+    {
+
+    },
+    "data":
+    {
+        "startItemListcommands":"arm0_startItemListcommands",
+        "startItems": {
+            "isArray": "true",
+            "dbValue":
+            [
+            ]
+        }
+    },
+    "functions":
+    {
+        
+    },
+    "dataProviders":
+    {
+      "startItemList":
+        {
+         "commands":
+            {
+                "delete":
+                {
+                    "id": "cmdDelete",
+                    "title": "{{i18n.Remove}}",
+                    "areas": [ "com.siemens.splm.clientfx.ui.modelObjectListActionCommands" ],
+                    "priorities": [ 300 ],
+                    "action":"removeFromStartItems",
+                    "displayOption": "ON_HOVER_AND_SELECTION",
+                    "position": "TOP_RIGHT"
+                }
+
+            },
+            "response":"{{subPanelContext.startItems.dbValue}}",
+            "selectionModelMode": "single"
+         }
+    },
+    "conditions":
+    {
+        
+    },
+
+    "i18n":
+    {
+        "Remove":
+        [
+          "RequirementsCommandPanelsMessages"
+        ]
+    },
+
+    "lifecycleHooks" : {
+        "onMount": "attachVMO"
+    }
+}

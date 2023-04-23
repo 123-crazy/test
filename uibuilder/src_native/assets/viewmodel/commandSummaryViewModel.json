@@ -1,0 +1,1119 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-splm-table.directive",
+        "js/aw-row.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-command-def.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "loadPlacements": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($id:ID!){command(id:$id){placements{id anchor{id title{value}} priority relativeTo{id title{value}} parentCommand{id title{value}}}}}",
+                    "variables": {
+                        "id": "{{ctx.selected.props.cmdId.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "rawCommandInfo": "data.command",
+                "placementList": "{{function:convertPlacementsToVMOs}}"
+            },
+            "deps": "js/placementsService"
+        },
+        "firePlacementsEditHandlerStateChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "editHandlerStateChange",
+                    "eventData": {
+                        "dataSource": "{{data.dataProviders.placementsDataProvider}}",
+                        "state": "starting"
+                    }
+                } ]
+            }
+        },
+        "loadHandlers": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($id:ID!){command(id:$id){handlers{id action{id definition}activeWhen{id expression{string}}enableWhen{id expression{string}}visibleWhen{id expression{string}}selectWhen{id expression{string}}}}}",
+                    "variables": {
+                        "id": "{{ctx.selected.props.cmdId.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "rawCommandInfo": "data.command",
+                "handlerList": "{{function:convertHandlersToVMOs}}"
+            },
+            "deps": "js/handlersService"
+        },
+        "fireHandlersEditHandlerStateChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "editHandlerStateChange",
+                    "eventData": {
+                        "dataSource": "{{data.dataProviders.handlersDataProvider}}",
+                        "state": "starting"
+                    }
+                } ]
+            }
+        },
+        "fireChildCommandsEditHandlerStateChange": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "editHandlerStateChange",
+                    "eventData": {
+                        "dataSource": "{{data.dataProviders.childCommandsDataProvider}}",
+                        "state": "starting"
+                    }
+                } ]
+            }
+        },
+        "showHandlersData": {
+            "actionType": "dataProvider",
+            "method": "handlersDataProvider"
+        },
+        "showPlacementsData": {
+            "actionType": "dataProvider",
+            "method": "placementsDataProvider"
+        },
+        "openConditionsPanel": {
+            "actionType": "activateCommandPanel",
+            "inputData": {
+                "commandId": "createCommandPlacement",
+                "location": "aw_toolsAndInfo"
+            }
+        },
+        "getAnchors": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){anchors(filter:$filter){id title{value}}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "anchors": "{{function:convertAnchorsToLovEntries}}"
+            },
+            "deps": "js/placementsService"
+        },
+        "getActions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){actions(filter:$filter){actions { id }, cursor { endIndex endReached startIndex startReached }}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "actions": "{{function:convertActionsToLovEntries}}"
+            },
+            "deps": "js/handlersService"
+        },
+        "getVisibleWhenConditions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){conditions(filter:$filter){id}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "visibleWhenConditions": "{{function:convertConditionsToLovEntries}}"
+            },
+            "deps": "js/handlersService"
+        },
+        "getEnableWhenConditions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){conditions(filter:$filter){id}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "enableWhenConditions": "{{function:convertConditionsToLovEntries}}"
+            },
+            "deps": "js/handlersService"
+        },
+        "getActiveWhenConditions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){conditions(filter:$filter){id}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "activeWhenConditions": "{{function:convertConditionsToLovEntries}}"
+            },
+            "deps": "js/handlersService"
+        },
+        "getSelectWhenConditions": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter:String){conditions(filter:$filter){id}}",
+                    "variables": {
+                        "filter": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "selectWhenConditions": "{{function:convertConditionsToLovEntries}}"
+            },
+            "deps": "js/handlersService"
+        },
+        "getRelativeToCommands": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($criteria:String){commands(commandInput:{criteria:$criteria}){commands{id title{value}}}}",
+                    "variables": {
+                        "criteria": "{{filterStr}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "relativeToCommands": "{{function:convertCommandsToLovEntries}}"
+            },
+            "deps": "js/placementsService"
+        },
+        "getParentCommands": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($criteria:String,$filter:CommandFilter){commands(commandInput:{criteria:$criteria,filter:$filter}){commands{id title{value}}}}",
+                    "variables": {
+                        "criteria": "{{data.activePlacementObject.props.parentCommand.dbValue}}",
+                        "filter": {
+                            "commandTypes": [
+                                "GROUP",
+                                "RIBBON"
+                            ]
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "parentCommands": "{{function:convertCommandsToLovEntries}}"
+            },
+            "deps": "js/placementsService"
+        },
+        "updatePlacementAnchor": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($id:ID!,$anchor:ID!){updatePlacementAnchor(input:{id:$id,anchor:$anchor}){id}}",
+                    "variables": {
+                        "id": "{{data.activePlacementObject.props.id.dbValue}}",
+                        "anchor": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updatePlacementPriority": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($id:ID!,$priority:Int!){updatePlacementPriority(input:{id:$id,priority:$priority}){id}}",
+                    "variables": {
+                        "id": "{{data.activePlacementObject.props.id.dbValue}}",
+                        "priority": "{{data.eventData.prop.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updatePlacementRelativeTo": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($id:ID!,$relativeTo:ID!){updatePlacementRelativeTo(input:{id:$id,relativeTo:$relativeTo}){id}}",
+                    "variables": {
+                        "id": "{{data.activePlacementObject.props.id.dbValue}}",
+                        "relativeTo": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updatePlacementParentCommand": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($id:ID!,$parentGroupId:ID!){updatePlacementParentGroupId(input:{id:$id,parentGroupId:$parentGroupId}){id}}",
+                    "variables": {
+                        "id": "{{data.activePlacementObject.props.id.dbValue}}",
+                        "parentGroupId": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updateHandlerAction": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandHandlerId:ID!,$commandHandlerActionId:ID!){updateHandlerAction(input:{commandHandlerId:$commandHandlerId,commandHandlerActionId:$commandHandlerActionId}){id}}",
+                    "variables": {
+                        "commandHandlerId": "{{data.activeHandlerObject.props.id.dbValue}}",
+                        "commandHandlerActionId": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updateActiveWhenHandlerCondition": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandHandlerId:ID!,$commandHandlerConditionId:ID!){updateHandlerActiveWhen(input:{commandHandlerId:$commandHandlerId,commandHandlerConditionId:$commandHandlerConditionId}){id}}",
+                    "variables": {
+                        "commandHandlerId": "{{data.activeHandlerObject.props.id.dbValue}}",
+                        "commandHandlerConditionId": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updateVisibleWhenHandlerCondition": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandHandlerId:ID!,$commandHandlerConditionId:ID!){updateHandlerVisibleWhen(input:{commandHandlerId:$commandHandlerId,commandHandlerConditionId:$commandHandlerConditionId}){id}}",
+                    "variables": {
+                        "commandHandlerId": "{{data.activeHandlerObject.props.id.dbValue}}",
+                        "commandHandlerConditionId": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updateEnableWhenHandlerCondition": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandHandlerId:ID!,$commandHandlerConditionId:ID!){updateHandlerEnableWhen(input:{commandHandlerId:$commandHandlerId,commandHandlerConditionId:$commandHandlerConditionId}){id}}",
+                    "variables": {
+                        "commandHandlerId": "{{data.activeHandlerObject.props.id.dbValue}}",
+                        "commandHandlerConditionId": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                        "name": "commandSummary.updateHandlers"
+                    },
+                    {
+                        "name": "commandSummary.notifyConfigChange"
+                    }
+                ]
+            }
+        },
+        "updateSelectWhenHandlerCondition": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "mutation($commandHandlerId:ID!,$commandHandlerConditionId:ID!){updateHandlerSelectWhen(input:{commandHandlerId:$commandHandlerId,commandHandlerConditionId:$commandHandlerConditionId}){id}}",
+                    "variables": {
+                        "commandHandlerId": "{{data.activeHandlerObject.props.id.dbValue}}",
+                        "commandHandlerConditionId": "{{data.eventData.lovValue.propInternalValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "events": {
+                "success": [ {
+                    "name": "commandSummary.notifyConfigChange"
+                } ]
+            }
+        },
+        "updateActivePlacementObject": {
+            "actionType": "JSFunction",
+            "method": "updateActiveObject",
+            "inputData": {
+                "placementObject": "{{data.eventData.vmo}}",
+                "gridId": "{{data.eventData.gridId}}"
+            },
+            "outputData": {
+                "activePlacementObject": "activeVMO",
+                "activeGridId": "activeGridId"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "updateActiveHandlerObject": {
+            "actionType": "JSFunction",
+            "method": "updateActiveObject",
+            "inputData": {
+                "handlerObject": "{{data.eventData.vmo}}",
+                "gridId": "{{data.eventData.gridId}}"
+            },
+            "outputData": {
+                "activeHandlerObject": "activeVMO",
+                "activeGridId": "activeGridId"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "updateActiveChildCommandObject": {
+            "actionType": "JSFunction",
+            "method": "updateActiveObject",
+            "inputData": {
+                "childCommandObject": "{{data.eventData.vmo}}",
+                "gridId": "{{data.eventData.gridId}}"
+            },
+            "outputData": {
+                "activeChildCommandObject": "activeVMO",
+                "activeGridId": "activeGridId"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "loadPlacementsColumnsAndAddCellRenderer": {
+            "actionType": "JSFunction",
+            "method": "loadColumnsAndAddCellRenderer",
+            "inputData": {
+                "columnProvider": "{{data.columnProviders.placementsColumnProvider}}",
+                "dataProvider": "{{data.dataProviders.placementsDataProvider}}"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "loadHandlersColumnsAndAddCellRenderer": {
+            "actionType": "JSFunction",
+            "method": "loadColumnsAndAddCellRenderer",
+            "inputData": {
+                "columnProvider": "{{data.columnProviders.handlersColumnProvider}}",
+                "dataProvider": "{{data.dataProviders.handlersDataProvider}}"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "loadHandlersToggleColumnsAndAddCellRenderer": {
+            "actionType": "JSFunction",
+            "method": "loadColumnsAndAddCellRenderer",
+            "inputData": {
+                "columnProvider": "{{data.columnProviders.handlersToggleColumnProvider}}",
+                "dataProvider": "{{data.dataProviders.handlersDataProvider}}"
+            },
+            "deps": "js/commandsSublocationService"
+        },
+        "loadChildCommands": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($commandId: ID!) { commandPlacements(filter: { parentGroupId: $commandId }) { id command { id title { value } } priority relativeTo { id title{value} } }}",
+                    "variables": {
+                        "commandId": "{{ctx.selected.props.cmdId.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "rawCommandInfo": "data.command",
+                "childCommandsInfo": "{{function:convertChildCommandsToVMOs}}"
+            },
+            "deps": "js/childCommandService"
+        },
+        "showChildCommandsData": {
+            "actionType": "dataProvider",
+            "method": "childCommandsDataProvider"
+        },
+        "getDefinitionCommandTitleI18Ns": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($filter: String){i18ns(filter:$filter){key source value}}",
+                    "variables": {
+                        "filter": "{{ctx.selected.props.title.dbValue}}"
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "titleI18NsArray": "{{function:convertTitleI18NsToLovEntries}}"
+            },
+            "deps": "js/commandsDefinitionService"
+        },
+        "notifyConfigChange": {
+            "actionType": "JSFunction",
+            "method": "notifyConfigChange",
+            "inputData": {
+                "path": "commandsViewModel"
+            },
+            "deps": "js/configurationService"
+        },
+        "loadChildCommandsColumnsAndAddCellRenderer": {
+            "actionType": "JSFunction",
+            "method": "loadCommandsColumnsAndAddCellRenderer",
+            "inputData": {
+                "columnProvider": "{{data.columnProviders.childCommandsColumnProvider}}",
+                "dataProvider": "{{data.dataProviders.childCommandsDataProvider}}",
+                "columnIndxs": [
+                    0,
+                    1
+                ],
+                "propName": "name"
+            },
+            "deps": "js/commandsSublocationService"
+        }
+    },
+    "data": {
+        "placementCommands": "aw_placement",
+        "handlerCommands": "aw_handler",
+        "placementChildCommand": "aw_placmentChildCmd"
+    },
+    "columnProviders": {
+        "handlersColumnProvider": {
+            "frozenColumnIndex": 0,
+            "loadColumnAction": "loadHandlersColumnsAndAddCellRenderer",
+            "columns": [ {
+                    "name": "",
+                    "displayName": "",
+                    "minWidth": 20,
+                    "width": 32,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": true,
+                    "enableSorting": false,
+                    "isTableCommand": true
+                },
+                {
+                    "name": "action",
+                    "displayName": "{{i18n.action}}",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "visibleWhen",
+                    "displayName": "{{i18n.visibleWhen}}",
+                    "maxWidth": 300,
+                    "minWidth": 100,
+                    "width": 200,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "enableWhen",
+                    "displayName": "{{i18n.enableWhen}}",
+                    "minWidth": 100,
+                    "width": 200,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "activeWhen",
+                    "displayName": "{{i18n.activeWhen}}",
+                    "minWidth": 100,
+                    "width": 200,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                }
+            ]
+        },
+        "handlersToggleColumnProvider": {
+            "frozenColumnIndex": 0,
+            "loadColumnAction": "loadHandlersToggleColumnsAndAddCellRenderer",
+            "columns": [ {
+                    "name": "",
+                    "displayName": "",
+                    "minWidth": 20,
+                    "width": 32,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": true,
+                    "enableSorting": false,
+                    "isTableCommand": true
+                },
+                {
+                    "name": "action",
+                    "displayName": "Action",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "visibleWhen",
+                    "displayName": "Visible When",
+                    "maxWidth": 300,
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "enableWhen",
+                    "displayName": "Enable When",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "activeWhen",
+                    "displayName": "Active When",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "selectWhen",
+                    "displayName": "Select When",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                }
+            ]
+        },
+        "placementsColumnProvider": {
+            "frozenColumnIndex": 0,
+            "loadColumnAction": "loadPlacementsColumnsAndAddCellRenderer",
+            "columns": [ {
+                    "name": "",
+                    "displayName": "",
+                    "minWidth": 20,
+                    "width": 32,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": true,
+                    "enableSorting": false,
+                    "isTableCommand": true
+                },
+                {
+                    "name": "anchor",
+                    "displayName": "Toolbar",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false,
+                    "renderingHint": "editLov"
+                },
+                {
+                    "name": "parentCommand",
+                    "displayName": "Command Group",
+                    "minWidth": 100,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false
+                },
+                {
+                    "name": "relativeTo",
+                    "displayName": "Relative To",
+                    "minWidth": 10,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false
+                },
+                {
+                    "name": "priority",
+                    "displayName": "Priority",
+                    "maxWidth": 300,
+                    "minWidth": 100,
+                    "width": 100,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": false,
+                    "enableSorting": false
+                }
+            ]
+        },
+        "childCommandsColumnProvider": {
+            "frozenColumnIndex": 0,
+            "loadColumnAction": "loadChildCommandsColumnsAndAddCellRenderer",
+            "columns": [ {
+                    "name": "",
+                    "displayName": "",
+                    "minWidth": 20,
+                    "width": 32,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "pinnedLeft": true,
+                    "enableSorting": false,
+                    "isTableCommand": true
+                },
+                {
+                    "name": "name",
+                    "displayName": "{{i18n.datasetName}}",
+                    "minWidth": 80,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "enableSorting": false,
+                    "pinnedLeft": false
+                },
+                {
+                    "name": "cmdId",
+                    "displayName": "{{i18n.id}}",
+                    "maxWidth": 300,
+                    "minWidth": 60,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "enableSorting": false,
+                    "pinnedLeft": false
+                },
+                {
+                    "name": "priority",
+                    "displayName": "{{i18n.priority}}",
+                    "minWidth": 60,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "enableSorting": false,
+                    "pinnedLeft": false
+                },
+                {
+                    "name": "relativeTo",
+                    "displayName": "{{i18n.relativeTo}}",
+                    "minWidth": 80,
+                    "width": 300,
+                    "enableColumnMenu": false,
+                    "enableColumnMoving": false,
+                    "enableSorting": false,
+                    "pinnedLeft": false
+                }
+            ]
+        }
+    },
+    "dataProviders": {
+        "handlersDataProvider": {
+            "action": "loadHandlers",
+            "commandsAnchor": "aw_deleteHandler",
+            "response": "{{data.handlerList}}",
+            "totalFound": "{{data.handlerList.length}}",
+            "selectionModelMode": "none"
+        },
+        "placementsDataProvider": {
+            "action": "loadPlacements",
+            "commandsAnchor": "aw_deletePlacement",
+            "response": "{{data.placementList}}",
+            "totalFound": "{{data.placementList.length}}",
+            "selectionModelMode": "none"
+        },
+        "getAnchorsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getAnchors",
+            "response": "{{data.anchors}}",
+            "totalFound": "{{data.anchors.length}}"
+        },
+        "getActionsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getActions",
+            "response": "{{data.actions}}",
+            "totalFound": "{{data.actions.length}}"
+        },
+        "getVisibleWhenConditionsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getVisibleWhenConditions",
+            "response": "{{data.visibleWhenConditions}}",
+            "totalFound": "{{data.visibleWhenConditions.length}}"
+        },
+        "getEnableWhenConditionsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getEnableWhenConditions",
+            "response": "{{data.enableWhenConditions}}",
+            "totalFound": "{{data.enableWhenConditions.length}}"
+        },
+        "getActiveWhenConditionsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getActiveWhenConditions",
+            "response": "{{data.activeWhenConditions}}",
+            "totalFound": "{{data.activeWhenConditions.length}}"
+        },
+        "getSelectWhenConditionsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getSelectWhenConditions",
+            "response": "{{data.selectWhenConditions}}",
+            "totalFound": "{{data.selectWhenConditions.length}}"
+        },
+        "getRelativeToCommandsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getRelativeToCommands",
+            "response": "{{data.relativeToCommands}}",
+            "totalFound": "{{data.relativeToCommands.length}}"
+        },
+        "getParentCommandsDP": {
+            "dataProviderType": "TcLOV",
+            "action": "getParentCommands",
+            "response": "{{data.parentCommands}}",
+            "totalFound": "{{data.parentCommands.length}}"
+        },
+        "childCommandsDataProvider": {
+            "action": "loadChildCommands",
+            "commandsAnchor": "aw_removeChild",
+            "response": "{{data.childCommandsInfo}}",
+            "totalFound": "{{data.childCommandsInfo.length}}",
+            "selectionModelMode": "none"
+        }
+    },
+    "grids": {
+        "handlersTable": {
+            "dataProvider": "handlersDataProvider",
+            "columnProvider": "handlersColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        },
+        "handlersToggleTable": {
+            "dataProvider": "handlersDataProvider",
+            "columnProvider": "handlersToggleColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        },
+        "placementsTable": {
+            "dataProvider": "placementsDataProvider",
+            "columnProvider": "placementsColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": false,
+                "enableSorting": false
+            }
+        },
+        "childCommandsTable": {
+            "dataProvider": "childCommandsDataProvider",
+            "columnProvider": "childCommandsColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "enablePinning": true,
+                "enableSorting": false
+            }
+        }
+    },
+    "functions": {
+        "convertPlacementsToVMOs": {
+            "functionName": "convertPlacementsToVMOs",
+            "parameters": [
+                "{{data.rawCommandInfo}}",
+                "{{data}}"
+            ]
+        },
+        "convertHandlersToVMOs": {
+            "functionName": "convertHandlersToVMOs",
+            "parameters": [
+                "{{data.rawCommandInfo}}",
+                "{{data}}"
+            ]
+        },
+        "convertCommandPropsToVMProps": {
+            "functionName": "convertCommandPropsToVMProps",
+            "parameters": [
+                "{{data.rawCommandInfo}}"
+            ]
+        },
+        "convertAnchorsToLovEntries": {
+            "functionName": "convertAnchorsToLovEntries"
+        },
+        "convertActionsToLovEntries": {
+            "functionName": "convertActionsToLovEntries"
+        },
+        "convertConditionsToLovEntries": {
+            "functionName": "convertConditionsToLovEntries"
+        },
+        "convertCommandsToLovEntries": {
+            "functionName": "convertCommandsToLovEntries"
+        },
+        "convertChildCommandsToVMOs": {
+            "functionName": "convertChildCommandsToVMOs",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isSelectedToggleCmdVisible": {
+            "expression": "ctx.selected.props.type.dbValue === 'TOGGLE'"
+        },
+        "isChildCommandVisible": {
+            "expression": "ctx.selected.props.type.dbValue === 'RIBBON' || ctx.selected.props.type.dbValue === 'GROUP' || ctx.selected.props.type.dbValue === 'SHUTTLE'"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "commandSummary.updatePlacements",
+            "action": "showPlacementsData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "commandSummary.updateCommonPlacements",
+            "criteria": {
+                "gridId": "placementsTable"
+            },
+            "action": "showPlacementsData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "commandSummary.updateHandlers",
+            "action": "showHandlersData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "commandSummary.updateChildren",
+            "action": "showChildCommandsData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "commandSummary.updateCommonPlacements",
+            "criteria": {
+                "gridId": "childCommandsTable"
+            },
+            "action": "showChildCommandsData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "showPlacementsData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "showHandlersData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "showChildCommandsData",
+            "condition": "ctx.selected.props.cmdId"
+        },
+        {
+            "eventId": "anchor.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updatePlacementAnchor"
+        },
+        {
+            "eventId": "relativeTo.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updatePlacementRelativeTo"
+        },
+        {
+            "eventId": "parentCommand.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updatePlacementParentCommand"
+        },
+        {
+            "eventId": "action.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateHandlerAction"
+        },
+        {
+            "eventId": "visibleWhen.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateVisibleWhenHandlerCondition"
+        },
+        {
+            "eventId": "enableWhen.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateEnableWhenHandlerCondition"
+        },
+        {
+            "eventId": "activeWhen.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateActiveWhenHandlerCondition"
+        },
+        {
+            "eventId": "selectWhen.lovValueChanged",
+            "cacheEventData": true,
+            "action": "updateSelectWhenHandlerCondition"
+        },
+        {
+            "eventId": "priority.blured",
+            "cacheEventData": true,
+            "condition": "prop.dbValue !== null && prop.dbValue !== undefined && prop.dbValue !== ''",
+            "action": "updatePlacementPriority"
+        },
+        {
+            "eventId": "placementsTable.plTable.loadMorePages",
+            "action": "firePlacementsEditHandlerStateChange"
+        },
+        {
+            "eventId": "handlersTable.plTable.loadMorePages",
+            "action": "fireHandlersEditHandlerStateChange"
+        },
+        {
+            "eventId": "handlersToggleTable.plTable.loadMorePages",
+            "action": "fireHandlersEditHandlerStateChange"
+        },
+        {
+            "eventId": "childCommandsTable.plTable.loadMorePages",
+            "action": "fireChildCommandsEditHandlerStateChange"
+        },
+        {
+            "eventId": "placementsTable.cellStartEdit",
+            "cacheEventData": true,
+            "action": "updateActivePlacementObject"
+        },
+        {
+            "eventId": "handlersTable.cellStartEdit",
+            "cacheEventData": true,
+            "action": "updateActiveHandlerObject"
+        },
+        {
+            "eventId": "handlersToggleTable.cellStartEdit",
+            "cacheEventData": true,
+            "action": "updateActiveHandlerObject"
+        },
+        {
+            "eventId": "childCommandsTable.cellStartEdit",
+            "cacheEventData": true,
+            "action": "updateActivePlacementObject"
+        },
+        {
+            "eventId": "commandSummary.notifyConfigChange",
+            "action": "notifyConfigChange"
+        }
+    ],
+    "i18n": {
+        "enableWhen": [
+            "CommandBuilderMessages"
+        ],
+        "activeWhen": [
+            "CommandBuilderMessages"
+        ],
+        "visibleWhen": [
+            "CommandBuilderMessages"
+        ],
+        "id": [
+            "CommandBuilderMessages"
+        ],
+        "priority": [
+            "CommandBuilderMessages"
+        ],
+        "relativeTo": [
+            "CommandBuilderMessages"
+        ],
+        "datasetName": [
+            "awAddDirectiveMessages"
+        ],
+        "action": [
+            "ActionBuilderMessages"
+        ]
+    }
+}

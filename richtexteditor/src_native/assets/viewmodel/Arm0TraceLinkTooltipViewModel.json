@@ -1,0 +1,191 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/visible-when.directive",
+        "js/aw-include.directive"
+    ],
+
+    "actions":{
+        "reveal":{
+            "actionType": "JSFunction",
+            "method": "getTooltipContentData",
+            "inputData":
+            {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData":
+            {
+                "tracelinkedItems.dbValue": ""
+            },
+            "events": {
+                "success": [
+                    {
+                        "name" : "Arm0TracelinkTooltip.refreshTracelinkedItemList"
+                    }
+                ]
+            },
+
+            "deps": "js/requirementsTooltipService"
+        },
+
+        "refreshTracelinkedItemList":
+        {
+            "actionType": "dataProvider",
+            "method": "tracelinkedItemList"
+        },
+        "tooltipOpenInNewTab": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "locale": "{{ctx.userSession.props.fnd0locale.dbValues[0]}}",
+                "pageId": "tc_xrt_Content",
+                "uid":
+                {
+                    "$adapt" : "{{data.eventMap['Arm0TracelinkTooltip.tooltipOpenInNewTab'].sourceObject}}",
+                    "path"  : "id"
+                },
+                "spageId": "{{i18n.documentationTitle}}",
+                "cmdId": "Awp0FullScreen"
+            },
+            "navigateIn": "newTab"
+        },
+        "openObjectInNewTab":
+        {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams":
+            {
+                "locale" : "{{ctx.userSession.props.fnd0locale.dbValues[0]}}",
+                "pageId": "tc_xrt_Content",
+                "uid":
+                {
+                    "$adapt" : "{{data.eventMap['Arm0TracelinkTooltip.openObjectInNewTab'].sourceObject}}",
+                    "path"  : "id"
+                },
+                "spageId": "FND_TraceLink",
+                "cmdId": "Awp0FullScreen"
+            },
+            "navigateIn": "newTab"
+        },
+
+
+
+        "showMoreTracelinks":
+        {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams":
+            {
+                "locale" : "{{ctx.userSession.props.fnd0locale.dbValues[0]}}",
+                "pageId": "tc_xrt_Content",
+                "uid":
+                {
+                    "$adapt" : "{{data.eventMap['Arm0TracelinkTooltip.showMoreTracelinks'].sourceObject}}",
+                    "path"  : "uid"
+                },
+                "spageId": "FND_TraceLink",
+                "cmdId": "Awp0FullScreen"
+            },
+            "navigateIn": "newTab"
+        },
+        "openSuspectTaskInNewTab": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams":
+            {
+                "uid": "{{data.eventMap['Arm0TracelinkTooltip.openSuspectTaskInNewTab'].sourceObjects[0]}}"
+            },
+            "navigateIn": "newTab"
+        }
+    },
+
+    "data": {
+        "clearTextTooltipCommands": "arm0_clearTextTooltipCommands",
+        "link": {
+            "displayName": "{{i18n.textName}}",
+            "type": "STRING",
+            "isRequired": "true"
+        },
+        "box1": {
+            "displayName": "",
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true",
+            "dbValue": "Test_Value"
+        },
+        "taskResults": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "displayName": "1",
+                    "isNull": "false"
+                },
+                {
+                    "displayName": "2",
+                    "isNull": "false"
+                },
+                {
+                    "displayName": "3",
+                    "isNull": "false"
+                }
+            ]
+        },
+        "tracelinkedItems": {
+            "isArray": "true",
+            "dbValue":
+            [
+            ]
+        }
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "Arm0TracelinkTooltip.refreshTracelinkedItemList",
+            "action": "refreshTracelinkedItemList"
+        },
+        {
+           "eventId": "Arm0TracelinkTooltip.showMoreTracelinks",
+           "cacheEventData": true,
+           "action": "showMoreTracelinks"
+        },
+        {
+           "eventId": "Arm0TracelinkTooltip.openObjectInNewTab",
+           "cacheEventData": true,
+           "action": "openObjectInNewTab"
+        },
+        {
+           "eventId": "Arm0TracelinkTooltip.openSuspectTaskInNewTab",
+           "cacheEventData": true,
+           "action": "openSuspectTaskInNewTab"
+        },
+        {
+           "eventId": "Arm0TracelinkTooltip.tooltipOpenInNewTab",
+           "cacheEventData": true,
+           "action": "tooltipOpenInNewTab"
+        },
+        {
+            "eventId":"Arm0TraceLinkTooltip.contentLoaded",
+            "action": "reveal"
+        }
+    ],
+
+    "dataProviders":
+    {
+        "tracelinkedItemList":
+        {
+            "response":"{{data.tracelinkedItems.dbValue}}",
+            "selectionModelMode": "single"
+         }
+    },
+
+    "i18n": {
+        "more":
+        [
+            "RequirementsCommandPanelsMessages"
+        ],
+        "documentationTitle": [
+            "RequirementsCommandPanelsMessages"
+        ]
+    }
+}

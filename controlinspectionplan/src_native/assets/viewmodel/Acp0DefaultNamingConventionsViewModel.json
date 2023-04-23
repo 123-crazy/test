@@ -1,0 +1,146 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-widget.directive",
+        "js/aw-flex-column.directive"
+    ],
+    "data": {
+        "acp0DefaultVarNamingConvention": {
+            "type": "STRING",
+            "dataProvider": "NCProvider",
+            "isRequired": "true"
+        },
+        "acp0DefaultAttNamingConvention": {
+            "type": "STRING",
+            "dataProvider": "NCProvider",
+            "isRequired": "true"
+        },
+        "acp0DefaultVisNamingConvention": {
+            "type": "STRING",
+            "dataProvider": "NCProvider",
+            "isRequired": "true"
+        },
+        "acp0DefaultVarNamingConvention_readonly": {
+            "type": "STRING",
+            "dataProvider": "NCProvider",
+            "isEditable": false
+        },
+        "acp0DefaultAttNamingConvention_readonly": {
+            "type": "STRING",
+            "dataProvider": "NCProvider",
+            "isEditable": false
+        },
+        "acp0DefaultVisNamingConvention_readonly": {
+            "type": "STRING",
+            "dataProvider": "NCProvider",
+            "isEditable": false
+        }
+    },
+
+    "dataProviders": {
+        "NCProvider": {
+            "response": "{{data.NamingConvention}}"
+        }
+    },
+
+    "actions": {
+        "loadData":{
+            "actionType": "JSFunction",
+            "method": "loadProperties",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0DefaultNamingConventionsService"
+        },
+        "editStateChanger":{
+            "actionType": "JSFunction",
+            "method": "DefNCEditStateChanger",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0DefaultNamingConventionsService"
+        },
+        "varNCChangeAction":{
+            "actionType": "JSFunction",
+            "method": "varNCChangeAction",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0DefaultNamingConventionsService"
+        },
+        "attNCChangeAction":{
+            "actionType": "JSFunction",
+            "method": "attNCChangeAction",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0DefaultNamingConventionsService"
+        },
+        "visNCChangeAction":{
+            "actionType": "JSFunction",
+            "method": "visNCChangeAction",
+            "inputData": {
+                "data" : "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Acp0DefaultNamingConventionsService"
+        }
+
+    },
+    "lifecycleHooks": {
+        "onInit": "loadData"
+    },
+    "i18n": {
+        "Acp0invalidNCBErrorMsg": ["ControlInspectionPlanMessages"]
+    },
+    "onEvent": [
+        {
+            "eventId": "editHandlerStateChange",
+            "action": "editStateChanger"
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "varNCChangeAction",
+            "criteria": {
+                "condition": "conditions.varNCChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "attNCChangeAction",
+            "criteria": {
+                "condition": "conditions.attNCChangeCondition"
+            },
+            "cacheEventData": true
+        },
+        {
+            "eventId": "condition.expressionValueChanged",
+            "action": "visNCChangeAction",
+            "criteria": {
+                "condition": "conditions.visNCChangeCondition"
+            },
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {
+        "varNCChangeCondition": {
+            "expression": "data.acp0DefaultVarNamingConvention.dbValue",
+            "trackValues": true
+        },
+        "attNCChangeCondition": {
+            "expression": "data.acp0DefaultAttNamingConvention.dbValue",
+            "trackValues": true
+        },
+        "visNCChangeCondition": {
+            "expression": "data.acp0DefaultVisNamingConvention.dbValue",
+            "trackValues": true
+        }
+    }
+}

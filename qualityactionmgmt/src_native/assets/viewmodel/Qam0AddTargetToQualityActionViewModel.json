@@ -1,0 +1,222 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-add.directive",
+        "js/aw-form.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive"
+    ],
+    "data": {
+        "addObjectPanelPinCommands": "qam0_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "actions": {
+        "createObject": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "addObject.startCreateObject"
+                } ]
+            },
+            "outputData": {
+                "createdObjectuid": "ServiceData.created[0]"
+            }
+        },
+        "completeEventClosePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "setCreateRelationType": {
+            "actionType": "JSFunction",
+            "method": "setCreateRelationType",
+            "inputData": {
+                "data": "{{data}}",
+                "location": "qam0Targets"
+            },
+            "deps": "js/Qam0AddQualityActionService"
+        },
+        "addTargetToQualityAction": {
+            "actionType": "JSFunction",
+            "method": "setPropertiesSOAinput",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "location": "qam0Targets"
+            },
+            "outputData": {
+                "inputData": "inputData",
+                "isAddToQualityActFlag": "isAddToQualityActFlag",
+                "addElement": "addElement"
+            },
+            "events": {
+                "success": [ {
+                        "condition": "data.addElement.length > 0",
+                        "name": "setpropertiesSOACallEvent"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+
+                    {
+                        "condition": "data.addElement.length === 1 && data.sourceObjects.length === data.addElement.length",
+                        "message": "SingleAddQualityActionSuccess"
+                    },
+                    {
+                        "condition": "data.addElement.length > 1 && data.sourceObjects.length === data.addElement.length",
+                        "message": "MultipleAddQualityActionSuccess"
+
+                    }
+                ]
+            },
+            "deps": "js/Qam0AddQualityActionService"
+        },
+        "setpropertiesSOACall": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info": "{{data.inputData}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [
+                                "{{ctx.xrtSummaryContextObject}}"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "deps": "js/Qam0AddQualityActionService"
+        },
+        "Qam0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Qam0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "functions": {
+
+    },
+    "onEvent": [ {
+            "eventId": "gwt.CreateOrAddObjectCompleteEvent",
+            "eventData": {
+                "createdObjs": [
+                    "{{data.createdChangeObject}}"
+                ]
+            },
+            "action": "completeEventClosePanel"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "setCreateRelationType"
+        },
+        {
+            "eventId": "setpropertiesSOACallEvent",
+            "action": "setpropertiesSOACall"
+        },
+        {
+            "eventId": "addToQualityAction.Qam0SetPin",
+            "cacheEventData": true,
+            "action": "Qam0SetPin"
+        },
+        {
+            "eventId": "addToQualityAction.Qam0SetUnPin",
+            "cacheEventData": true,
+            "action": "Qam0SetUnPin"
+        }
+    ],
+    "messages": {
+        "SingleAddQualityActionSuccess" : {
+            "messageType": "INFO",
+            "messageText": "{{i18n.SinglePasteSuccessInDependent}}",
+            "messageTextParams": [
+                "{{data.addElement[0]}}"
+            ]
+        },
+        "MultipleAddQualityActionSuccess" : {
+            "messageType": "INFO",
+            "messageText": "{{i18n.MultiplePasteSuccessInDependent}}",
+            "messageTextParams": [
+                "{{data.addElement.length}}"
+            ]
+        }
+    },
+    "conditions": {
+        "ispinned": {
+            "expression": "data.unpinnedToForm.dbValue"
+        },
+        "isRefreshRequired": {
+            "expression": "ctx.addObject.refreshFlag && !data.unpinnedToForm.dbValue"
+        },
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        }
+    },
+    "i18n": {
+        "addQualityActionCommandTitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "addTargetSourceSameFailureMessage": [
+            "QualityActionMgmtMessages"
+        ],
+        "pasteFailForExistDependentQualityAction": [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

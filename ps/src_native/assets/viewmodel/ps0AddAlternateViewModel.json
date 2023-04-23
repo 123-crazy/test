@@ -1,0 +1,397 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-footer.directive",
+        "js/visible-when.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-form.directive",
+        "js/aw-add.directive"
+    ],
+    "data": {
+        "pinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "ps0pincommands": "ps0_oneStepPinCommands"
+    },
+    "actions": {
+        "createAndAddAlternate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateInput}}"
+            },
+            "outputData": {
+                "createdMainObject": "output[0].objects[0]",
+                "createdObject": "{{function:getCreatedObject}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addAlternate.itemCreated"
+                    },
+                    {
+                        "name": "addAlternate.updateRecentUsedTypes"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "addAlternateFailure"
+                    }
+                ]
+            },
+            "deps": "js/addObjectUtils"
+        },
+        "refreshElementWithAlternate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-01-DataManagement",
+            "method": "refreshObjects",
+            "inputData": {
+                "objects": [
+                    "{{data.selectedObject}}",
+                    "{{data.primarySelection}}"
+                ]
+            },
+            "deps": "js/alternatesService"
+        },
+        "addAlternate": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-AWS2-2018-05-GlobalAlternate",
+            "method": "addAlternates",
+            "inputData": {
+                "element": {
+                    "uid": "{{data.selectedObject.uid}}",
+                    "type": "{{data.selectedObject.type}}"
+                },
+                "alternatesToBeAdded": "{{data.alternates}}"
+            },
+            "outputData": {
+                "partialErrors": "partialErrors",
+                "plain": "plain",
+                "errorMessage": "{{function:processPartialErrors}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relations": "",
+                            "relatedModified": [
+                                "{{data.primarySelection}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!_internal.conditionStates.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "addAlternate.clearDataAndLoadNextValues",
+                        "condition": "_internal.conditionStates.isPanelPinned"
+                    },
+                    {
+                        "name": "refreshElementWithAlternate"
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": false,
+                            "relations": "",
+                            "relatedModified": [
+                                "{{data.primarySelection}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "!_internal.conditionStates.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "addAlternateMultipleFailureMessage",
+                        "condition": "data.alternates.length > 1  && data.plain.length > 0"
+                    },
+                    {
+                        "message": "addAlternateFailure"
+                    }
+                ]
+            },
+            "deps": "js/alternatesService"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "condition": "!_internal.conditionStates.isPanelPinned",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "addSelectionsAsAlternate": {
+            "actionType": "JSFunction",
+            "method": "addSelectionsAsAlternate",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjects": {
+                    "$adapt": "{{ctx.xrtSummaryContextObject}}",
+                    "path": "uid"
+                }
+            },
+            "outputData": {},
+            "deps": "js/alternatesService"
+        },
+        "addSelectionsAsAlternateInTreeView":{
+            "actionType": "JSFunction",
+            "method": "addSelectionsAsAlternate",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjects": "{{ctx.selected.props.awb0Archetype.dbValues}}"
+            },
+            "outputData": {},
+            "deps": "js/alternatesService"
+        },
+        "revOccAddSelectionsAsAlternate": {
+            "actionType": "JSFunction",
+            "method": "addSelectionsAsAlternate",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjects": "{{ctx.xrtSummaryContextObject.props.awb0Archetype.dbValues}}"
+            },
+            "outputData": {},
+            "deps": "js/alternatesService"
+        },
+        "revOccAddSelectionsAsAlternateInTreeView": {
+            "actionType": "JSFunction",
+            "method": "addSelectionsAsAlternate",
+            "inputData": {
+                "data": "{{data}}",
+                "selectedObjects": "{{ctx.selected.props.awb0Archetype.dbValues}}"
+            },
+            "outputData": {},
+            "deps": "js/alternatesService"
+        },
+        "addSelectionAsAlternateActionHandler": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addSelectionAsAlternateForPaletteAndSearch"
+                    }
+                ]
+            }
+        },
+        "ps0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "ps0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "autoAssignProperty": {
+            "actionType": "JSFunction",
+            "method": "autoAssignProperty",
+            "inputData": {
+                "prop": "{{data.eventData.prop}}",
+                "operationType": "CREATE",
+                "pattern": "{{data.eventData.newPattern}}",
+                "selectedObj": "{{}}",
+                "hasRevRule": "{{data.hasRevRuleAttached}}"
+            },
+            "deps": "js/autoAssignService"
+        },
+        "clearDataAndLoadNextValues": {
+            "actionType": "JSFunction",
+            "method": "clearCreatedElementField",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "awPanel.loadNextValues"
+                    }
+                ]
+            },
+            "deps": "js/addElementService"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "addAlternate.itemCreated",
+            "condition": "conditions.notRevisableOccurrenceStructure",
+            "action": "addSelectionsAsAlternate"
+        },
+        {
+            "eventId": "addAlternate.itemCreated",
+            "condition": "conditions.notRevisableOccurrenceStructureInTreeView",
+            "action": "addSelectionsAsAlternateInTreeView"
+        },
+        {
+            "eventId": "addAlternate.itemCreated",
+            "condition": "conditions.isRevisableOccurrenceStructure",
+            "action": "revOccAddSelectionsAsAlternate"
+        },
+        {
+            "eventId": "addAlternate.itemCreated",
+            "condition": "conditions.isRevisableOccurrenceStructureInTreeView",
+            "action": "revOccAddSelectionsAsAlternateInTreeView"
+        },
+        {
+            "eventId": "addSelectionAsAlternateForPaletteAndSearch",
+            "condition": "conditions.notRevisableOccurrenceStructure",
+            "action": "addSelectionsAsAlternate"
+        },
+        {
+            "eventId": "addSelectionAsAlternateForPaletteAndSearch",
+            "condition": "conditions.notRevisableOccurrenceStructureInTreeView",
+            "action": "addSelectionsAsAlternateInTreeView"
+        },
+        {
+            "eventId": "addSelectionAsAlternateForPaletteAndSearch",
+            "condition": "conditions.isRevisableOccurrenceStructure",
+            "action": "revOccAddSelectionsAsAlternate"
+        },
+        {
+            "eventId": "addSelectionAsAlternateForPaletteAndSearch",
+            "condition": "conditions.isRevisableOccurrenceStructureInTreeView",
+            "action": "revOccAddSelectionsAsAlternateInTreeView"
+        },
+        {
+            "eventId": "refreshElementWithAlternate",
+            "action": "refreshElementWithAlternate"
+        },
+        {
+            "eventId": "addAlternate",
+            "action": "addAlternate"
+        },
+        {
+            "eventId": "primaryWorkArea.selectionChangeEvent",
+            "action": "closePanel",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "ps0SetPin",
+            "cacheEventData": true,
+            "action": "ps0SetPin"
+        },
+        {
+            "eventId": "ps0SetUnPin",
+            "cacheEventData": true,
+            "action": "ps0SetUnPin"
+        },
+        {
+            "eventId": "awPattern.newPatternSelected",
+            "cacheEventData": true,
+            "action": "autoAssignProperty"
+        },
+        {
+            "eventId": "addAlternate.clearDataAndLoadNextValues",
+            "action": "clearDataAndLoadNextValues"
+        }
+    ],
+    "functions": {
+        "getCreateInput": {
+            "functionName": "getCreateInput",
+            "parameters": [
+                "{{allowedTypeInfos}}"
+            ]
+        }
+    },
+    "conditions": {
+        "shouldShowAddButtonInNewTab": {
+            "expression": "data.selectedTab.panelId==='newTabPageSub' && data.creationType"
+        },
+        "shouldShowAddButtonInPaletteTab": {
+            "expression": "data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length > 0 || ctx.getFavoriteProvider.selectedObjects.length > 0  || ctx.getRecentObjsProvider.selectedObjects.length > 0)"
+        },
+        "shouldShowAddButtonInSearchTab": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.selectedTab.panelId!='paletteTabPageSub' && data.dataProviders.performSearch.selectedObjects.length > 0"
+        },
+        "isPanelPinned": {
+            "expression": "data.pinnedToForm.dbValue === false"
+        },
+        "singleAlternateSelectedToAdd": {
+            "expression": "data.alternates.length === 1"
+        },
+        "notRevisableOccurrenceStructure": {
+            "expression": "ctx.ViewModeContext.ViewModeContext !== 'TreeView' && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === undefined"
+        },
+        "notRevisableOccurrenceStructureInTreeView":{
+            "expression":"ctx.ViewModeContext.ViewModeContext === 'TreeView' && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === undefined"
+        },
+        "isRevisableOccurrenceStructure": {
+            "expression": "ctx.ViewModeContext.ViewModeContext !== 'TreeView' && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === true"
+        },
+        "isRevisableOccurrenceStructureInTreeView": {
+            "expression": "ctx.ViewModeContext.ViewModeContext === 'TreeView' && ctx.aceActiveContext.context.supportedFeatures.Awb0RevisibleOccurrenceFeature === true"
+        },
+        "isInTreeView":{
+            "expression":"ctx.ViewModeContext.ViewModeContext === 'TreeView'"
+        },
+        "isInNonTreeView":{
+            "expression":"ctx.ViewModeContext.ViewModeContext !== 'TreeView'"
+        }
+    },
+    "messages": {
+        "addAlternateMultipleFailureMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.addAlternateMultipleFailureMessage}}",
+            "messageTextParams": [
+                "{{data.plain.length}}",
+                "{{data.alternateObjectsToAdd.length}}",
+                "{{data.errorMessage}}"
+            ]
+        },
+        "addAlternateFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "add": [
+            "PSConstants"
+        ],
+        "addAlternateMultipleFailureMessage": [
+            "PSMessages"
+        ]
+    }
+}

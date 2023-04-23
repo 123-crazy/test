@@ -1,0 +1,95 @@
+{
+    "schemaVersion": "1.0.0",
+      "imports": [
+        "js/aw-add.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel.directive"
+    ],
+    "actions": {
+        "addQualityChecklistReference": {
+            "actionType": "JSFunction",
+            "method": "getCreateInputForCreateChecklistObject",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "outputData": {
+                "createdObjectForChecklistReferences": "",
+                "addElementResponse": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "createChecklistReferencesRelation"
+                }],
+                "failure": [ {
+                    "name": "addObject.addOprfailed"
+                } ]
+            },
+            "deps": "js/Aqc0UtilService"
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [{
+                    "primaryObject": "{{ctx.xrtSummaryContextObject}}",
+                    "secondaryObject": "{{data.createdObjectForChecklistReferences}}",
+                    "relationType": "Apm0QChecklistReferences",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                }]
+            },
+            "events": {
+                "success": [ {
+                    "name":"cdm.relatedModified",
+                    "eventData": {
+                        "relatedModified": [
+                            "{{ctx.selected}}"
+                        ]
+                    }
+                },
+                {
+                    "name": "complete",
+                    "eventData":
+                    {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "createChecklistReferencesRelation",
+            "action": "createRelation"
+        }
+    ],
+    "conditions": {
+        "isNewTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId=='newTabPageSub' && data.creationType"
+        },
+        "isPaletteSearchTabAddButtonVisible": {
+            "expression": "data.selectedTab.panelId!='newTabPageSub' && data.sourceObjects.length>0"
+        },
+        "isAddButtonVisible": {
+            "expression": "conditions.isPaletteSearchTabAddButtonVisible || conditions.isNewTabAddButtonVisible"
+        }
+    },
+    "data": {
+        "performAddOperation": true
+    },
+    "i18n": {
+        "apm0Add": [
+            "ApqpProgramMgmtMessages"
+        ],
+        "BACK_BUTTON_TITLE": [
+            "BaseMessages"
+        ]
+    }
+}

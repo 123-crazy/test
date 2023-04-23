@@ -1,0 +1,77 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-link-with-popup.directive",
+        "js/aw-include.directive"
+    ],
+    "actions": {
+        "initializeView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "populateContextKey"
+                },
+                {
+                    "action": "initializeArrangementConfigurationInfo"
+                }
+            ]
+        },
+        "populateContextKey": {
+            "actionType": "JSFunction",
+            "method": "populateContextKey",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceStructureConfigurationService"
+        },
+        "initializeArrangementConfigurationInfo": {
+            "actionType": "JSFunction",
+            "method": "initializeArrangementConfigurationInfo",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/aceArrangementsService"
+        },
+        "updateCurrentArrangement": {
+            "actionType": "JSFunction",
+            "method": "updateCurrentArrangement",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/aceArrangementsService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "initializeView"
+    },
+    "onEvent": [
+        {
+            "eventId": "awArrangementPanel.arrangementChanged",
+            "cacheEventData": true,
+            "condition": "conditions.isUpdateApplicable",
+            "action": "updateCurrentArrangement"
+        },
+        {
+            "eventId": "productContextChangedEvent",
+            "action": "initializeArrangementConfigurationInfo"
+        }
+
+    ],
+    "conditions": {
+        "isUpdateApplicable": {
+            "expression": "data.viewKey === viewKey"
+        }
+    },
+    "messages": {},
+
+    "data": {
+        "currentArrangement": {
+            "uiValue": "{{data.currentArrangement}}",
+            "type": "STRING"
+        }
+    },
+
+    "i18n": {
+        "arrangement": [ "OccurrenceManagementConstants" ]
+    }
+}

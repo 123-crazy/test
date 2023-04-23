@@ -1,0 +1,34 @@
+<aw-column class="awLargeTHeader" width="fill" aw-class="['aw-layout-locationPanel', data.locationPanelStyle, data.layoutSummaryOnlyStyle ]">
+    <header class="aw-layout-header">
+        <aw-row height="6.584f" class="aw-layout-header" wrap-style="nowrap" visible-when="!ctx.fullscreen" align-content="center">
+            <aw-column class="awHeader" width="fill" justify="left">
+                <aw-row align-content="center" class="aw-layout-headerTitleContainer">
+                    <aw-header-title headerVMO="data.headerViewModel" headerTitle="ctx['location.titles'].headerTitle" headerProperties="data.headerProperties"></aw-header-title>
+                    <aw-column width="fill">
+                        <aw-tab-set action="switchSubLocation" exist-when="data.subLocationTabs.length > 1 && !ctx.fullscreen" tabs="data.subLocationTabs" class="aw-layout-subLocationTitles"></aw-tab-set>
+                    </aw-column>
+                </aw-row>
+                <aw-row>
+                    <aw-sublocation-title>
+                        <div class="aw-layout-validationErrorMessage" exist-when="ctx.sublocationTitleErrorMessage">
+                            {{ctx.sublocationTitleErrorMessage}}
+                        </div>
+                        <aw-workarea-title provider="data.breadCrumbProvider" breadcrumb-config="data.breadcrumbConfig" exist-when="!ctx.sublocationTitleErrorMessage"></aw-workarea-title>
+                    </aw-sublocation-title>
+                </aw-row>
+            </aw-column>
+
+            <aw-column width="auto" align-content="end" justify="right">
+                <aw-row height="auto" align-content="center">
+                    <aw-global-search visible-when="!ctx.embeddedLocationView"></aw-global-search>
+                    <aw-logo></aw-logo>
+                </aw-row>
+            </aw-column>
+        </aw-row>
+    </header>
+    <aw-row height="fill" wrap-style="nowrap" class="aw-layout-subLocation afx-content-background">
+        <aw-column width="fill" wrap-style="nowrap">
+            <ui-view class="aw-layout-flexColumn"></ui-view>
+        </aw-column>
+    </aw-row>
+</aw-column>

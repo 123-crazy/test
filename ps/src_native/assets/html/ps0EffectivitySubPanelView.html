@@ -1,0 +1,30 @@
+    <div exist-when="!ctx.expressionEffectivity.isOnlyUnitEffectivityApplicable">
+        <aw-radiobutton prop="data.dateOrUnitEffectivityTypeRadioButton"></aw-radiobutton>
+        <div exist-when="data.dateOrUnitEffectivityTypeRadioButton.dbValue">
+            <div aw-init="prop=data.startDate">
+                <aw-date prop="data.startDate" exist-when="!data.isTimeEnabled"></aw-date>
+                <aw-datetime prop="data.startDate" exist-when="data.isTimeEnabled"></aw-datetime>
+            </div>
+            <div>
+                <aw-listbox prop="data.endDateOptions" list="data.endDateList.dbValue"></aw-listbox>
+                <aw-date prop="data.endDate" exist-when="data.endDateOptions.dbValue=='Date' && !data.isTimeEnabled" class="aw-endDate-authorEffectivityPanel"></aw-date>
+                <aw-datetime prop="data.endDate" exist-when="data.endDateOptions.dbValue=='Date' && data.isTimeEnabled" class="aw-endDate-authorEffectivityPanel"></aw-datetime>
+            </div>
+        </div>
+    </div>
+
+    <div exist-when="!data.dateOrUnitEffectivityTypeRadioButton.dbValue||ctx.expressionEffectivity.isOnlyUnitEffectivityApplicable">
+        <aw-command-panel-section caption="i18n.unitEffectivity" exist-when="ctx.expressionEffectivity.isOnlyUnitEffectivityApplicable"></aw-command-panel-section>
+        <aw-flex-row>
+            <aw-label prop="data.endItemLabel"></aw-label>
+            <aw-property-non-edit-val prop="data.endItemVal"></aw-property-non-edit-val>
+            <button type="button" class="aw-commands-commandIconButton aw-jswidgets-rmButton" title="{{data.i18n.replaceElementBtn}}" aw-click="data.ps0ReplaceButtonClickEvent()">
+                <aw-property-image name="cmdReplace"></aw-property-image>
+            </button>
+        </aw-flex-row>
+        <div>
+            <div aw-init="prop=data.unitRangeText">
+                <aw-textbox title="{{data.i18n.unitEffectivityTooltip}}" prop="data.unitRangeText"></aw-textbox>
+            </div>
+        </div>
+    </div>

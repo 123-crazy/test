@@ -1,0 +1,92 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-advanced-bar.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-chip-list.directive",
+        "js/aw-link.directive",
+        "js/exist-when.directive"
+    ],
+    "actions": {
+        "removeFilterChip": {
+            "actionType": "JSFunction",
+            "method": "removeFilter",
+            "inputData": {
+                "filterChips": "{{data.filterChips}}",
+                "chipToRemove": "{{chip}}"
+            },
+            "parameters": {
+                "chip": "{{chip}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "filtersDataProvider.reset"
+                    },
+                    {
+                        "name": "ganttBreadcrumb.filterChanged",
+                        "excludeLocalDataCtx": true
+                    }
+                ]
+            },
+            "deps": "js/SMGanttFilters"
+        },
+        "removeAllFilterChips": {
+            "actionType": "JSFunction",
+            "method": "removeAllFilters",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "filtersDataProvider.reset"
+                    },
+                    {
+                        "name": "ganttBreadcrumb.filterChanged",
+                        "excludeLocalDataCtx": true
+                    }
+                ]
+            },
+            "deps": "js/SMGanttFilters"
+        },
+        "refreshFilterChips": {
+            "actionType": "JSFunction",
+            "method": "refreshFilterChips",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "filtersDataProvider.reset"
+                } ]
+            },
+            "deps": "js/SMGanttFilters"
+        }
+    },
+    "data": {
+        "filterChips": [],
+        "clearAll": {
+            "displayName": "{{i18n.clear}}",
+            "type": "STRING",
+            "isRequired": "false"
+        }
+    },
+    "dataProviders": {
+        "filtersDataProvider": {
+            "type": "Static",
+            "response": "{{data.filterChips}}",
+            "selectionModelMode": "none"
+        }
+    },
+    "conditions": {},
+    "lifecycleHooks": {},
+    "onEvent": [ {
+        "eventId": "scheduleNavigation.updateFilters",
+        "action": "refreshFilterChips"
+    } ],
+    "i18n": {
+        "clear": [
+            "SearchMessages"
+        ]
+    }
+}

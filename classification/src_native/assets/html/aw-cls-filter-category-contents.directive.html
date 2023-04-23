@@ -1,0 +1,26 @@
+<div class="aw-base-normal aw-layout-flexRow aw-ui-filterCategoryCell"
+     ng-class="{'aw-ui-filterNameLabelSelected': filter.selected && isBulkFilter, 'aw-ui-filterNameLabel': !(filter.selected && isBulkFilter)}"
+     title="{{filter.name}}"
+     ng-click="select(category, filter, $event)">
+    <aw-checkbox prop="filter.itemInfo" action="{{checkboxAction}}" ng-if="isBulkFilter" class="aw-ui-filterCategoryCheckbox"></aw-checkbox>
+    <div ng-if="isBulkFilter" style="display: inherit;width: 100%;">
+        <span filterNameColorBlockId="filterLabelColorBlock1"
+                class="aw-searchcore-filterNameColorBlock {{filter.color}}"
+                visible-when="filter.showColor">&nbsp;
+        </span>
+        <div class="aw-searchcore-filterCategoryNameAndCountContainer aw-layout-flexRow">
+            <span class="aw-ui-filterCategoryName">{{filter.name}}&nbsp;</span>
+            <span class="aw-layout-flexRow aw-ui-filterCategoryCountContainer">
+                <span ng-if="category.type === 'RadioFilter' ">
+                    {{filter.count > 0 ? '(' +  filter.count + ')' : ''}}
+                </span>
+                <span ng-if="category.type !== 'RadioFilter' ">
+                    {{filter.showCount ? '(' +  filter.count + ')' : ''}}
+                </span>
+            </span>
+        </div>
+        <div class="aw-ui-filterCategoryShowSuffixIconContainer" ng-if="filter.showSuffixIcon">
+            <aw-icon class="aw-ui-filterCategoryShowSuffixIcon" icon-id="{{filter.suffixIconId}}"></aw-icon>
+        </div>
+    </div>
+</div>

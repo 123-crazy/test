@@ -1,0 +1,269 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-in-content-search-box.directive",
+        "js/aw-splm-table.directive",
+        "js/visible-when.directive"
+    ],
+     "data": {
+        "searchBox": {
+            "displayName": "",
+            "type": "STRING"
+        },
+        "unitSystem": {
+            "displayName": "{{i18n.unitSystemLabel}}",
+            "labelPosition": "PROPERTY_LABEL_AT_SIDE",
+            "type": "BOOLEAN",
+            "isRequired": "false",
+            "propertyRadioTrueText": "{{i18n.unitSystemMetric}}",
+            "propertyRadioFalseText": "{{i18n.unitSystemNonMetric}}"
+        }
+    },
+    "actions": {
+        "selectEvent":{
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "nodes.selectNode",
+                    "excludeLocalDataCtx": true
+                } ]
+            }
+        },
+        "selectNode":{
+            "actionType": "JSFunction",
+            "method": "selectNode",
+            "inputData": {
+                "data": "{{data}}",
+                "selected":"{{ctx.selected}}",
+                "type":"Attributes"
+            },
+            "deps":"js/classifyAdminService"
+        },
+        "deselectNode":{
+            "actionType": "JSFunction",
+            "method": "deselectNode",
+            "inputData": {
+                "data":"{{data}}",
+                "ctx":"{{ctx}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "selectPreviousNode":{
+            "actionType": "JSFunction",
+            "method": "selectPreviousNode",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx":"{{ctx.clsAdmin}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "resetScope":{
+            "actionType": "JSFunction",
+            "method": "resetScope",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProviderName": "nodes",
+                "type": "Nodes",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "parseExpansion":{
+            "actionType": "JSFunction",
+            "method": "parseExpansion",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx.clsAdmin}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "nodes.selectPreviousNode",
+                        "condition":"ctx.clsAdmin.clsTree.selectedTreeNode !== undefined && ctx.clsAdmin.clsTree.selectedTreeNode"
+                    }
+                ]
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadNodes": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "data": "{{data}}",
+                "dataProviderName": "nodes",
+                "type":"Nodes",
+                "ctx": "{{ctx.clsAdmin}}",
+                "isSearch": "{{function:checkSearch}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "nodes.expansion"
+                    }
+
+                ]
+            },
+            "outputData": {
+                "response": "tableSummaries"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadNodesForExpand": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadTreeTableData",
+            "inputData": {
+                "treeLoadInput": "request.treeLoadInput",
+                "data": "{{data}}",
+                "dataProviderName": "nodes",
+                "type":"Nodes",
+                "ctx": "{{ctx.clsAdmin}}",
+                "isSearch": false
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "nodes.expansion"
+                    }
+                ]
+            },
+            "outputData": {
+                "response": "tableSummaries"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadColumns": {
+            "actionType": "JSFunction",
+            "method": "loadColumns",
+            "inputData": {
+                "ctx": "{{ctx.clsAdmin}}",
+                "dataProvider": "{{data.dataProviders.nodes}}",
+                "gridoptions": "{{gridOptions}}"
+            },
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "loadPropertiesActionJS": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadPropertiesJS",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProviderName": "nodes",
+                "type": "Nodes",
+                "propertyLoadInput": "request.propertyLoadInput"
+            },
+            "outputData": {},
+            "deps": "js/classifyAdminTreeTableService"
+        },
+        "doSearch":
+        {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                {
+                    "name": "primaryWorkarea.reset"
+
+                } ]
+            }
+        }
+    },
+
+    "dataProviders": {
+        "nodes": {
+            "initializeAction": "loadNodes",
+            "nextAction": "loadNodesForExpand",
+            "focusAction": "loadNodes",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "editContext": "TABLE_CONTEXT",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "response": "data.response",
+            "selectionModelMode": "single"
+        },
+        "getTableDetails": {
+            "action": "loadPropertiesActionJS",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+    "columnProviders": {
+        "structureColumnProvider": {
+            "loadColumnAction": "loadColumns",
+            "columns": "{{data.columns}}",
+            "frozenColumnIndex" : -1,
+            "sortCriteria": []
+        }
+    },
+    "grids": {
+        "nodesTable": {
+            "dataProvider": "nodes",
+            "propertyProvider": "getTableDetails",
+            "columnProvider": "structureColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "useStaticFirstCol": true
+            }
+        }
+    },
+    "conditions": {
+
+    },
+    "onEvent": [
+        {
+            "eventId":"nodes.selectionChangeEvent",
+            "action":"selectEvent"
+        },
+        {
+            "eventId":"nodes.selectNode",
+            "action":"selectNode"
+        },
+        {
+            "eventId": "nodes.dataProvider.reset",
+            "action": "deselectNode"
+        },
+        {
+            "eventId": "nodes.expansion",
+            "action":"parseExpansion"
+        },
+        {
+            "eventId": "nodes.selectPreviousNode",
+            "action":"selectPreviousNode"
+        },
+        {
+            "eventId": "nodes.plTable.reload",
+            "action": "doSearch"
+        },
+        {
+            "eventId":"nodes.filterChangeEvent",
+            "action":"doSearch"
+        },
+        {
+            "eventId":"clsAdmin.setRelease",
+            "action":"doSearch"
+        }
+    ],
+    "messages":{
+
+    },
+    "functions": {
+        "checkSearch":
+        {
+            "functionName": "checkSearch",
+            "parameters":
+            [
+                "{{data}}"
+            ]
+        }
+    },
+    "i18n": {
+        "nodesTitle": [ "ClassificationAdminMessages" ],
+        "noResultsFound": [ "ClassificationAdminMessages" ],
+        "search": [ "ClassificationAdminMessages" ],
+        "and": [ "ClassificationAdminMessages" ],
+        "releases" : [ "ClassificationAdminMessages" ]
+    }
+}
+
+

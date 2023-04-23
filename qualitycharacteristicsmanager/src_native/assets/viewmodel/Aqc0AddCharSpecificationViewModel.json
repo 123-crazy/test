@@ -1,0 +1,678 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/visible-when.directive",
+        "js/aw-xrt.directive",
+        "js/aw-i18n.directive",
+        "js/exist-when.directive",
+        "js/aw-listbox.directive",
+        "js/aw-widget.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "JSFunction",
+            "method": "initialiseCreatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "varCharSpecLoaded"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CharManagerUtils2"
+        },
+        "loadUnitOfMeasure": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qc0UnitOfMeasure",
+                    "lovInput": {
+                        "operationName": "Edit",
+                        "boName": "Qc0VariableCharSpec"
+                    }
+                }
+            },
+            "outputData": {
+                "unitOfMeasureList": "{{function:getLOVList}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "loadLimitationValues": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qc0limitation",
+                    "lovInput": {
+                        "operationName": "Edit",
+                        "boName": "Qc0VariableCharSpec"
+                    }
+                }
+            },
+            "outputData": {
+                "limitationList": "{{function:getLOVList}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "loadClassificationValues": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qc0Criticality",
+                    "lovInput": {
+                        "operationName": "Edit",
+                        "boName": "Qc0MasterCharSpec"
+                    }
+                }
+            },
+            "outputData": {
+                "qc0CriticalityList": "{{function:getClassificationLOVList}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils2"
+        },
+        "loadToleranceTypeValues": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qc0ToleranceType",
+                    "lovInput": {
+                        "operationName": "Edit",
+                        "boName": "Qc0VariableCharSpec"
+                    }
+                }
+            },
+            "outputData": {
+                "ToleranceTypeList": "{{function:getLOVList}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "editEventAction": {
+            "actionType": "JSFunction",
+            "method": "processEditData",
+            "inputData": {
+                "data": "{{data}}",
+                "eventData": "{{data.eventData}}"
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "createCharSpecVar": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": "{{function:getCreateInputForSaveAsvarChar}}"
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "failureMsg": "{{function:getFailureMessage}}",
+                "ctx.createdObjectForTreeFromAddAction": "output[0].objects[0]",
+                "ctx.AddSpecificationFlagForTree": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "charSpecCreated",
+                        "condition": "data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "aqc0NullMapEventForAddCharSpecs",
+                        "condition": "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    },
+                    {
+                        "name" : "updatePinnedToForm"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": "{{conditions.isRefreshRequired}}",
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}",
+                            "relatedModified": [
+                                "{{data.qc0GroupReference}}"
+                            ],
+                            "createdObjects": [
+                                "{{data.createdObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValuesFCS",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "ctx.sublocation.nameToken === 'characteristicslibrary'",
+                        "message": "Aqc0CharSpecificationCreatedMessage"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "createCharSpecAtt": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "",
+                        "data": {
+                            "boName": "Qc0AttributiveCharSpec",
+                            "stringProps": {
+                                "qc0Criticality": "{{data.qc0Criticality.dbValue}}",
+                                "qc0Context": "{{data.qc0Context.dbValue}}",
+                                "object_name": "{{data.objectName.dbValue}}",
+                                "qc0OkDescription": "{{data.qc0OkDescription.dbValue}}",
+                                "qc0NokDescription": "{{data.qc0NokDescription.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}"
+                            },
+                            "tagProps": {
+                                "qc0GroupReference": {
+                                    "uid": "{{data.qc0GroupReference.uid}}",
+                                    "type": "{{data.qc0GroupReference.type}}"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "failureMsg": "{{function:getFailureMessage}}",
+                "ctx.createdObjectForTreeFromAddAction": "output[0].objects[0]",
+                "ctx.AddSpecificationFlagForTree": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "charSpecCreated",
+                        "condition": "data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "aqc0NullMapEventForAddCharSpecs",
+                        "condition": "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    },
+                    {
+                        "name" : "updatePinnedToForm"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": "{{conditions.isRefreshRequired}}",
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}",
+                            "relatedModified": [
+                                "{{data.qc0GroupReference}}"
+                            ],
+                            "createdObjects": [
+                                "{{data.createdObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValuesFCS",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "ctx.sublocation.nameToken === 'characteristicslibrary'",
+                        "message": "Aqc0CharSpecificationCreatedMessage"
+                    }
+                ]
+            },
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "createCharSpecVis": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [
+                    {
+                        "clientId": "",
+                        "data": {
+                            "boName": "Qc0VisualCharSpec",
+                            "stringProps": {
+                                "qc0Criticality": "{{data.qc0Criticality.dbValue}}",
+                                "qc0Context": "{{data.qc0Context.dbValue}}",
+                                "object_name": "{{data.objectName.dbValue}}",
+                                "object_desc": "{{data.object_desc.dbValue}}"
+                            },
+                            "tagProps": {
+                                "qc0GroupReference": {
+                                    "uid": "{{data.qc0GroupReference.uid}}",
+                                    "type": "{{data.qc0GroupReference.type}}"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "ctx.createdObjectForTreeFromAddAction": "output[0].objects[0]",
+                "ctx.AddSpecificationFlagForTree": true
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "charSpecCreated",
+                        "condition": "data.pinnedToForm.dbValue"
+                    },
+                    {
+                        "name": "aqc0NullMapEventForAddCharSpecs",
+                        "condition": "ctx.ViewModeContext.ViewModeContext === 'TreeSummaryView'"
+                    },
+                    {
+                        "name" : "updatePinnedToForm"
+                    },
+                    {
+                        "name": "primaryWorkarea.reset"
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "refreshLocationFlag": "{{conditions.isRefreshRequired}}",
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}",
+                            "relatedModified": [
+                                "{{data.qc0GroupReference}}"
+                            ],
+                            "createdObjects": [
+                                "{{data.createdObject}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "awPanel.loadNextValuesFCS",
+                        "condition": "data.unpinnedToForm.dbValue"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [
+                    {
+                        "condition": "ctx.sublocation.nameToken === 'characteristicslibrary'",
+                        "message": "Aqc0CharSpecificationCreatedMessage"
+                    }
+                ]
+            }
+        },
+        "closPanelHeader": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "Aqc0SetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Aqc0SetUnPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "generateNextValuesFCS": {
+            "actionType": "JSFunction",
+            "method": "autoAssignAllProperties",
+            "inputData": {
+                "data": "{{data}}",
+                "operationType": "CREATE"
+            },
+            "deps": "js/autoAssignService"
+        },
+        "generateNextValuesAndSubmit": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "generateNextValuesForProperties",
+            "inputData": {
+                "propertyNamingRuleInfo": [
+                    {
+                        "clientId": "",
+                        "operationType": 1,
+                        "businessObjectTypeName": "{{data.objCreateInfo.createType}}",
+                        "propertyNameAttachedPattern": {
+                            "object_name": "XX\"-\"XXX\"-\"nnnnnn"
+                        }
+                    }
+                ]
+            },
+            "outputData": {
+                "objectName.dbValue": "generatedValues[0].generatedValues.object_name.nextValue"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "callCreateObjectForVariable",
+                        "condition": "data.objCreateInfo.createType === 'Qc0VariableCharSpec'"
+                    },
+                    {
+                        "name": "callCreateObjectForAttributive",
+                        "condition": "data.objCreateInfo.createType === 'Qc0AttributiveCharSpec'"
+                    },
+                    {
+                        "name": "callCreateObjectForVisual",
+                        "condition": "data.objCreateInfo.createType === 'Qc0VisualCharSpec'"
+                    }
+                ]
+            }
+        },
+        "validateUnitofMeasure": {
+            "actionType": "JSFunction",
+            "method": "validateUnitofMeasure",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "isValid": "isValid"
+            },
+            "deps": "js/Aqc0CharManagerUtils",
+            "events": {
+                "success": [
+                    {
+                        "name": "unitOfMeasureValidated",
+                        "condition": "data.isValid"
+                    },
+                    {
+                        "name": "unitOfMeasureNotValid",
+                        "condition": "!data.isValid"
+                    }
+                ]
+            }
+        },
+        "throwValidationError": {
+            "actionType": "JSFunction",
+            "method": "throwValidationError",
+            "inputData": {},
+            "deps": "js/Aqc0CharManagerUtils"
+        },
+        "clearMapOfCharGroupAndSpecificationAction": {
+            "actionType": "JSFunction",
+            "method": "clearMapOfCharGroupAndSpecification",
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        },
+        "updatePinnedToForm": {
+            "actionType": "JSFunction",
+            "method": "updatePinnedToForm",
+            "inputData": {"data":"{{data}}"},
+            "deps": "js/Aqc0CharLibraryTreeTableService"
+        }
+    },
+    "data": {
+        "qc0Criticality": {
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "qc0limitation": {
+            "displayName": "{{i18n.Limitation}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "qc0ToleranceType": {
+            "displayName": "{{i18n.ToleranceType}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "qc0UnitOfMeasure": {
+            "displayName": "{{i18n.UnitOfMeasure}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "qc0NominalValue": {
+            "displayName": "{{i18n.NominalValue}}",
+            "type": "DOUBLE",
+            "isRequired": "true",
+            "isEditable": "true"
+        },
+        "objectName": {
+            "displayName": "{{i18n.Name}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "true"
+        },
+        "qc0UpperTolerance": {
+            "displayName": "{{i18n.UpperTolerance}}",
+            "type": "DOUBLE",
+            "isRequired": "false",
+            "isEditable": "true"
+        },
+        "qc0LowerTolerance": {
+            "displayName": "{{i18n.LowerTolerance}}",
+            "type": "DOUBLE",
+            "isRequired": "false",
+            "isEditable": "true"
+        },
+        "createObject": {
+            "type": "",
+            "typeName": ""
+        },
+        "Aqc0pinCommands": "aqc0_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        },
+        "qc0OkDescription": {
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true"
+        },
+        "qc0NokDescription": {
+            "type": "STRING",
+            "isRequired": "false",
+            "isEditable": "true"
+        }
+    },
+    "messages": {
+        "Aqc0CharSpecificationCreatedMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Aqc0CharSpecificationCreated}}",
+            "messageTextParams": [
+                "{{data.createdObject.props.object_name.dbValues[0]}}"
+            ]
+        }
+    },
+    "functions": {
+        "getUnitOfMeasure": {
+            "functionName": "validateUnitofMeasure",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getCreateInputForSaveAsvarChar": {
+            "functionName": "getCreateInputForSaveAsvarChar",
+            "parameters": [
+                "{{data}}",
+                "create"
+            ]
+        },
+        "getFailureMessage": {
+            "functionName": "getFailureMessage",
+            "parameters": [
+                "{{data}}"
+            ]
+        }
+    },
+    "conditions": {
+        "isRefreshRequired": {
+            "expression": "ctx.addObject.refreshFlag && !data.unpinnedToForm.dbValue"
+        },
+        "aqc0IsCharLibrarySubLocation": {
+            "expression": "ctx.sublocation.nameToken === 'characteristicslibrary' && ctx.selected && ctx.selected.modelType.typeHierarchyArray.indexOf( 'Qc0CharacteristicsGroup' ) > -1"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "charSpecCreated",
+            "action": "closPanelHeader"
+        },
+        {
+            "eventId": "addCharSpecPanel.Aqc0SetPin",
+            "cacheEventData": true,
+            "action": "Aqc0SetPin"
+        },
+        {
+            "eventId": "addCharSpecPanel.Aqc0SetUnPin",
+            "cacheEventData": true,
+            "action": "Aqc0SetUnPin"
+        },
+        {
+            "eventId": "awPanel.loadNextValuesFCS",
+            "action": "generateNextValuesFCS"
+        },
+        {
+            "eventId": "callCreateObjectForVariable",
+            "action": "validateUnitofMeasure"
+        },
+        {
+            "eventId": "callCreateObjectForAttributive",
+            "action": "createCharSpecAtt"
+        },
+        {
+            "eventId": "callCreateObjectForVisual",
+            "action": "createCharSpecVis"
+        },
+        {
+            "eventId": "unitOfMeasureValidated",
+            "action": "createCharSpecVar"
+        },
+        {
+            "eventId": "unitOfMeasureNotValid",
+            "action": "throwValidationError"
+        },
+        {
+            "eventId": "varCharSpecLoaded",
+            "condition": "data.createObject.type === 'Qc0VariableCharSpec'",
+            "action": "loadUnitOfMeasure"
+        },
+        {
+            "eventId": "varCharSpecLoaded",
+            "action": "loadClassificationValues"
+        },
+        {
+            "eventId": "varCharSpecLoaded",
+            "condition": "ctx.isLimitationSupported",
+            "action": "loadLimitationValues"
+        },
+        {
+            "eventId": "varCharSpecLoaded",
+            "condition": "ctx.isToleranceTypeSupported",
+            "action": "loadToleranceTypeValues"
+        },
+        {
+            "eventId": "editHandlerStateChange",
+            "cacheEventData": true,
+            "action": "editEventAction"
+        },
+        {
+            "eventId": "aqc0NullMapEventForAddCharSpecs",
+            "action": "clearMapOfCharGroupAndSpecificationAction"
+        },
+        {
+            "eventId": "updatePinnedToForm",
+            "action": "updatePinnedToForm"
+        }
+    ],
+    "i18n": {
+        "UpperTolerance": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "LowerTolerance": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "addButtonTitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Aqc0AddCharSpecificationTitle": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Aqc0CharSpecificationCreated": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Limitation": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "NominalValue": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Name": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "ToleranceType": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "UnitOfMeasure": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "ClassificationType": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "Criticality": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "OkCondition": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "NotOkCondition": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "OkDescription": [
+            "qualitycharacteristicsmanagerMessages"
+        ],
+        "NotOkDescription": [
+            "qualitycharacteristicsmanagerMessages"
+        ]
+    }
+}

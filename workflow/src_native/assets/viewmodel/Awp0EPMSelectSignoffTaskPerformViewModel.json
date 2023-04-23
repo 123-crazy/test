@@ -1,0 +1,64 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-panel.directive",
+        "js/visible-when.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-command-sub-panel.directive"
+    ],
+
+    "actions":
+    {
+        "reveal":
+        {
+            "actionType": "JSFunction",
+            "method": "populateSubPanel",
+            "inputData":
+            {
+                "data": "{{data}}"
+            },
+
+            "deps": "js/Awp0EPMSSTTaskPerform"
+        },
+        "registerPerformPanelProps": {
+            "actionType": "JSFunction",
+            "method": "registerPerformPanelProps",
+            "deps": "js/Awp0PerformTask"
+        },
+        "unregisterPerformPanelProp": {
+            "actionType": "JSFunction",
+            "method": "unregisterPerformPanelProp",
+            "deps": "js/Awp0PerformTask"
+        }
+    },
+
+    "onEvent":
+    [
+        {
+            "eventId": "Awp0EPMSelectSignoffTaskPerform.contentLoaded",
+            "action": "reveal"
+        },
+        {
+           "eventId": "Awp0EPMSelectSignoffTaskPerform.contentLoaded",
+            "action": "registerPerformPanelProps"
+        },
+        {
+            "eventId": "Awp0EPMSelectSignoffTaskPerform.contentUnloaded",
+            "action": "unregisterPerformPanelProp"
+        },
+        {
+            "eventId": "Awp0PerformTask.updateInternalPanel",
+            "action": "reveal"
+        }
+    ],
+
+    "i18n":
+    {
+        "performTask":
+        [
+            "InboxMessages"
+        ]
+    }
+
+}

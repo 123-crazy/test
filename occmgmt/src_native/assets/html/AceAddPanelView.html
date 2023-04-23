@@ -1,0 +1,29 @@
+<aw-panel-header>
+    <aw-panel-section caption="i18n.toTitle">
+        <aw-default-cell vmo="ctx.aceActiveContext.context.addElement.parent"></aw-default-cell>
+    </aw-panel-section>
+</aw-panel-header>
+<aw-form name="createInputsFormValidator" aw-form-validator="">
+    <aw-form name="createInputs">
+    <aw-add include-types="{{data.allowedTypeInfo.objectTypeName}}" type-filter="{{data.allowedTypeInfo.searchTypeName}}" load-sub-types="false" max-recent-count="5" exist-when="data.allowedTypeInfo" visible-tabs="{{data.allowedTypeInfo.allowedTabs}}" preferred-type="{{data.allowedTypeInfo.preferredType}}" is-include-sub-types="data.isIncludeSubTypes"></aw-add>
+        <aw-command-panel-section
+            exist-when="ctx.aceActiveContext.context.addElement.AddOccurrencePropertiesOnCreate==='true' && ctx.aceActiveContext.context.supportedFeatures.Awb0BulkAddFeature && !ctx.aceActiveContext.context.isMarkupEnabled && ((data.selectedTab.panelId==='paletteTabPageSub' && (ctx.getClipboardProvider.selectedObjects.length >= 1 || ctx.getFavoriteProvider.selectedObjects.length >= 1 || ctx.getRecentObjsProvider.selectedObjects.length >= 1 )) || (data.selectedTab.panelId==='resultsTabPageSub' && data.dataProviders.performSearch.selectedObjects.length >= 1 ))"
+            caption="i18n.addElementProperties" collapsed="false">
+            <aw-command-sub-panel panel-id="Awb0ElementCreateSub" isolate-mode="true"></aw-command-sub-panel>
+        </aw-command-panel-section>
+    <aw-numeric prop="data.numberOfElements" visible-when="(ctx.aceActiveContext.context.addElement.AddOccurrencePropertiesOnCreate!=='true' || ctx.aceActiveContext.context.isMarkupEnabled ) && ctx.aceActiveContext.context.supportedFeatures.Awb0BulkAddFeature && conditions.isSingleElementSelected"></aw-numeric>
+    </aw-form>
+    <aw-panel-footer>
+        <aw-button action="createAndAddElement" visible-when="createInputs.$valid && createInputsFormValidator.$valid && conditions.isNewTabAddButtonVisible" >
+            <aw-i18n>i18n.addElementBtn</aw-i18n>
+        </aw-button>
+        <aw-button action="addElements" visible-when="createInputsFormValidator.$valid && (( conditions.isSingleElementSelected && (conditions.isAddOccurrencePropertiesOnCreateSupported || conditions.areNumberOfElementsValid)) || conditions.areMultipleElementSelected)" >
+            <aw-i18n>i18n.addElementBtn</aw-i18n>
+        </aw-button>
+        <aw-button default="false" action="getPropertiesToCopy" visible-when="createInputsFormValidator.$valid && (( conditions.isSingleElementSelected && ctx.aceActiveContext.context.addElement.isCopyButtonEnabled && (conditions.isAddOccurrencePropertiesOnCreateSupported || conditions.areNumberOfElementsValid)) || (conditions.areMultipleElementSelected && ctx.aceActiveContext.context.addElement.isCopyButtonEnabled))" >
+            <aw-i18n>i18n.addElementCopyButtonText</aw-i18n>
+        </aw-button>
+    </aw-panel-footer>
+</aw-form>
+
+

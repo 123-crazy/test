@@ -1,0 +1,390 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/exist-when.directive",
+        "js/aw-i18n.directive",
+        "js/aw-listbox.directive",
+        "js/aw-textbox.directive"
+    ],
+    "actions": {
+        "createCondAndAddExpr": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "createObjects",
+            "inputData": {
+                "input": [ {
+                    "clientId": "",
+                    "data": {
+                        "boName": "Acp0RuleCondition",
+                        "tagProps": {
+                            "acp0NamingConventionRef": {
+                                "type":"Acp0NamingConvention",
+                                "uid":"{{data.acp0NamingConvention.dbValue.uid}}"
+                            }
+                        },
+                        "stringArrayProps":{
+                            "acp0Expresison": ["{{data.sourceAttribute.dbValue}} {{data.relation.uiValue}} {{data.attributeValue.uiValue}}"]
+                        }
+                    }
+                } ]
+            },
+            "outputData": {
+                "createdCondObject": "output[0].objects[0]"
+            },
+            "events": {
+                "success": [
+                {
+                    "name": "acp0.setPropForAddConditionOnRule"
+                }
+             ]
+            }
+        },
+        "setPropForAddConditionOnRule": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info":
+                [
+                    {
+                        "object": "{{ctx.selected}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [
+                            {
+                                "name": "acp0RuleCondition",
+                                "values":"{{function:getCondorExpToAdd}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "condExprGrid.plTable.reload",
+                        "condition": "ctx.selected.type === 'Acp0Rule'"
+                    },
+                    {
+                        "name":"acp0exprsCreated",
+                        "eventData": {
+                            "createdGroups": [
+                                "{{data.createdCondObject}}"
+                            ],
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.editInProgress && ctx.selected && ctx.selected.modelType.typeHierarchyArray.indexOf('Acp0Rule') > -1",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.selected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "ctx.editInProgress && ctx.selected && ctx.selected.modelType.typeHierarchyArray.indexOf('Acp0Rule') > -1"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "addConditionSuccessfulMessage"
+                }
+             ]
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "addExprInCond": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2010-09-DataManagement",
+            "method": "setProperties",
+            "inputData": {
+                "info":
+                [
+                    {
+                        "object": "{{ctx.selected}}",
+                        "timestamp": "",
+                        "vecNameVal":
+                        [   {
+                                "name": "acp0Expresison",
+                                "values":"{{function:getCondorExpToAdd}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "acp0.expandCondNodeAftrAddExpr"
+                    },
+                    {
+                        "name":"acp0exprsCreated",
+                        "eventData": {
+                            "createdGroups": [
+                                "{{data.createdCondObject}}"
+                            ],
+                            "isPinnedFlag": "{{data.unpinnedToForm.dbValue}}"
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData":
+                        {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+                        "name": "cdm.relatedModified",
+                        "condition": "ctx.editInProgress && ctx.pselected && ctx.pselected.modelType.typeHierarchyArray.indexOf('Acp0Rule') > -1",
+                        "eventData": {
+                            "refreshLocationFlag": true,
+                            "relatedModified": [
+                                "{{ctx.pselected}}"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "primaryWorkarea.reset",
+                        "condition": "ctx.editInProgress && ctx.pselected && ctx.pselected.modelType.typeHierarchyArray.indexOf('Acp0Rule') > -1"
+                    }
+                ]
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "expandCondNodeAftrAddExpr": {
+            "actionType": "JSFunction",
+            "method": "expandCondNodeAftrAddorRemoveExpr",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "loadRequiredLOVValues": {
+            "actionType": "JSFunction",
+            "method": "loadRequiredLOVValues",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+        "ncSelectionChange": {
+            "actionType": "JSFunction",
+            "method": "loadSourceAttributeLOVValues",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/Acp0RuleNCCondUtils"
+        },
+
+        "Acp0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "Acp0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        }
+    },
+    "conditions": {
+        "isWithOperatorPanelVisible": {
+            "expression": "ctx.selected && ctx.selected.type === 'Acp0RuleCondition' && ctx.selected.props.acp0Expresison.dbValues.length > 0"
+        },
+        "ncVisibleOnPanel": {
+            "expression": "ctx.selected && ctx.selected.type === 'Acp0Rule'"
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "Acp0AddExprsForCondBuild.contentLoaded",
+            "action": "loadRequiredLOVValues"
+        },
+        {
+            "eventId": "Acp0AddExprsForCondBuild.contentLoaded",
+            "action": "ncSelectionChange"
+        },
+        {
+            "eventId": "acp0.setPropForAddConditionOnRule",
+            "action": "setPropForAddConditionOnRule"
+        },
+        {
+            "eventId": "acp0.expandCondNodeAftrAddExpr",
+            "action": "expandCondNodeAftrAddExpr"
+        },
+        {
+            "eventId": "addExpresPanel.Acp0SetPin",
+            "cacheEventData": true,
+            "action": "Acp0SetPin"
+          },
+          {
+            "eventId": "addExpresPanel.Acp0SetUnPin",
+            "cacheEventData": true,
+            "action": "Acp0SetUnPin"
+          }
+    ],
+
+    "functions": {
+        "getCondorExpToAdd":
+        {
+            "functionName": "getCondorExpToAdd",
+            "parameters":
+            [
+                "{{ctx}}","{{data}}"
+            ]
+        },
+        "loadRequiredLOVValues": {
+            "functionName": "loadRequiredLOVValues",
+            "parameters":
+            [
+                "{{ctx}}","{{data}}"
+            ]
+        }
+    },
+    "data": {
+        "acp0NamingConvention": {
+            "displayName": "{{i18n.namingConvention}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isRequired": true
+        },
+        "operator": {
+            "displayName": "{{i18n.operator}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isRequired": true
+        },
+        "OperatorValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "{{i18n.AND}}",
+                    "dispValue": "{{i18n.AND}}",
+                    "propInternalValue": "&&"
+                },
+                {
+                    "propDisplayValue": "{{i18n.OR}}",
+                    "dispValue": "{{i18n.OR}}",
+                    "propInternalValue": "||"
+                }
+            ]
+        },
+        "sourceAttribute": {
+            "displayName": "{{i18n.sourceAttribute}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isRequired": true
+        },
+        "relation": {
+            "displayName": "{{i18n.relation}}",
+            "type": "STRING",
+            "hasLov": true,
+            "isRequired": true
+        },
+        "RelationValues": {
+            "type": "STRING",
+            "dbValue": [
+                {
+                    "propDisplayValue": "==",
+                    "dispValue": "==",
+                    "propInternalValue": "=="
+                },
+                {
+                    "propDisplayValue": "!=",
+                    "dispValue": "!=",
+                    "propInternalValue": "!="
+                },
+                {
+                    "propDisplayValue": ">",
+                    "dispValue": ">",
+                    "propInternalValue": ">"
+                },
+                {
+                    "propDisplayValue": ">=",
+                    "dispValue": ">=",
+                    "propInternalValue": ">="
+                },
+                {
+                    "propDisplayValue": "<",
+                    "dispValue": "<",
+                    "propInternalValue": "<"
+                },
+                {
+                    "propDisplayValue": "<=",
+                    "dispValue": "<=",
+                    "propInternalValue": "<="
+                }
+            ]
+        },
+        "attributeValue": {
+            "displayName": "{{i18n.attributeValue}}",
+            "type": "STRING",
+            "isRequired": true
+        },
+        "Acp0pinCommands": "acp0_oneStepPinCommands",
+        "pinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+
+        "unpinnedToForm":
+        {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+    "messages": {
+        "addConditionSuccessfulMessage": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.addCondition}}",
+            "messageTextParams": [
+                "{{data.acp0NamingConvention.uiValue}}"
+            ]
+        }
+    },
+    "i18n": {
+        "addCondition": ["ControlInspectionPlanMessages"],
+        "attributeValue": ["ControlInspectionPlanMessages"],
+        "commandPanelTitle": ["ControlInspectionPlanMessages"],
+        "namingConvention": ["ControlInspectionPlanMessages"],
+        "operator": ["ControlInspectionPlanMessages"],
+        "propertiesForAddExpr": ["ControlInspectionPlanMessages"],
+        "relation": ["ControlInspectionPlanMessages"],
+        "sourceAttribute": ["ControlInspectionPlanMessages"]
+    }
+}

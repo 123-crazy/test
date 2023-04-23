@@ -1,0 +1,344 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-list.directive",
+        "js/aw-avatar.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-parse-html.directive",
+        "js/visible-when.directive",
+        "js/aw-link.directive",
+        "js/aw-click.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-include.directive",
+        "js/aw-label.directive",
+        "js/aw-i18n.directive",
+        "js/aw-pic.directive",
+        "js/enable-when.directive"
+    ],
+    "actions": {
+        "isInputTextValidAction":
+        {
+            "actionType": "JSFunction",
+            "method": "isInputTextValid",
+            "inputData": {
+                "data": "{{data}}",
+                "isInputTextValidVal": "{{data.eventData.isTextValid}}"
+            },
+            "deps": "js/Ac0CreateCollabObjectService"
+        },
+
+        "doCommentsDataProvider": {
+            "actionType": "dataProvider",
+            "method": "commentsDataProvider"
+        },
+
+        "searchComments": {
+            "actionType": "GraphQL",
+            "serviceName": "",
+            "inputData": {
+                "request": {
+                    "query": "query($searchInput:SearchInput){collabCommentList(searchInput:$searchInput){totalFound totalLoaded cursor results{uid type typeHierarchy typeIconURL thumbnailURL collabPlainText collabRichText collabAutoMsgType collabCreateUserId{uid user_id object_string} collabNumResponses collabDateModified collabRootComment collabRelatedObjectInfo { ... on ClientObject { uid type cellHeader1 thumbnailURL } ... on CollabSnapshotObject { uid type cellHeader1 thumbnailURL }} }}}",
+                    "variables": {
+                        "searchInput": {
+                            "searchCriteria": {
+                                "SearchMode": "commentsForConversation",
+                                "ObjectUID": "{{function:getConvObjectUID}}"
+                            },
+                            "maxToLoad": 5,
+                            "maxToReturn": 5,
+                            "searchFilterFieldSortType": "{{ctx.search.sortType}}",
+                            "cursor": {
+                                "startIndex": "{{data.dataProviders.commentsDataProvider.startIndex}}",
+                                "endIndex": "{{function:getCursorEndIndexValue}}",
+                                "startReached": "{{function:getCursorEndReachedValue}}",
+                                "endReached": "{{function:getCursorStartReachedValue}}"
+                            },
+                            "inflateProperties": false
+                        }
+                    }
+                },
+                "endPoint": "graphql"
+            },
+            "outputData": {
+                "totalFound": "data.collabCommentList.totalFound",
+                "searchResults": "data.collabCommentList.results",
+                "dataProviders.commentsDataProvider.cursorObject": "data.collabCommentList.cursor",
+                "dataProviders.commentsDataProvider.cursorObject.startReached": true
+            },
+            "dataParsers": [{
+                "id": "searchCommDataParser",
+                "responseObjs": "data.collabCommentList.results"
+            }],
+            "events": {
+                "success": [ {
+                    "name": "Ac0Conversation.commentsListLoaded"
+                } ]
+            },
+            "deps": "js/Ac0ConversationUtils"
+        },
+
+        "noop": {
+            "actionType": "JSFunction",
+            "method": "getRandObjId",
+            "deps": "js/Ac0ConversationService"
+        },
+
+        "reply": {
+            "actionType": "JSFunctionAsync",
+            "method": "replyBoxAction",
+            "deps": "js/Ac0ConversationService",
+            "inputData": {
+                "convData": "{{subPanelContext}}",
+                "vmData": "{{data}}"
+            }
+        },
+
+        "loadMore": {
+            "actionType": "JSFunction",
+            "method": "loadMoreAction",
+            "deps": "js/Ac0ConversationService",
+            "inputData": {
+                "vmData": "{{data}}",
+                "currentCommentCtx": "{{subPanelContext}}"
+            }
+        },
+
+        "invokeAdvanced": {
+            "actionType": "JSFunction",
+            "method": "navigateToCreateComment",
+            "deps": "js/Ac0ConversationService",
+            "inputData": {
+                "vmData": "{{data}}",
+                "convData": "{{subPanelContext}}"
+            }
+
+        },
+
+        "modifyCommentsPostLoad": {
+            "actionType": "JSFunction",
+            "method": "modifyComments",
+            "deps": "js/Ac0ConversationService",
+            "inputData": {
+                "vmData": "{{data}}",
+                "convData": "{{subPanelContext}}"
+            }
+        },
+
+        "teardownCommentsPanel": {
+            "actionType": "JSFunction",
+            "method": "teardownCommentsPanel",
+            "deps": "js/Ac0ConversationUtils",
+            "inputData": {
+                "vmData": "{{data}}",
+                "convContext": "{{subPanelContext}}"
+            }
+        },
+
+        "initCommentsPanel": {
+            "actionType": "JSFunctionAsync",
+            "method": "initCommentsPanel",
+            "deps": "js/Ac0ConversationUtils",
+            "inputData": {
+                "vmData": "{{data}}",
+                "convContext": "{{subPanelContext}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "Ac0Conversation.initCommentsPanelComplete"
+                } ]
+            }
+        },
+
+        "checkCKEInputTextValidity": {
+            "actionType": "JSFunction",
+            "method": "checkCKEInputTextValidityAndPublishEvent",
+            "inputData": {
+                "cke": "{{data.ckeInstance.cke._instance}}"
+            },
+            "deps": "js/Ac0CreateCollabObjectService"
+        }
+    },
+
+    "data": {
+        "replyPlaceHolder": {
+            "displayName": "{{i18n.reply}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "isEditable": "false",
+            "dbValue": "",
+            "dispValue": ""
+       },
+        "replyButton": "{{i18n.reply}}",
+        "loadMoreButton": "{{i18n.moreReplies}}",
+        "loadMoreComments": false,
+        "hideReplyBox": true,
+        "hideMoreRepliesButton": true,
+        "moreCommentsAvailable": true,
+        "commentsDataProviderNotCalled": true,
+        "cmdMore": "cmdMore"
+    },
+
+    "functions": {
+        "reOrderQuestionAndAnswer": {
+            "functionName": "reOrderQuestionAndAnswer",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+
+        "getConvObjectUID": {
+            "functionName": "getConvObjectUID",
+            "parameters": [
+                "{{subPanelContext}}", "{{ctx}}"
+            ]
+        },
+        "getCursorEndIndexValue": {
+            "functionName": "getCursorEndIndexValue",
+            "parameters": [ "{{data.dataProviders.commentsDataProvider}}" ]
+        },
+        "getCursorEndReachedValue": {
+            "functionName": "getCursorEndReachedValue",
+            "parameters": [ "{{data.dataProviders.commentsDataProvider}}" ]
+        },
+        "getCursorStartReachedValue": {
+            "functionName": "getCursorStartReachedValue",
+            "parameters": [ "{{data.dataProviders.commentsDataProvider}}" ]
+        }
+    },
+
+    "dataParseDefinitions": {
+        "searchCommDataParser": {
+            "identifier": "{{response.uid}}",
+            "thumbnailUrl": "{{response.thumbnailURL}}",
+            "props": {
+                "userId": {
+                    "name": "userId",
+                    "displayName": "id",
+                    "value": "{{response.collabCreateUserId.uid}}",
+                    "displayValue": "{{response.collabCreateUserId.uid}}",
+                    "type": "STRING"
+                },
+                "uid": {
+                    "name": "userId",
+                    "displayName": "id",
+                    "value": "{{response.collabCreateUserId.uid}}",
+                    "displayValue": "{{response.collabCreateUserId.uid}}",
+                    "type": "STRING"
+                },
+                "userName": {
+                    "name": "userName",
+                    "displayName": "userName",
+                    "value": "{{response.collabCreateUserId.object_string}}",
+                    "displayValue": "{{response.collabCreateUserId.object_string}}",
+                    "type": "STRING"
+                },
+                "modifiedDateTime": {
+                    "name": "modifiedDateTime",
+                    "displayName": "date",
+                    "value": "{{response.collabDateModified}}",
+                    "displayValue": "{{response.collabDateModified}}",
+                    "type": "DATETIME"
+                },
+                "plainText": {
+                    "name": "collabPlainText",
+                    "displayName": "text",
+                    "value": "{{response.collabPlainText}}",
+                    "displayValue": "{{response.collabPlainText}}",
+                    "type": "STRING"
+                },
+                "richText": {
+                    "name": "collabRichText",
+                    "displayName": "text",
+                    "value": "{{response.collabRichText}}",
+                    "displayValue": "{{response.collabRichText}}",
+                    "type": "STRING"
+                },
+                "autoMsgType": {
+                    "name": "collabAutoMsgType",
+                    "displayName": "text",
+                    "value": "{{response.collabAutoMsgType}}",
+                    "displayValue": "{{response.collabAutoMsgType}}",
+                    "type": "STRING"
+                },
+                "collabRelatedObjectInfoList": {
+                    "name": "collabRelatedObjectInfoList",
+                    "displayName": "sourceObjects",
+                    "value": "{{response.collabRelatedObjectInfo}}",
+                    "displayValue": "{{response.collabRelatedObjectInfo}}",
+                    "type": "OBJECT",
+                    "isArray": true
+                }
+            }
+        }
+    },
+
+    "dataProviders": {
+        "commentsDataProvider": {
+            "action": "searchComments",
+            "deps": "js/Ac0ConversationService",
+            "response": "{{data.searchResults}}",
+            "selectionModelMode": "none",
+            "totalFound": "{{data.totalFound}}"
+        }
+
+    },
+    "onEvent": [ {
+            "eventId": "S2clConvComment.commentsLoaded",
+            "action": "postCommentsLoadedAction"
+        },
+        {
+            "eventId": "Ac0Conversation.commentsListLoaded",
+            "action": "modifyCommentsPostLoad"
+        },
+        {
+            "eventId": "Ac0Conversation.initCommentsPanelComplete",
+            "condition": "conditions.commentsDataProviderNotCalled",
+            "action": "doCommentsDataProvider"
+        },
+        {
+            "eventId": "isInputTextValidEvent",
+            "cacheEventData": true,
+            "action": "isInputTextValidAction"
+        },
+        {
+            "eventId": "ac0activeCollaboration.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "doCommentsDataProvider"
+        },
+        {
+            "eventId": "ac0EditComm.editCommentComplete",
+            "action": "checkCKEInputTextValidity"
+        }
+    ],
+
+    "conditions": {
+        "validInputDataForCreateComment":
+        {
+            "expression":"data.isInputTextValid"
+        },
+        "commentsDataProviderNotCalled": {
+            "expression": "data.commentsDataProviderNotCalled === true"
+        }
+    },
+
+    "lifecycleHooks": {
+        "onMount": "initCommentsPanel",
+        "onUnmount": "teardownCommentsPanel"
+    },
+
+    "i18n": {
+        "conversation": [ "ActiveCollabDeclarativeMessages" ],
+        "newConversation": [ "ActiveCollabDeclarativeMessages" ],
+        "newComment": [ "ActiveCollabDeclarativeMessages" ],
+        "more": [ "ActiveCollabDeclarativeMessages" ],
+        "less": [ "ActiveCollabDeclarativeMessages" ],
+        "reply": [ "ActiveCollabDeclarativeMessages" ],
+        "save": [ "ActiveCollabDeclarativeMessages" ],
+        "replies": [ "ActiveCollabDeclarativeMessages" ],
+        "discard": ["ZeroCompileCommandMessages"],
+        "moreReplies": [ "ActiveCollabDeclarativeMessages" ]
+    }
+
+}

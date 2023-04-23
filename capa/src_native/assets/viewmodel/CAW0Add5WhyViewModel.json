@@ -1,0 +1,407 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-command-panel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-widget.directive",
+        "js/aw-listbox.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-panel-header.directive",
+        "js/aw-type-selector.directive",
+        "js/aw-title-link.directive"
+    ],
+    "actions": {
+        "getNextId": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2008-06-DataManagement",
+            "method": "getNextIds",
+            "inputData": {
+                "vInfoForNextId": [
+                    {
+                        "typeName": "CAW05Why",
+                        "propName": "caw0Id",
+                        "pattern": "nnnnnnnnn"
+                    }
+                ]
+            },
+            "outputData": {
+                "nextId": "nextIds[0]"
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.create5WhyObject"
+                    }
+                ]
+            }
+        },
+        "create5WhyObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Internal-Core-2012-10-DataManagement",
+            "method": "createRelateAndSubmitObjects",
+            "inputData": {
+                "inputs": "{{function:getCreateObjectInput}}"
+            },
+            "outputData": {
+                "createdObject": "output[0].objects[0]",
+                "addElementResponse": ""
+            },
+            "deps": "js/Caw0PropertyUpdateService",
+            "events": {
+                "success": [
+                    {
+                        "name": "caw0.createRelation"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode.code==26050",
+                    "message": "createRelFailureMsg"
+                } ]
+            }
+        },
+        "createRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [
+                    {
+                        "primaryObject": "{{ctx.selected}}",
+                        "secondaryObject": "{{data.createdObject}}",
+                        "relationType": "CAW0Related5Why",
+                        "clientId": "",
+                        "userData": {
+                            "uid": "AAAAAAAAAAAAAA",
+                            "type": "unknownType"
+                        }
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "addElement.added",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Relations'",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    },
+                    {
+                        "name": "open5WhyObject",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Methodology'"
+                    },
+                    {
+                        "name": "Caw0Relations.activeViewUpdated",
+                        "condition": "ctx.xrtPageContext.primaryXrtPageID === 'tc_xrt_Relations'",
+                        "eventData": {
+                            "addElementResponse": "{{data.addElementResponse}}"
+                        }
+                    }
+                ],
+                "failure": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        },
+        "load5WhyTypes": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "caw05WhyType",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "CAW05Why"
+                    }
+                }
+            },
+            "outputData": {
+                "WhyTypes": "{{function:getLOVList}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "loadAnalysisDimension": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "caw0AnalysisDimension",
+                    "lovInput": {
+                        "operationName": "Create",
+                        "boName": "CAW05Why"
+                    }
+                }
+            },
+            "outputData": {
+                "dimension": "{{function:getLOVListOfAnalysis}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "CAW0AddWhy": {
+            "actionType": "JSFunctionAsync",
+            "deps": "js/command.service",
+            "method": "executeCommand",
+            "inputData": {
+                "0": "CAW0AddWhy"
+            },
+            "events": {
+                "success": [ {
+                    "name": "addWhy.caw0SetPin",
+                    "eventData": {
+                        "data": "{{commandContext}}"
+                    }
+                } ]
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "events": {
+                "success": [
+                    {
+                        "name": "openAddWhyPanel"
+                    }
+                ]
+            }
+        },
+        "updatePanel": {
+            "actionType": "JSFunction",
+            "method": "updatePanel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "clearSelectedType": {
+            "actionType": "JSFunction",
+            "method": "clearSelectedType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "outputData": {},
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "autoSelectType": {
+            "actionType": "JSFunction",
+            "method": "autoSelectType",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "open5WhyObject": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{data.createdObject.uid}}",
+                "pageId": "tc_xrt_Methodology"
+            },
+            "events": {
+                "success": [ {
+                    "name": "openAddPanelFromIshikawa"
+                } ]
+            }
+        },
+        "openAddPanelFromIshikawa": {
+            "actionType": "JSFunction",
+            "method": "updateAdded5WhyFlag",
+            "inputData": {
+                "data": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "updatePanelData": {
+            "actionType": "JSFunction",
+            "method": "updatePanelData",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        },
+        "deletePanelData": {
+            "actionType": "JSFunction",
+            "method": "deletePanelData",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Caw0PropertyUpdateService"
+        }
+    },
+    "lifecycleHooks": {
+        "onMount": "updatePanelData",
+        "onUnmount":"deletePanelData"
+    },
+    "onEvent": [
+        {
+            "eventId": "caw0.create5WhyObject",
+            "action": "create5WhyObject"
+        },
+        {
+            "eventId": "caw0.createRelation",
+            "action": "createRelation"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "load5WhyTypes"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "action": "loadAnalysisDimension"
+        },
+        {
+            "eventId": "addElement.added",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "openAddWhyPanel",
+            "condition": "ctx.xrtPageContext.primaryXrtPageID !== 'tc_xrt_Relations'",
+            "action": "CAW0AddWhy"
+        },
+        {
+            "eventId": "GraphRefreshed",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "awTypeSelector.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "updatePanel"
+        },
+        {
+            "eventId": "awTypeSelector.modelObjectsUpdated",
+            "action": "autoSelectType"
+        },
+        {
+            "eventId": "open5WhyObject",
+            "action": "open5WhyObject"
+        },
+        {
+            "eventId": "openAddPanelFromIshikawa",
+            "action": "openAddPanelFromIshikawa"
+        }
+    ],
+    "data": {
+        "caw0ProbDefinition": {
+            "displayName": "{{i18n.probDefinition}}",
+            "type": "STRING",
+            "isRequired": "true",
+            "dbValue": "{{ctx.selected.props.object_name.dbValues[0]}}",
+            "maxLength":256
+        },
+        "object_desc": {
+            "displayName": "{{i18n.description}}",
+            "type": "STRING",
+            "dbValue": "",
+            "maxLength":240
+        },
+        "caw0AnalysisType": {
+            "displayName": "{{i18n.caw0AnalysisType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "caw05WhyType": {
+            "displayName": "{{i18n.whyType}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "hasLov": "true",
+            "dbValue": ""
+        },
+        "caw0AnalysisDimension": {
+            "displayName": "{{i18n.caw0AnalysisDimension}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "",
+            "isEditable": "true",
+            "hasLov": "true",
+            "hasInitialValue": "true",
+            "initialize": "true"
+        },
+        "caw0AnalysisDimensionStatic": {
+            "displayName": "{{i18n.caw0AnalysisDimension}}",
+            "type": "STRING",
+            "isRequired": "false",
+            "dbValue": "{{ctx.selected.caw0AnalysisDimension}}",
+            "uiValue": "{{ctx.selected.caw0AnalysisDimension}}",
+            "isEditable": "false"
+        },
+        "filterBox": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING",
+            "dbValue": ""
+        }
+    },
+    "functions": {
+        "getCreateObjectInput": {
+            "functionName": "getCreateObjectInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}",
+                "adding5Why"
+            ]
+        }
+    },
+    "messages": {
+        "createRelFailureMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "i18n": {
+        "probDefinition": [
+            "CAW0CapaMessages"
+        ],
+        "description": [
+            "CAW0CapaMessages"
+        ],
+        "caw0AnalysisType" :[
+            "CAW0CapaMessages"
+        ],
+        "whyType": [
+            "CAW0CapaMessages"
+        ],
+        "fiveWhy": [
+            "CAW0CapaMessages"
+        ],
+        "toTitle": [
+            "CAW0CapaMessages"
+        ],
+        "addPanelTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "addButtonTitle": [
+            "TCUICommandPanelsMessages"
+        ],
+        "objectType": [
+            "awAddDirectiveMessages"
+        ],
+        "caw0AnalysisDimension": [
+            "CAW0CapaMessages"
+        ]
+    }
+}

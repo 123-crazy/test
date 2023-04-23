@@ -1,0 +1,371 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-splm-table.directive",
+        "js/aw-search-box.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-scrollpanel.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-button.directive",
+        "js/aw-i18n.directive",
+        "js/aw-row.directive",
+        "js/aw-panel-section.directive"
+    ],
+
+    "actions": {
+        "orgTreeDoSearch": {
+            "actionType": "JSFunctionAsync",
+            "method": "doSearch",
+            "inputData": {
+                "searchString": "{{data.orgTreeSearchBox.dbValue}}",
+                "data": "{{data}}"
+            },
+            "outputData": {
+                "ctx.searchCriteria.treeFilterData": "response"
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "scrollToSelected": {
+            "actionType": "JSFunction",
+            "method": "scrollToSelected",
+            "inputData": {
+                "data": "{{data}}",
+                "orgTreeData": "{{ctx.orgTreeData}}",
+                "selectedNodeHierarchy": "{{ctx.selectedTreeNode.hierarchy}}"
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "treeNodeSelected": {
+            "actionType": "JSFunction",
+            "method": "treeNodeSelected",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}",
+                "currentNode": "{{data.eventData.selectedObjects.0}}"
+            },
+            "events": {
+                "success": [
+                {
+                    "name": "OrgTree.ExpandNode",
+                    "condition": "data.initialExpand == false"
+                } ]
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "loadOrgTreeData": {
+            "actionType": "JSFunctionAsync",
+            "method": "getTreeStructure",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "treeLoadInput": "request.treeLoadInput",
+                "data": "{{data}}"
+            },
+            "dataParsers": [ {
+                "id": "orgTree",
+                "responseObjs": ""
+            } ],
+            "outputData": {
+                "orgTreeInput": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "OrgTree.preserveSelection"
+                } ]
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "preserveSelection": {
+            "actionType": "JSFunction",
+            "method": "preserveSelection",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "OrgTree.ScrollToSelected",
+                    "condition": "data.orgTreeInput.treeLoadResult.parentNode.id !== 'top'"
+                } ]
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+
+        "updateMembers":{
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2020-01-ProjectLevelSecurity",
+            "method": "addOrRemoveProjectMembers",
+            "deps": "js/addRemoveProjectTeamMembersSvc",
+            "inputData":
+            {
+                "inputs": "{{function:addSelectedMembers}}"
+
+            },
+            "outputData":{
+                "addMemberResponse":""
+            },
+            "events":
+            {
+                "success":
+                [
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+
+                        "name":"ProjectTeamTreeReloadAndSelectNode",
+                        "excludeLocalDataCtx": true,
+                        "eventData": {
+                            "nodes": "{{data.nodes}}"
+                        }
+                    }
+                ],
+                "failure":[
+                    {
+                        "name": "complete",
+                        "condition": "data.pinnedToForm.dbValue",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    },
+                    {
+
+                        "name":"ProjectTeamTreeReloadAndSelectNode",
+                        "excludeLocalDataCtx": true,
+                        "eventData": {
+                            "nodes": "{{data.nodes}}"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure":[
+                    {
+                        "condition":"data.addMemberResponse.partialErrors[0].errorValues",
+                        "message":"addProjectTeamMemberFailureMessage"
+                    }
+                ]
+            }
+        },
+        "addSelectedTeamMembers": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name": "addTeamMembers"
+                    }
+                ]
+            }
+        },
+        "loadPropertiesActionJS": {
+            "actionType": "JSFunctionAsync",
+            "method": "loadPropertiesJS",
+            "inputData": {
+                "dataProvider": "{{data}}",
+                "propertyLoadInput": "request.propertyLoadInput"
+            },
+            "outputData": {},
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+        "expandTreeNode": {
+            "actionType": "JSFunction",
+            "method": "expandNode",
+            "inputData": {
+                "node": "{{ctx.treeLoadInput.rootNode.children.0}}",
+                "isExpanded": true,
+                "data": "{{data}}"
+            },
+            "deps": "js/addRemoveProjectTeamMembersSvc"
+        },
+        "addTeamMemberSetPin": {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "addTeamMemberUnSetPin": {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData": {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "clearSelectedTreeNode": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "selectedTreeNode"
+            }
+        }
+    },
+    "conditions":
+    {
+        "isValidToShowAddTeamMembersButton":
+        {
+            "expression": "data.dataProviders.orgTreeTableDataProvider.selectedObjects.length > 1 || ctx.selectedTreeNode && ( ctx.selectedTreeNode.type === 'Group' || ctx.selectedTreeNode.type === 'GroupMember' || ctx.selectedTreeNode.type === 'Role')"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "orgTreeTableDataProvider.selectionChangeEvent",
+            "cacheEventData": true,
+            "action": "treeNodeSelected"
+        },
+        {
+            "eventId": "OrgTree.preserveSelection",
+            "action": "preserveSelection"
+        },
+        {
+            "eventId": "OrgTree.loadOrgTreeData",
+            "action": "loadOrgTreeData"
+        },
+        {
+            "eventId": "OrgTree.ExpandNode",
+            "action": "expandTreeNode"
+        },
+        {
+            "eventId": "OrgTree.ScrollToSelected",
+            "action": "scrollToSelected"
+        },
+        {
+            "eventId": "addTeamMembers",
+            "action": "updateMembers"
+        },
+        {
+            "eventId": "addRemoveProjectTeamMembers.addTeamMemberSetPin",
+            "cacheEventData": true,
+            "action": "addTeamMemberSetPin"
+        },
+        {
+            "eventId": "addRemoveProjectTeamMembers.addTeamMemberUnSetPin",
+            "cacheEventData": true,
+            "action": "addTeamMemberUnSetPin"
+        },
+        {
+            "eventId": "complete",
+            "action": "clearSelectedTreeNode"
+        }
+    ],
+    "data": {
+        "orgTreeName": "prefOrgTree",
+        "initialExpand": false,
+        "orgTreeCategory": {
+            "dbValue": "{{i18n.organizationFilterLabel}}",
+            "uiValue": "{{i18n.organizationFilterLabel}}"
+        },
+        "orgTreeSearchBox": {
+            "displayName": "{{i18n.orgTreeFilterText}}",
+            "type": "STRING"
+        },
+        "orgTreeSearchBoxPlaceHolder": {
+            "dbValue": "{{i18n.orgTreeFilterText}}"
+        },
+        "AddTeamMemberPinCommands":"AddTeamMember_oneStepPinCommands",
+        "pinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm": {
+            "type": "BOOLEAN",
+            "dbValue": false
+        }
+    },
+
+    "dataProviders": {
+        "orgTreeTableDataProvider": {
+            "action": "loadOrgTreeData",
+            "initializeAction": "loadOrgTreeData",
+            "nextAction": "loadOrgTreeData",
+            "previousAction": "loadOrgTreeData",
+            "treeLoadResult": "action.result.treeLoadResult",
+            "inputData": {
+                "accessMode": "tree"
+            },
+            "response": "data.response",
+            "selectionModelMode": "multiple"
+        },
+        "orgTreeTablePropertyProvider": {
+            "action": "loadPropertiesActionJS",
+            "propertyLoadResult": "action.result.propertyLoadResult"
+        }
+    },
+
+    "columnProviders": {
+        "orgTreeTableColumnProvider": {
+            "columns": [{
+                "name": "Test",
+                "isTreeNavigation": true,
+                "isTableCommand": false,
+                "enableSorting": false,
+                "width": 1100,
+                "minWidth": 500,
+                "enableColumnMoving": false
+            }],
+            "soaEnabled": false,
+            "sortCriteria": [],
+            "frozenColumnIndex": -1
+        }
+    },
+
+    "grids": {
+        "orgTreeTable12": {
+            "dataProvider": "orgTreeTableDataProvider",
+            "propertyProvider": "orgTreeTablePropertyProvider",
+            "columnProvider": "orgTreeTableColumnProvider",
+            "addIconColumn": false,
+            "gridOptions": {
+                "useStaticFirstCol": true
+            }
+        }
+    },
+
+    "dataParseDefinitions": {
+        "orgTree": {
+            "identifier": "AAAAAAAAAAAAAA",
+            "props": {
+                "object_name": {
+                    "name": "object_name",
+                    "displayName": "",
+                    "value": "{{response.label}}",
+                    "displayValue": "{{response.label}}",
+                    "type": "STRING"
+                }
+            }
+        }
+    },
+    "functions": {
+        "addSelectedMembers": {
+            "functionName": "addSelectedMembers",
+            "parameters": [  "{{data.dataProviders.orgTreeTableDataProvider}}",
+                "{{ctx}}",
+                "{{data}}"]
+        }
+    },
+    "messages": {
+        "addProjectTeamMemberFailureMessage":{
+            "messageType": "ERROR",
+            "messageText": "{{data.addMemberResponse.partialErrors[0].errorValues[0].message}}"
+        }
+    },
+    "i18n": {
+        "Organization": [
+            "ProjmgmtConstants"
+        ],
+        "orgTreeFilterText": [ "ProjmgmtConstants" ],
+        "addTeamMembers": [ "ProjmgmtConstants" ]
+    }
+}

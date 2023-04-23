@@ -1,0 +1,349 @@
+{
+    "schemaVersion" : "1.0.0",
+   "imports": [
+      "js/aw-command-panel.directive",
+      "js/aw-panel-body.directive",
+      "js/aw-panel-section.directive",
+      "js/aw-panel-footer.directive",
+      "js/aw-list-filter.directive",
+      "js/visible-when.directive",
+      "js/aw-default-cell.directive",
+      "js/aw-changeowner-cell.directive",
+      "js/aw-changeowner-cell-content.directive",
+      "js/aw-button.directive",
+      "js/aw-i18n.directive",
+      "js/aw-default-group-cell.directive",
+      "js/aw-header-cell.directive"
+   ],
+   "actions": {
+        "reveal":
+        {
+            "actionType": "dataProvider",
+            "method": "userPerformSearch"
+        },
+        "isValidSubTransfer":
+        {
+          "actionType":"Event",
+             "method":"Event",
+             "inputData":
+             {
+                 "events":
+                 [
+                     {
+                         "condition":"data.dataProviders.userPerformSearch.selectedObjects.length > 0",
+                         "name":"transferSub.subscriptionTransferCmdEvent"
+                     }
+                 ]
+             }
+        },
+      "search": {
+         "actionType": "TcSoaService",
+         "serviceName": "Query-2014-11-Finder",
+         "method": "performSearch",
+         "inputData": {
+             "searchInput":{
+                 "maxToLoad": 100,
+                 "maxToReturn": 25,
+                 "providerName": "Awp0ResourceProvider",
+                 "searchCriteria": {
+                     "searchString": "{{data.filterBox.dbValue}}",
+                     "resourceProviderContentType": "Users",
+                     "group": "",
+                     "role": "",
+                     "searchSubGroup": "false"
+                 },
+                 "searchFilterFieldSortType": "Alphabetical",
+                 "searchFilterMap": {},
+                 "searchSortCriteria": [],
+                 "startIndex": "{{data.dataProviders.userPerformSearch.startIndex}}"
+             }
+         },
+         "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+        "policy": {
+        "types": [{
+                    "name": "POM_member",
+                    "properties":
+                    [
+                        {
+                            "name": "user",
+                            "modifiers": [
+                                {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "GroupMember",
+                    "properties":
+                    [
+                        {
+                            "name": "group",
+                            "modifiers": [
+                                {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "role",
+                            "modifiers": [
+                                {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Role",
+                    "properties":
+                    [
+                        {
+                            "name": "role_name"
+                        }
+                    ]
+                },
+
+                {
+                    "name": "Group",
+                    "properties":
+                    [
+                        {
+                            "name": "name"
+                        }
+                    ]
+                },
+                {
+                    "name": "POM_user",
+                    "properties":
+                    [
+                        {
+                            "name": "user_id"
+                        },
+                        {
+                            "name": "user_name"
+                        }
+                    ]
+                },
+                {
+                    "name": "User",
+                    "properties":
+                    [
+                        {
+                            "name": "person",
+                            "modifiers":
+                            [
+                                {
+                                    "name": "withProperties",
+                                    "Value": "true"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Person",
+                    "properties":
+                    [
+                        {
+                            "name": "user_name"
+                        },
+
+                        {
+                            "name": "PA9"
+                        },
+
+                        {
+                            "name": "PA10"
+                        }
+                    ]
+                },
+                {
+                    "name": "POM_application_object",
+                    "properties":
+                    [
+                        {
+                            "name": "owning_user"
+                        }
+                    ]
+                }
+            ]
+        }
+      },
+      "transfer":
+      {
+          "actionType": "TcSoaService",
+         "serviceName": "Internal-Notification-2015-03-SubscriptionManagement",
+         "method": "transferNotifications",
+         "inputData": {
+
+             "input": {
+                "subscriptions": "{{ctx.mselected}}",
+                "notifier":
+                {
+                    "type":"{{data.dataProviders.userPerformSearch.selectedObjects[0].props.user.referenceTypeName}}",
+                    "uid":"{{data.dataProviders.userPerformSearch.selectedObjects[0].props.user.dbValue}}"
+                },
+                "notificationDateRange": {
+                    "fromDate": "",
+                    "toDate": ""
+                }
+            }
+         },
+         "outputData":
+         {
+            "transferPartialErrors":"ServiceData.partialErrors"
+         },
+        "events":
+        {
+          "success":
+          [
+            {
+                "name": "primaryWorkarea.reset"
+            },
+            {
+                "name": "complete",
+                "eventData":
+                {
+                    "source": "toolAndInfoPanel"
+                }
+            }
+          ],
+          "failure":
+          [
+            {
+                "name": "primaryWorkarea.reset"
+            },
+            {
+                "name": "complete",
+                "eventData":
+                {
+                    "source": "toolAndInfoPanel"
+                }
+            }
+          ]
+        },
+        "actionMessages":
+        {
+            "failure":
+             [
+                {
+                    "message": "failureChangeOwnerMessage",
+                    "condition": "(ctx.mselected && ctx.mselected.length === 1)"
+
+                },
+                {
+                    "message": "multipleFailureChangeOwnerMessage",
+                    "condition": "(ctx.mselected && ctx.mselected.length > 1)"
+                }
+            ],
+            "success":
+            [    {
+                    "message": "successfulChangeOwnerMessage",
+                    "condition": "(ctx.mselected && ctx.mselected.length === 1)"
+
+                },
+                {
+                    "message": "multipleSuccessfulChangeOwnerMessage",
+                    "condition": "(ctx.mselected && ctx.mselected.length > 1)"
+
+                }
+            ]
+        }
+      }
+   },
+    "data": {
+      "filterBox": {
+         "displayName": "",
+         "type": "STRING",
+         "dbValue": ""
+      }
+   },
+   "dataProviders": {
+      "userPerformSearch": {
+         "action": "search",
+         "response": "{{data.searchResults}}",
+         "totalFound": "{{data.totalFound}}",
+         "totalLoaded": "{{data.totalLoaded}}",
+         "selectionModelMode": "single"
+      }
+   },
+"messages":
+    {
+        "successfulChangeOwnerMessage":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.successfulTransferNotification}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_string.dbValues[0]}}",
+                "{{data.dataProviders.userPerformSearch.selectedObjects[0].props.user.uiValues[0]}}"
+            ]
+        },
+        "multipleSuccessfulChangeOwnerMessage":
+        {
+            "messageType": "INFO",
+            "messageText": "{{i18n.multipleSubscriptionTransferNotification}}",
+            "messageTextParams": [
+                "{{ctx.mselected.length}}",
+                "{{ctx.mselected.length}}"
+            ]
+        },
+        "failureChangeOwnerMessage":
+        {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorTransferNotification}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_string.dbValues[0]}}",
+                "{{data.dataProviders.userPerformSearch.selectedObjects[0].props.user.uiValues[0]}}"
+            ]
+        },
+        "multipleFailureChangeOwnerMessage":
+        {
+             "expression": {
+                "successCount": "ctx.mselected.length - data.transferPartialErrors.length"
+            },
+            "messageType": "ERROR",
+            "messageText":"{{i18n.multipleSubscriptionTransferNotification}}",
+            "messageTextParams": [
+                "{{expression.successCount}}",
+                "{{ctx.mselected.length}}"
+            ],
+            "messageData": {
+                "partialErrors": "{{data.transferPartialErrors}}"
+            }
+        }
+    },
+   "onEvent": [
+        {
+            "eventId": "awPanel.reveal",
+            "criteria":
+            {
+                "panelId": "Sub0ChangeOwner"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId":"transferSub.subscriptionTransferCmdEvent",
+            "action":"transfer"
+        }
+   ],
+   "i18n": {
+      "user": [ "SubscriptionMessages" ],
+      "transferButtonTitle": [ "SubscriptionMessages" ],
+      "Sub0ChangeOwner": [ "SubscriptionMessages" ],
+      "EmailAddress": [ "SubscriptionMessages" ],
+      "PhoneNumber": [ "SubscriptionMessages" ],
+      "successfulTransferNotification":["SubscriptionMessages"],
+      "errorTransferNotification":["SubscriptionMessages"],
+      "multipleSubscriptionTransferNotification":["SubscriptionMessages"]
+   }
+}

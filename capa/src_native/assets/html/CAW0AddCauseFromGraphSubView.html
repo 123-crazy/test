@@ -1,0 +1,52 @@
+<aw-panel-header>
+    <aw-panel-section caption="i18n.toTitle">
+        <aw-default-cell vmo="ctx.xrtSummaryContextObject"></aw-default-cell>
+    </aw-panel-section>
+</aw-panel-header>
+<aw-panel-body exist-when="!data.isObjectTypeSelected">
+    <aw-panel-section caption="i18n.objectType">
+        <aw-type-selector prop="data.filterBox" include="CAW0Defect" override-id="IssueAndCapa" load-sub-types="true">
+        </aw-type-selector>
+    </aw-panel-section>
+</aw-panel-body>
+<aw-panel-body exist-when="data.isObjectTypeSelected">
+    <aw-title-link prop="ctx.type_name" action="clearSelectedType"></aw-title-link>
+    <aw-panel-section>
+        <aw-listbox prop="data.caw0CauseGroup" list="data.causeGroups" action='updateCauseselectioninMethodology'></aw-listbox>
+        <aw-widget prop="data.object_name"></aw-widget>
+        <aw-widget prop="data.object_desc"></aw-widget>
+    </aw-panel-section>
+    <aw-command-panel-section exist-when="ctx.tcSessionData.tcMajorVersion >= 13" caption="i18n.failure" anchor="data.addFailureCommand" context="data">
+        <aw-list dataprovider="data.dataProviders.getFailureProvider">
+            <aw-default-cell vmo="item"></aw-default-cell>
+        </aw-list>
+    </aw-command-panel-section>
+    <aw-checkbox exist-when="ctx.tcSessionData.tcMajorVersion >= 13" prop="data.isRootCause" caption="i18n.caw0RootCause"></aw-checkbox>
+    <aw-command-panel-section exist-when="data.isRootCause.dbValue" caption="i18n.caw0AddNew">
+        <aw-flex-row height="3f">
+            <aw-flex-column width="10">
+               <aw-radiobutton prop="data.fiveWhyOption" list="data.fiveWhyOptionList.dbValue" action="getSelected5why" ></aw-radiobutton>
+            </aw-flex-column>
+            <aw-flex-column width="2">
+                <div class="aw-capa-infoIcon">
+                    <aw-icon icon-id="cmdShowInfoPanel" extended-tooltip="data.caw0tooltipFor5Why"></aw-icon>
+                </div>
+            </aw-flex-column>
+        </aw-flex-row>
+         <aw-flex-row height="3f">
+            <aw-flex-column width="10">
+                <aw-radiobutton prop="data.ishikawaOption" list="data.ishikawaOptionList.dbValue" action="getSelectedIshikawa" ></aw-radiobutton>
+            </aw-flex-column>
+            <aw-flex-column width="2">
+                <div class="aw-capa-infoIcon">
+                    <aw-icon icon-id="cmdShowInfoPanel" extended-tooltip="data.caw0tooltipForIshikawa"></aw-icon>
+                </div>
+            </aw-flex-column>
+        </aw-flex-row>
+    </aw-command-panel-section>
+</aw-panel-body>
+<aw-panel-footer exist-when="data.isObjectTypeSelected">
+    <aw-button default="true" action="createCauseObject" visible-when="conditions.isNameDescIshiCauseGroupEmpty">
+        <aw-i18n>i18n.addButtonTitle</aw-i18n>
+    </aw-button>
+</aw-panel-footer>

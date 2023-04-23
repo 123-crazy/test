@@ -1,0 +1,227 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-button.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel.directive",
+        "js/aw-listbox.directive",
+        "js/aw-checkbox.directive",
+        "js/aw-datetime.directive",
+        "js/aw-panel-body.directive",
+        "js/aw-title-link.directive",
+        "js/aw-break.directive"
+    ],
+
+    "data": {
+        "DueDate": {
+            "displayName": "{{i18n.dueDate}}",
+            "type": "DATE",
+            "dbValue": "",
+            "labelPosition": "PROPERTY_LABEL_AT_TOP"
+        },
+        "qualityActionStatus": {
+            "displayName": "{{i18n.qualityActionStatus}}",
+            "type": "STRING",
+            "hasLov": "true",
+            "dbValue": "{{ctx.selected.props.qam0QualityActionStatus.dbValue}}"
+        },
+        "dependentQualityAction": {
+            "displayName": "{{i18n.dependentQualityAction}}",
+            "labelPosition": "PROPERTY_LABEL_AT_RIGHT"
+        },
+        "objName" : {
+            "displayName": "{{i18n.qualityActiontitle}}"
+        }
+    },
+    "actions": {
+        "getDeepCopyData": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2015-07-DataManagement",
+            "method": "getDeepCopyData",
+            "inputData": {
+                "deepCopyDataInput": {
+                    "operation": "SaveAs",
+                    "targetObject": "{{ctx.selected}}",
+                    "deepCopyDatas": [ {
+                        "attachedObject": "{{ctx.selected}}"
+                    } ],
+                    "selectedBO": "{{ctx.selected}}"
+                }
+            },
+            "outputData": {
+                "deepCopyDatas": "{{function:getQualityActionDeepCopyData}}"
+            },
+            "events": {
+                "success": [ {
+
+                    "name": "prepareSaveAsInput"
+                } ]
+            },
+            "deps": "js/Qam0SaveAsService"
+        },
+        "prepareSaveAsInput": {
+            "actionType": "JSFunction",
+            "method": "prepareSaveAsInput",
+            "inputData": {
+                "ctx": "{{data}}",
+                "data": "{{ctx}}",
+                "deepCopyDatas":"{{data.deepCopyDatas}}"
+            },
+            "outputData": {
+                "iVecSoaSavAsIn": "iVecSoaSavAsIn",
+                "iVecSoaRelteInfoIn": "iVecSoaRelteInfoIn"
+            },
+            "events": {
+                "success": [ {
+
+                    "name": "createNewObjectWithSaveAsObjectSOA"
+                } ]
+            },
+            "deps": "js/Qam0SaveAsService"
+        },
+        "createNewObject": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2014-10-DataManagement",
+            "method": "saveAsObjectsAndRelate",
+            "inputData": {
+                "iVecSoaSavAsIn": "{{data.iVecSoaSavAsIn}}",
+                "iVecSoaRelteInfoIn": "{{data.iVecSoaRelteInfoIn}}"
+            },
+            "events": {
+                "success": [ {
+                    "name": "complete",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "SaveAsObjectSuccess"
+                } ]
+            },
+
+            "deps": "js/Qam0SaveAsService"
+        },
+        "loadQualityActionStatus": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2013-05-LOV",
+            "method": "getInitialLOVValues",
+            "inputData": {
+                "initialData": {
+                    "propertyName": "qam0QualityActionStatus",
+                    "lovInput": {
+                        "operationName": "Edit",
+                        "boName": "Qam0QualityAction"
+                    }
+                }
+            },
+            "outputData": {
+                "qualityActionStatusList": "{{function:getLOVList}}"
+            },
+            "deps": "js/Qam0SaveAsService"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.reveal",
+            "action": "loadQualityActionStatus"
+        },
+        {
+            "eventId": "createNewObjectWithSaveAsObjectSOA",
+            "action": "createNewObject"
+        },
+        {
+            "eventId": "prepareSaveAsInput",
+            "action" : "prepareSaveAsInput"
+
+        }
+    ],
+    "functions": {
+        "getLOVList": {
+            "functionName": "getLOVList",
+            "parameters": []
+        },
+        "getQualityActionDeepCopyData":{
+            "functionName":"getQualityActionDeepCopyData",
+            "parameters": []
+        },
+        "getSaveAsinputs": {
+            "functionName": "getSaveAsinputs",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        },
+        "getDateString_DueDate": {
+            "functionName": "getDateString_DueDate",
+            "parameters": [
+                "{{data.DueDate.dateApi.dateObject}}"
+            ]
+        },
+        "getResponsibleUserObject": {
+            "functionName": "getResponsibleUserObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getConfirmedByObject": {
+            "functionName": "getConfirmedByObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getCompletedByObject": {
+            "functionName": "getCompletedByObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getTargetObject": {
+            "functionName": "getTargetObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getDependentQualityActionsObject": {
+            "functionName": "getDependentQualityActionsObject",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        }
+
+    },
+    "messages": {
+        "SaveAsObjectSuccess": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.SaveAsObjectSuccess}}",
+            "messageTextParams": [
+                "{{ctx.selected.props.object_name.dbValues[0]}}"
+            ]
+        }
+    },
+    "conditions": {
+
+    },
+    "i18n": {
+        "saveAs": [
+            "QualityActionMgmtMessages"
+        ],
+        "dueDate": [
+            "QualityActionMgmtMessages"
+        ],
+        "qualityActionStatus": [
+            "QualityActionMgmtMessages"
+        ],
+        "dependentQualityAction": [
+            "QualityActionMgmtMessages"
+        ],
+        "qualityActiontitle": [
+            "QualityActionMgmtMessages"
+        ],
+        "SaveAsObjectSuccess" : [
+            "QualityActionMgmtMessages"
+        ]
+    }
+}

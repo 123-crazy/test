@@ -1,0 +1,215 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-flex-row.directive",
+        "js/aw-flex-column.directive",
+        "js/aw-source-editor.directive",
+        "js/aw-splitter.directive",
+        "js/aw-include.directive"
+    ],
+    "data": {
+        "editorModel": {
+            "htmlModel": {}
+        },
+        "viewSrc": {
+            "name": "viewEditor",
+            "data": ""
+        },
+        "viewConfig": {
+            "language": "html",
+            "theme": "vs-light",
+            "automaticLayout": true,
+            "formatOnType": true
+        },
+        "viewModelSrc": {
+            "name": "viewModelEditor",
+            "data": ""
+        },
+        "viewModelConfig": {
+            "language": "json",
+            "theme": "vs-light",
+            "automaticLayout": true,
+            "formatOnType": true
+        },
+        "toolsPanelData": {
+            "slide": "PUSH",
+            "direction": "LEFT_TO_RIGHT",
+            "animation": true,
+            "width": "STANDARD",
+            "height": "FULL"
+        }
+    },
+    "actions": {
+        "setDefaultValuesInEditor": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "setViewEditorValue"
+                },
+                {
+                    "action": "setViewModelEditorValue"
+                }
+            ]
+        },
+        "setViewEditorValue": {
+            "actionType": "JSFunction",
+            "method": "setViewEditorValue",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/wysiwygViewEditorService"
+        },
+        "updateViewContent": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "updateMasterView"
+                },
+                {
+                    "action": "redrawVMEditor"
+                }
+            ]
+        },
+        "redrawVMEditor": {
+            "actionType": "JSFunction",
+            "method": "redrawVMEditor",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/wysiwygViewModelEditorService"
+        },
+        "updateMasterView": {
+            "actionType": "JSFunction",
+            "method": "updateMasterView",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/wysiwygViewEditorService"
+        },
+        "setViewModelEditorValue": {
+            "actionType": "JSFunction",
+            "method": "setViewModelEditorValue",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/wysiwygViewModelEditorService"
+        },
+        "updateMasterViewModel": {
+            "actionType": "JSFunction",
+            "method": "updateMasterViewModel",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/wysiwygViewModelEditorService"
+        },
+        "openToolsPanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "awsidenav.openClose",
+                    "eventData": {
+                        "id": "aw_navigation"
+                    }
+                } ]
+            }
+        },
+        "loadWysiwygJson": {
+            "actionType": "JSFunction",
+            "method": "processWysiwygJson",
+            "outputData": {
+                "wysiwygJson": "wysiwygJson"
+            },
+            "events": {
+                "success": [ {
+                    "name": "wysiwygJsonLoaded"
+                } ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "displayFilteredNodesAction": {
+            "actionType": "JSFunction",
+            "method": "displayFilteredNodes",
+            "inputData": {
+                "data": "{{data}}",
+                "inputNode": "{{data.eventData}}"
+            },
+            "outputData": {},
+            "events": {
+                "success": [ {
+                    "name": "wysiwygJsonLoaded"
+                } ]
+            },
+            "deps": "js/wysiwygHelper"
+        },
+        "registerLeaveHandler":{
+            "actionType": "JSFunction",
+            "method": "registerLeaveHandler",
+            "deps": "js/wysiwygUtilService"
+        },
+        "sourceEditorMountAction": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "sourceEditorMountActionEvent"
+                } ]
+            }
+        }
+    },
+    "onEvent": [
+        {
+            "eventId": "configurationChange.viewmodel",
+            "action": "setViewModelEditorValue"
+        },
+        {
+            "eventId": "sourceEditorMountActionEvent",
+            "action": "setDefaultValuesInEditor"
+        },
+        {
+            "eventId": "sourceEditorMountActionEvent",
+            "action": "registerLeaveHandler",
+            "condition": "ctx.wysiwygCurrentPanel.isDirty === true"
+        },
+        {
+            "eventId": "wysiwyg.reloadWysiwygEditor",
+            "action": "setViewEditorValue"
+        },
+        {
+            "eventId": "sourceEditor.contentBlur",
+            "action": "updateViewContent",
+            "cacheEventData": true,
+            "condition": "name === 'viewEditor'"
+        },
+        {
+            "eventId": "wysiwyg.reloadWysiwygEditor",
+            "action": "setViewModelEditorValue"
+        },
+        {
+            "eventId": "sourceEditor.contentBlur",
+            "action": "updateMasterViewModel",
+            "cacheEventData": true,
+            "condition": "name === 'viewModelEditor'"
+        },
+        {
+            "eventId": "sourceEditorMountActionEvent",
+            "action": "openToolsPanel"
+        },
+        {
+            "eventId": "wysiwygTree.refresh",
+            "action": "loadWysiwygJson"
+        },
+        {
+            "eventId": "sourceEditorMountActionEvent",
+            "action": "loadWysiwygJson"
+        },
+        {
+            "eventId": "wysiwygTree.filteredNodes",
+            "cacheEventData": true,
+            "action": "displayFilteredNodesAction"
+        }
+    ],
+    "conditions": {},
+    "i18n": {},
+    "lifecycleHooks": {
+        "onMount": "sourceEditorMountAction"
+    }
+}

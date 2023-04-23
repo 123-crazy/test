@@ -1,0 +1,67 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports": [
+                  "js/aw-in-content-search-box.directive",
+                  "js/aw.secondarySearch.service"
+               ],
+    "data":
+    {
+        "searchBox": {
+            "displayName":"",
+            "type":"STRING",
+            "isRequired":"true",
+            "dbValue":"{{ctx.searchSearch.searchStringSecondary}}",
+            "dispValue":"{{ctx.searchSearch.searchStringSecondary}}"
+        }
+    },
+    "actions":
+    {
+        "doSearchKeepFilter":
+        {
+            "actionType": "JSFunction",
+            "method": "doInContentSearchKeepFilter",
+            "inputData":
+            {
+                "targetState": "teamcenter_search_search",
+                "searchCriteria": "{{data.searchBox.dbValue}}",
+                "shapeSearchProviderActive": "{{ctx.search.reqFilters.ShapeSearchProvider[0]}}",
+                "savedSearchUid": "{{ctx.searchSearch.savedSearchUid}}"
+            },
+            "outputData":
+            {
+            },
+            "events": {
+                "success": [ {
+                    "name": "search.removeSavedSearchUidFromCtx"
+                }]
+            },
+            "deps": "js/aw.secondarySearch.service"
+        },
+        "removeSavedSearchUidFromCtx":
+        {
+            "actionType": "JSFunction",
+            "method": "removeSavedSearchUidFromCtx",
+            "inputData":
+            {
+            },
+            "outputData":
+            {
+            },
+            "deps": "js/globalSearchService"
+        },
+        "selectSeedItem": {
+            "actionType": "JSFunction",
+            "method": "setSelection",
+            "inputData": {
+                "selectionModel": "",
+                "newSelection": "{{ctx.shapeSearch.geolusCriteria}}"
+            },
+            "deps": "js/selectionModelFactory"
+        }
+    },
+    "onEvent": [ {
+            "eventId": "search.removeSavedSearchUidFromCtx",
+            "action": "removeSavedSearchUidFromCtx"
+        }
+    ]
+}

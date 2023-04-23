@@ -1,0 +1,83 @@
+
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-column.directive",
+        "js/aw-flex-row.directive",
+        "js/aw-popup2.directive",
+        "js/aw-include.directive"
+    ],
+
+    "data": {
+    },
+
+    "dataProviders": {
+    },
+
+    "actions": {
+
+        "destroyView": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "closePopupPanel"
+                },
+                {
+                    "action": "unregisterContext"
+                }
+            ]
+        },
+        "closePopupPanel": {
+            "actionType": "JSFunction",
+            "method": "hidePopupPanel",
+            "inputData": {
+                "popupId": "{{data.popupId}}"
+            },
+            "deps": "js/Awp0WorkflowPopupService"
+        },
+        "registerContext": {
+            "actionType": "JSFunction",
+            "method": "registerUserPanelContext",
+            "inputData": {
+                "selectionMode": "multiple",
+                "additionalSearchCriteria": {},
+                "profileObject": null,
+                "isHideAddButtonOnUserPanel" : true
+            },
+            "deps": "js/Awp0WorkflowAssignmentUtils"
+        },
+        "unregisterContext": {
+            "actionType": "JSFunction",
+            "method": "unRegisterCtx",
+            "deps": "js/appCtxService",
+            "inputData": {
+                "name": "workflow"
+            }
+        }
+
+    },
+    "messages": {
+
+    },
+    "lifecycleHooks": {
+        "onInit": "registerContext",
+        "onUnmount": "destroyView"
+    },
+    "onEvent":
+    [
+        {
+            "eventId": "workflow.closeTaskAssignmentPanel",
+            "action": "closePopupPanel"
+        }
+    ],
+
+    "conditions":
+    {
+
+    },
+
+    "i18n": {
+        "taskAssignments": [ "WorkflowCommandPanelsMessages" ]
+    }
+
+}
+

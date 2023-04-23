@@ -1,0 +1,239 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-section.directive",
+        "js/visible-when.directive",
+        "js/exist-when.directive",
+        "js/aw-xrt.directive",
+        "js/aw-panel-footer.directive",
+        "js/aw-i18n.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-button.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/aw-panel-body.directive"
+    ],
+    "actions": {
+        "initializeSelectedTemplate": {
+            "actionType": "dataProvider",
+            "method": "selectedTemplateProvider"
+        },
+        "getSelectedTemplate": {
+            "actionType": "JSFunction",
+            "method": "getSelectedTemplate",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "openCreatedObject": {
+            "actionType": "Navigate",
+            "navigateTo": "com_siemens_splm_clientfx_tcui_xrt_showObject",
+            "navigationParams": {
+                "uid": "{{data.newObject.uid}}"
+            }
+        },
+        "OOTBSaveAsAction": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2012-09-DataManagement",
+            "method": "saveAsObjectAndRelate",
+            "inputData": {
+                "saveAsInput": "{{function:getSaveAsInput}}",
+                "relateInfo": [ {
+                    "relate": true
+                } ]
+            },
+            "outputData": {
+                "newObject": "{{dataParseDefinitions:convertSavedAsObject}}",
+                "newObjectCreated": "{{function:getNewCreatedObject}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "Pgp0AddPlanLevel.SaveAs.Complete",
+                        "eventData": {
+                            "newObjectUid": "{{data.newObject.uid}}"
+                        }
+                    },
+                    {
+                        "name": "openOnCreate",
+                        "condition": "data.openOnCreate.dbValues[0] === true"
+                    }
+                ]
+            },
+            "actionMessages": {
+                "success": [ {
+                    "message": "createSuccessMsg"
+                } ],
+                "failure": [ {
+                    "message": "startSaveAsFailure"
+                } ]
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                    "name": "complete",
+                    "condition": "data.pinnedToForm.dbValue",
+                    "eventData": {
+                        "source": "toolAndInfoPanel"
+                    }
+                } ]
+            }
+        },
+        "refreshFromTemplateTabActionJob": {
+            "actionType": "batchJob",
+            "steps": [ {
+                    "action": "refreshFromTemplateTabAction"
+                },
+                {
+                    "action": "initializeSelectedTemplate"
+                }
+            ]
+        },
+        "refreshFromTemplateTabAction": {
+            "actionType": "JSFunction",
+            "method": "refreshFromTemplateTab",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "updateSaveAsForm": {
+            "actionType": "JSFunction",
+            "method": "modifySaveAsForm",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        },
+        "destroy": {
+            "actionType": "JSFunction",
+            "method": "destroy",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+            "deps": "js/Pgp0AddPlanLevel"
+        }
+
+    },
+    "dataParseDefinitions": {
+        "convertSavedAsObject": {
+            "outputFormatType": "ViewModelObject",
+            "dataInput": "saveAsTrees[0].objectCopy.uid",
+            "operationType": "CREATE"
+        }
+    },
+    "dataProviders": {
+        "selectedTemplateProvider": {
+            "initializeAction": "getSelectedTemplate",
+            "response": "{{data.dataProviders.selectedTemplateProvider.viewModelCollection.loadedVMObjects}}",
+            "selectionModelMode": "single",
+            "noResultsFound": "{{i18n.noResultsFound}}"
+        }
+    },
+    "data": {
+        "templateSectionCommands": "pgp0_templateSectionCommands",
+
+        "allGroups": {
+            "displayName": "{{i18n.owningGroup}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "allUsers": {
+            "displayName": "{{i18n.owningUser}}",
+            "type": "STRING",
+            "hasLov": true
+        },
+        "filterText": {
+            "displayName": "{{i18n.filter}}",
+            "type": "STRING"
+        },
+        "isTemplate": {
+            "displayName": "{{i18n.Pgp0Template}}",
+            "dbValue" : false,
+            "labelPosition" : "PROPERTY_LABEL_AT_SIDE"
+        },
+        "openOnCreate": {
+            "displayName": "{{i18n.openOnCreate}}",
+            "dbValue" : false,
+            "labelPosition" : "PROPERTY_LABEL_AT_SIDE"
+        }
+    },
+
+    "conditions": {
+        "isTemplateSelectedInView": {
+            "expression": "data.dataProviders.selectedTemplateProvider.viewModelCollection.loadedVMObjects.length > 0"
+        },
+        "isTemplateSelectedInCtx": {
+            "expression": "ctx.programPlanningContext.selectedTemplate !== undefined"
+        }
+    },
+
+    "functions": {
+        "getSaveAsInput": {
+            "functionName": "getSaveAsInput",
+            "parameters": [
+                "{{data}}",
+                "{{ctx}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "awPanel.loadNextValues",
+            "action": "generateNextValues"
+        },
+        {
+            "eventId": "openOnCreate",
+            "action": "openCreatedObject"
+        },
+        {
+            "eventId": "Pgp0AddPlanLevel.SaveAs.Complete",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "Pgp0CreateFromTemplate.refreshTab",
+            "action": "refreshFromTemplateTabActionJob"
+        },
+        {
+            "eventId": "awXRT.contentLoaded",
+            "action": "updateSaveAsForm"
+        }
+    ],
+
+    "messages": {
+        "createSuccessMsg": {
+            "messageType": "INFO",
+            "messageText": "{{i18n.Pgp0SaveAsOperationSuccessful}}",
+            "messageTextParams": [
+                "{{data.newObject.props.object_string.uiValue}}"
+            ]
+        },
+        "startSaveAsFailure": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+
+    },
+
+    "i18n": {
+        "addCriteriaCommandTitle": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0Template": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0SaveAsOperationSuccessful": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0CreatePlanFromTemplate": [ "ProgramPlanningCommandPanelsMessages" ],
+        "Pgp0Required": [ "ProgramPlanningCommandPanelsMessages" ],
+        "properties" : [ "ProgramPlanningCommandPanelsMessages" ]
+
+    },
+
+    "lifecycleHooks": {
+        "onInit": "initializeSelectedTemplate",
+        "onMount": "initializeSelectedTemplate",
+        "onUnmount":"destroy"
+    }
+}

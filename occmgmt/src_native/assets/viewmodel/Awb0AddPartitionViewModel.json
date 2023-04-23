@@ -1,0 +1,82 @@
+{
+    "schemaVersion" : "1.0.0",
+    "imports":
+    [
+        "js/aw-command-sub-panel.directive",
+        "js/aw-command-panel.directive"
+    ],
+    "data":
+    {
+        "pinnedToForm":
+        {
+
+            "propType": "BOOLEAN",
+            "dbValue": true
+        },
+        "unpinnedToForm":
+        {
+
+            "propType": "BOOLEAN",
+            "dbValue": false
+        },
+        "awb0pincommands": "awb0_oneStepPinCommands"
+    },
+    "actions":
+    {
+        "awb0SetPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+
+        "awb0SetUnPin":
+        {
+            "actionType": "JSFunction",
+            "method": "setUnPin",
+            "inputData":
+            {
+                "data": "{{data.eventData.data}}"
+            },
+            "outputData": {},
+            "deps": "js/addObjectUtils"
+        },
+        "setCtxAddElementInputParentElementToSelectedElement":
+        {
+            "actionType": "JSFunction",
+            "method": "setCtxAddElementInputParentElementToSelectedElement",
+            "inputData":
+            {
+                "parent" : "{{ctx.selected}}",
+                "parentForAllowedTypes" : "{{ctx.aceActiveContext.context.topElement}}"
+            },
+            "outputData": {},
+            "deps": "js/addElementService"
+        }
+    },
+    "onEvent":
+    [
+         {
+           "eventId": "addChildElement.awb0SetPin",
+           "cacheEventData": true,
+           "action": "awb0SetPin"
+         },
+         {
+           "eventId": "addChildElement.awb0SetUnPin",
+           "cacheEventData": true,
+           "action": "awb0SetUnPin"
+         }
+    ],
+    "i18n":
+    {
+       "addPartition": ["OccmgmtPartitionMessages"]
+    },
+    "lifecycleHooks": {
+        "onInit":"setCtxAddElementInputParentElementToSelectedElement"
+    }
+}

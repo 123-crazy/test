@@ -1,0 +1,429 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-graph.directive"
+    ],
+    "actions": {
+
+        "drawGraph": {
+            "actionType": "JSFunction",
+            "method": "drawGraph",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/NetworkGraphService"
+        },
+        "initLegendData": {
+            "actionType": "JSFunction",
+            "method": "initLegendData",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/NetworkGraphService"
+        },
+        "loadNetworkGraph": {
+            "actionType": "TcSoaService",
+            "serviceName": "PPSMInterfaceAw-2017-06-PPSMInterface",
+            "method": "loadNetworkGraph",
+            "inputData": {
+                "input": "{{function:getloadNetworkGraphInput}}"
+            },
+
+            "outputData": {
+                "graphData": "graph"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "network.startDrawGraph",
+                    "eventData": {
+                        "userActionKey": "{{data.eventData.userActionKey}}"
+                    }
+                } ]
+            },
+            "deps": "js/NetworkGraphService"
+        },
+        "loadNetworkGraphExpand": {
+            "actionType": "TcSoaService",
+            "serviceName": "PPSMInterfaceAw-2017-06-PPSMInterface",
+            "method": "loadNetworkGraph",
+            "inputData": {
+                "input": "{{function:getloadNetworkGraphInput}}"
+            },
+
+            "outputData": {
+                "graphData": "graph"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "network.startDrawGraph",
+                    "eventData": {
+                        "userActionKey": "{{data.eventData.userActionKey}}"
+                    }
+                } ]
+            },
+            "deps": "js/NetworkGraphService"
+        },
+        "updateDegreeInfoOnNodes": {
+            "actionType": "JSFunction",
+            "method": "updateDegreeInfoOnAllVisibleNodes",
+            "inputData": {
+                "data": "{{data}}",
+                "ctx": "{{ctx}}"
+            },
+
+            "deps": "js/NetworkGraphService"
+        },
+        "updateSelection": {
+            "actionType": "JSFunction",
+            "method": "updateContextSelection",
+            "inputData": {
+                "selected": "{{data.eventMap['awGraph.selectionChanged'].selected}}",
+                "unselected": "{{data.eventMap['awGraph.selectionChanged'].unSelected}}"
+            },
+            "deps": "js/NetworkGraphSelectionService"
+        },
+        "addNewWorkElementToDiagram": {
+            "actionType": "JSFunction",
+            "method": "addNewWorkElementToDiagram",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/NetworkGraphCreateObjectsService"
+        },
+        "quickEdgeCreateAction": {
+            "actionType": "JSFunction",
+            "method": "quickEdgeCreateAction",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "eventData": "{{data}}"
+            },
+            "deps": "js/NetworkGraphCreateObjectsService"
+        },
+        "networkgraphItemsMoved": {
+            "actionType": "JSFunction",
+            "method": "networkgraphItemsMoved",
+            "inputData": {
+                "items": "{{data.eventMap['awGraph.graphItemsMoved'].items}}",
+                "graphModel": "{{data.graphModel}}"
+            },
+
+            "deps": "js/NetworkGraphService"
+        },
+        "createEdgeRelation": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "createRelations",
+            "inputData": {
+                "input": [ {
+                    "primaryObject": "{{data.eventMap['networkGraphEdgeCreation'].primaryObject}}",
+                    "secondaryObject": "{{data.eventMap['networkGraphEdgeCreation'].secondaryObject}}",
+                    "relationType": "{{data.eventMap['networkGraphEdgeCreation'].categoryType}}",
+                    "clientId": "",
+                    "userData": {
+                        "uid": "AAAAAAAAAAAAAA",
+                        "type": "unknownType"
+                    }
+                } ]
+            },
+
+            "outputData": {
+                "newEdgeRelationCreated": "output"
+            },
+
+            "events": {
+                "success": [ {
+                    "name": "resetEdgeStyle",
+                    "eventData": {}
+
+                } ],
+                "failure": [ {
+                    "name": "resetEdgeStyle",
+                    "eventData": {}
+
+                } ]
+            }
+        },
+        "resetEdgeStyle": {
+            "actionType": "JSFunction",
+            "method": "resetEdgeStyle",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+
+            "deps": "js/NetworkGraphCreateObjectsService"
+        },
+        "networkGraphHoverChanged": {
+            "actionType": "JSFunction",
+            "method": "networkGraphHoverChanged",
+            "inputData": {
+                "graphModel": "{{data.graphModel}}",
+                "data": "{{data.eventMap['awGraph.hoverChanged']}}"
+            },
+
+            "deps": "js/NetworkGraphSelectionService"
+        }
+
+    },
+    "functions": {
+        "getloadNetworkGraphInput": {
+            "functionName": "getloadNetworkGraphInput",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "data": {
+        "legend": {
+            "tabModel": [
+
+            ]
+        },
+
+        "graphModel": {
+            "config": {
+                "enableEdit": true,
+                "minZoom": 0,
+                "maxZoom": 1,
+                "autoEdgeRoutingType": "HV",
+                "fitViewPosition": "CENTER",
+                "hoverDelayTime": 500,
+                "movableItems": [
+                    "Node"
+                ],
+                "selectableItems": [
+                    "Node",
+                    "Edge"
+                ],
+                "layout": {
+                    "layoutMode": "IncUpdateLayout",
+                    "NodeGrowDirection": "leftToRight",
+                    "options": [
+                        "TopToBottom",
+                        "RightToLeft",
+                        "LeftToRight",
+                        "BottomToTop",
+                        "Incremental"
+                    ],
+                    "config": {
+                        "nodeToNodeDistance": {
+                            "x": 50,
+                            "y": 50
+                        },
+                        "edgeToEdgeDistance": {
+                            "x": 25,
+                            "y": 25
+                        }
+                    }
+                },
+                "showNodeOverlay": true,
+
+                "nodeOverlay": {
+                    "zoomThreshold": 0.7
+                },
+
+                "inputMode": "viewInputMode",
+                "graphEditHandler": "js/NetworkGraphEditHandler",
+                "moveWithoutSelection": true,
+                "enableAutoPan": true,
+                "enableMarqueeSelection": false,
+                "marqueeSelectionModifierKey": [
+                    [ "Shift" ]
+                ],
+
+                "showOverview": true,
+                "enableObjectArrangement": true,
+                "snapToGridByAnchorPoint": false,
+                "showGrid": false,
+                "grid": {
+                    "lineStyle": "LINE",
+                    "lineColor": "rgb(129,182,196)",
+                    "showMajorLines": true,
+                    "showMinorLines": true,
+                    "bringToTop": false,
+                    "majorSpacing": 50,
+                    "minorLinesPerMajor": 5,
+                    "enableSnapping": true,
+                    "enableSnapConnections": false,
+                    "snapPointsPerMinor": 1,
+                    "snapConnectionTolerance": 0
+                },
+                "enableAlignment": false,
+                "alignment": {
+                    "strokeColor": "rgb(0,255,0)",
+                    "strokeWidth": 2,
+                    "strokeDashStyle": "SOLID",
+                    "tolerance": 10,
+                    "separateGridSnapAndAlignment": true
+                },
+                "defaults": {
+                    "nodeSize": {
+                        "width": 300,
+                        "height": 125
+                    },
+
+                    "nodeStyle": {
+                        "templateId": "NetworkNodeTemplate"
+                    },
+
+                    "edgeStyle": {
+                        "dashStyle": "DASH",
+                        "thickness": 1.0,
+                        "color": "(0,0,0)"
+                    },
+
+                    "edgeLabel": {
+                        "maxWidth": 128
+                    },
+
+                    "portLabel": {
+                        "maxWidth": 96
+                    },
+
+                    "label": {
+                        "hasBackground": true,
+                        "backgroundFillColor": "rgb(1,244,244,244)",
+                        "backgroundStyleClass": "aw-graph-labelBackground",
+                        "backgroundAnchor": [ 0.5, 0.5 ],
+                        "textAnchor": [ 0.5, 0.5 ],
+                        "contentStyleClass": "aw-widgets-label aw-base-normal aw-graph-label",
+                        "allowWrapping": false,
+                        "maxMoveDistance": 500
+                    }
+                }
+
+            },
+
+            "nodeTemplates": {
+                "networkNodeTemplate": {
+                    "templateUrl": "/html/NetworkNodeTemplate.html",
+                    "initialBindData": {
+                        "node_fill_color": "rgb(255,182,121)"
+                    },
+                    "textOverflow": "WRAP"
+                }
+
+            },
+
+            "inputModes": {
+                "viewInputMode": {
+                    "editMode": false,
+                    "enableManualEdgeRouting": false,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                },
+                "edgeCreationMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": false,
+                    "enableLabelEdit": false,
+                    "creatableItem": "Edge",
+                    "defaultCursor": "hand",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur",
+                    "enableSelfLoopConnection": true
+                },
+                "editInputMode": {
+                    "editMode": true,
+                    "enableManualEdgeRouting": true,
+                    "enableNodeResize": true,
+                    "enableLabelEdit": true,
+                    "creatableItem": "",
+                    "dragableCursorUrl": "cursor/openhand.cur",
+                    "draggingCursorUrl": "cursor/closedhand.cur"
+                }
+            },
+            "hoverStyle": {
+                "node": "aw-widgets-cellListItemNodeHovered",
+                "edge": { "thicknessScale": 3.0 }
+            }
+        }
+
+    },
+    "onEvent": [ {
+            "eventId": "awGraph.initialized",
+            "action": "initLegendData",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "network.legendInitialized",
+            "action": "loadNetworkGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "network.startDrawGraph",
+            "action": "drawGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "networkUpdateDegreeInfoOnNodes",
+            "action": "updateDegreeInfoOnNodes",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "network.expandPromoteRelation",
+            "action": "loadNetworkGraph",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "network.expandOutgoing",
+            "action": "loadNetworkGraphExpand",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.selectionChanged",
+            "action": "updateSelection",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "workElementCreateSuccessful",
+            "action": "addNewWorkElementToDiagram",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.graphItemsMoved",
+            "action": "networkgraphItemsMoved",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "networkGraphEdgeCreation",
+            "action": "createEdgeRelation",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "resetEdgeStyle",
+            "action": "resetEdgeStyle",
+            "cacheEventData": true
+        },
+        {
+            "eventId": "awGraph.hoverChanged",
+            "action": "networkGraphHoverChanged",
+            "cacheEventData": true
+        }
+    ],
+    "conditions": {
+        "createFromLegendActive": {
+            "expression": "ctx.graph.legendState.creatingSubCategory && ctx.graph.legendState.creatingSubCategory.creationMode !== 0"
+        }
+    },
+    "i18n": {
+        "showIncomingRelationTooltip": [ "ProgramdiagrammingMessages" ],
+        "showOutgoingRelationTooltip": [ "ProgramdiagrammingMessages" ],
+        "hideIncomingRelationTooltip": [ "ProgramdiagrammingMessages" ],
+        "hideOutgoingRelationTooltip": [ "ProgramdiagrammingMessages" ],
+        "showAllIncomingRelations": [ "ProgramdiagrammingMessages" ],
+        "showAllOutgoingRelations": [ "ProgramdiagrammingMessages" ],
+        "hideIncomingRelationPartialTooltip": [ "ProgramdiagrammingMessages" ],
+        "hideOutgoingRelationPartialTooltip": [ "ProgramdiagrammingMessages" ]
+    }
+}

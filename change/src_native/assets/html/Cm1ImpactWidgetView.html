@@ -1,0 +1,57 @@
+<aw-panel>
+    <aw-panel-body>
+        <aw-panel-header>
+            <aw-row>
+                <div class="aw-change-impactedCandidatesLabel">
+                    <div class="aw-widgets-propertyContainer aw-layout-flexRow">
+                        <aw-label prop="data.impactedCandidatesTitle"></aw-label>
+                    </div>
+                </div>
+                <aw-listbox class="aw-change-impactedAnalysisListBox" prop="data.selectedProblemItem" list="data.problemItems" action="handleProblemItemSelection"></aw-listbox>
+            </aw-row>
+        </aw-panel-header>
+        <aw-panel-section>
+            <aw-column width="54%" height="fill">
+                <div exist-when="ctx.ImpactsViewMode === 'TableView' && data.problemItemLOVLoaded.dbValue === true">
+                    <aw-row>
+                        <aw-column width="fill" height="fill">
+                            <div class="aw-layout-panelSectionTitle ">
+                                <span>{{data.i18n.proposedImpactedTitle}}</span>
+                            </div>
+                            <aw-include name="Cm1ParentTraversal" sub-panel-context="data"></aw-include>
+                        </aw-column>
+                        <aw-column>
+                            <div class="aw-change-impactedAnalysisArrows">
+                                <aw-command-bar anchor="cm1_addImpactedItemCommandsClick" context="data"></aw-command-bar>
+                            </div>
+                        </aw-column>
+                    </aw-row>
+                    <aw-row>
+                        <aw-include name="Cm1RelatedObject" sub-panel-context="data"></aw-include>
+                    </aw-row>
+                </div>
+                <div exist-when="ctx.ImpactsViewMode === 'RelationView'">
+                    <aw-row width="54%" height="60f" justify="center">
+                        <aw-column width="fill" height="fill">
+                            <div class="aw-layout-panelSectionTitle ">
+                                <span>{{data.i18n.proposedImpactedTitle}}</span>
+                            </div>
+                            <aw-command-bar anchor="cm1_addImpactedItemCommandsLeftFirst" alignment="HORIZONTAL">
+                            </aw-command-bar>
+                            <aw-include name="Rv1RelationsBrowser" sub-panel-context="data"></aw-include>
+                        </aw-column>
+                        <aw-columns>
+                            <div class="aw-change-impactedAnalysisRBArrows">
+                                <aw-command-bar anchor="cm1_addImpactedItemCommandsClick" context="data"></aw-command-bar>
+                            </div>
+                            </aw-column>
+                    </aw-row>
+                </div>
+            </aw-column>
+            <aw-splitter direction="VERTICAL"> </aw-splitter>
+            <aw-column width="35%" height="fill">
+            <aw-include name="Cm1PersistedImpacted" sub-panel-context="data"></aw-include>
+        </aw-column>
+        </aw-panel-section>
+    </aw-panel-body>
+</aw-panel>

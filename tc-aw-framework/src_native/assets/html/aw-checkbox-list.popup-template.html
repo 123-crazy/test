@@ -1,0 +1,57 @@
+<aw-popup-panel2>
+    <div ng-if="prop.hasChildren" class="aw-jswidgets-listboxDrop aw-jswidgets-drop aw-base-scrollPanel aw-jswidgets-page" ng-style="{'width': lovDDWidth}" aw-when-scrolled="requestNextLovEntries()">
+        <ul class="aw-widgets-cellListWidget" role="listbox" aria-label="{{prop.propertyDisplayName}}">
+            <li class="aw-jswidgets-nestingListItem" ng-repeat="lovEntry in lovEntries" role="option">
+                <aw-property-lov-child lov-entry="lovEntry" prop="prop" pickleaf="updateArray2"></aw-property-lov-child>
+            </li>
+            <li class="aw-aria-border aw-jswidgets-nestingListItemDisplay aw-jswidgets-lov-novals" ng-hide="hasValues()" role="option">{{prop.lovNoValsText}}</li>
+            <li class="aw-jswidgets-loadingItem" ng-hide="queueIdle" role="option">
+                <div class="aw-jswidgets-loading">&nbsp;</div>
+            </li>
+        </ul>
+    </div>
+    <div ng-if="!prop.hasChildren" class="aw-jswidgets-checkboxDrop aw-jswidgets-drop aw-base-scrollPanel aw-jswidgets-page" ng-style="{'width': lovDDWidth}" aw-when-scrolled="requestNextLovEntries()">
+        <div class="aw-jswidgets-cbaSearch aw-widget-iconParent" visible-when="prop.overFiveEntries">
+            <input type="text" autocomplete="off" autocorrect="off" autocapitilize="off" aw-autofocus auto-focus="true" spellcheck="false" ng-model="listFilterText" ng-change="changeFunction(listFilterText)"/>
+            <aw-property-image name="cmdSearch" class="aw-widget-icon"></aw-property-image>
+        </div>
+        <ul class="aw-widgets-cellListWidget">
+            <div class="afx-selected-vals">
+                <li class="aw-jswidgets-nestingListItem" ng-repeat="lovEntry in filtered = ( selectedPHolders | filter: listFilterText)">
+                    <div class="aw-jswidgets-nestingListItemDisplay">
+                        <span>
+                            <div class="afx-checkbox afx-checkbox-label-right">
+                                <label class="aw-jswidgets-checkboxWrapper">
+                                    <input  aria-label="{{lovEntry.propDisplayValue}}" type="checkbox" id="{{lovEntry.propInternalValue + $id}}"class="aw-jswidgets-checkboxButton" ng-model="lovEntry.sel" ng-change="updateArray(lovEntry)" />
+                                    <span class="afx-checkbox-md-style">
+                                        <span class="check"></span>
+                                    </span>
+                                </label>
+                            </div>
+                            <label class="aw-jswidgets-checkboxLabel" for="{{lovEntry.propInternalValue + $id}}" title="{{lovEntry.propDisplayValue}}">{{lovEntry.propDisplayValue}}</label>
+                        </span>
+                        <div ng-if="lovEntry.propDisplayDescription" class="aw-widgets-cellListCellItemType aw-base-small" title="{{lovEntry.propDisplayDescription}}">{{lovEntry.propDisplayDescription}}</div>
+                    </div>
+                </li>
+            </div>
+
+            <li class="aw-jswidgets-nestingListItem" ng-repeat="lovEntry in filtered = ( lovEntries | filter: listFilterText)">
+                <div class="aw-jswidgets-nestingListItemDisplay">
+                    <span>
+                        <div class="afx-checkbox afx-checkbox-label-right">
+                            <label class="aw-jswidgets-checkboxWrapper">
+                                <input aria-label="{{lovEntry.propDisplayValue}}" type="checkbox" id="{{lovEntry.propInternalValue + $id}}" class="aw-jswidgets-checkboxButton" ng-model="lovEntry.sel" ng-change="updateArray(lovEntry)" />
+                                <span class="afx-checkbox-md-style">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <label class="aw-jswidgets-checkboxLabel" for="{{lovEntry.propInternalValue + $id}}" title="{{lovEntry.propDisplayValue}}">{{lovEntry.propDisplayValue}}</label>
+                    </span>
+                    <div ng-if="lovEntry.propDisplayDescription" class="aw-widgets-cellListCellItemType aw-base-small" title="{{lovEntry.propDisplayDescription}}">{{lovEntry.propDisplayDescription}}</div>
+                </div>
+            </li>
+            <li class="aw-jswidgets-loading" ng-class="loadingClass()">&nbsp;</li>
+        </ul>
+    </div>
+</aw-popup-panel2>

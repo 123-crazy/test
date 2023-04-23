@@ -1,0 +1,510 @@
+{
+    "schemaVersion": "1.0.0",
+    "imports": [
+        "js/aw-panel-body.directive",
+        "js/aw-command-panel-section.directive",
+        "js/aw-listbox.directive",
+        "js/aw-list-filter.directive",
+        "js/aw-default-cell.directive",
+        "js/aw-list.directive",
+        "js/aw-column.directive",
+        "js/aw-row.directive",
+        "js/aw-scrollpanel.directive"
+    ],
+    "actions": {
+        "reveal": {
+            "actionType": "dataProvider",
+            "methods": [
+                "getDisciplines",
+                "assignedDisciplineList"
+            ]
+        },
+        "assignResources": {
+            "actionType": "TcSoaService",
+            "serviceName": "ProjectManagement-2015-07-ScheduleManagement",
+            "method": "assignResources",
+            "inputData": {
+                "schedule" :"{{function:getScheduleUidFromCtx}}",
+                "createAssignments": "{{function:getAssignContainerDiscipline}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{function:getUIDToRefresh}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "condition": "data.unassignDisciplinesFlag !== true",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages":{
+                "failure":[
+                    {
+                        "message":"assignResourcesFailure"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "unAssignMsgValidation": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "unassign.showMessage",
+                        "condition": "conditions.showMessageforMultipleSelection"
+                    },
+                    {
+                        "name": "unassign.doNotShowMessage",
+                        "condition": "conditions.showMessageforMultipleSelection === false"
+                    }
+                ]
+            }
+        },
+        "unAssignResources": {
+            "actionType": "JSFunction",
+            "method": "unAssignResourcesfromTask",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "data": "{{data.Discipline}}",
+                "dataProvider": "{{data.dataProviders.assignedDisciplineList.viewModelCollection.loadedVMObjects}}",
+                "schedule": {
+                    "uid": "{{function:getScheduleUid}}",
+                    "type": "Schedule"
+                },
+                "response": "{{data.response.output}}"
+            },
+            "events": {
+                "success": [ {
+                        "name": "cdm.relatedModified",
+                        "eventData": {
+                            "relatedModified": [ "{{function:getUIDToRefresh}}" ]
+                        }
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            }
+        },
+        "getResourceAssignmentsForDiscipline": {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2007-09-DataManagement",
+            "method": "expandGRMRelationsForPrimary",
+            "inputData": {
+                "primaryObjects": "{{ctx.mselected}}",
+                "pref": {
+                    "expItemRev": false,
+                    "returnRelations": true,
+                    "info": [ {
+                        "relationTypeName": "ResourceAssignment"
+                    } ]
+                }
+            },
+            "policy": {
+                "types": [ {
+                        "name": "ResourceAssignment",
+                        "properties": [ {
+                                "name": "primary_object"
+                            },
+                            {
+                                "name": "discipline"
+                            },
+                            {
+                                "name": "resource_level"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputData": {
+                "response": ""
+            },
+            "events": {
+                "success": [ {
+                    "name": "unAssignResources"
+                } ]
+            },
+            "actionMessages":{
+                "failure":[
+                    {
+                        "message": "soaFailureMessage"
+                    }
+                ]
+            }
+        },
+        "getProperties" : {
+            "actionType": "TcSoaService",
+            "serviceName": "Core-2006-03-DataManagement",
+            "method": "getProperties",
+            "inputData": {
+                "objects" : "{{ctx.mselected}}",
+                "attributes" : [ "ResourceAssignment" ]
+            },
+            "policy":
+            {
+                "types":
+                [
+                    {
+                        "name": "ScheduleTask",
+                        "properties":
+                        [
+                            {
+                                "name": "ResourceAssignment"
+                            }
+                        ]
+
+                    }
+                ]
+            },
+            "outputData" : {
+                "getAssignedDiscipline" : "{{function:getAssignedDiscipline}}"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "soaErrorMessage"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "getAssignedDiscipline": {
+            "actionType": "JSFunction",
+            "method": "getAssignedDiscipline",
+            "inputData": {
+                "ctx": "{{ctx}}",
+                "data": "{{data}}"
+            },
+            "deps": "js/ResourcesService"
+        },
+        "addDiscipline": {
+            "actionType": "JSFunction",
+            "method": "addDiscipline",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "actionMessages": {
+                "failure": [ {
+                    "condition": "errorCode=='assignmentDisciplineError'",
+                    "message": "assignmentDisciplineError"
+                } ]
+            },
+            "deps": "js/Saw1AddDisciplineCommandHandler"
+        },
+        "removeDiscipline": {
+            "actionType": "JSFunction",
+            "method": "removeDiscipline",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "deps": "js/Saw1RemoveDisciplineCommandHandler"
+        },
+        "searchDisciplines": {
+            "actionType": "JSFunction",
+            "method": "getDisciplines",
+            "inputData": {
+                "data": "{{data}}",
+                "dataProvider": "{{data.dataProviders.getDisciplines}}"
+            },
+            "policy": {
+                "types": [ {
+                        "name": "Discipline",
+                        "properties": [ {
+                            "name": "discipline_name"
+                        } ]
+                    },
+                    {
+                        "name": "ScheduleTask",
+                        "properties": [ {
+                            "name": "ResourceAssignment",
+                            "modifiers": [ {
+                                "name": "withProperties",
+                                "Value": "true"
+                            } ]
+                        } ]
+                    }
+                ]
+            },
+            "outputData": {
+                "searchResults": "searchResults",
+                "totalFound": "totalFound",
+                "totalLoaded": "totalLoaded"
+            },
+            "actionMessages": {
+                "failure": [
+                    {
+                        "message": "displayError"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "saveDisciplines": {
+            "actionType": "JSFunction",
+            "method": "disciplineSaveAction",
+            "inputData": {
+                "data": "{{data}}"
+            },
+            "events": {
+                "success": [ {
+                        "condition": "data.unassignDisciplinesFlag === true || data.assignDisciplinesFlag === true",
+                        "name": "unAssignDisciplineMsg"
+                    },
+                    {
+                        "condition": "data.unassignDisciplinesFlag === false && data.assignDisciplinesFlag === false && data.Discipline.length === data.dataProviders.assignedDisciplineList.viewModelCollection.loadedVMObjects.length",
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            },
+            "actionMessages": {
+                "failure": [ {
+                        "condition": "errorCode=='diffScheduleErrorMsg'",
+                        "message": "diffScheduleErrorMsg"
+                    },
+                    {
+                        "condition": "errorCode=='assignmentDisciplineError'",
+                        "message": "assignmentDisciplineError"
+                    }
+                ]
+            },
+            "deps": "js/ResourcesService"
+        },
+        "assignAndUnassignSoaCall": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [ {
+                        "name": "getResourceAssignmentsForDiscipline",
+                        "condition": "data.unassignDisciplinesFlag === true"
+                    },
+                    {
+                        "name": "assignResources.callSoa",
+                        "condition": "data.assignDisciplinesFlag === true"
+                    }
+                ]
+            }
+        },
+        "unregisterEvent": {
+            "actionType": "JSFunction",
+            "method": "unregisterEvent",
+            "deps": "js/ResourcesService",
+            "inputData": {
+                "ctx": "{{ctx}}"
+            }
+        },
+        "closePanel": {
+            "actionType": "Event",
+            "method": "Event",
+            "inputData": {
+                "events": [
+                    {
+                        "name" : "unregisterEvent"
+                    },
+                    {
+                        "name": "complete",
+                        "eventData": {
+                            "source": "toolAndInfoPanel"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "data": {
+        "filterBox": {
+            "displayName": "",
+            "type": "STRING",
+            "dbValue": ""
+        },
+        "Discipline": []
+    },
+
+    "dataProviders": {
+        "getDisciplines": {
+            "action": "searchDisciplines",
+            "response": "{{data.searchResults}}",
+            "totalFound": "{{data.totalFound}}",
+            "totalLoaded": "{{data.totalLoaded}}",
+            "selectionModelMode": "single",
+            "commandsAnchor": "aw_addDisciplineCellCommand"
+        },
+        "assignedDisciplineList": {
+            "action": "getProperties",
+            "response": "{{data.Discipline}}",
+            "commandsAnchor": "aw_removeDisciplineCellCommand"
+        }
+    },
+    "conditions": {
+        "showMessageforMultipleSelection": {
+            "expression": "ctx.mselected.length > 1  && data.unassignDisciplinesFlag === true"
+        }
+    },
+    "messages": {
+        "removeDisciplineConfirmationMessage": {
+            "messageType": "WARNING",
+            "messageText": "{{i18n.confirmUnassignDisciplineMsg}}",
+            "messageTextParams": [],
+            "navigationOptions": [ {
+                    "option": "cancel",
+                    "text": "{{i18n.CancelText}}",
+                    "action": ""
+                },
+                {
+                    "option": "remove",
+                    "text": "{{i18n.saw1remove}}",
+                    "action": "assignAndUnassignSoaCall"
+                }
+            ]
+        },
+        "diffScheduleErrorMsg": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.errorMsgForDiffSch}}",
+            "messageTextParams": []
+        },
+        "assignmentDisciplineError": {
+            "messageType": "ERROR",
+            "messageText": "{{i18n.assignmentDisciplineError}}"
+        },
+        "assignResourcesFailure":{
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "soaErrorMessage": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        },
+        "displayError": {
+            "messageType": "ERROR",
+            "messageText": "{{errorCode}}"
+        }
+    },
+    "functions": {
+        "getAssignContainerDiscipline": {
+            "functionName": "getAssignContainerDiscipline",
+            "parameters": [
+                "{{data}}"
+            ]
+        },
+        "getScheduleUidFromCtx": {
+            "functionName": "getScheduleUidFromCtx",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getUIDToRefresh": {
+            "functionName": "getUIDToRefresh",
+            "parameters": [
+                "{{ctx}}"
+            ]
+        },
+        "getScheduleUid": {
+            "functionName": "ScheduleUid",
+            "parameters": []
+        },
+        "getAssignedDiscipline" : {
+            "functionName": "getAssignedDiscipline",
+            "parameters": [
+                "{{ctx}}",
+                "{{data}}"
+            ]
+        }
+    },
+    "onEvent": [ {
+            "eventId": "Saw1AddDisciplineCommand.addDiscipline",
+            "action": "addDiscipline"
+        },
+        {
+            "eventId": "Saw1RemoveDisciplineCommand.removeUser",
+            "action": "removeDiscipline"
+        },
+        {
+            "eventId": "awPanel.reveal",
+            "criteria": {
+                "panelId": "Saw1Disciplines"
+            },
+            "action": "reveal"
+        },
+        {
+            "eventId": "unassign.showMessage",
+            "message": "removeDisciplineConfirmationMessage"
+        },
+        {
+            "eventId": "unassign.doNotShowMessage",
+            "action": "assignAndUnassignSoaCall"
+        },
+        {
+            "eventId": "getResourceAssignmentsForDiscipline",
+            "action": "getResourceAssignmentsForDiscipline"
+        },
+        {
+            "eventId": "assignResources.callSoa",
+            "action": "assignResources"
+        },
+        {
+            "eventId": "unAssignDisciplineMsg",
+            "action": "unAssignMsgValidation"
+        },
+        {
+            "eventId": "unAssignResources",
+            "action": "unAssignResources"
+        },
+        {
+            "eventId": "Saw1DisciplinesEvent",
+            "action": "saveDisciplines"
+        },
+        {
+            "eventId": "syncGanttSplitSelectionDone",
+            "action": "closePanel"
+        },
+        {
+            "eventId": "unregisterEvent",
+            "action": "unregisterEvent"
+        }
+    ],
+    "i18n": {
+        "assignResourceCommandTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "assignedSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "availableSectionTitle": [
+            "ScheduleManagerMessages"
+        ],
+        "errorMsgForDiffSch": [
+            "ScheduleManagerMessages"
+        ],
+        "confirmUnassignDisciplineMsg": [
+            "ScheduleManagerMessages"
+        ],
+        "assignmentDisciplineError": [
+            "ScheduleManagerMessages"
+        ],
+        "saw1remove": [
+            "ScheduleManagerMessages"
+        ],
+        "add": [
+            "ScheduleManagerMessages"
+        ]
+    }
+}
